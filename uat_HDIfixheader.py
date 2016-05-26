@@ -48,6 +48,7 @@ for f in files:
     RASTRNG = header['RASTRNG']
     RA = coord.Angle(RASTRNG,unit=u.hour)
     header.append(card=('CRVAL1',RA.degree,'RA of reference point'))
+
     DECSTRNG = header['DECSTRNG']
     DEC = coord.Angle(DECSTRNG,unit=u.degree)
     header.append(card=('CRVAL2',DEC.degree,'DEC of reference point'))
@@ -59,7 +60,9 @@ for f in files:
     header.append(card=('CTYPE1','RA---TAN-SIP',''))
     header.append(card=('CTYPE2','DEC--TAN-SIP',''))
     header.append(card=('GAIN','1.3','gain (e-/ADU)'))
-    
+    header.append(card=('TELRA',RA.degree,'RA of reference point'))
+    header.append(card=('TELDEC',DEC.degree,'DEC of reference point'))
+    header.append(card=('TELEQUIN','2000','Epoch (years)'))    
     print 'WRITING UPDATED FILE'
     fits.writeto('h'+f,data,header,clobber=True)
     i += 1
