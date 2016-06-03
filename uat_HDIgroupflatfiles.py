@@ -70,9 +70,9 @@ for f in set_ftype:
 os.remove('junkfile')            
 flats = glob.glob('*flat*')
 for f in flats:
-    iraf.flatcombine(input='@'+f, output='c'+f, combine=median)
-    mean = iraf.imstat(input=f, fields='mean', lower='INDEF', format=0, Stdout=1)
-    iraf.imarith(operand1='@c'+f, op='/', operand2=mean, result='n'+f
+    iraf.flatcombine(input='@'+f, output='c'+f, combine=median) # combine flat, create e.g. cdomeflatR
+    mean = iraf.imstat(input=f, fields='mean', lower='INDEF', format=0, Stdout=1) # find mean of combined flat image
+    iraf.imarith(operand1='c'+f, op='/', operand2=mean, result='n'+f) # normalize the combined flat
 
                 
 
