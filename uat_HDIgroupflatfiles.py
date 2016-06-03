@@ -11,7 +11,7 @@
   -User should move junk files to a junk subdirectory before starting
    - Junk files include initial bias frames pointing and other garbage frames
   - Use gethead to pull relevant header data
-  - Overscan subtract and trim images (we assume these image names begin with 'tr'
+  - Overscan subtract and trim images (we assume these image names begin with 'tr')
   - Combine flats according to flat type (dome vs sky) and filter
 
   EXAMPLE:
@@ -29,18 +29,25 @@
   Rose A. Finn
   EDITED BY:
   Natasha Collova, Tiffany Flood, and Kaitlyn Hoag 5/29/15
-
+  Grant Boughton, Natasha Collova, and Sandy Spicer 6/3/16
   UPDATES:
+  Now combines and normalizes the grouped flat files 
+    Input ex. = skyflatR
+    Output ex. = cskyflatR.fits (combined sky flats in R band) & nskyflatR.fits (normalized sky flats in R band)
   
 '''
 import glob
 import os
 import numpy as np
 from pyraf import iraf
-    
-os.system('gethead tr*f00.fits CMMTOBS > junkfile')
+
+iraf.noao()
+iraf.imred()
+iraf.ccdred()    
+
+os.system('gethead tr*f00.fits CMMTOBS > tempflats')    #tempflats is the name of a "junk file" that contains the gethead information from all the flat images. This file will be deleted after the information is read out in the future. We are left with multiple arrays of information from the headers.
 #we assume that the flat images are trimmed and the file name starts with 'tr'
-infile=open('junkfile','r')
+infile=open('tempflats','r')
 fnames=[]
 filter=[]
 ftype=[]   #skyflat or domeflat
@@ -59,20 +66,21 @@ for f in set_ftype:
     print "flat type=",f
     for element in set_filter:
         ftype_filter = str(f)+str(element)
-        print 'filter type = ',element
+        print 'grouping files for filter type = ',element
         indices=np.where((array_ftype == f)&(array_filter == element))
-        print indices, len(indices[0])
         if len(indices[0]) > 0:
             outfile = open(ftype_filter,'w')
             for i in indices[0]:
                 outfile.write(fnames[i]+'\n')
             outfile.close()
-os.remove('junkfile')            
+os.remove('tempflats')            
 flats = glob.glob('*flat*')
+flats=set(flats)-set(glob.glob('c*.fits'))-set(glob.glob('n*.fits'))     # doesn't include flat files that have already been combined or normalized in the following loop
 for f in flats:
-    iraf.flatcombine(input='@'+f, output='c'+f, combine=median) # combine flat, create e.g. cdomeflatR
-    mean = iraf.imstat(input=f, fields='mean', lower='INDEF', format=0, Stdout=1) # find mean of combined flat image
-    iraf.imarith(operand1='c'+f, op='/', operand2=mean, result='n'+f) # normalize the combined flat
+    iraf.imcombine(input='@'+f, output='c'+f, combine='median', scale='median') # combine flat, create e.g. cdomeflatR
+    flat_mean = iraf.imstat(images='c'+f, fields='mean', lower='INDEF', format=0, Stdout=1) # find mean of combined flat image
+    iraf.imarith(operand1='c'+f, op='/', operand2=flat_mean[0], result='n'+f) # normalize the combined flat
+    
 
                 
 
