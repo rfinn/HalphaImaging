@@ -1,6 +1,24 @@
 #!/usr/bin/env python
 
 '''
+  BASIC INFORMATION ABOUT THIS CODE:
+  -This is the FIRST program you need to run in order to perform the data reduct  ion of HDI images.
+  -This code will create trimmed files of your original images which will remove  overscan regions in addition to combining the flats by grouping together the f  ilter and flat type and normalizing those combined images.
+ 
+  BEFORE RUNNING THIS CODE:
+  -Type "ur_setup" into the terminal to enable ureka
+  -Make sure that you are able to run these codes even if your images are in a seperate directory. In order to do so, you must type the following into terminal 
+          emacs -nw .profile
+          export PATH=$PATH:~/directory_of_your_python_code
+      -Check to see if this added path was successfully added by typing: 
+          echo $PATH
+  -Create a junk director to put pointing tests, focus frames, and bad exposures into within the directory where all your images are stored so that they are eliminated from the data reduction process.
+  -IN ORDER TO START PYRAF --> type the following into terminal
+          pyraf
+          imred
+          ccdred
+          epar ccdproc --> use parameters that are listed on our authorea website and/or github titled "H
+
   GOAL:
   Make lists of files that contain
   - dome flats with same filter
@@ -18,7 +36,16 @@
      In the directory containing all flats type in the command line:
       '/home/share/research/pythonCode/uat_HDIgroupflatfiles.py'(or whatever the path is to where this program is stored)
 
+  WHAT THIS CODE DOES:
+  -This program combines and stores the information of the normalized flats of t  hat same filter so that this additive effect could be subtracted from our data  This code also subtracts the overscan regions.
+  -This program does the above be grouping all the flat files by filter and flat   type so that they can be combined accordingly and normalized thereafter.  
   
+  INPUT/OUTPUT:
+  Input: 'skyflat(type of filter)' or 'domeflat(type of filter)'
+         -These contain trimmed image files grouped by filter grabbed from the i         mage headers seen at the beginning of this code. 
+  Output: For combined flats --> 'cskyflat(type of filter).fits' or 'cdomeflat(t          ype of filter).fits'.
+          For normalized flats --> 'nskyflat(type of filter).fits' or 'ndomeflat          (type of filter).fits'.
+
   REQUIRED MODULES:
   pyraf
 
