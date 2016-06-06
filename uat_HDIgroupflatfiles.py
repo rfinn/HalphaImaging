@@ -7,17 +7,17 @@
  
   BEFORE RUNNING THIS CODE:
   -Type "ur_setup" into the terminal to enable ureka
-  -Make sure that you are able to run these codes even if your images are in a seperate directory. In order to do so, you must type the following into terminal 
+  -Make sure that you are able to run these codes even if your images are in a s  eperate directory. In order to do so, you must type the following into terminal 
           emacs -nw .profile
           export PATH=$PATH:~/directory_of_your_python_code
       -Check to see if this added path was successfully added by typing: 
           echo $PATH
-  -Create a junk director to put pointing tests, focus frames, and bad exposures into within the directory where all your images are stored so that they are eliminated from the data reduction process.
+  -Create a junk director to put pointing tests, focus frames, and bad exposures  into within the directory where all your images are stored so that they are el  iminated from the data reduction process.
   -IN ORDER TO START PYRAF --> type the following into terminal
           pyraf
           imred
           ccdred
-          epar ccdproc --> use parameters that are listed on our authorea website and/or github titled "H
+          epar ccdproc --> use parameters that are listed on our authorea websit          e titled "Halpha Imaging of Nearby Galaxy Groups" written by Dr. Rose           Finn, Grant Boughton, Natasha Collova, Sandy Spicer, and Kelly Whalen. 
 
   GOAL:
   Make lists of files that contain
@@ -29,12 +29,12 @@
   -User should move junk files to a junk subdirectory before starting
    - Junk files include initial bias frames pointing and other garbage frames
   - Use gethead to pull relevant header data
-  - Overscan subtract and trim images (we assume these image names begin with 'tr')
+  - Overscan subtract and trim images (we assume these image names begin with 't  r')
   - Combine flats according to flat type (dome vs sky) and filter
 
   EXAMPLE:
      In the directory containing all flats type in the command line:
-      '/home/share/research/pythonCode/uat_HDIgroupflatfiles.py'(or whatever the path is to where this program is stored)
+     '/home/share/research/pythonCode/uat_HDIgroupflatfiles.py'(or whatever the      path is to where this program is stored)
 
   WHAT THIS CODE DOES:
   -This program combines and stores the information of the normalized flats of t  hat same filter so that this additive effect could be subtracted from our data  This code also subtracts the overscan regions.
@@ -50,7 +50,7 @@
   pyraf
 
   NOTES:
-  in junkfile ftr flats still show. We changed the gethead requirements to only bring in files that start with tr but the ftr files will not go away! =(
+  in junkfile ftr flats still show. We changed the gethead requirements to only   bring in files that start with tr but the ftr files will not go away! =(
   
   WRITTEN BY:
   Rose A. Finn
@@ -60,7 +60,7 @@
   UPDATES:
   Now combines and normalizes the grouped flat files 
     Input ex. = skyflatR
-    Output ex. = cskyflatR.fits (combined sky flats in R band) & nskyflatR.fits (normalized sky flats in R band)
+    Output ex. = cskyflatR.fits (combined sky flats in R band) & nskyflatR.fits     (normalized sky flats in R band)
   
 '''
 import glob
