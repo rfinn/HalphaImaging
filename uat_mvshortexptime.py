@@ -1,15 +1,44 @@
 #!/usr/bin/env python
 
 '''
-USE:
-Changes certain header keywords to the standard.
-Updates CMMTOBS --> FILTER
-        RASTRNG --> CRVAL1
-        DECSTRNG --> CRVAL2
-Adds CRPIX1, CRPIX2, CD1_1, CD2_2, CTYPE1, CTYPE2
 
-INPUT: all ftr*.fits in directory
-OUTPUT: hftr*.fits
+BASIC INFORMATION ABOUT THIS CODE:
+  -This is the FOURTH program you need to perform the data reduction process of   HDI images.
+  -This code gets rid of short exposure times (less than 61 seconds) so that the  only exposure frames we will use to analyze our images are exposures that are   more clear and less likely to have abnormalities in the image itself. 
+
+BEFORE RUNNING THIS CODE:
+  -Be sure to type ur_setup in the terminal everytime you open a new terminal     window so that ureka is activated.
+  -Ensure that pyraf is still activated by retyping the commands listed in the c  omments of the FIRST program titled "uat_HDIgroupflatfiles.py".
+
+PROCEDURE:
+  -This code creates a subdirectory called short_exptime where all short exptime   s will go to so they are not included in the data reduction process.
+  -This code uses args.parse to also parse the code so that it was able to call   on the directory when the for loop found images shorter than the limited expos  ure time (< 61 seconds).
+  -Usually when observing, the majority of object images taken with such short o  f exposure times are used for pointing stars, focus frames, standard stars, et  c.n Those of which we do not want to include in our reduction. 
+
+GOAL:
+  -Mainly, the goal of this code is to elminate short exposure times. It does th   is so that we only have necessary exposure times for the data reduction. Shor   t exposure times are usually not object frames and/or object images that we d   on't want in our data. There was a reason that whoever was observing didn't     take a longer exposure time on that object, perhaps a focusing issue, pointi    ng issue, etc. 
+
+EXAMPLE:
+  -In the directory, containing all fits files that are less than the 61 second exposure time limit, type in the ocmmand line:
+   '/home/share/research/pythonCode/uat_mvshortexptime.py'
+
+WHAT THIS CODE DOES:
+  -Mainly, this code moves the short exposure times to the subdirectory titled "   short_exptime". 
+
+INPUT/OUTPUT:
+  Input --> all ftr*.fits in directory
+  Output --> None, just moves those ftr*.fits files that have a small exposure t             ime into a subdirectory so we don't use these images.
+
+REQUIRED MODULES:
+  -pyraf
+
+EXTRA NOTES:
+  -We wrote this code during the summer of 2015 and wrote it in this way to prac  tice using args.parse in a program. Of course, there are many different ways o  f writing a program like this.
+
+WRITTEN BY:
+Dr. Rose Finn
+EDITED BY:
+Research Team Summer 2015 --> Grant Boughton, Natasha Collova, Tiffany Flood, Kaitlyn Hoag, and Kelly Whalen  
 
 
 
