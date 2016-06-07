@@ -1,23 +1,43 @@
 #!/usr/bin/env python
 
 '''
-USE:
-Changes certain header keywords to the standard.
-Updates CMMTOBS --> FILTER
+BASIC INFORMATION ABOUT THIS CODE:
+  -This is the FIFTH program you need to run in order to perform the reduction o  f HDI images.
+  -This code will fix all the headers to contain basic WCS information so that i  n the future we can feed the fits images into stacking programs like SCamp and  SWarp. 
+  -Updates CMMTOBS --> FILTER
         RASTRNG --> CRVAL1
         DECSTRNG --> CRVAL2
-Adds CRPIX1, CRPIX2, CD1_1, CD2_2, CTYPE1, CTYPE2
+  -Adds CRPIX1, CRPIX2, CD1_1, CD2_2, CTYPE1, CTYPE2
 
-INPUT: all ftr*.fits in directory
-OUTPUT: hftr*.fits
+BEFORE RUNNING THIS CODE:
+  -Be sure to type ur_setup in the terminal everytime you open a new terminal     window so that ureka is activated.
+  -Ensure that pyraf is still activated by retyping the commands listed in the c  omments of the FIRST program titled "uat_HDIgroupflatfiles.py".
+
+PROCEDURE:
+  -This code uses the python task .rename and .append to the list of header info  rmation so that the header contains basic WCS information that can be easily r  ead by astronomy programs. 
+  -In addition, we used different arguments using args.parse to call on adding t   he different header information.
+     
+GOAL:
+  -The goal of this code is to successfully add the correct header information t  hat previously was not there before.
 
 EXAMPLE:
    In the directory containing all flattened objects with incorrect headers type in the command line:
       '/home/share/research/pythonCode/uat_HDIfixheader.py'(or whatever the path is to where this program is stored)
    
+INPUT/OUPUT:
+Input --> all ftr*.fits in directory
+Output --> hftr*.fits
 
-NOTES: can be used on dome flattened images. To do so type '--filestring "dtr*.fits"' after the command
+REQUIRED MODULES:
+-pyraf
 
+EXTRA NOTES:
+can be used on dome flattened images. To do so type '--filestring "dtr*.fits"' after the command
+
+WRITTEN BY:
+Dr. Rose Finn
+EDITED BY:
+Research Team Summer 2015 --> Grant Boughton, Natasha Collova, Tiffany Flood, Kaitlyn Hoag, Kelly Whalen
 
 '''
 
