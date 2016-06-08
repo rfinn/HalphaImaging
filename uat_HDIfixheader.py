@@ -71,6 +71,8 @@ for f in files:
 
     DECSTRNG = header['DECSTRNG']
     DEC = coord.Angle(DECSTRNG,unit=u.degree)
+
+    EQUINOX = header['EQUINOX']
     header.append(card=('CRVAL2',DEC.degree,'DEC of reference point'))
 
     header.append(card=('CRPIX1','2048.','X reference pixel'))
@@ -82,7 +84,7 @@ for f in files:
     header.append(card=('GAIN','1.3','gain (e-/ADU)'))
     header.append(card=('TELRA',RA.degree,'RA of reference point'))
     header.append(card=('TELDEC',DEC.degree,'DEC of reference point'))
-    header.append(card=('TELEQUIN','2000','Epoch (years)'))    
+    header.append(card=('TELEQUIN',EQUINOX,'Epoch (years)'))    
     print 'WRITING UPDATED FILE'
     fits.writeto('h'+f,data,header,clobber=True)
     i += 1
