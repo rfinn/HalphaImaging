@@ -45,6 +45,7 @@ import argparse
 import glob
 from astropy import coordinates as coord
 from astropy import units as u
+from astropy.coordinates import SkyCoord
 from astropy.io import fits
 
 parser = argparse.ArgumentParser(description ='Edit image headers to include basic WCS information to the HDI image headers')
@@ -58,8 +59,8 @@ i=1
 for f in files:
     print 'FIXING HEADER FOR FILE %i OF %i'%(i,nfiles)
     data, header = fits.getdata(f,header=True)
-    header.rename_key('FILTER1','FWHEEL1')
-    header.rename_key('FILTER2','FWHEEL2')
+    header.rename_keyword('FILTER1','FWHEEL1')
+    header.rename_keyword('FILTER2','FWHEEL2')
 
     FILTER = header['CMMTOBS']
     header.append(card=('FILTER',FILTER,'FILTER'))
@@ -82,9 +83,13 @@ for f in files:
     header.append(card=('CTYPE1','RA---TAN-SIP',''))
     header.append(card=('CTYPE2','DEC--TAN-SIP',''))
     header.append(card=('GAIN','1.3','gain (e-/ADU)'))
-    header.append(card=('TELRA',RA.degree,'RA of reference point'))
-    header.append(card=('TELDEC',DEC.degree,'DEC of reference point'))
-    header.append(card=('TELEQUIN',EQUINOX,'Epoch (years)'))    
+    # add code to transform RA and Dec to epoch 2000
+    # c = SkyCoord(ra=123.67*u.degree, dec = 19.5545*u.degree,obstime='J2015.25',frame='fk5',equinox='J2015.25')
+    c = SkyCoord(ra=RA.deg*u.degree,dec=DEC.degree*u.degree,frame='fk5',equinox='J'+str(EQUINOX))
+    c2000 = c.transform_to(coord.FK5(equinox='J2000.0'))
+    header.append(card=('TELRA',c2000.ra.value,'RA of reference point'))
+    header.append(card=('TELDEC',c2000.dec.value,'DEC of reference point'))
+    header.append(card=('TELEQUIN','J2000.0','Epoch (years)'))    
     print 'WRITING UPDATED FILE'
     fits.writeto('h'+f,data,header,clobber=True)
     i += 1
