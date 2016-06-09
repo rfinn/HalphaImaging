@@ -49,7 +49,7 @@ import glob
 import os
 import subprocess
 
-parser = argparse.ArgumentParser(description ='Edit image headers to include basic WCS information to the HDI image headers')
+parser = argparse.ArgumentParser(description ='Move images with short exposure times to a subdirectory')
 parser.add_argument('--filestring', dest='filestring', default='ftr*.fits', help='match string for input files (default =  ftr*.fits)')
 parser.add_argument('--minexptime', dest='minexptime', default=61., help='min exposure time of science frames (default = 61 sec)')
 parser.add_argument('--subdir', dest='subdir', default='short_exptime', help='subdirectory for short exptime images (default = short_exptime)')
