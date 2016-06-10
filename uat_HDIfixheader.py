@@ -14,28 +14,33 @@ BEFORE RUNNING THIS CODE:
   -Ensure that pyraf is still activated by retyping the commands listed in the c  omments of the FIRST program titled "uat_HDIgroupflatfiles.py".
 
 PROCEDURE:
-  -This code uses the python task .rename and .append to the list of header info  rmation so that the header contains basic WCS information that can be easily r  ead by astronomy programs. 
-  -In addition, we used different arguments using args.parse to call on adding t   he different header information.
+  -This code uses the python task .rename and .append to the list of header information so that the header contains basic WCS information that can be easily read by astronomy programs. 
+  -In addition, we used different arguments using args.parse to call on adding the different header information.
      
 GOAL:
-  -The goal of this code is to successfully add the correct header information t  hat previously was not there before.
+    The goal of this code is to successfully add header information that is not included in the HDI raw data frames.
 
 EXAMPLE:
    In the directory containing all flattened objects with incorrect headers type in the command line:
-      '/home/share/research/pythonCode/uat_HDIfixheader.py'(or whatever the path is to where this program is stored)
+      /home/share/research/pythonCode/uat_HDIfixheader.py
+
+      (or whatever the path is to where this program is stored)
    
 INPUT/OUPUT:
-Input --> all ftr*.fits in directory
-Output --> hftr*.fits
+    Input --> all ftr*.fits in directory
+    Output --> hftr*.fits
 
 REQUIRED MODULES:
--pyraf
-
+    argparse
+    glob
+    astropy
+    
 EXTRA NOTES:
 can be used on dome flattened images. To do so type '--filestring "dtr*.fits"' after the command
 
 WRITTEN BY:
-Dr. Rose Finn
+Rose Finn
+
 EDITED BY:
 Research Team Summer 2015 --> Grant Boughton, Natasha Collova, Tiffany Flood, Kaitlyn Hoag, Kelly Whalen
 
@@ -64,10 +69,13 @@ for f in files:
 
     FILTER = header['CMMTOBS']
     header.append(card=('FILTER',FILTER,'FILTER'))
-
+    ccdsec = header['CCDSEC']
+    header.append(card='DATASEC',ccdsec,'DATA SECTION')
 
     RASTRNG = header['RASTRNG']
     DECSTRNG = header['DECSTRNG']
+    naxis1 = header['NAXIS1']
+    naxis2 = header['NAXIS2']
     RA = coord.Angle(RASTRNG,unit=u.hour)
     DEC = coord.Angle(DECSTRNG,unit=u.degree)
     EQUINOX = header['EQUINOX']
@@ -87,8 +95,8 @@ for f in files:
         header.append(card=('CRVAL2',c2000.dec.value,'DEC of reference point'))
 
     if 'CRPIX1' in header:
-        header['CRPIX1']=('2048.','X reference pixel')
-        header['CRPIX2']=('2048.','Y reference pixel')
+        header['CRPIX1']=((naxis1+1)/2.,'X reference pixel')
+        header['CRPIX2']=((naxis2+1)/2.,'Y reference pixel')
     else:
         header.append(card=('CRPIX1','2048.','X reference pixel'))
         header.append(card=('CRPIX2','2048.','Y reference pixel'))
@@ -100,8 +108,8 @@ for f in files:
         header.append(card=('CD1_1',float(args.pixelscalex),'Pixel scale in X'))
         header.append(card=('CD2_2',float(args.pixelscaley),'Pixel scale in Y'))
     if 'CD1_2' in header:
-        header['CD1_2']=(1.486985e-6,'')# value from Becky's quick_WCS_instructions
-        header['CD2_1']=(1.4404496e-6,'')# value from Becky's quick_WCS_instructions
+        header['CD1_2']=(0,'')# value from Becky's quick_WCS_instructions
+        header['CD2_1']=(0,'')# value from Becky's quick_WCS_instructions
     else:
         header.append(card=('CD1_2',1.486985e-6,''))# value from Becky's quick_WCS_instructions
         header.append(card=('CD2_1',1.4404496e-6,''))# value from Becky's quick_WCS_instructions
