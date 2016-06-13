@@ -62,7 +62,7 @@ args = parser.parse_args()
 
 # get input files
 print 'cp' +args.d + '/default.* .'
-os.system('cp' +args.d + '/default.* .')
+os.system('cp ' +args.d + '/default.* .')
 files = sorted(glob.glob(args.filestring))
 
 nfiles = len(files)
