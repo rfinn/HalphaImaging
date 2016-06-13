@@ -70,7 +70,7 @@ for f in files:
     FILTER = header['CMMTOBS']
     header.append(card=('FILTER',FILTER,'FILTER'))
     ccdsec = header['CCDSEC']
-    header.append(card='DATASEC',ccdsec,'DATA SECTION')
+    header.append(card=('DATASEC',ccdsec,'DATA SECTION'))
 
     RASTRNG = header['RASTRNG']
     DECSTRNG = header['DECSTRNG']
