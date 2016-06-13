@@ -7,7 +7,7 @@ BASIC INFORMATION ABOUT THIS CODE:
 
 
 BEFORE RUNNNING THIS CODE:
-  -Be sure to type ur_setup in the terminal everytime you open a new terminal     window so that ureka is activated.
+  -Be sure to type ur_setup in the terminal everytime you open a new terminal window so that ureka is activated.
   -Ensure that pyraf is still activated by retyping the commands listed in the c  omments of the FIRST program titled "uat_HDIgroupflatfiles.py".
 
 
