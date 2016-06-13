@@ -61,6 +61,7 @@ parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromati
 args = parser.parse_args()
 
 # get input files
+print 'cp' +args.d + '/default.* .'
 os.system('cp' +args.d + '/default.* .')
 files = sorted(glob.glob(args.filestring))
 
