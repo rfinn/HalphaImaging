@@ -57,7 +57,7 @@ parser.add_argument('--s', dest = 's', default = False, action = 'store_true', h
 parser.add_argument('--c', dest = 'c', default = False, action = 'store_true', help = 'Run scamp')
 parser.add_argument('--w', dest = 'w', default = False, action = 'store_true', help = 'Run swarp to create mosaics')
 parser.add_argument('--l', dest = 'l', default = False, help = 'List of images to input to swarp')
-parser.add_argument('--d',dest = 'd', default ='~/Github/HalphaImaging/astromatic', help = 'Locates path of default config files')
+parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic', help = 'Locates path of default config files')
 args = parser.parse_args()
 
 # get input files
