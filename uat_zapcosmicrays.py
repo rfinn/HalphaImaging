@@ -55,7 +55,7 @@ from astropy import units as u
 from astropy.io import fits
 
 parser = argparse.ArgumentParser(description ='Remove cosmic rays using LAcosmic')
-parser.add_argument('--filestring', dest='filestring', default='hftr*.fits', help='match string for input files (default =  ftr*.fits)')
+parser.add_argument('--filestring', dest='filestring', default='ftr*.fits', help='match string for input files (default =  ftr*.fits)')
 #parser.add_argument('--', dest='pixelscalex', default='0.00011808', help='pixel scale in x (default = 0.00011808)')
 #parser.add_argument('--pixscaley', dest='pixelscaley', default='0.00011808', help='pixel scale in y (default = 0.00011808)')
 args = parser.parse_args()
