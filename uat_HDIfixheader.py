@@ -98,8 +98,8 @@ for f in files:
         header['CRPIX1']=((naxis1+1)/2.,'X reference pixel')
         header['CRPIX2']=((naxis2+1)/2.,'Y reference pixel')
     else:
-        header.append(card=('CRPIX1','2048.','X reference pixel'))
-        header.append(card=('CRPIX2','2048.','Y reference pixel'))
+        header.append(card=('CRPIX1',(naxis1+1)/2.,'X reference pixel'))
+        header.append(card=('CRPIX2',(naxis2+1)/2.,'Y reference pixel'))
 
     if 'CD1_1' in header:
         header['CD1_1']=(float(args.pixelscalex),'Pixel scale in X')

@@ -52,7 +52,7 @@ import argparse
 import subprocess
 
 parser = argparse.ArgumentParser(description ='Run sextractor, scamp, and swarp to determine WCS solution and make mosaics')
-parser.add_argument('--filestring', dest = 'filestring', default = 'hftr*o00.fits', help = 'string to use to get input files (default = "hftr*o00.fits")')
+parser.add_argument('--filestring', dest = 'filestring', default = 'chftr*o00.fits', help = 'string to use to get input files (default = "hftr*o00.fits")')
 parser.add_argument('--s', dest = 's', default = False, action = 'store_true', help = 'Run sextractor to create object catalogs')
 parser.add_argument('--c', dest = 'c', default = False, action = 'store_true', help = 'Run scamp')
 parser.add_argument('--w', dest = 'w', default = False, action = 'store_true', help = 'Run swarp to create mosaics')
@@ -71,15 +71,15 @@ i = 1
 
 if args.s:
     for f in files:
-        read_exptime = 'gethead ' + f + ' EXPTIME'
-        exptime = subprocess.check_output(read_exptime,shell=True)
-        exptime = exptime.rstrip()
-        print f, exptime
-        if float(exptime) > 61.:
-            print 'RUNNING SEXTRACTOR ON FILE %i OF %i'%(i,nfiles)
-            t = f.split('.fits')
-            froot = t[0]
-            os.system('sex ' + f + ' -c default.sex.hdi -CATALOG_NAME ' + froot + '.cat')
+        #read_exptime = 'gethead ' + f + ' EXPTIME'
+        #exptime = subprocess.check_output(read_exptime,shell=True)
+        #exptime = exptime.rstrip()
+        #print f, exptime
+        #if float(exptime) > 61.:
+        print 'RUNNING SEXTRACTOR ON FILE %i OF %i'%(i,nfiles)
+        t = f.split('.fits')
+        froot = t[0]
+        os.system('sex ' + f + ' -c default.sex.hdi -CATALOG_NAME ' + froot + '.cat')
             #os.rename('check.fits', froot + 'check.fits')
         i += 1
         

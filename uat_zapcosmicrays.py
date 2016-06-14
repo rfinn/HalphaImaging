@@ -54,7 +54,7 @@ from astropy import units as u
 #from astropy.coordinates import SkyCoord
 from astropy.io import fits
 
-parser = argparse.ArgumentParser(description ='Edit image headers to include basic WCS information to the HDI image headers')
+parser = argparse.ArgumentParser(description ='Remove cosmic rays using LAcosmic')
 parser.add_argument('--filestring', dest='filestring', default='hftr*.fits', help='match string for input files (default =  ftr*.fits)')
 #parser.add_argument('--', dest='pixelscalex', default='0.00011808', help='pixel scale in x (default = 0.00011808)')
 #parser.add_argument('--pixscaley', dest='pixelscaley', default='0.00011808', help='pixel scale in y (default = 0.00011808)')
@@ -64,10 +64,10 @@ nfiles=len(files)
 i=1
 for f in files:
     print 'ZAPPING COSMIC RAYS FOR FILE %i OF %i'%(i,nfiles)
-    data = ccdproc.CCDData(f,unit = u.adu)
+    data = ccdproc.CCDData.read(f,unit = u.adu)
     cr_cleaned = ccdproc.cosmicray_lacosmic(data, sigclip=5)
     #print 'WRITING UPDATED FILE'
-    cr_cleaned.write('c'+f,cr_cleaned,header,clobber=True)
+    cr_cleaned.write('c'+f,clobber=True)
     i += 1
     print '\n'
 
