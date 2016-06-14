@@ -114,11 +114,11 @@ for f in files:
         header.append(card=('CD1_2',1.486985e-6,''))# value from Becky's quick_WCS_instructions
         header.append(card=('CD2_1',1.4404496e-6,''))# value from Becky's quick_WCS_instructions
     if 'CTYPE1' in header:
-        header['CTYPE1']=('RA---TAN-SIP','')# value from Becky's quick_WCS_instructions
-        header['CTYPE2']=('DEC--TAN-SIP','')# value from Becky's quick_WCS_instructions
+        header['CTYPE1']=('RA---TAN','')# value from Becky's quick_WCS_instructions
+        header['CTYPE2']=('DEC--TAN','')# value from Becky's quick_WCS_instructions
     else:
-        header.append(card=('CTYPE1','RA---TAN-SIP',''))# value from Becky's quick_WCS_instructions
-        header.append(card=('CTYPE2','DEC--TAN-SIP',''))# value from Becky's quick_WCS_instructions
+        header.append(card=('CTYPE1','RA---TAN',''))# value from Becky's quick_WCS_instructions
+        header.append(card=('CTYPE2','DEC--TAN',''))# value from Becky's quick_WCS_instructions
     if 'WCSDIM' in header:
         header['WCSDIM']=(2,'')
     else:
