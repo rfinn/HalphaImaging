@@ -18,7 +18,7 @@ ASTREF_CATALOG          USNO-B1          # NONE, FILE, USNO-A1,USNO-A2,USNO-B1,
 ASTREF_BAND            DEFAULT         # Photom. band for astr.ref.magnitudes
                                        # or DEFAULT, BLUEST, or REDDEST
 ASTREFMAG_LIMITS       12,18      # Select magnitude range in ASTREF_BAND
-SAVE_REFCATALOG        N               # Save ref catalogs in FITS-LDAC format?
+SAVE_REFCATALOG        Y               # Save ref catalogs in FITS-LDAC format?
 REFOUT_CATPATH         .               # Save path for reference catalogs
  
 #--------------------------- Merged output catalogs ---------------------------
