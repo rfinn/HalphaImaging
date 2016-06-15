@@ -122,7 +122,7 @@ for f in files:
     if 'EQUINOX_OBS' in header:
         header['EQUINOX_OBS'] = EQUINOX
     else:
-        header.append(card=('EQUINOX_BS',EQUINOX,'Equinox at time of observations'))
+        header.append(card=('EQUINOX_OBS',EQUINOX,'Equinox at time of observations'))
     header['EQUINOX'] = 2000.0
     if 'WCSDIM' in header:
         header['WCSDIM']=(2,'')
