@@ -52,12 +52,16 @@ import argparse
 import subprocess
 
 parser = argparse.ArgumentParser(description ='Run sextractor, scamp, and swarp to determine WCS solution and make mosaics')
+<<<<<<< HEAD
 parser.add_argument('--filestring', dest = 'filestring', default = 'hcftr*o00.fits', help = 'string to use to get input files (default = "hftr*o00.fits")')
+=======
+parser.add_argument('--filestring', dest = 'filestring', default = 'hcftr*o00.fits', help = 'string to use to get input files (default = "hcftr*o00.fits")')
+>>>>>>> 48a3a10f0ccfbbb04073b5aaa7d030e122691c72
 parser.add_argument('--s', dest = 's', default = False, action = 'store_true', help = 'Run sextractor to create object catalogs')
 parser.add_argument('--c', dest = 'c', default = False, action = 'store_true', help = 'Run scamp')
 parser.add_argument('--w', dest = 'w', default = False, action = 'store_true', help = 'Run swarp to create mosaics')
 parser.add_argument('--l', dest = 'l', default = False, help = 'List of images to input to swarp')
-parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic', help = 'Locates path of default config files')
+parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files')
 args = parser.parse_args()
 
 # get input files
