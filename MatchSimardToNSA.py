@@ -1,5 +1,4 @@
 #!/usr/bin/python
-
 # coding: utf-8
 
 # Goal:  
@@ -19,7 +18,6 @@
 # Notes:
 # * All entries in asu.fit are strings. Can be changed to floats using np.astype(np.float32)
 
-# In[5]:
 
 import csv
 import numpy as np
@@ -27,8 +25,6 @@ from astropy.io import fits
 import fnmatch
 import time
 
-
-# In[6]:
 
 def findnearest(x1,y1,x2,y2,delta):
     matchflag=1
@@ -50,21 +46,15 @@ def findnearest(x1,y1,x2,y2,delta):
     return imatch, matchflag,nmatch
 
 
-# In[7]:
-
 asu1 = fits.getdata('asu.fit',1)
 asu2 = fits.getdata('asu.fit',2)
 asu3 = fits.getdata('asu.fit',3)
 nsadat =fits.getdata('nsa_v0_1_2.fits')
 
 
-# In[8]:
-
 for i in range(len(asu1._DE)):
     asu1._DE[i] = asu1._DE[i].rstrip("\r").rstrip("+")
-
-
-# In[11]:
+    
 
 matchRadius=0.1/3600
 start_time = time.time()
@@ -148,9 +138,3 @@ hdu = fits.BinTableHDU.from_columns(newcol)
 hdu.writeto(outfile,clobber=True)
 print "Done"
 print("--- %s seconds ---" % (time.time() - start_time))
-
-
-# In[ ]:
-
-
-

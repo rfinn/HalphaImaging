@@ -1,17 +1,14 @@
-
+#!/usr/bin/python
 # coding: utf-8
 
 # Goal:  
 # Make code to take in RA, DEC, and Radius and return a matched catalog with all information on galaxies in that area
 # 
 
-# In[2]:
 
 import numpy as np
 from astropy.io import fits
 
-
-# In[8]:
 
 def findSurroundings(ra, dec, radius, prefix):
     petro = fits.getdata('YangDR7PetroToNSA.fits')

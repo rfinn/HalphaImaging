@@ -1,6 +1,4 @@
 #!/usr/bin/python
-
-
 # coding: utf-8
 
 # GOAL:<br/>
@@ -49,15 +47,12 @@
 #     17. ID2: 1: mass estimated using the ranking of M_stellar, -1: extrapolation 
 #       
 
-# In[97]:
 
 import csv
 import numpy as np
 from astropy.io import fits
 import glob
 
-
-# In[1]:
 
 # Combines the two inputs into one table, matched by group ID
 # Returns a numpy array
@@ -98,8 +93,6 @@ def makeFits(cT,outname):
     hdu.writeto(outfile,clobber=True)
 
 
-# In[3]:
-
 # Converts space seperated variable tables to .csv files
 
 infiles = glob.glob('*C_*')
@@ -111,8 +104,6 @@ for doc in infiles:
             o.writerow(line.split())
 
 
-# In[101]:
-
 # Opens the new .csv files
 
 petro1 = np.loadtxt('ipetroC_1.csv',delimiter=',',unpack=True,dtype=float)
@@ -120,8 +111,6 @@ petro3 = np.loadtxt('petroC_group.csv',delimiter=',',unpack=True,dtype=float)
 model1 = np.loadtxt('imodelC_1.csv',delimiter=',',unpack=True,dtype=float)
 model3 = np.loadtxt('modelC_group.csv',delimiter=',',unpack=True,dtype=float)
 
-
-# In[142]:
 
 # Writes out the combined tables to a .csv file
 

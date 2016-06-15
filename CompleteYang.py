@@ -1,18 +1,15 @@
-
+#!/usr/bin/python
 # coding: utf-8
 
 # GOAL:  
 #     To complete the Yang tables so they include information on each galaxy and the group it is in
 
-# In[3]:
 
 import csv
 import numpy as np
 from astropy.io import fits
 import glob
 
-
-# In[4]:
 
 def combineTable(t1,t2):
     t1 = np.array(t1) # SDSS7.csv
@@ -59,8 +56,6 @@ def makeFits(cT,outname):
     hdu.writeto(outfile,clobber=True)
 
 
-# In[5]:
-
 doc='SDSS7' 
 with open(doc) as fin, open(doc+'.csv','w') as fout:
     o=csv.writer(fout)
@@ -68,14 +63,10 @@ with open(doc) as fin, open(doc+'.csv','w') as fout:
         o.writerow(line.split())
 
 
-# In[6]:
-
 petro = np.loadtxt('combinePetro.csv',delimiter=',',unpack=True,dtype=float)
 model = np.loadtxt('combineModel.csv',delimiter=',',unpack=True,dtype=float)
 SDSS7 = np.loadtxt('SDSS7.csv',delimiter=',',unpack=True,dtype=float)
 
-
-# In[ ]:
 
 completePetro = combineTable(SDSS7,petro)
 completeModel = combineTable(SDSS7,model)
@@ -83,9 +74,3 @@ makeFits(completePetro,'completePetro')
 makeFits(completeModel,'completeModel')
 np.savetxt("completePetro.csv", completePetro, delimiter=",")
 np.savetxt("completeModel.csv", completeModel, delimiter=",")
-
-
-# In[ ]:
-
-
-
