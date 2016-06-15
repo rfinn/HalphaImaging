@@ -52,7 +52,7 @@ import argparse
 import subprocess
 
 parser = argparse.ArgumentParser(description ='Run sextractor, scamp, and swarp to determine WCS solution and make mosaics')
-parser.add_argument('--filestring', dest = 'filestring', default = 'chftr*o00.fits', help = 'string to use to get input files (default = "hftr*o00.fits")')
+parser.add_argument('--filestring', dest = 'filestring', default = 'hcftr*o00.fits', help = 'string to use to get input files (default = "hftr*o00.fits")')
 parser.add_argument('--s', dest = 's', default = False, action = 'store_true', help = 'Run sextractor to create object catalogs')
 parser.add_argument('--c', dest = 'c', default = False, action = 'store_true', help = 'Run scamp')
 parser.add_argument('--w', dest = 'w', default = False, action = 'store_true', help = 'Run swarp to create mosaics')
