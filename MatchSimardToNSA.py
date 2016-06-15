@@ -130,7 +130,7 @@ headers3 = asu3.names
 i = 0
 cols = []
 for n in headers3:
-    colnum = fits.Column(name=n,format='A10',array=new[i])
+    colnum = fits.Column(name=n,format='A10',array=new3[i])
     cols.append(colnum)
     i = i+1
 newcol = fits.ColDefs(cols)
