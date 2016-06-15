@@ -9,7 +9,7 @@ FGROUP_RADIUS          .4             # Max dist (deg) between field groups
 #---------------------------- Reference catalogs ------------------------------
  
 REF_SERVER         cocat1.u-strasbg.fr # Internet addresses of catalog servers
-ASTREF_CATALOG          SDSS-R9          # NONE, FILE, USNO-A1,USNO-A2,USNO-B1,
+ASTREF_CATALOG          USNO-A1          # NONE, FILE, USNO-A1,USNO-A2,USNO-B1,
                                        # GSC-1.3,GSC-2.2,GSC-2.3,
                                        # TYCHO-2, UCAC-1,UCAC-2,UCAC-3,UCAC-4,
                                        # NOMAD-1, PPMX, CMC-14, 2MASS, DENIS-3,
@@ -17,7 +17,7 @@ ASTREF_CATALOG          SDSS-R9          # NONE, FILE, USNO-A1,USNO-A2,USNO-B1,
                                        # SDSS-R8, SDSS-R9
 ASTREF_BAND            DEFAULT         # Photom. band for astr.ref.magnitudes
                                        # or DEFAULT, BLUEST, or REDDEST
-ASTREFMAG_LIMITS       -99.0,99.0      # Select magnitude range in ASTREF_BAND
+ASTREFMAG_LIMITS       12,18      # Select magnitude range in ASTREF_BAND
 SAVE_REFCATALOG        N               # Save ref catalogs in FITS-LDAC format?
 REFOUT_CATPATH         .               # Save path for reference catalogs
  

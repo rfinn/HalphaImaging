@@ -7,7 +7,7 @@ BASIC INFORMATION ABOUT THIS CODE:
 
 
 BEFORE RUNNNING THIS CODE:
-  -Be sure to type ur_setup in the terminal everytime you open a new terminal     window so that ureka is activated.
+  -Be sure to type ur_setup in the terminal everytime you open a new terminal window so that ureka is activated.
   -Ensure that pyraf is still activated by retyping the commands listed in the c  omments of the FIRST program titled "uat_HDIgroupflatfiles.py".
 
 
@@ -41,7 +41,7 @@ REQUIRED MODULES:
 EXTRA NOTES:
 
 WRITTEN BY:
-Dr. Rose Finn
+Rose Finn
 EDITED BY:
 Research Team 2015 --> Grant Boughton, Natasha Collova, Tiffany Flood, Kaitlyn Hoag, and Kelly Whalen
 '''
@@ -52,16 +52,17 @@ import argparse
 import subprocess
 
 parser = argparse.ArgumentParser(description ='Run sextractor, scamp, and swarp to determine WCS solution and make mosaics')
-parser.add_argument('--filestring', dest = 'filestring', default = 'hftr*o00.fits', help = 'string to use to get input files (default = "hftr*o00.fits")')
+parser.add_argument('--filestring', dest = 'filestring', default = 'hcftr*o00.fits', help = 'string to use to get input files (default = "hcftr*o00.fits")')
 parser.add_argument('--s', dest = 's', default = False, action = 'store_true', help = 'Run sextractor to create object catalogs')
 parser.add_argument('--c', dest = 'c', default = False, action = 'store_true', help = 'Run scamp')
 parser.add_argument('--w', dest = 'w', default = False, action = 'store_true', help = 'Run swarp to create mosaics')
 parser.add_argument('--l', dest = 'l', default = False, help = 'List of images to input to swarp')
-parser.add_argument('--d',dest = 'd', default ='/Users/alfalfa/Github/HalphaImaging/astromatic', help = 'Locates path of default config files')
+parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files')
 args = parser.parse_args()
 
 # get input files
-os.system('cp' +args.d + '/default.* .')
+print 'cp' +args.d + '/default.* .'
+os.system('cp ' +args.d + '/default.* .')
 files = sorted(glob.glob(args.filestring))
 
 nfiles = len(files)
@@ -70,15 +71,15 @@ i = 1
 
 if args.s:
     for f in files:
-        read_exptime = 'gethead ' + f + ' EXPTIME'
-        exptime = subprocess.check_output(read_exptime,shell=True)
-        exptime = exptime.rstrip()
-        print f, exptime
-        if float(exptime) > 61.:
-            print 'RUNNING SEXTRACTOR ON FILE %i OF %i'%(i,nfiles)
-            t = f.split('.fits')
-            froot = t[0]
-            os.system('sex ' + f + ' -c default.sex.hdi -CATALOG_NAME ' + froot + '.cat')
+        #read_exptime = 'gethead ' + f + ' EXPTIME'
+        #exptime = subprocess.check_output(read_exptime,shell=True)
+        #exptime = exptime.rstrip()
+        #print f, exptime
+        #if float(exptime) > 61.:
+        print 'RUNNING SEXTRACTOR ON FILE %i OF %i'%(i,nfiles)
+        t = f.split('.fits')
+        froot = t[0]
+        os.system('sex ' + f + ' -c default.sex.hdi -CATALOG_NAME ' + froot + '.cat')
             #os.rename('check.fits', froot + 'check.fits')
         i += 1
         

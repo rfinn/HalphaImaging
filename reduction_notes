@@ -1,0 +1,212 @@
+*mscgetcatalog* 
+- returns a lot of garbage points when using usnob1 catalog.  
+- Galaxies are included, and nearby galaxies are shredded into multiple sources.  
+- Not sure how to fix this yet.  
+- Some have a magnitude listed as 99 - could try getting rid of all these.
+- want to use a smaller magnitude range - trying 12-16 - returned 307 objects - this still gave an error when running msccmatch
+
+*msctvmark* 
+- use this to display the catalog results
+
+  display hftr7134t0040o00.fits 1
+  msctvmark coords=t0040.v7.cat frame=1 wcs='world' radii=15
+
+
+*msczero* 
+-seems to work ok in pyraf after running 
+       set disable_wcs_maps=""
+       flpr
+
+
+*msccmatch* 
+- keep getting floating point error when it is ready to write the solution
+- Adriana Durbala's reduction guide says to shorten the length of the catalog
+
+
+* need to create bpm for cosmic rays - there a lot of them!
+
+
+
+INSTALLING IRAF 2.16 from source
+
+following notes from here:  ftp://iraf.noao.edu/iraf/v216/README
+
+sudo mkdir /home/iraf/
+sudo wget ftp://iraf.noao.edu/iraf/v216/PCIX/iraf-src.tar.gz
+sudo tar xvf iraf-src.tar.gz 
+
+
+su -
+export iraf=/home/iraf/
+export IRAFARCH=linux64
+
+
+sudo chgrp
+
+sudo chown 
+setenv iraf /home/iraf/
+source $iraf/unix/hlib/irafuser.csh
+make linux64
+man ln
+sudo ln -s /iraf /home
+man ln
+sudo ln -s /home /iraf
+ls /
+ls /iraf/iraf/
+make linux64
+make sysgen
+which gcc
+sudo aptitude search gcc
+sudo aptitude install gcc
+
+
+starting again, making iraf userd
+
+need to install f77
+*******************************************
+
+INSTALLING SCAMP
+
+downloaded install file to mac, unpacked, and then copied to coma
+
+sudo aptitude install gfortran
+
+sudo aptitude install cpufrequtils
+
+
+** ATLAS
+
+cd software/ATLAS
+mkdir builddir
+cd builddir
+../configure --help
+
+sudo ../configure
+sudo make
+
+running - according to install guide (atlas_install.pdf), this could take a loooong time.  
+started around 10:24 am.  finished around 10:35. - not too bad
+
+
+sudo make check  # run some checks, optional - return no fails - yay!
+
+DONE BUILDING TESTERS, RUNNING:
+SCOPING FOR FAILURES IN BIN TESTS:
+fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+        bin/sanity.out
+8 cases: 8 passed, 0 skipped, 0 failed
+4 cases: 4 passed, 0 skipped, 0 failed
+8 cases: 8 passed, 0 skipped, 0 failed
+4 cases: 4 passed, 0 skipped, 0 failed
+8 cases: 8 passed, 0 skipped, 0 failed
+4 cases: 4 passed, 0 skipped, 0 failed
+8 cases: 8 passed, 0 skipped, 0 failed
+4 cases: 4 passed, 0 skipped, 0 failed
+DONE
+SCOPING FOR FAILURES IN CBLAS TESTS:
+fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+        interfaces/blas/C/testing/sanity.out | \
+                fgrep -v PASSED
+Make.top:27: recipe for target 'sanity_test' failed
+make[1]: [sanity_test] Error 1 (ignored)
+DONE
+SCOPING FOR FAILURES IN F77BLAS TESTS:
+fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+        interfaces/blas/F77/testing/sanity.out | \
+                fgrep -v PASSED
+Make.top:27: recipe for target 'sanity_test' failed
+make[1]: [sanity_test] Error 1 (ignored)
+DONE
+make[1]: Leaving directory '/home/rfinn/software/ATLAS/builddir'
+
+
+sudo make time
+
+gives this output
+Reference clock rate=2400Mhz, new rate=2394Mhz
+   Refrenc : % of clock rate achieved by reference install
+   Present : % of clock rate achieved by present ATLAS install
+
+                    single precision                  double precision
+            ********************************   *******************************
+                  real           complex           real           complex
+            ---------------  ---------------  ---------------  ---------------
+Benchmark   Refrenc Present  Refrenc Present  Refrenc Present  Refrenc Present
+=========   ======= =======  ======= =======  ======= =======  ======= =======
+  kSelMM      375.8   484.1    342.1   726.0    346.0   233.8    174.7   378.7
+  kGenMM       94.1   203.8     93.6   200.3    169.9   193.5     87.8   188.0
+  kMM_NT       80.2   170.9     78.5   172.2    153.7   169.1     77.0   169.1
+  kMM_TN       93.6   197.0     89.3   189.0    176.1   192.1     88.3   194.9
+  BIG_MM      673.3   743.9    667.9   729.6    336.2   331.6    335.3   370.3
+   kMV_N      181.9   125.3    364.6   384.1     93.0    96.1    165.1   192.3
+   kMV_T      182.0   125.3    353.4   384.4     93.7    96.1    165.4   192.3
+    kGER      143.3    83.6    266.6   384.3     68.9    48.0    128.8    96.1
+make[1]: Leaving directory '/home/rfinn/software/ATLAS/builddir'
+
+
+- double precision timings look good.  Single precision - not so much.  
+- the install manual says the present should be w/in a few percent of reference, and this is mostly the case.
+- not going to mess with this.
+
+sudo make install
+ - got errors on dynamic libraries *dll files - b/c they weren't built. hopefully this is ok.
+ - if not, I will have to reinstall with dll option enabled
+
+
+
+** CDSclient
+
+- no package in aptitude
+- downloaded tar file from http://cdsarc.u-strasbg.fr/ftp/pub/sw/cdsclient.tar.gz to ~/software directory
+- in software directory
+     tar xvfz cdsclient.tar.gz 
+- cd cdsclient-3.83/
+- sudo ./configure
+- sudo make
+- sudo make install
+
+(that was easy...)
+
+
+
+** FFTW v3.0
+- there is an aptitude package for this
+- sudo aptitude install fftw3
+
+** PLPLOT V5.9 or above
+- http://plplot.sourceforge.net/
+- looks like there are packages for this as well - 24 are listed under jessie
+- installed a few options - not sure if I got everything I need. 
+- will be able to tell if this is sufficient if we are able to generate diagnostic plots
+
+** scamp!
+
+- cd ~/software/scamp-2.0.4
+- looking at instructions in INSTALL file
+- do i want to build with multi-thread capabilities?
+
+- error - fftw3.h filtes not found in default location
+
+sudo aptitude install liblapack-3.so
+
+
+
+sudo apt-file search fftw3.h
+
+
+
+###############
+
+SWARP
+
+sudo aptitude remove swarp
+
+
+
+wget http://www.astromatic.net/download/swarp/swarp-2.38.0.tar.gz
+tar xvfz swarp-2.38.0.tar.gz
+cd swarp-2.38.0
+
+
+
+
