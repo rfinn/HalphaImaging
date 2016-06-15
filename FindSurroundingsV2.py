@@ -1,14 +1,11 @@
-
+#!/usr/bin/python
 # coding: utf-8
 
-# In[2]:
 
 import numpy as np
 from astropy.io import fits
 import time
 
-
-# In[3]:
 
 def findSurroundings2(ra, dec, radius, prefix):
     start_time = time.time()
@@ -29,9 +26,3 @@ def findSurroundings2(ra, dec, radius, prefix):
     fits.writeto(prefix+'_Simard2.fits',simard2[matches],clobber=True)
     fits.writeto(prefix+'_Simard3.fits',simard3[matches],clobber=True)
     print("--- %s seconds ---" % (time.time() - start_time))
-
-
-# In[ ]:
-
-
-

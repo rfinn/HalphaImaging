@@ -1,4 +1,4 @@
-
+#!/usr/bin/python
 # coding: utf-8
 
 # Goal:  
@@ -13,15 +13,12 @@
 # * YangDR7PetroToNSA.fits 
 # * YangDR7ModelToNSA.fits
 
-# In[1]:
 
 import csv
 import numpy as np
 from astropy.io import fits
 import glob
 
-
-# In[2]:
 
 def findnearest(x1,y1,x2,y2,delta):
     matchflag=1
@@ -43,14 +40,10 @@ def findnearest(x1,y1,x2,y2,delta):
     return imatch, matchflag,nmatch
 
 
-# In[4]:
-
 petro = fits.getdata('completePetro.fits')
 model = fits.getdata('completeModel.fits')
 nsadat =fits.getdata('nsa_v0_1_2.fits')
 
-
-# In[7]:
 
 matchRadius=0.1/3600
 
@@ -65,8 +58,6 @@ matchedarray[matchflag] = petro[imatch[matchflag]]
 fits.writeto(outfile,matchedarray,clobber=True)
 
 
-# In[8]:
-
 imatch=np.zeros(len(nsadat.RA),'i')
 matchflag=np.zeros(len(nsadat.RA),'bool')
 nmatch=np.zeros(len(nsadat.RA),'i')
@@ -76,4 +67,3 @@ outfile='YangDR7ModelToNSA.fits'
 matchedarray=np.zeros(len(nsadat),dtype=model.dtype)
 matchedarray[matchflag] = model[imatch[matchflag]]
 fits.writeto(outfile,matchedarray,clobber=True)
-
