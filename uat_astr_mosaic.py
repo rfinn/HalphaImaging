@@ -41,7 +41,7 @@ REQUIRED MODULES:
 EXTRA NOTES:
 
 WRITTEN BY:
-Dr. Rose Finn
+Rose Finn
 EDITED BY:
 Research Team 2015 --> Grant Boughton, Natasha Collova, Tiffany Flood, Kaitlyn Hoag, and Kelly Whalen
 '''
@@ -52,11 +52,7 @@ import argparse
 import subprocess
 
 parser = argparse.ArgumentParser(description ='Run sextractor, scamp, and swarp to determine WCS solution and make mosaics')
-<<<<<<< HEAD
-parser.add_argument('--filestring', dest = 'filestring', default = 'hcftr*o00.fits', help = 'string to use to get input files (default = "hftr*o00.fits")')
-=======
 parser.add_argument('--filestring', dest = 'filestring', default = 'hcftr*o00.fits', help = 'string to use to get input files (default = "hcftr*o00.fits")')
->>>>>>> 48a3a10f0ccfbbb04073b5aaa7d030e122691c72
 parser.add_argument('--s', dest = 's', default = False, action = 'store_true', help = 'Run sextractor to create object catalogs')
 parser.add_argument('--c', dest = 'c', default = False, action = 'store_true', help = 'Run scamp')
 parser.add_argument('--w', dest = 'w', default = False, action = 'store_true', help = 'Run swarp to create mosaics')
