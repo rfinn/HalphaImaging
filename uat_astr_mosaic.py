@@ -80,7 +80,7 @@ if args.s:
         t = f.split('.fits')
         froot = t[0]
         os.system('sex ' + f + ' -c default.sex.hdi -CATALOG_NAME ' + froot + '.cat')
-            #os.rename('check.fits', froot + 'check.fits')
+        os.rename('check.fits', froot + 'check.fits')
         i += 1
         
 if args.c:
