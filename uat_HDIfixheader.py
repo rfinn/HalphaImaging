@@ -87,12 +87,12 @@ for f in files:
     if 'CRVAL1' in header:
         header['CRVAL1']=(c2000.ra.value,'RA of reference point')
     else:
-        header.append(card=('CRVAL1',c2000.ra.value,'RA of reference point'))
+        header.append(card=('CRVAL1',c.ra.value,'RA of reference point'))
 
     if 'CRVAL2' in header:
         header['CRVAL2']=(c2000.dec.value,'DEC of reference point')
     else:
-        header.append(card=('CRVAL2',c2000.dec.value,'DEC of reference point'))
+        header.append(card=('CRVAL2',c.dec.value,'DEC of reference point'))
 
     if 'CRPIX1' in header:
         header['CRPIX1']=((naxis1+1)/2.,'X reference pixel')
@@ -119,11 +119,11 @@ for f in files:
     else:
         header.append(card=('CTYPE1','RA---TAN',''))# value from Becky's quick_WCS_instructions
         header.append(card=('CTYPE2','DEC--TAN',''))# value from Becky's quick_WCS_instructions
-    if 'EQUINOX_OBS' in header:
-        header['EQUINOX_OBS'] = EQUINOX
-    else:
-        header.append(card=('EQUINOX_OBS',EQUINOX,'Equinox at time of observations'))
-    header['EQUINOX'] = 2000.0
+    #if 'EQUINOX_OBS' in header:
+    #    header['EQUINOX_OBS'] = EQUINOX
+    #else:
+    #    header.append(card=('EQUINOX_OBS',EQUINOX,'Equinox at time of observations'))
+    #header['EQUINOX'] = 2000.0
     if 'WCSDIM' in header:
         header['WCSDIM']=(2,'')
     else:
