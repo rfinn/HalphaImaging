@@ -125,7 +125,7 @@ for i in range(len(matchedarray3)): # row
     for j in range(len(matchedarray3[0])): #column
         if len(new3)<62:
             new3.append([])
-        new3[j].append(matchedarray[i][j])
+        new3[j].append(matchedarray3[i][j])
 headers3 = asu3.names
 i = 0
 cols = []
