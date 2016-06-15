@@ -85,12 +85,12 @@ for f in files:
     c2000 = c.transform_to(coord.FK5(equinox='J2000.0'))
     print 'J2000 coords = ',c2000
     if 'CRVAL1' in header:
-        header['CRVAL1']=(c2000.ra.value,'RA of reference point')
+        header['CRVAL1']=(c.ra.value,'RA of reference point')
     else:
         header.append(card=('CRVAL1',c.ra.value,'RA of reference point'))
 
     if 'CRVAL2' in header:
-        header['CRVAL2']=(c2000.dec.value,'DEC of reference point')
+        header['CRVAL2']=(c.dec.value,'DEC of reference point')
     else:
         header.append(card=('CRVAL2',c.dec.value,'DEC of reference point'))
 
@@ -102,10 +102,10 @@ for f in files:
         header.append(card=('CRPIX2',(naxis2+1)/2.,'Y reference pixel'))
 
     if 'CD1_1' in header:
-        header['CD1_1']=(-1.*float(args.pixelscalex),'Pixel scale in X')
+        header['CD1_1']=(float(args.pixelscalex),'Pixel scale in X')
         header['CD2_2']=(float(args.pixelscaley),'Pixel scale in Y')
     else:
-        header.append(card=('CD1_1',-1.*float(args.pixelscalex),'Pixel scale in X'))
+        header.append(card=('CD1_1',float(args.pixelscalex),'Pixel scale in X'))
         header.append(card=('CD2_2',float(args.pixelscaley),'Pixel scale in Y'))
     if 'CD1_2' in header:
         header['CD1_2']=(0,'')# value from Becky's quick_WCS_instructions
