@@ -119,7 +119,11 @@ for f in files:
     else:
         header.append(card=('CTYPE1','RA---TAN',''))# value from Becky's quick_WCS_instructions
         header.append(card=('CTYPE2','DEC--TAN',''))# value from Becky's quick_WCS_instructions
-    #header['EQUINOX'] = 2000.0
+    if 'EQUINOX_OBS' in header:
+        header['EQUINOX_OBS'] = EQUINOX
+    else:
+        header.append(card=('EQUINOX_BS',EQUINOX,'Equinox at time of observations'))
+    header['EQUINOX'] = 2000.0
     if 'WCSDIM' in header:
         header['WCSDIM']=(2,'')
     else:
