@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 
 # coding: utf-8
 
@@ -65,7 +67,7 @@ def combineTable(t1,t2):
     t2 = np.array(t2)
     combinedArray = np.empty((639359,17),'f') # creates an empty numpy array that is the same size as the final table
     i = 0
-    combinedArray[:,0:5] = t1[:,0:5]
+    combinedArray[:,0:5] = t1[0:5,:].T
     for row in combinedArray:
         if row[2] !=0: # only matches galaxies that belong in a group
             combinedArray[i,5:18] = t2[1:13,row[2]+2] # uses row[2]+2 because there is an offset of 2 between group ID and index
