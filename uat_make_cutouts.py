@@ -9,10 +9,9 @@ GOAL:
 
 PROCEDURE:
 
-
     read catalog containing RA, Dec and some measure of galaxy size (e.g. NSA THETA_50)
-    keep RA, DEC for galaxies that are on image
-    feed results RA, DEC and Size to cutout2d
+    keep RA, DEC for galaxies that are on image and in the right redshift slice so that Halpha is viewable through specified filter
+    feed results RA, DEC and Size to Cutout2D
 
 INPUTS:
 
@@ -29,7 +28,8 @@ USAGE:
 
 EXAMPLE:
 
-    python uat_make_cutouts.py full_path_to_catalog input_image halpha_filter_number
+    uat_make_cutouts.py --image A1367-h02_R.coadd.fits --catalog /Users/rfinn/research/NSA/nsa_v0_1_2.fits --filter R --nhalpha 12 --plot
+
 
 REQUIRED MODULES:
 
@@ -47,37 +47,108 @@ http://docs.astropy.org/en/stable/nddata/utils.html
 
 
 import numpy as np
-from matplotlib import pyplt as plt
+from matplotlib import pyplot as plt
+import astropy
 from astropy.io import fits
 from astropy.wcs import WCS
+from astropy.coordinates import SkyCoord
+from astropy.coordinates import ICRS, FK5
+import astropy.units as u
 from astropy.nddata.utils import Cutout2D
 import argparse
 
+#try:
+#    import montage
+#    import os
+#    CanUseMontage=True
+#except ImportError:
+#    CanUseMontage=False
+#except Exception:
+#    CanUseMontage=False
 
-parser = argparse.ArgumentParser(description ='Get cutouts for ')
-parser.add_argument('--filestring', dest = 'filestring', default = 'hcftr*o00.fits', help = 'string to use to get input files (default = "hcftr*o00.fits")')
-parser.add_argument('--s', dest = 's', default = False, action = 'store_true', help = 'Run sextractor to create object catalogs')
-parser.add_argument('--c', dest = 'c', default = False, action = 'store_true', help = 'Run scamp')
-parser.add_argument('--w', dest = 'w', default = False, action = 'store_true', help = 'Run swarp to create mosaics')
-parser.add_argument('--l', dest = 'l', default = False, help = 'List of images to input to swarp')
-parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files')
+
+
+parser = argparse.ArgumentParser(description ='Get cutouts for NSA galaxies within field of view of mosaic and redshift range of designated H-alpha filter')
+parser.add_argument('--image', dest = 'image', default = 'halpha.fits', help = 'mosaic/HDI image to make cutouts from')
+parser.add_argument('--catalog', dest = 'catalog', default = '/home/share/catalogs/nsa_v0_1_2.fits', help = 'full path to the NSA catalog')
+parser.add_argument('--filter',dest = 'filter', default ='R', help = 'Filter for the input mosaic image (e.g. r, R, Ha)')
+parser.add_argument('--nhalpha',dest = 'nhalpha', default ='12', help = 'H-alpha filter number (e.g. 4, 8, 12 or 16)')
+parser.add_argument('--plot', dest = 'plot', default = False, action = 'store_true', help = 'plot cutouts and position wrt mosaic')
+#parser.add_argument('--l', dest = 'l', default = False, help = 'List of images to input to swarp')
+
 args = parser.parse_args()
 
 
-catalog=sys.argv[1]
-filternumber=sys.argv[2]
 
-pixelscale=.423
-
-
-
+# setting up filter information
 #dictionary of Halpha filters
 lmin={'4':6573., '8':6606.,'12':6650.,'16':6682.}
 lmax={'4':6669., '8':6703.,'12':6747., '16':6779.}
 
-Zmax=(((lmax[filternumber])/6563.)-1)
-Zmin=(((lmin[filternumber])/6563.)-1)
-print Zmax, Zmin
+Zmax=(((lmax[args.nhalpha])/6563.)-1)
+Zmin=(((lmin[args.nhalpha])/6563.)-1)
+print 'Galaxies detectable in Halpha have redshifts between ',Zmin,' and ', Zmax
+
+def makecuts(image,imagefilter):
+    catdat= fits.getdata(args.catalog)
+    print 'Cutting out', image    
+    
+    zFlag = (catdat.Z > Zmin) & (catdat.Z < Zmax)
+    
+    f = fits.open(image)
+    prihdr = f[0].header
+    n2,n1 = f[0].data.shape
+    
+    w= WCS(image)
+    px,py = w.wcs_world2pix(catdat.RA,catdat.DEC,1)
+    onimageflag=(px < n1) & (px >0) & (py < n2) & (py > 0)
+    
+    keepflag=zFlag & onimageflag
+    RA=catdat.RA[keepflag]
+    DEC=catdat.DEC[keepflag]
+    radius=catdat.SERSIC_TH50[keepflag]
+    IDNUMBER=catdat.NSAID[keepflag]
+    print 'number of galaxies to keep = ', sum(keepflag)
+    
+    for i in range(len(RA)):
+
+        if (radius[i]<.01):
+            size=120.
+        else:
+            size=radius[i]
+            
+        position = SkyCoord(ra=RA[i],dec=DEC[i],unit='deg')
+        size = u.Quantity((6.*size, 6.*size), u.arcsec)
+        #print image, radius[i], position, size
+        #cutout = Cutout2D(fdulist[0].data, position, size, wcs=w, mode='strict') #require entire image to be on parent image
+        try:
+            cutout = Cutout2D(f[0].data, position, size, wcs=w, mode='strict') #require entire image to be on parent image
+        except astropy.nddata.utils.PartialOverlapError:# PartialOverlapError:
+            print 'galaxy is only partially covered by mosaic - skipping ',IDNUMBER[i]
+            continue
+        if args.plot:
+            plt.figure()
+            plt.imshow(f[0].data, origin='lower')
+            cutout.plot_on_original(color='white')
+            plt.show()
+            r = raw_input('type any key to continue (p to skip plotting)')
+            if r.find('p') > -1:
+                args.plot = False
+        # figure out how to save the cutout as fits image
+        ((ymin,ymax),(xmin,xmax)) = cutout.bbox_original
+        outimage = (str(IDNUMBER[i])+'-'+ args.filter+".fits")
+        newfile = fits.PrimaryHDU()
+        newfile.data = f[0].data[ymin:ymax,xmin:xmax]
+        newfile.header = f[0].header
+        newfile.header.update(w[ymin:ymax,xmin:xmax].to_header())
+        
+        fits.writeto(outimage, newfile.data, header = newfile.header, clobber=True)
+    return cutout
+if __name__ == '__main__':
+    imcutout = makecuts(args.image,args.filter)
+
+
+########## OLD STUFF ############
 
 #Name of images
 Haimage=('Hacs_final.fits')
@@ -88,43 +159,6 @@ Hawcimage=('Ha_final.fits')
 
 def get_cutout(image,RA,Dec,size):
     print 'getting cutouts!'
-
-
-
-
-    
-    
-#Start of Galaxy cutout code 
-"""
-======
-Cutout
-======
-
-Generate a cutout image from a .fits file
-"""
-try:
-    import astropy.io.fits as pyfits
-    import astropy.wcs as pywcs
-except ImportError:
-    import pyfits
-    import pywcs
-import numpy
-try:
-    import coords
-except ImportError:
-    pass # maybe should do something smarter here, but I want agpy to install...
-try:
-    import montage
-    import os
-    CanUseMontage=True
-except ImportError:
-    CanUseMontage=False
-except Exception:
-    CanUseMontage=False
-
-class DimensionError(ValueError):
-    pass
-
 
 
 def cutout(filename, xc, yc, xw=25, yw=25, units='pixels', outfile=None,
@@ -221,50 +255,3 @@ def cutout(filename, xc, yc, xw=25, yw=25, units='pixels', outfile=None,
 
     return newfile  
 #End of galaxy cutout
-
-def makecuts(image,imagefilter):
-    hdulist= fits.open(catalog)
-    fdata=hdulist[1].data
-    print 'Cutting out', image    
-    
-    voptflag=fdata.VOPT>.1
-    vall=fdata.VOPT+~voptflag*fdata.V21
-    zall= vall/(3.e5)
-    zFlag = (zall > Zmin)&(zall < Zmax)
-    
-    fdulist = fits.open(image)
-    prihdr = fdulist[0].header
-    t=fdulist[0].data
-    n2,n1=t.shape
-    
-
-    w= WCS(image)
-    px,py = w.wcs_world2pix(fdata.RA,fdata.DEC,1)
-    onimageflag=(px < n1) & (px >0) & (py < n2) & (py > 0)
-    
-    keepflag=zFlag & onimageflag
-    RA=fdata.RA[keepflag]
-    DEC=fdata.DEC[keepflag]
-    A100=fdata.A100[keepflag]
-    AGCNUMBER=fdata.AGCNUMBER[keepflag]
-    print 'number of galaxies to keep = ', sum(keepflag)
-    
-    for i in range(len(RA)):
-                
-        a=(A100[i]/200.)*60.
-        height= ((6*a)/pixelscale)
-        width= ((6*a)/pixelscale)
-        
-
-        if (a<.01):
-            height=120.
-            width=120.
-            
-            
-        outimage=(str(AGCNUMBER[i])+'_'+ imagefilter+".fits")
-        cutout(image, RA[i], DEC[i],xw=width ,yw=height , outfile=outimage)
-        
-
-makecuts(Haimage,'Ha')
-makecuts(Rimage,'R')
-makecuts(Hawcimage,'Hawc')
