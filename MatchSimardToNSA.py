@@ -24,6 +24,7 @@ import numpy as np
 from astropy.io import fits
 import fnmatch
 import time
+import argparse
 
 
 def findnearest(x1,y1,x2,y2,delta):
@@ -46,10 +47,18 @@ def findnearest(x1,y1,x2,y2,delta):
     return imatch, matchflag,nmatch
 
 
+parser = argparse.ArgumentParser(description ='Match the NSA catalog with the Simard catalogs')
+parser.add_argument('--s', dest = 's', default = False, action = 'store_true', help = 'Use shortened version of NSA catalog (nsa_uat.fits)')
+args = parser.parse_args()
+
+
 asu1 = fits.getdata('asu.fit',1)
 asu2 = fits.getdata('asu.fit',2)
 asu3 = fits.getdata('asu.fit',3)
-nsadat =fits.getdata('nsa_v0_1_2.fits')
+if arg.s:
+    nsadat = fits.getdata('nsa_uat.fits')
+else:
+    nsadat = fits.getdata('nsa_v0_1_2.fits')
 
 
 for i in range(len(asu1._DE)):
@@ -77,7 +86,10 @@ for i in range(len(nsadat.RA)):
             imatch[i],matchflag[i],nmatch[i] = t[0][1],t[1],t[2]
 print "Done matching"  
 print("--- %s seconds ---" % (time.time() - start_time))
-outfile='Simard1ToNSA.fits'
+if arg.s:
+    outfile='Simard1ToNSA_uat.fits'
+else:
+    outfile='Simard1ToNSA.fits'
 matchedarray1=np.zeros(len(nsadat),dtype=asu1.dtype)
 matchedarray1[matchflag] = asu1[imatch[matchflag]]
 new1 = []
@@ -97,7 +109,10 @@ newcol = fits.ColDefs(cols)
 hdu = fits.BinTableHDU.from_columns(newcol)
 hdu.writeto(outfile,clobber=True)
 
-outfile='Simard2ToNSA.fits'
+if arg.s:
+    outfile='Simard2ToNSA_uat.fits'
+else:
+    outfile='Simard2ToNSA.fits'
 matchedarray2=np.zeros(len(nsadat),dtype=asu2.dtype)
 matchedarray2[matchflag] = asu2[imatch[matchflag]]
 new2 = []
@@ -117,7 +132,10 @@ newcol = fits.ColDefs(cols)
 hdu = fits.BinTableHDU.from_columns(newcol)
 hdu.writeto(outfile,clobber=True)
 
-outfile='Simard3ToNSA.fits'
+if arg.s:
+    outfile='Simard3ToNSA_uat.fits'
+else:
+    outfile='Simard3ToNSA.fits'
 matchedarray3=np.zeros(len(nsadat),dtype=asu3.dtype)
 matchedarray3[matchflag] = asu3[imatch[matchflag]]
 new3 = []

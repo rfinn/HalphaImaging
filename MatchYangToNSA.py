@@ -18,6 +18,8 @@ import csv
 import numpy as np
 from astropy.io import fits
 import glob
+import argparse
+
 
 
 def findnearest(x1,y1,x2,y2,delta):
@@ -40,9 +42,17 @@ def findnearest(x1,y1,x2,y2,delta):
     return imatch, matchflag,nmatch
 
 
+parser = argparse.ArgumentParser(description ='Match the NSA catalog with both the Yang Petro catalog and the Yang Model catalog')
+parser.add_argument('--s', dest = 's', default = False, action = 'store_true', help = 'Use shortened version of NSA catalog (nsa_uat.fits)')
+args = parser.parse_args()
+
+
 petro = fits.getdata('completePetro.fits')
 model = fits.getdata('completeModel.fits')
-nsadat =fits.getdata('nsa_v0_1_2.fits')
+if arg.s:
+    nsadat = fits.getdata('nsa_uat.fits')
+else:
+    nsadat = fits.getdata('nsa_v0_1_2.fits')
 
 
 matchRadius=0.1/3600
@@ -52,7 +62,10 @@ matchflag=np.zeros(len(nsadat.RA),'bool')
 nmatch=np.zeros(len(nsadat.RA),'i')
 for i in range(len(nsadat.RA)):
     imatch[i],matchflag[i],nmatch[i]  = findnearest(nsadat.RA[i],nsadat.DEC[i],petro.field(2),petro.field(3),matchRadius)      
-outfile='YangDR7PetroToNSA.fits'
+if arg.s:
+    outfile='YangDR7PetroToNSA_uat.fits' 
+else:
+    outfile='YangDR7PetroToNSA.fits'
 matchedarray=np.zeros(len(nsadat),dtype=petro.dtype)
 matchedarray[matchflag] = petro[imatch[matchflag]]
 fits.writeto(outfile,matchedarray,clobber=True)
@@ -63,7 +76,10 @@ matchflag=np.zeros(len(nsadat.RA),'bool')
 nmatch=np.zeros(len(nsadat.RA),'i')
 for i in range(len(nsadat.RA)):
     imatch[i],matchflag[i],nmatch[i]  = findnearest(nsadat.RA[i],nsadat.DEC[i],model.field(2),model.field(3),matchRadius)      
-outfile='YangDR7ModelToNSA.fits'
+if arg.s:
+    outfile='YangDR7ModelToNSA_uat.fits' 
+else:
+    outfile='YangDR7ModelToNSA.fits'
 matchedarray=np.zeros(len(nsadat),dtype=model.dtype)
 matchedarray[matchflag] = model[imatch[matchflag]]
 fits.writeto(outfile,matchedarray,clobber=True)
