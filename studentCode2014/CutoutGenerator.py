@@ -15,6 +15,7 @@ Example:
 python CutoutGenerator.py /home/rfinn/idl/agctotal.fits 16
 
 Note- You may need to change the variables Haimage, Rimage and Hawcimage if your image names are different
+
 """
 
 
