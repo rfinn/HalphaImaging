@@ -73,6 +73,8 @@ parser.add_argument('--image', dest = 'image', default = 'halpha.fits', help = '
 parser.add_argument('--catalog', dest = 'catalog', default = '/home/share/catalogs/nsa_v0_1_2.fits', help = 'full path to the NSA catalog')
 parser.add_argument('--filter',dest = 'filter', default ='R', help = 'Filter for the input mosaic image (e.g. r, R, Ha)')
 parser.add_argument('--nhalpha',dest = 'nhalpha', default ='12', help = 'H-alpha filter number (e.g. 4, 8, 12 or 16)')
+parser.add_argument('--scale',dest = 'scale', default =10., help = 'cutout size = (scale x Re, scale x Re) - increase scale to increase size of cutout')
+parser.add_argument('--cluster',dest = 'cluster', default ='A1367', help = 'cluster name to preprend to cutout image names (no spaces!)')
 parser.add_argument('--plot', dest = 'plot', default = False, action = 'store_true', help = 'plot cutouts and position wrt mosaic')
 #parser.add_argument('--l', dest = 'l', default = False, help = 'List of images to input to swarp')
 
@@ -109,16 +111,18 @@ def makecuts(image,imagefilter):
     radius=catdat.SERSIC_TH50[keepflag]
     IDNUMBER=catdat.NSAID[keepflag]
     print 'number of galaxies to keep = ', sum(keepflag)
-    
+
+    if args.region_file:
+        
     for i in range(len(RA)):
 
         if (radius[i]<.01):
             size=120.
         else:
-            size=radius[i]
+            size=float(args.scale)*radius[i]
             
         position = SkyCoord(ra=RA[i],dec=DEC[i],unit='deg')
-        size = u.Quantity((6.*size, 6.*size), u.arcsec)
+        size = u.Quantity((size, size), u.arcsec)
         #print image, radius[i], position, size
         #cutout = Cutout2D(fdulist[0].data, position, size, wcs=w, mode='strict') #require entire image to be on parent image
         try:
@@ -136,7 +140,7 @@ def makecuts(image,imagefilter):
                 args.plot = False
         # figure out how to save the cutout as fits image
         ((ymin,ymax),(xmin,xmax)) = cutout.bbox_original
-        outimage = (str(IDNUMBER[i])+'-'+ args.filter+".fits")
+        outimage = args.cluster+'-'+(str(IDNUMBER[i])+'-'+ args.filter+".fits")
         newfile = fits.PrimaryHDU()
         newfile.data = f[0].data[ymin:ymax,xmin:xmax]
         newfile.header = f[0].header
