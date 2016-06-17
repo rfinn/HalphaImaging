@@ -63,6 +63,10 @@ sudo aptitude install gcc
 starting again, making iraf userd
 
 need to install f77
+
+ABANDON ALL HOPE - GOING BACK TO SCAMP AND SWARP!!!
+
+
 *******************************************
 
 INSTALLING SCAMP
@@ -208,5 +212,26 @@ tar xvfz swarp-2.38.0.tar.gz
 cd swarp-2.38.0
 
 
+#############
 
+scamp and swarp are now installed on coma
+
+#############
+
+FINE TUNING SCAMP CONFIG FILE
+
+* Comparing results from SDSSDR9 and GSC-2.3
+- ran a test case w/A1367-h02 using both catalogs
+
+- downloading image from digitized sky survey to serve as astrometric reference
+https://archive.stsci.edu/cgi-bin/dss_form
+
+   - POSS2 Red
+   - 60 x 60 arcmin
+   - 11:46:12, 19:35:45
+   - downloaded on macbook
+   - copied to coma
+
+--- conclusion = GSC-2.3 does a better job with the astrometric correction; 
+--- the distortion-corrected images made using SDSSDR9 are really off at the edge of the coadded image
 
