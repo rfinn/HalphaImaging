@@ -9,7 +9,7 @@ FGROUP_RADIUS          1.             # Max dist (deg) between field groups
 #---------------------------- Reference catalogs ------------------------------
  
 REF_SERVER         cocat1.u-strasbg.fr # Internet addresses of catalog servers
-ASTREF_CATALOG          GSC-2.3          # NONE, FILE, USNO-A1,USNO-A2,USNO-B1,
+ASTREF_CATALOG          UCAC-4          # NONE, FILE, USNO-A1,USNO-A2,USNO-B1,
                                        # GSC-1.3,GSC-2.2,GSC-2.3,
                                        # TYCHO-2, UCAC-1,UCAC-2,UCAC-3,UCAC-4,
                                        # NOMAD-1, PPMX, CMC-14, 2MASS, DENIS-3,
@@ -40,8 +40,8 @@ PIXSCALE_MAXERR        1.2             # Max scale-factor uncertainty
 POSANGLE_MAXERR        1.5             # Max position-angle uncertainty (deg)
 POSITION_MAXERR        7.0             # Max positional uncertainty (arcmin)
 MATCH_RESOL            0               # Matching resolution (arcsec); 0=auto
-MATCH_FLIPPED          N               # Allow matching with flipped axes?
-MOSAIC_TYPE            UNCHANGED       # UNCHANGED, SAME_CRVAL, SHARE_PROJAXIS,
+MATCH_FLIPPED          Y               # Allow matching with flipped axes?
+MOSAIC_TYPE            FIX_FOCALPLANE       # UNCHANGED, SAME_CRVAL, SHARE_PROJAXIS,
                                        # FIX_FOCALPLANE or LOOSE
  
 #---------------------------- Cross-identification ----------------------------
@@ -52,7 +52,7 @@ CROSSID_RADIUS         2.0             # Cross-id initial radius (arcsec)
  
 SOLVE_ASTROM           Y               # Compute astrometric solution (Y/N) ?
 PROJECTION_TYPE        SAME            # SAME, TPV or TAN
-ASTRINSTRU_KEY         FILTER   # FITS keyword(s) defining the astrom
+ASTRINSTRU_KEY         INTRUME   # FITS keyword(s) defining the astrom
 STABILITY_TYPE         INSTRUMENT      # EXPOSURE, PRE-DISTORTED or INSTRUMENT
 CENTROID_KEYS          XWIN_IMAGE,YWIN_IMAGE # Cat. parameters for centroiding
 CENTROIDERR_KEYS       ERRAWIN_IMAGE,ERRBWIN_IMAGE,ERRTHETAWIN_IMAGE
