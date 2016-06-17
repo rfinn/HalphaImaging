@@ -40,7 +40,7 @@ PIXSCALE_MAXERR        1.2             # Max scale-factor uncertainty
 POSANGLE_MAXERR        2.0             # Max position-angle uncertainty (deg)
 POSITION_MAXERR        10.0             # Max positional uncertainty (arcmin)
 MATCH_RESOL            0               # Matching resolution (arcsec); 0=auto
-MATCH_FLIPPED          N               # Allow matching with flipped axes?
+MATCH_FLIPPED          Y               # Allow matching with flipped axes?
 MOSAIC_TYPE            FIX_FOCALPLANE       # UNCHANGED, SAME_CRVAL, SHARE_PROJAXIS,
                                        # FIX_FOCALPLANE or LOOSE
  
