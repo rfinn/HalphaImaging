@@ -55,8 +55,8 @@ from astropy.io import fits
 
 parser = argparse.ArgumentParser(description ='Edit image headers to include basic WCS information to the HDI image headers')
 parser.add_argument('--filestring', dest='filestring', default='cftr*.fits', help='match string for input files (default =  cftr*.fits)')
-parser.add_argument('--pixscalex', dest='pixelscalex', default='0.00011808', help='pixel scale in x (default = 0.00011808)')
-parser.add_argument('--pixscaley', dest='pixelscaley', default='0.00011808', help='pixel scale in y (default = 0.00011808)')
+parser.add_argument('--pixscalex', dest='pixelscalex', default='0.00011805', help='pixel scale in x (default = 0.00011808)')
+parser.add_argument('--pixscaley', dest='pixelscaley', default='0.00011805', help='pixel scale in y (default = 0.00011808)')
 args = parser.parse_args()
 files = sorted(glob.glob(args.filestring))
 nfiles=len(files)
@@ -68,9 +68,9 @@ for f in files:
     header.rename_keyword('FILTER2','FWHEEL2')
 
     FILTER = header['CMMTOBS']
-    header.append(card=('FILTER',FILTER,'FILTER'))
+    
     ccdsec = header['CCDSEC']
-    header.append(card=('DATASEC',ccdsec,'DATA SECTION'))
+    
 
     RASTRNG = header['RASTRNG']
     DECSTRNG = header['DECSTRNG']
@@ -79,11 +79,17 @@ for f in files:
     RA = coord.Angle(RASTRNG,unit=u.hour)
     DEC = coord.Angle(DECSTRNG,unit=u.degree)
     EQUINOX = header['EQUINOX']
+    INSTRUMENT = header['INSTRUME']
     # process coordinates to J2000 epoch
     c = SkyCoord(ra=RA.deg*u.degree,dec=DEC.degree*u.degree,frame='fk5',equinox='J'+str(EQUINOX))
-    print 'original coords = ',c
+    #print 'original coords = ',c
     c2000 = c.transform_to(coord.FK5(equinox='J2000.0'))
-    print 'J2000 coords = ',c2000
+    #print 'J2000 coords = ',c2000
+    # trying to clear header and add the min info required
+    header.clear()
+    header.append(card=('FILTER',FILTER,'FILTER'))
+    header.append(card=('DATASEC',ccdsec,'DATA SECTION'))
+    header.append(card=('INSTRUME',INSTRUMENT,'INSTRUMENT'))
     if 'CRVAL1' in header:
         header['CRVAL1']=(c.ra.value,'RA of reference point')
     else:
@@ -95,11 +101,11 @@ for f in files:
         header.append(card=('CRVAL2',c.dec.value,'DEC of reference point'))
 
     if 'CRPIX1' in header:
-        header['CRPIX1']=((naxis1+1)/2.,'X reference pixel')
-        header['CRPIX2']=((naxis2+1)/2.,'Y reference pixel')
+        header['CRPIX1']=(1990.,'X reference pixel')
+        header['CRPIX2']=(2048.,'Y reference pixel')
     else:
-        header.append(card=('CRPIX1',(naxis1+1)/2.,'X reference pixel'))
-        header.append(card=('CRPIX2',(naxis2+1)/2.,'Y reference pixel'))
+        header.append(card=('CRPIX1',1990.,'X reference pixel'))
+        header.append(card=('CRPIX2',2048.,'Y reference pixel'))
 
     if 'CD1_1' in header:
         header['CD1_1']=(float(args.pixelscalex),'Pixel scale in X')
@@ -111,8 +117,8 @@ for f in files:
         header['CD1_2']=(0,'')# value from Becky's quick_WCS_instructions
         header['CD2_1']=(0,'')# value from Becky's quick_WCS_instructions
     else:
-        header.append(card=('CD1_2',1.486985e-6,''))# value from Becky's quick_WCS_instructions
-        header.append(card=('CD2_1',1.4404496e-6,''))# value from Becky's quick_WCS_instructions
+        header.append(card=('CD1_2',1.226985e-6,''))# value from Becky's quick_WCS_instructions
+        header.append(card=('CD2_1',-1.2404496e-6,''))# value from Becky's quick_WCS_instructions
     if 'CTYPE1' in header:
         header['CTYPE1']=('RA---TAN','')# value from Becky's quick_WCS_instructions
         header['CTYPE2']=('DEC--TAN','')# value from Becky's quick_WCS_instructions
@@ -123,20 +129,21 @@ for f in files:
     #    header['EQUINOX_OBS'] = EQUINOX
     #else:
     #    header.append(card=('EQUINOX_OBS',EQUINOX,'Equinox at time of observations'))
-    #header['EQUINOX'] = 2000.0
-    if 'WCSDIM' in header:
-        header['WCSDIM']=(2,'')
-    else:
-        header.append(card=('WCSDIM',2,''))
-    if 'WAT0_001' in header:
-        header['WAT0_001']=('system=image','')
-    else:
-        header.append(card=('WAT0_001','system=image',''))
+    header.append(card=('EQUINOX', EQUINOX,'equinox of RA,Dec'))
+    header.append(card=('EPOCH', EQUINOX,'equinox of RA,Dec'))
+    #if 'WCSDIM' in header:
+    #    header['WCSDIM']=(2,'')
+    #else:
+    #    header.append(card=('WCSDIM',2,''))
+    #if 'WAT0_001' in header:
+    #    header['WAT0_001']=('system=image','')
+    #else:
+    #    header.append(card=('WAT0_001','system=image',''))
         
-    if 'WAT0_002' in header:
-        header['WAT0_002']=('system=image','')
-    else:
-        header.append(card=('WAT0_002','system=image',''))
+    #if 'WAT0_002' in header:
+    #    header['WAT0_002']=('system=image','')
+    #else:
+    #    header.append(card=('WAT0_002','system=image',''))
     
     if 'GAIN' in header:
         header['GAIN']=('1.3','gain (e-/ADU)')
@@ -145,14 +152,15 @@ for f in files:
     
     # add code to transform RA and Dec to epoch 2000
     # c = SkyCoord(ra=123.67*u.degree, dec = 19.5545*u.degree,obstime='J2015.25',frame='fk5',equinox='J2015.25')
-    if 'TELRA' in header:
-        header['TELRA']=(c2000.ra.value,'RA of reference point')
-        header['TELDEC']=(c2000.dec.value,'DEC of reference point')
-        header['TELEQUIN']=('J2000.0','Epoch (years)')
-    else:
-        header.append(card=('TELRA',c2000.ra.value,'RA of reference point'))
-        header.append(card=('TELDEC',c2000.dec.value,'DEC of reference point'))
-        header.append(card=('TELEQUIN','J2000.0','Epoch (years)'))    
+    # for mosaic
+    #if 'TELRA' in header:
+    #    header['TELRA']=(c2000.ra.value,'RA of reference point')
+    #    header['TELDEC']=(c2000.dec.value,'DEC of reference point')
+    #    header['TELEQUIN']=('J2000.0','Epoch (years)')
+    #else:
+    #    header.append(card=('TELRA',c2000.ra.value,'RA of reference point'))
+    #    header.append(card=('TELDEC',c2000.dec.value,'DEC of reference point'))
+    #    header.append(card=('TELEQUIN','J2000.0','Epoch (years)'))    
     print 'WRITING UPDATED FILE'
     fits.writeto('h'+f,data,header,clobber=True)
     i += 1

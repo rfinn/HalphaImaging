@@ -232,6 +232,35 @@ https://archive.stsci.edu/cgi-bin/dss_form
    - downloaded on macbook
    - copied to coma
 
---- conclusion = GSC-2.3 does a better job with the astrometric correction; 
+$$$ conclusion = GSC-2.3 does a better job with the astrometric correction; 
 --- the distortion-corrected images made using SDSSDR9 are really off at the edge of the coadded image
 
+* decrease error in projection angle to 1.5 deg and center offset to 7 arcmin
+
+
+IS WCS PRECESSION CORRECT?
+
+using http://cxc.harvard.edu/toolkit/precess.jsp to check precession of RA and Dec from epoch
+2015.3 to 2000.0
+
+image: cftr7135t0052o00.fits
+RA: +11:47:00.8
+Dec: +19:31:08
+Epoch: 2015.30642
+
+output
+-------
+RA: 11 46 13.41
+176.555861
+
+Dec: +19 36 13.95
+19.603874
+
+After running fix header, 
+
+RA = 176.753333
+Dec = 19.503954
+
+So this is wrong.  RA is off by 0.2 degrees!
+
+First, try running scamp using 2015.3 coordinates

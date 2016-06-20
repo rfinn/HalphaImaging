@@ -9,7 +9,7 @@ FGROUP_RADIUS          1.             # Max dist (deg) between field groups
 #---------------------------- Reference catalogs ------------------------------
  
 REF_SERVER         cocat1.u-strasbg.fr # Internet addresses of catalog servers
-ASTREF_CATALOG          UCAC-4          # NONE, FILE, USNO-A1,USNO-A2,USNO-B1,
+ASTREF_CATALOG          SDSS-R7          # NONE, FILE, USNO-A1,USNO-A2,USNO-B1,
                                        # GSC-1.3,GSC-2.2,GSC-2.3,
                                        # TYCHO-2, UCAC-1,UCAC-2,UCAC-3,UCAC-4,
                                        # NOMAD-1, PPMX, CMC-14, 2MASS, DENIS-3,
@@ -18,7 +18,7 @@ ASTREF_CATALOG          UCAC-4          # NONE, FILE, USNO-A1,USNO-A2,USNO-B1,
 ASTREF_BAND            DEFAULT         # Photom. band for astr.ref.magnitudes
                                        # or DEFAULT, BLUEST, or REDDEST
 ASTREFMAG_LIMITS       11,20      # Select magnitude range in ASTREF_BAND
-SAVE_REFCATALOG        N               # Save ref catalogs in FITS-LDAC format?
+SAVE_REFCATALOG        Y               # Save ref catalogs in FITS-LDAC format?
 REFOUT_CATPATH         .               # Save path for reference catalogs
  
 #--------------------------- Merged output catalogs ---------------------------
@@ -37,8 +37,8 @@ MATCH                  Y               # Do pattern-matching (Y/N) ?
 MATCH_NMAX             0               # Max.number of detections for MATCHing
                                        # (0=auto)
 PIXSCALE_MAXERR        1.2             # Max scale-factor uncertainty
-POSANGLE_MAXERR        1.5             # Max position-angle uncertainty (deg)
-POSITION_MAXERR        7.0             # Max positional uncertainty (arcmin)
+POSANGLE_MAXERR        2.             # Max position-angle uncertainty (deg)
+POSITION_MAXERR        10.             # Max positional uncertainty (arcmin)
 MATCH_RESOL            0               # Matching resolution (arcsec); 0=auto
 MATCH_FLIPPED          Y               # Allow matching with flipped axes?
 MOSAIC_TYPE            FIX_FOCALPLANE       # UNCHANGED, SAME_CRVAL, SHARE_PROJAXIS,
