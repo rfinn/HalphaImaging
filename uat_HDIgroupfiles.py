@@ -25,7 +25,7 @@ os.system('ls *b00.fits > biasframes')
 object_files=glob.glob('*o00.fits')
 flat_files=glob.glob('*f00.fits')
 all_files=glob.glob('*.fits')
-os.system('gethead *f00.fits CMMTOBS > junkfile')
+os.system('gethead *f00.fits FILTER > junkfile')
 infile=open('junkfile','r')
 fnames=[]
 ftype=[]
