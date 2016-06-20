@@ -32,7 +32,7 @@ import numpy as np
 # OBJECT - title of observed object
 # EXPTIME - exposure time
 
-os.system('gethead hcf*o00.fits CMMTOBS OBJECT EXPTIME > junkfile2')
+os.system('gethead hcf*o00.fits FILTER OBJECT EXPTIME > junkfile2')
 infile=open('junkfile2','r')
 fnames=[]      #creates empty list to contain file name
 ftype=[]       #creates empty list to contain type of filter

@@ -81,6 +81,7 @@ for f in files:
     EQUINOX = header['EQUINOX']
     INSTRUMENT = header['INSTRUME']
     OBJECT = header['OBJECT']
+    EXPTIME = header['EXPTIME']
     # process coordinates to J2000 epoch
     c = SkyCoord(ra=RA.deg*u.degree,dec=DEC.degree*u.degree,frame='fk5',equinox='J'+str(EQUINOX))
     #print 'original coords = ',c
@@ -133,6 +134,7 @@ for f in files:
     header.append(card=('EQUINOX', EQUINOX,'equinox of RA,Dec'))
     header.append(card=('EPOCH', EQUINOX,'equinox of RA,Dec'))
     header.append(card=('OBJECT', OBJECT,'Object Name'))
+    header.append(card=('EXPTIME', EXPTIME,'Exposure Time (sec)'))
     #if 'WCSDIM' in header:
     #    header['WCSDIM']=(2,'')
     #else:
