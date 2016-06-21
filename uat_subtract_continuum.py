@@ -11,6 +11,9 @@ PROCEDURE:
    save resultant imaage
   
 EXAMPLE:
+   from within ipython type:
+
+   %run ~/github/HalphaImaging/uat_subtract_continuum.py --r A1367-h02_R.coadd.fits --ha A1367-h02_ha12.coadd.fits --scale .055
 
 INPUT/OUPUT:
 
@@ -31,19 +34,19 @@ parser = argparse.ArgumentParser(description ='subtract scaled R-band image from
 parser.add_argument('--r', dest = 'r', default = None, help = 'R-band image')
 parser.add_argument('--ha', dest = 'ha', default = None, help = 'R-band image')
 parser.add_argument('--scale', dest = 'scale', default = 0.06, help = 'R-band image')
-
 args = parser.parse_args()
 
+figure_size=(10,4)
 
-r = fits.getdata(args.r)
-ha = fits.getdata(args.ha)
+r,r_header = fits.getdata(args.r,header=True)
+ha,ha_header = fits.getdata(args.ha,header=True)
 scale = float(args.scale)
 
 adjust_scale = True
 while adjust_scale:
     cs = ha  - scale*r
     v1,v2=scoreatpercentile(ha,[5.,95.])
-    plt.figure(1,figsize=(10,4))
+    plt.figure(1,figsize=figure_size)
     plt.clf()
     plt.subplots_adjust(hspace=0,wspace=0)
     plt.subplot(1,3,1)
@@ -61,7 +64,7 @@ while adjust_scale:
     plt.show()
     
     
-    t=raw_input('enter new value for scale factor;\n w to write output and quit;\n q to quit without saving\n')
+    t=raw_input('enter new value for scale factor;\n   w to write output and quit;\n   q to quit without saving\n')
     try:
         scale=float(t)
     except ValueError:
@@ -69,8 +72,8 @@ while adjust_scale:
         if t.find('q') > -1:
             break
         if t.find('w') > -1:
-            outimage = args.ha.split('-Ha')[0]+'-cs.fits'
+            outimage = args.ha.split('-Ha')[0]+'-CS.fits'
             newfile = fits.PrimaryHDU()
             newfile.data = cs
-            newfile.header = ha.header
+            newfile.header = ha_header
             fits.writeto(outimage, newfile.data, header = newfile.header, clobber=True)
