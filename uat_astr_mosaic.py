@@ -4,22 +4,15 @@
 BASIC INFORMATION ABOUT THIS CODE:
   -This is the SIXTH program you need to run in order to perform the data reduct  ion of HDI images. 
   -This program has SCamp compute the astrometric solution and then has SWarp c   reate image mosaics. 
-
-
 BEFORE RUNNNING THIS CODE:
   -Be sure to type ur_setup in the terminal everytime you open a new terminal window so that ureka is activated.
   -Ensure that pyraf is still activated by retyping the commands listed in the c  omments of the FIRST program titled "uat_HDIgroupflatfiles.py".
-
-
 GOAL:
   The goal of this program is to have scamp compute the astrometric 
   solution and then have swarp create image mosaics.
-
   This assumes that images have been reduced through flatfielding.
-
   If using HDI data, you need to run a separate program to add convert
   some header keywords to standard values and to add a rough WCS solution.
-
 PROCEDURE:
   - copy default setup files to current directory
   - Run sextractor on each image
@@ -29,17 +22,10 @@ PROCEDURE:
 EXAMPLE:
    In the directory containing all flattened objects with fixed headers to run sextractor type in the command line:
       '/Users/alfalfa/Github/HalphaImaging/uat_astr_mosaic.py --s'(or whatever the path is to where this program is stored)
-
 WHAT THIS CODE DOES:
-
-
 INPUT/OUPUT:
-
 REQUIRED MODULES:
-
-
 EXTRA NOTES:
-
 WRITTEN BY:
 Rose Finn
 EDITED BY:
@@ -133,4 +119,4 @@ if args.swarp:
             else:
                 os.system('swarp @' + args.l + ' -c default.swarp -IMAGEOUT_NAME ' + args.l + '.coadd.fits -WEIGHTOUT_NAME ' + args.l + '.coadd.weight.fits ')
         print 'DONE'
-         
+

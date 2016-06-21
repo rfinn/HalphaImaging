@@ -52,7 +52,7 @@ from astropy.coordinates import ICRS, FK5
 import astropy.units as u
 from astropy.nddata.utils import Cutout2D
 import argparse
-
+from matplotlib.colors import LogNorm
 #try:
 #    import montage
 #    import os
@@ -128,7 +128,7 @@ def makecuts(image,imagefilter):
             continue
         if args.plot:
             plt.figure()
-            plt.imshow(f[0].data, origin='lower',cmap=cm.gray)
+            plt.imshow(f[0].data, origin='lower',cmap='gray', norm=LogNorm())
             cutout.plot_on_original(color='white')
             plt.show()
             r = raw_input('type any key to continue (p to skip plotting) \n')
