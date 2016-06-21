@@ -13,21 +13,33 @@ GOAL:
   This assumes that images have been reduced through flatfielding.
   If using HDI data, you need to run a separate program to add convert
   some header keywords to standard values and to add a rough WCS solution.
+
 PROCEDURE:
   - copy default setup files to current directory
   - Run sextractor on each image
   - Make a list containing all .cat files
   - Run scamp
   - Run swarp
+
 EXAMPLE:
    In the directory containing all flattened objects with fixed headers to run sextractor type in the command line:
       '/Users/alfalfa/Github/HalphaImaging/uat_astr_mosaic.py --s'(or whatever the path is to where this program is stored)
+
+   To get swarp to create aligned images in multiple bans (e.g. Halpha and R-band), do the following
+    uat_astr_mosaic.py --swarp --l A1367-h02_ha12
+
+    uat_astr_mosaic.py --swarp --l A1367-h02_R --refimage 'A1367-h02_ha12.coadd.fits'
+
+    uat_astr_mosaic.py --swarp --l A1367-h02_ha12 --refimage 'A1367-h02_ha12.coadd.fits'
+
+
 WHAT THIS CODE DOES:
 INPUT/OUPUT:
 REQUIRED MODULES:
 EXTRA NOTES:
 WRITTEN BY:
 Rose Finn
+
 EDITED BY:
 Research Team 2015 --> Grant Boughton, Natasha Collova, Tiffany Flood, Kaitlyn Hoag, and Kelly Whalen
 '''
