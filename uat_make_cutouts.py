@@ -42,10 +42,6 @@ REFERENCES:
 http://docs.astropy.org/en/stable/nddata/utils.html
 
 """
-
-
-
-
 import numpy as np
 from matplotlib import pyplot as plt
 import astropy
@@ -112,7 +108,7 @@ def makecuts(image,imagefilter):
     IDNUMBER=catdat.NSAID[keepflag]
     print 'number of galaxies to keep = ', sum(keepflag)
 
-    if args.region_file:
+#    if args.region_file:
         
     for i in range(len(RA)):
 
@@ -132,10 +128,10 @@ def makecuts(image,imagefilter):
             continue
         if args.plot:
             plt.figure()
-            plt.imshow(f[0].data, origin='lower')
+            plt.imshow(f[0].data, origin='lower',cmap=cm.gray)
             cutout.plot_on_original(color='white')
             plt.show()
-            r = raw_input('type any key to continue (p to skip plotting)')
+            r = raw_input('type any key to continue (p to skip plotting) \n')
             if r.find('p') > -1:
                 args.plot = False
         # figure out how to save the cutout as fits image
