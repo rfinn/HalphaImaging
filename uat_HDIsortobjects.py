@@ -17,14 +17,21 @@
    In the directory containing all flattened objects with fixed headers to be sorted type in the command line:
       '/home/share/research/pythonCode/uat_HDIsortobjects.py'(or whatever the path is to where this program is stored)
 
+written by Rose A. Finn
+edited by Grant Boughton & Kelly Whalen
 
    
 '''
 import glob
 import os
 import numpy as np
+import argparse
+from astropy.io import fits
 
+parser = argparse.ArgumentParser(description ='group objects by filter and target for combining with swarp')
+parser.add_argument('--filestring', dest = 'filestring', default = 'hcftr*o00.fits', help = 'string to use to get input files (default = "hcftr*o00.fits")')
 
+args = parser.parse_args()
 
 
 # group files using gethead
@@ -32,20 +39,36 @@ import numpy as np
 # OBJECT - title of observed object
 # EXPTIME - exposure time
 
-os.system('gethead hcf*o00.fits FILTER OBJECT EXPTIME > junkfile2')
-infile=open('junkfile2','r')
-fnames=[]      #creates empty list to contain file name
-ftype=[]       #creates empty list to contain type of filter
-fobject=[]     #creates empty list to contain name of object
-exptime=[]     #creates empty list to contain time(s) exposed
-for line in infile:
-    t=line.split()      #splits input at each space and puts each element into                          list t
-    fnames.append(t[0]) #adds the element in index 0 of list t to the empty                             list fnames
-    fobject.append(t[2].rstrip('\n').replace(' ',''))
-    exptime.append(t[3].rstrip('\n').replace(' ',''))
-    ftype.append(t[1])
+try:
+    os.system('gethead '+args.filestring+' FILTER, OBJECT, EXPTIME > junkfile2')
+    infile=open('junkfile2','r')
+    fnames=[]      #creates empty list to contain file name
+    ftype=[]       #creates empty list to contain type of filter
+    fobject=[]     #creates empty list to contain name of object
+    exptime=[]     #creates empty list to contain time(s) exposed
+    for line in infile:
+        t=line.split()      #splits input at each space and puts each element into                          list t
+        fnames.append(t[0]) #adds the element in index 0 of list t to the empty                             list fnames
+        fobject.append(t[2].rstrip('\n').replace(' ',''))
+        exptime.append(t[3].rstrip('\n').replace(' ',''))
+        ftype.append(t[1])
     
-infile.close()
+    infile.close()
+
+except:
+    files = glob.glob(args.filestring)
+
+    fnames=[]      #creates empty list to contain file name
+    ftype=[]       #creates empty list to contain type of filter
+    fobject=[]     #creates empty list to contain name of object
+    exptime=[]     #creates empty list to contain time(s) exposed
+
+    for f in files:
+        data, header = fits.getdata(f,header=True)
+        fnames.append(f)
+        ftype.append(header['FILTER'])
+        fobject.append(header['OBJECT'])
+        exptime.append(header['EXPTIME'])
 
 filters=set(ftype)    #takes all inputs from ftype and adds the unique ones to                        the set of filters
 objecttypes=set(fobject)
@@ -59,7 +82,12 @@ for f in filters:
         objectgroup=str(t)+ '_' + str(f) #creates a variable that is the                                                 combined characteristics of the image
         indices=np.where((f == ftype) & (t == fobject) & (exptime > 60)) #finds                                                                       indices where the filter and name                                                            of object match the values searched                                                          for in the for loop
         if len(indices[0]) > 0:
-            outfile = open(objectgroup,'w') #writes the name of file to a
+            if objectgroup.find(' ') > -1: # get rid of long filter names
+                t = objectgroup.split()
+                filename = t[0]+'-'+t[1]
+            else:
+                filename = objectgroup
+            outfile = open(filename,'w') #writes the name of file to a
                                             #file titled the characteristics
                                             #stated in the variable objectgroup
             for i in indices[0]:
@@ -71,5 +99,3 @@ os.remove('junkfile2')
 
 
 
-#written by Dr. Rose A. Finn
-#edited by Grant Boughton & Kelly Whalen

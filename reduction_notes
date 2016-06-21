@@ -264,3 +264,30 @@ Dec = 19.503954
 So this is wrong.  RA is off by 0.2 degrees!
 
 First, try running scamp using 2015.3 coordinates
+
+This worked.  I stripped down the header and kept the 2015.3 coords.
+
+ALIGNING R AND HALPHA IMAGES
+----------------------------
+
+trying to figure out the easiest way to use scamp and swarp to create R and Halpha images that are
+matched by pixels.  
+
+In swarp, you can specify
+
+CENTER_TYPE MANUAL
+CENTER RA,DEC
+PIXEL_SCALE 0.425
+
+ 
+So we could 
+- create a mosaic of both R and Halpha images
+- determine the center
+- determine the dimensions
+- use this info to create separate R and Halpha images
+
+Another approach:
+- align Halpha image
+- align R, using Halpha as reference image
+  - get header info from reference image
+  - feed this info into swarp so that center and size are set
