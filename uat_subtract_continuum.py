@@ -34,9 +34,13 @@ parser = argparse.ArgumentParser(description ='subtract scaled R-band image from
 parser.add_argument('--r', dest = 'r', default = None, help = 'R-band image')
 parser.add_argument('--ha', dest = 'ha', default = None, help = 'R-band image')
 parser.add_argument('--scale', dest = 'scale', default = 0.06, help = 'R-band image')
+parser.add_argument('--mosaic', dest = 'mos', default = False, action = 'store_true', help = 'specifies mosaic image')
 args = parser.parse_args()
 
 figure_size=(10,4)
+if args.mos:
+    figure_size=(15,8)
+    
 
 r,r_header = fits.getdata(args.r,header=True)
 ha,ha_header = fits.getdata(args.ha,header=True)
@@ -49,13 +53,17 @@ while adjust_scale:
     plt.figure(1,figsize=figure_size)
     plt.clf()
     plt.subplots_adjust(hspace=0,wspace=0)
+    #Halpha plus continuum
     plt.subplot(1,3,1)
+    plt.imshow(ha,cmap='gray_r',vmin=v1,vmax=v2)
+    plt.title('Halpha + cont')
+    plt.gca().set_yticks(())
+    #R
+    plt.subplot(1,3,2)
     plt.imshow(r,cmap='gray_r',vmin=v1,vmax=v2)
     plt.title('R')
-    plt.subplot(1,3,2)
-    plt.imshow(ha,cmap='gray_r',vmin=v1,vmax=v2)
-    plt.title('Halpha')
     plt.gca().set_yticks(())
+    #Continuum subtracted image
     plt.subplot(1,3,3)
     plt.imshow(cs,cmap='gray_r',vmin=v1,vmax=v2)
     plt.gca().set_yticks(())
