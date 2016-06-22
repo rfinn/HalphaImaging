@@ -3,114 +3,125 @@
 '''
 PURPOSE:
 
-The goal of the program is to create a mask for a galaxy image so that 
+The goal of the program is to create a mask for a galaxy image to mask
+out other objects within the cutout area.
 
 USAGE:
 
+from within ipython type:
+
+   %run ~/github/HalphaImaging/uat_mask.py --image 'A1367-140231-R.fits'
+
+
 PROCEDURE:
+
+
+REQUIRED MODULES:
+   os
+   astropy
+   numpy
+   argsparse
+   matplotlib
+   scipy
+
 
 '''
 
 import os
-import sys
 from astropy.io import fits
 import numpy as np
-from pyraf import iraf
+#from pyraf import iraf
 import argparse
+from matplotlib import pyplot as plt
+from scipy.stats import scoreatpercentile
+
+defaultcat='default.sex.HDI.mask'
 
 
-defaultcat='default.sex.sdss'
-
-mypath=os.getcwd()
-if mypath.find('Users') > -1:
-    print "Running on Rose's mac pro"
-    sedir='/Users/rfinn/research/LocalClusters/sextractor/'
-elif mypath.find('home') > -1:
-    print "Running on coma"
-    sedir='/home/share/research/LocalClusters/sextractor/'
-
-parser=argparse.ArgumentParser()
-parser.add_argument("agcnumber",help='agcnumber')
-#parser.add_argument("-t",'--threshold',help="sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store")
-#parser.add_argument("-c",'--catalog', help="optional input, sextractor default.sex file",action="store")
-#parser.add_argument("-d",'--display', help="display result in ds9",action="store_true")
+parser = argparse.ArgumentParser(description ='Create a mask for extraneous objects in field')
+parser.add_argument('--image', dest = 'image', default = None, help = 'image to mask')
+parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files')
+parser.add_argument('--threshold', dest = 'threshold', default = .005, help = "sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store") 
 args = parser.parse_args()
 
-
-#
-# assume galaxy is at the center of the image
-fdulist = fits.open(image)
-t=fdulist[0].data
-n2,n1=t.shape
-xc=n1/2.
-yc=n2/2.
-fdulist.close()
-
-# run sextractor to generate a list of objects in the image
-# generate 'segmentation image'
-#try:
-#    os.system('ln -s /home/share/research/LocalClusters/sextractor/* .')
-#except:
-#    print 'could not link to /home/share/research/LocalClusters/sextractor'
-#    print defaultcat,' should be in the current directory'
-sextractor_files=['default.sex.sdss','default.param','default.conv','default.nnw']
+sextractor_files=['default.sex.HDI.mask','default.param','default.conv','default.nnw']
 for file in sextractor_files:
-    os.system('ln -s '+sedir+file+' .')
+    os.system('ln -s '+args.d+'/'+file+' .')
 
-if args.threshold:
-    os.system('sex %s -c %s -CATALOG_NAME test.cat -CATALOG_TYPE ASCII -DEBLEND_MINCONT %f'%(image,defaultcat,deblend))
-else:
-    os.system('sex %s -c %s -CATALOG_NAME test.cat -CATALOG_TYPE ASCII'%(image,defaultcat))
+def read_se_cat():
+    sexout=fits.getdata('test.cat')
+    xsex=sexout['XWIN_IMAGE']
+    ysex=sexout['YWIN_IMAGE']
+    dist=np.sqrt((yc-ysex)**2+(xc-xsex)**2)
+    #   find object ID
+    objIndex=np.where(dist == min(dist))
+    objNumber=sexout['NUMBER'][objIndex]
+    return objNumber[0] # not sure why above line returns a list
 
-#   parse sextractor output to get x,y coords of objects        
+def runse():
+    os.system('sex %s -c %s -CATALOG_NAME test.cat -CATALOG_TYPE FITS_1.0 -DEBLEND_MINCONT %f'%(args.image,defaultcat,args.threshold))
+    maskdat = fits.getdata('segmentation.fits')
+    center_object = read_se_cat()
+    #maskdat[maskdat == center_object] = 0
+    return maskdat
 
-sexout=np.loadtxt('test.cat',usecols=[0,1,2],comments='#')
-sexnumber=sexout[:,0]
-xsex=sexout[:,1]
-ysex=sexout[:,2]
-dist=np.sqrt((yc-ysex)**2+(xc-xsex)**2)
+adjust_mask = True
+figure_size = (6,3)
 
-#   find object ID
-objIndex=np.where(dist == min(dist))
-objNumber=sexnumber[objIndex]
-objNumber=objNumber[0] # not sure why above line returns a list
-mask_image=image.split('.fits')[0]+'mask.fits'
+# create name for output mask file
+t = args.image.split('-')
+mask_image=t[0]+'-'+t[1]+'-mask.fits'
 
+# read in image and define center coords
+image, imheader = fits.getdata(args.image,header = True)
+yc,xc = image.shape
+xc = xc/2.
+yc = yc/2.
 
-fdulist = fits.open('segmentation.fits',mode='update')
-t=fdulist[0].data
-# replace object ID values with zero
-f = (t == objNumber)
-replace_values = np.zeros(t.shape)
-t=t*(~f) + replace_values*f
-# set all bad values to 1
-t[t> .1]=t[t > .1]/t[t > .1]
-fdulist.flush()
-# write out mask image
-if os.path.isfile(mask_image):
-    os.remove(mask_image)
+v1,v2=scoreatpercentile(image,[5.,95.])
 
-hdu=fits.PrimaryHDU(t)
-hdu.writeto(mask_image)
+# run sextractor on input image
+# return segmentation image with central object removed
+maskdat = runse()
 
-fdulist.close()
-
-#   use iraf imexam to replace object ID values with zero
-#iraf.imreplace(working_dir+mask_image,value=0,lower=objNumber-.5,upper=objNumber+.5)
-# convert segmentation image to object mask by replacing the object ID of target galaxy with zeros
+while adjust_mask:
+    plt.figure(1,figsize=figure_size)
+    plt.clf()
+    plt.subplots_adjust(hspace=0,wspace=0)
+    plt.subplot(1,2,1)
+    plt.imshow(image,cmap='gray_r',vmin=v1,vmax=v2)
+    plt.title('image')
+    plt.subplot(1,2,2)
+    plt.imshow(maskdat,cmap='gray_r',vmin=v1,vmax=v2)
+    plt.title('mask')
+    plt.gca().set_yticks(())
+    plt.draw()
+    plt.show()
+    
+    
+    t=raw_input('enter:\n   pixel value to remove object in mask;\n   t to adjust SE threshold (0=no deblend, 1=lots); \n   w to write output and quit; \n   q to quit without saving\n')
+    try:
+        objID = int(t)
+        maskdat[maskdat == objID] = 0.
+    except ValueError:
+        adjust_scale = False
+        if t.find('t') > -1:
+            t = raw_input('enter new threshold')
+            args.threshold = float(t)
+            runse()
+        if t.find('q') > -1:
+            break
+        if t.find('w') > -1:
+            newfile = fits.PrimaryHDU()
+            newfile.data = maskdat
+            newfile.header = imheader
+            fits.writeto(mask_image, newfile.data, header = newfile.header, clobber=True)
+            adjust_mask = False
 
 # clean up
-sextractor_files=['default.sex.sdss','default.param','default.conv','default.nnw']
+#sextractor_files=['default.sex.sdss','default.param','default.conv','default.nnw']
 for file in sextractor_files:
     os.system('unlink '+file)
 
-if args.display:
-    try:
-        d.set('frame delete all')
-    except:
-        d=ds9.ds9()
-        d.set('frame delete all')
-    d.set('file new '+image)
-    d.set('zscale')
-    d.set('file new '+mask_image)
-    d.set('zscale')
+
+    
