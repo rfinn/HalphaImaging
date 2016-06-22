@@ -22,18 +22,19 @@ uat_runellipse.py r_image.fits ha_image.fits
 
 import sys
 import os
-from pylab import *
+from matplotlib import pyplot as plt 
 from pyraf import iraf
 from astropy.io import fits
 import ds9
 import argparse
 
-parser=argparse.ArgumentParser()
-parser.add_argument("agcnumber",help='agcnumber')
-#parser.add_argument("-t",'--threshold',help="sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store")
-#parser.add_argument("-c",'--catalog', help="optional input, sextractor default.sex file",action="store")
-#parser.add_argument("-d",'--display', help="display result in ds9",action="store_true")
+
+parser = argparse.ArgumentParser(description ='Run ellipse on R and Halpha images')
+parser.add_argument('--r', dest = 'r', default = None, help = 'R-band image')
+parser.add_argument('--ha', dest = 'ha', default = None, help = 'R-band image')
+#parser.add_argument('--scale', dest = 'scale', default = 0.06, help = 'R-band image')
 args = parser.parse_args()
+
 
 #if args.threshold:
 #    print 'got a threshold value',args.threshold
@@ -209,8 +210,8 @@ iraf.ttools()
 #haimage=sys.argv[2]
 #rimage=sys.argv[1]
 
-rimage=args.agcnumber+'_R.fits'
-haimage=args.agcnumber+'_Ha.fits'
+rimage=args.r
+haimage=args.ha
 mask=rimage.split('.fits')[0]+'mask.fits'
 # run ellipse on r image
 
