@@ -28,7 +28,7 @@ USAGE:
 
 EXAMPLE:
 
-    uat_make_cutouts.py --image A1367-h02_R.coadd.fits --filter R --nhalpha 12
+    uat_make_cutouts.py --image A1367-h02_R.coadd.fits --filter R --nhalpha 12 --cluster coma
 
     uat_make_cutouts.py --image A1367-h02_R.coadd.fits --catalog /Users/rfinn/research/NSA/nsa_v0_1_2.fits --filter R --nhalpha 12 --plot
 
