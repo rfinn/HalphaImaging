@@ -5,18 +5,19 @@ DESCRIPTION:
 Run iraf.stsdas.analysis.isophote.ellipse on R-band image.  Take the parameters
 from the R-band fit and use this as input for running ellipse on H-alpha image.
 
-In both cases, the 
+
 
 PROCEDURE:
 
 - pass in r_image and Ha_image
-- assumes mask is named r_image+mask 
-
+- assumes mask is named e.g. CLUSTER-NSAID-mask.fits, e.g. A1367-140231-mask.fits 
 
 
 USEAGE:
 
-uat_runellipse.py r_image.fits ha_image.fits
+run in ipython -pylab
+
+   %run uat_runellipse.py --r r_image.fits --ha ha_image.fits
 
 '''
 
@@ -125,6 +126,8 @@ def measure_disk(input_image,xcenter,ycenter,ipa,iellip,initialr,minr,maxr,zp,ba
     interactivevalue='yes'
 
     print '\n Running ellipse on ',input_image,'\n'
+    print ' Enter ? for a list of options \n'
+    print ' Enter c to continue fitting ellipses automatically \n'
     mfile=input_image
     
     xcenter_cutout=xcenter
@@ -170,7 +173,7 @@ def measure_disk(input_image,xcenter,ycenter,ipa,iellip,initialr,minr,maxr,zp,ba
         for line in infile:
             t=line.split()
             if float(t[0]) > myradius:
-                print 'got here',myradius, t[0]
+                #print 'got here',myradius, t[0]
                 newellip=float(t[1])
                 if newellip < .05: # min value that ellipse can handle
                     newellip=.05
@@ -210,13 +213,14 @@ iraf.ttools()
 #haimage=sys.argv[2]
 #rimage=sys.argv[1]
 
-rimage=args.r
-haimage=args.ha
-mask=rimage.split('.fits')[0]+'mask.fits'
-# run ellipse on r image
+if __name__ == '__main__':
+    rimage=args.r
+    haimage=args.ha
+    t = rimage.split('-')
+    mask=t[0]+'-'+t[1]+'-mask.fits'
+    
+    # run ellipse on r image
+    newxcenter,newycenter,newellip,newPA=call_measure_disk(rimage,wave_band=0,mask_image=mask)
 
-newxcenter,newycenter,newellip,newPA=call_measure_disk(rimage,wave_band=0,mask_image=mask)
-
-# use ellipse parameters from r-band as input for Halpha
-
-newxcenter,newycenter,newellip,newPA=call_measure_disk(haimage,wave_band=1,ipa=newPA,xcenter=newxcenter,ycenter=newycenter,minr=2,initialr=20,iellip = newellip,keepfixed=1,mask_image=mask)
+    # use ellipse parameters from r-band as input for Halpha
+    newxcenter,newycenter,newellip,newPA=call_measure_disk(haimage,wave_band=1,ipa=newPA,xcenter=newxcenter,ycenter=newycenter,minr=2,initialr=20,iellip = newellip,keepfixed=1,mask_image=mask)
