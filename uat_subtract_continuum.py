@@ -58,19 +58,19 @@ while adjust_scale:
     plt.imshow(ha,cmap='gray_r',vmin=v1,vmax=v2)
     plt.title('Halpha + cont')
     plt.gca().set_yticks(())
-    plt.gca().invert_yaxis(())
+    plt.gca().invert_yaxis()
     #R
     plt.subplot(1,3,2)
     plt.imshow(r,cmap='gray_r',vmin=v1,vmax=v2)
     plt.title('R')
     plt.gca().set_yticks(())
-    plt.gca().invert_yaxis((()
+    plt.gca().invert_yaxis()
     #Continuum subtracted image
     plt.subplot(1,3,3)
     plt.imshow(cs,cmap='gray_r',vmin=v1,vmax=v2)
     plt.title('contsub, scale = %4.3f'%(scale))
     plt.gca().set_yticks(())
-    plt.gca().invert_yaxis(())
+    plt.gca().invert_yaxis()
     plt.draw()
     plt.show()
     

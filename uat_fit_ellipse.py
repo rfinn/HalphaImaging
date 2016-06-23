@@ -2,6 +2,12 @@
 
 '''
 
+GOAL:
+
+To develop a non-iraf version of ellipse that will:
+- fit ellipse to image
+- measure flux in concentric elliptical aperture
+- write out flux vs semi-major axis
 
 PROCEDURE:
 - fit an elliptical aperture at large radius
