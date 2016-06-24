@@ -8,8 +8,8 @@ import argparse
 import numpy as np
 from astropy.io import fits
 from scipy.stats import mode
-import matplotlib.pyplot as plt
-get_ipython().magic(u'matplotlib inline')
+#import matplotlib.pyplot as plt
+
 
 parser = argparse.ArgumentParser(description ='Run sextractor on mosaics')
 parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of config files')
@@ -43,10 +43,10 @@ def FindScale(cluster):
         if abs(qflux[i]) >.15:
             nflag[i] = False
     qflux = qflux[nflag]
-    plt.hist(qflux)
-    plt.title("Halpha Flux / R Flux")
-    plt.xlabel("Scale")
-    plt.ylabel("Amount")
+ #   plt.hist(qflux)
+ #   plt.title("Halpha Flux / R Flux")
+ #   plt.xlabel("Scale")
+ #   plt.ylabel("Amount")
     print "Cluster Name:", cluster
     print "Number of Points Found:", len(rflags)
     print "Number of Uncompromised Points:", len(rgflx)
