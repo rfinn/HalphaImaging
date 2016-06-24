@@ -26,6 +26,7 @@ def FindScale(cluster):
         rcat = rcat[0]
     except IndexError:
         print "No catalogs found"
+        print
         return
     hadat = fits.getdata(hacat,2)
     rdat = fits.getdata(rcat,2)
