@@ -18,6 +18,7 @@ args = parser.parse_args()
 os.system('cp ' +args.d + '/default.* .')
 
 def FindScale(cluster):
+    print "Cluster Name:", cluster
     hacat = glob.glob(cluster + "_ha*.cat")
     rcat = glob.glob(cluster + "_R.cat")
     try:
@@ -25,7 +26,7 @@ def FindScale(cluster):
         rcat = rcat[0]
     except IndexError:
         print "No catalogs found"
-        sys.exit(0)
+        return
     hadat = fits.getdata(hacat,2)
     rdat = fits.getdata(rcat,2)
     haflux = hadat["FLUX_AUTO"]
@@ -48,7 +49,6 @@ def FindScale(cluster):
  #   plt.title("Halpha Flux / R Flux")
  #   plt.xlabel("Scale")
  #   plt.ylabel("Amount")
-    print "Cluster Name:", cluster
     print "Number of Points Found:", len(rflags)
     print "Number of Uncompromised Points:", len(rgflx)
     print "Number of Points w/o Outliers:", len(qflux)
