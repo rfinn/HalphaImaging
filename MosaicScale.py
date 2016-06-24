@@ -39,6 +39,7 @@ def FindScale(cluster):
     rgflx = rflux[keepflag]
     hagflx = haflux[keepflag]
     qflux = hagflx/rgflx
+    nflag = np.ones(len(qflux),dtype = bool)
     for i in range(len(qflux)):
         if abs(qflux[i]) >.15:
             nflag[i] = False
@@ -63,7 +64,7 @@ for it in hafiles:
     ir = t[0]+'_R'
     os.system('/usr/bin/sextractor ' + it + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + it + '.cat')
     os.system('/usr/bin/sextractor ' + it + '.coadd.fits,' + ir + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + ir + '.cat')
-    os.rename('check.fits', t[0] + 'check.fits')
+
 
 if args.c == 'all':
     clusters = glob.glob('*_ha*')
