@@ -43,12 +43,14 @@ def FindScale(cluster):
     rgflx = rflux[keepflag]
     hagflx = haflux[keepflag]
     qflux = hagflx/rgflx
-    nflag = np.ones(len(qflux),dtype = bool)
-    for i in range(len(qflux)):
-        if abs(qflux[i]) >.15: # Defines what is an outlier
-            nflag[i] = False
+    #nflag = np.ones(len(qflux),dtype = bool)
+    nflag = (qflux < .15)
+    #for i in range(len(qflux)):
+    #    if abs(qflux[i]) >.15: # Defines what is an outlier
+    #        nflag[i] = False
     qflux = qflux[nflag]
-    plt.hist(qflux)
+    plt.figure()
+    plt.hist(qflux,bins = np.arange(.03,.055,.002))
     plt.title("Halpha Flux / R Flux")
     plt.xlabel("Scale")
     plt.ylabel("Amount")
