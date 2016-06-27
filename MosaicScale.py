@@ -87,7 +87,7 @@ else:
         
     cn = cl.split('_')
     print 'Running SExtractor on',cn[0]
-    cr = t[0]+'_R'
+    cr = cn[0]+'_R'
     os.system('/usr/bin/sextractor ' + cl + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + cl + '.cat')
     os.system('/usr/bin/sextractor ' + cl + '.coadd.fits,' + cr + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + cr + '.cat')
     print
