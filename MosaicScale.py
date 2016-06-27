@@ -14,6 +14,8 @@ from scipy.stats import mode
 parser = argparse.ArgumentParser(description ='Run sextractor on mosaics')
 parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of config files')
 parser.add_argument('--c',dest = 'c', default ='all', help = 'Cluster name to find scale of. Defaults to all in directory')
+parser.add_argument('--ns',dest = 'ns', default =True, action = 'store_true' help = 'If included will not run sextractor')
+
 args = parser.parse_args()
 os.system('cp ' +args.d + '/default.* .')
 
@@ -61,16 +63,17 @@ def FindScale(cluster):
 
 
 if args.c == 'all':
-    hafiles = glob.glob('*_ha*')
-    hafiles = set(hafiles) - set(glob.glob("*.*"))
-    for it in hafiles:
-        t = it.split('_')
-        print "Running SExtractor on",t[0]
-        ir = t[0]+'_R'
-        os.system('/usr/bin/sextractor ' + it + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + it + '.cat')
-        os.system('/usr/bin/sextractor ' + it + '.coadd.fits,' + ir + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + ir + '.cat')
-        print
-        print
+    if args.ns:
+        hafiles = glob.glob('*_ha*')
+        hafiles = set(hafiles) - set(glob.glob("*.*"))
+        for it in hafiles:
+            t = it.split('_')
+            print "Running SExtractor on",t[0]
+            ir = t[0]+'_R'
+            os.system('/usr/bin/sextractor ' + it + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + it + '.cat')
+            os.system('/usr/bin/sextractor ' + it + '.coadd.fits,' + ir + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + ir + '.cat')
+            print
+            print
     
     clusters = glob.glob('*_ha*')
     clusters = set(clusters) - set(glob.glob("*.*"))
@@ -78,20 +81,21 @@ if args.c == 'all':
         t = i.split('_')
         FindScale(t[0])
 else:
-    cluster = glob.glob(args.c+'_ha*')
-    try:
-        cl = cluster[0]
-    except IndexError:
-        print "No catalogs found for cluster", args.c
-        sys.exit(0)
+    if args.ns:
+        cluster = glob.glob(args.c+'_ha*')
+        try:
+            cl = cluster[0]
+        except IndexError:
+            print "No catalogs found for cluster", args.c
+            sys.exit(0)
         
-    cn = cl.split('_')
-    print 'Running SExtractor on',cn[0]
-    cr = cn[0]+'_R'
-    os.system('/usr/bin/sextractor ' + cl + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + cl + '.cat')
-    os.system('/usr/bin/sextractor ' + cl + '.coadd.fits,' + cr + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + cr + '.cat')
-    print
-    print
+        cn = cl.split('_')
+        print 'Running SExtractor on',cn[0]
+        cr = cn[0]+'_R'
+        os.system('/usr/bin/sextractor ' + cl + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + cl + '.cat')
+        os.system('/usr/bin/sextractor ' + cl + '.coadd.fits,' + cr + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + cr + '.cat')
+        print
+        print
     
     FindScale(args.c)
         
