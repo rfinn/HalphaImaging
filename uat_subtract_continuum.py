@@ -83,7 +83,10 @@ while adjust_scale:
         if t.find('q') > -1:
             break
         if t.find('w') > -1:
-            outimage = args.ha.split('-Ha')[0]+'-CS.fits'
+            if args.ha.find('Ha') > -1:
+                outimage = args.ha.split('-Ha')[0]+'-CS.fits'
+            elif args.ha.find('ha') > -1:
+                outimage = args.ha.split('_ha')[0]+'-CS.fits'
             newfile = fits.PrimaryHDU()
             newfile.data = cs
             newfile.header = ha_header
