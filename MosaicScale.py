@@ -8,7 +8,7 @@ import argparse
 import numpy as np
 from astropy.io import fits
 from scipy.stats import mode
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
 parser = argparse.ArgumentParser(description ='Run sextractor on mosaics')
@@ -48,10 +48,11 @@ def FindScale(cluster):
         if abs(qflux[i]) >.15: # Defines what is an outlier
             nflag[i] = False
     qflux = qflux[nflag]
-    #plt.hist(qflux)
-    #plt.title("Halpha Flux / R Flux")
-    #plt.xlabel("Scale")
-    #plt.ylabel("Amount")
+    plt.hist(qflux)
+    plt.title("Halpha Flux / R Flux")
+    plt.xlabel("Scale")
+    plt.ylabel("Amount")
+    plt.savefig(cluster+'_scale.png')
     print "Number of Points Found:", len(rflags)
     print "Number of Uncompromised Points:", len(rgflx)
     print "Number of Points w/o Outliers:", len(qflux)
