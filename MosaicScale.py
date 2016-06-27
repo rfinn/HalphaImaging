@@ -36,24 +36,25 @@ def FindScale(cluster):
     rflags = rdat["FLAGS"]
     keepflag = np.ones(len(rflags),dtype = bool)
     for i in range(len(hflags)):
-        if (rflags[i]+hflags[i])>0:
+        if (rflags[i]+hflags[i])>0: # Doesn't accept any flags
             keepflag[i] = False
     rgflx = rflux[keepflag]
     hagflx = haflux[keepflag]
     qflux = hagflx/rgflx
     nflag = np.ones(len(qflux),dtype = bool)
     for i in range(len(qflux)):
-        if abs(qflux[i]) >.15:
+        if abs(qflux[i]) >.15: # Defines what is an outlier
             nflag[i] = False
     qflux = qflux[nflag]
- #   plt.hist(qflux)
- #   plt.title("Halpha Flux / R Flux")
- #   plt.xlabel("Scale")
- #   plt.ylabel("Amount")
+    #plt.hist(qflux)
+    #plt.title("Halpha Flux / R Flux")
+    #plt.xlabel("Scale")
+    #plt.ylabel("Amount")
     print "Number of Points Found:", len(rflags)
     print "Number of Uncompromised Points:", len(rgflx)
     print "Number of Points w/o Outliers:", len(qflux)
     print "Average Scale:", np.mean(qflux)
+    print "Median Scale:", np.median(qflux)
     print 
     return np.mean(qflux)
 
