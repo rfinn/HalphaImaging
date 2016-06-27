@@ -58,23 +58,41 @@ def FindScale(cluster):
     print 
     return np.mean(qflux)
 
-hafiles = glob.glob('*_ha*')
-hafiles = set(hafiles) - set(glob.glob("*.*"))
-for it in hafiles:
-    t = it.split('_')
-    print "Running Sextractor on",t[0]
-    ir = t[0]+'_R'
-    os.system('/usr/bin/sextractor ' + it + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + it + '.cat')
-    os.system('/usr/bin/sextractor ' + it + '.coadd.fits,' + ir + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + ir + '.cat')
 
 
 if args.c == 'all':
+    hafiles = glob.glob('*_ha*')
+    hafiles = set(hafiles) - set(glob.glob("*.*"))
+    for it in hafiles:
+        t = it.split('_')
+        print "Running SExtractor on",t[0]
+        ir = t[0]+'_R'
+        os.system('/usr/bin/sextractor ' + it + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + it + '.cat')
+        os.system('/usr/bin/sextractor ' + it + '.coadd.fits,' + ir + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + ir + '.cat')
+        print
+        print
+    
     clusters = glob.glob('*_ha*')
     clusters = set(clusters) - set(glob.glob("*.*"))
     for i in clusters:
         t = i.split('_')
         FindScale(t[0])
 else:
+    cluster = glob.glob(args.c+'_ha*')
+    try:
+        cl = cluster[0]
+    except IndexError:
+        print "No catalogs found for cluster", args.c
+        sys.exit(0)
+        
+    cn = cl.split('_')
+    print 'Running SExtractor on',cn[0]
+    cr = t[0]+'_R'
+    os.system('/usr/bin/sextractor ' + cl + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + cl + '.cat')
+    os.system('/usr/bin/sextractor ' + cl + '.coadd.fits,' + cr + '.coadd.fits -c default.sex.hdi -CATALOG_NAME ' + cr + '.cat')
+    print
+    print
+    
     FindScale(args.c)
         
 
