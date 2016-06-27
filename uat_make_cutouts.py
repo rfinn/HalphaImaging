@@ -71,7 +71,7 @@ parser.add_argument('--image', dest = 'image', default = 'halpha.fits', help = '
 parser.add_argument('--catalog', dest = 'catalog', default = '/home/share/catalogs/nsa_v0_1_2.fits', help = 'full path to the NSA catalog')
 parser.add_argument('--filter',dest = 'filter', default ='R', help = 'Filter for the input mosaic image (e.g. r, R, Ha)')
 parser.add_argument('--nhalpha',dest = 'nhalpha', default ='12', help = 'H-alpha filter number (e.g. 4, 8, 12 or 16)')
-parser.add_argument('--scale',dest = 'scale', default =10., help = 'cutout size = (scale x Re, scale x Re) - increase scale to increase size of cutout')
+parser.add_argument('--scale',dest = 'scale', default =15., help = 'cutout size = (scale x Re, scale x Re) - increase scale to increase size of cutout')
 parser.add_argument('--cluster',dest = 'cluster', default ='A1367', help = 'cluster name to preprend to cutout image names (no spaces!)')
 parser.add_argument('--plot', dest = 'plot', default = False, action = 'store_true', help = 'plot cutouts and position wrt mosaic')
 #parser.add_argument('--l', dest = 'l', default = False, help = 'List of images to input to swarp')

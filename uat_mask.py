@@ -12,6 +12,8 @@ from within ipython type:
 
    %run ~/github/HalphaImaging/uat_mask.py --image 'A1367-140231-R.fits'
 
+you just need to run this on R-band images.
+
 
 PROCEDURE:
 
@@ -62,7 +64,7 @@ def runse():
     os.system('sex %s -c %s -CATALOG_NAME test.cat -CATALOG_TYPE FITS_1.0 -DEBLEND_MINCONT %f'%(args.image,defaultcat,args.threshold))
     maskdat = fits.getdata('segmentation.fits')
     center_object = read_se_cat()
-    #maskdat[maskdat == center_object] = 0
+    maskdat[maskdat == center_object] = 0
     return maskdat
 
 adjust_mask = True
@@ -95,8 +97,8 @@ while adjust_mask:
     plt.imshow(maskdat,cmap='gray_r',vmin=v1,vmax=v2)
     plt.title('mask')
     plt.gca().set_yticks(())
-    plt.draw()
-    plt.show()
+    #plt.draw()
+    plt.show(block=False)
     
     
     t=raw_input('enter:\n   pixel value to remove object in mask;\n   t to adjust SE threshold (0=no deblend, 1=lots); \n   w to write output and quit; \n   q to quit without saving\n')

@@ -32,8 +32,11 @@ mosaic_pixelscale=.425
 
 
 parser = argparse.ArgumentParser(description ='Run ellipse on R and Halpha images')
-parser.add_argument('--r', dest = 'r', default = None, help = 'R-band image')
-parser.add_argument('--ha', dest = 'ha', default = None, help = 'R-band image')
+#parser.add_argument('--r', dest = 'r', default = None, help = 'R-band image')
+#parser.add_argument('--ha', dest = 'ha', default = None, help = 'R-band image')
+parser.add_argument('--cluster', dest = 'cluster', default = None, help = 'cluster and prefix of image names (e.g. A1367)')
+parser.add_argument('--id', dest = 'id', default = None, help = 'NSA ID number')
+
 #parser.add_argument('--scale', dest = 'scale', default = 0.06, help = 'R-band image')
 args = parser.parse_args()
 
@@ -158,10 +161,11 @@ def makeplots(rimage,haimage):
     #plt.close()
 
 
-rimage=args.r
-t = rimage.split('-')
-prefix = t[0]+'-'+t[1] # should be CLUSTER-NSAID
-haimage=args.ha
+rimage=args.cluster+'-'+args.id+'-R.fits'
+haimage=args.cluster+'-'+args.id+'-CS.fits'
+#t = rimage.split('-')
+prefix = args.cluster#t[0]+'-'+t[1] # should be CLUSTER-NSAID
+#haimage=args.ha
 
 
 makeplots(rimage,haimage)
