@@ -51,7 +51,7 @@ def FindScale(cluster):
     qflux = qflux[nflag]
     plt.figure()
     plt.hist(qflux,bins = np.arange(.03,.055,.002))
-    plt.title(cluster,": Halpha Flux / R Flux")
+    plt.title("%s : Halpha Flux / R Flux" %(cluster))
     plt.xlabel("Scale")
     plt.ylabel("Amount")
     plt.savefig(cluster+'_scale.png')
