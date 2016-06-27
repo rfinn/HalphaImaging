@@ -14,7 +14,7 @@ from scipy.stats import mode
 parser = argparse.ArgumentParser(description ='Run sextractor on mosaics')
 parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of config files')
 parser.add_argument('--c',dest = 'c', default ='all', help = 'Cluster name to find scale of. Defaults to all in directory')
-parser.add_argument('--ns',dest = 'ns', default =True, action = 'store_true' help = 'If included will not run sextractor')
+parser.add_argument('--ns',dest = 'ns', default =True, action = 'store_true', help = 'If included will not run sextractor')
 
 args = parser.parse_args()
 os.system('cp ' +args.d + '/default.* .')
