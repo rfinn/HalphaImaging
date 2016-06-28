@@ -14,6 +14,11 @@ from within ipython type:
 
 you just need to run this on R-band images.
 
+Interacting with the display is finicky.  This works fine when running
+within ipython - not so much when running from the command line.  When running
+from the command line, I am not able to interact with the figure.  This may
+have something to do with setting block=False in show().
+
 
 PROCEDURE:
 
@@ -30,6 +35,7 @@ REQUIRED MODULES:
 '''
 
 import os
+import sys
 from astropy.io import fits
 import numpy as np
 import argparse
@@ -114,7 +120,7 @@ while adjust_mask:
             args.threshold = float(t)
             runse()
         if t.find('q') > -1:
-            break
+            sys.exit()
         if t.find('w') > -1:
             newfile = fits.PrimaryHDU()
             newfile.data = maskdat

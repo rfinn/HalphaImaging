@@ -18,3 +18,13 @@ EXAMPLE:  Running reduction of A1367-h02
 -------------------------------------
 
 ~/github/HalphaImaging/uat_review_contsub.py --cluster A1367
+
+
+** Create masks
+---------------
+
+Do this only for galaxies with residual Halpha emission.
+
+Note: display windows are flaky.  Sometimes the pixel values show up
+when you run the cursor over the mask image, and sometimes they don't.  
+I found that restarting terminal helps with this.

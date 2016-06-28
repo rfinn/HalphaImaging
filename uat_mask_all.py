@@ -35,6 +35,7 @@ glob
 import os
 import argparse
 import glob
+import sys
 
 parser = argparse.ArgumentParser(description ='Run uat_mask.py on all images that match input string')
 parser.add_argument('--cluster', dest = 'string', default = None, help = 'image string to match (e.g. A1367)')
@@ -47,4 +48,8 @@ input_images = glob.glob(search_string)
 
 for image in input_images:
     print 'masking image ',image
-    os.system(args.d+'uat_mask.py --image '+image)
+    try:
+        os.system(args.d+'uat_mask.py --image '+image)
+    except SystemExit:
+        sys.exit()
+        
