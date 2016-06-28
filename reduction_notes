@@ -291,3 +291,5 @@ Another approach:
 - align R, using Halpha as reference image
   - get header info from reference image
   - feed this info into swarp so that center and size are set
+
+

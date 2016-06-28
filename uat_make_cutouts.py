@@ -20,6 +20,16 @@ INPUTS:
 
 USAGE:
 
+When running from macbook (not coma):
+
+~/github/HalphaImaging/uat_make_cutouts.py --image A1367-h02_ha12.coadd.fits --catalog ~/research/NSA/nsa_v0_1_2.fits --filter Ha --nhalpha 12 --cluster A1367
+
+~/github/HalphaImaging/uat_make_cutouts.py --image A1367-h02_R.coadd.fits --catalog ~/research/NSA/nsa_v0_1_2.fits --filter R --nhalpha 12 --cluster A1367
+
+~/github/HalphaImaging/uat_make_cutouts.py --image A1367-h02-CS.fits --catalog ~/research/NSA/nsa_v0_1_2.fits --filter CS --nhalpha 12 --cluster A1367
+
+If running on coma, you don't need to specify the catalog path - the default should be the correct value.
+
     uat_make_cutouts.py catalog image Halpha_filter_number
 
     To run type CutoutGenerator.py catalog filter_number into the commandline.
@@ -67,13 +77,13 @@ from matplotlib.colors import LogNorm
 
 
 parser = argparse.ArgumentParser(description ='Get cutouts for NSA galaxies within field of view of mosaic and redshift range of designated H-alpha filter')
-parser.add_argument('--image', dest = 'image', default = 'halpha.fits', help = 'mosaic/HDI image to make cutouts from')
+parser.add_argument('--image', dest = 'image', default = None, help = 'mosaic/HDI image to make cutouts from')
 parser.add_argument('--catalog', dest = 'catalog', default = '/home/share/catalogs/nsa_v0_1_2.fits', help = 'full path to the NSA catalog')
-parser.add_argument('--filter',dest = 'filter', default ='R', help = 'Filter for the input mosaic image (e.g. r, R, Ha)')
-parser.add_argument('--nhalpha',dest = 'nhalpha', default ='12', help = 'H-alpha filter number (e.g. 4, 8, 12 or 16)')
-parser.add_argument('--scale',dest = 'scale', default =15., help = 'cutout size = (scale x Re, scale x Re) - increase scale to increase size of cutout')
-parser.add_argument('--cluster',dest = 'cluster', default ='A1367', help = 'cluster name to preprend to cutout image names (no spaces!)')
-parser.add_argument('--plot', dest = 'plot', default = False, action = 'store_true', help = 'plot cutouts and position wrt mosaic')
+parser.add_argument('--filter',dest = 'filter', default ='R', help = 'Filter for the input mosaic image (e.g. r, R, Ha).  Default value is R.')
+parser.add_argument('--nhalpha',dest = 'nhalpha', default ='12', help = 'H-alpha filter number (e.g. 4, 8, 12 or 16).  Default value is 12.')
+parser.add_argument('--scale',dest = 'scale', default =15., help = 'cutout size = (scale x Re, scale x Re) - increase scale to increase size of cutout.  Default value is 15.')
+parser.add_argument('--cluster',dest = 'cluster', default ='A1367', help = 'cluster name to preprend to cutout image names (no spaces!).  Default value is A1367.')
+parser.add_argument('--plot', dest = 'plot', default = False, action = 'store_true', help = 'plot cutouts and position wrt mosaic.  Default value is False.')
 #parser.add_argument('--l', dest = 'l', default = False, help = 'List of images to input to swarp')
 
 args = parser.parse_args()

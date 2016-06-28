@@ -49,21 +49,22 @@ WRITTEN BY:
 '''
 from astropy.io import fits
 import argparse
+from argparse import RawDescriptionHelpFormatter
 from matplotlib import pyplot as plt
 from scipy.stats import scoreatpercentile
 
-parser = argparse.ArgumentParser(description ='subtract scaled R-band image from Halpha')
+parser = argparse.ArgumentParser(description ='This program subtracts scaled R-band image from Halpha.\n \nTo subtract mosaics:\n~/github/HalphaImaging/uat_subtract_continuum.py --r A1367-h02_R.coadd.fits --ha A1367-h02_ha12.coadd.fits --scale 0.0445 --mosaic \n\nTo subtract cutouts:\n~/github/HalphaImaging/uat_subtract_continuum.py --cluster A1367 --scale 0.044 --id 113364', formatter_class=RawDescriptionHelpFormatter)
 parser.add_argument('--cluster',dest = 'cluster', default = None, help = 'Cluster prefix of image for continuum subtraction.  Use this if you are subtracting continuum from a cutout rather than a mosaic.')
 parser.add_argument('--id',dest = 'id', default = None, help = 'NSAID of image for continuum subtraction.  Use this if you are subtracting continuum from a cutout rather than a mosaic.')
-parser.add_argument('--r', dest = 'r', default = None, help = 'R-band image')
-parser.add_argument('--ha', dest = 'ha', default = None, help = 'Halpha image')
+parser.add_argument('--r', dest = 'r', default = None, help = 'R-band image.  Use this if you are subtracting mosaic images rather than cutouts.')
+parser.add_argument('--ha', dest = 'ha', default = None, help = 'Halpha image.  Use this if you are subtracting mosaic images rather than cutouts.')
 parser.add_argument('--scale', dest = 'scale', default = 0.0445, help = 'factor to scale R-band image by before subtracting from Halpha image')
-parser.add_argument('--mosaic', dest = 'mos', default = False, action = 'store_true', help = 'set this if subtracting mosaic images rather than cutouts')
+parser.add_argument('--mosaic', dest = 'mos', default = False, action = 'store_true', help = 'set this if subtracting mosaic images rather than cutouts.  It will make the figure bigger so you can see the mosaics better.')
 args = parser.parse_args()
 
 figure_size=(10,4)
 if args.mos:
-    figure_size=(15,8)
+    figure_size=(14,6)
     
 if args.id:
     rimage = args.cluster+'-'+args.id+'-R.fits'

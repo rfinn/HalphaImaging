@@ -90,34 +90,33 @@ for csimage in infiles:
     plt.subplots_adjust(hspace=0,wspace=0)
     #Halpha plus continuum
     plt.subplot(1,3,1)
-    plt.imshow(ha,cmap='gray_r',vmin=v1,vmax=v2)
+    plt.imshow(ha,cmap='gray_r',vmin=v1,vmax=v2,origin='lower')
     plt.title('Halpha + cont')
-    plt.gca().set_yticks(())
-    plt.gca().invert_yaxis()
+    plt.xlabel(prefix, fontsize = 14)
     #R
     plt.subplot(1,3,2)
-    plt.imshow(r,cmap='gray_r',vmin=v1/.0445,vmax=v2/.0445)
+    plt.imshow(r,cmap='gray_r',vmin=v1/.0445,vmax=v2/.0445,origin='lower')
     plt.title('R')
     plt.gca().set_yticks(())
-    plt.gca().invert_yaxis()
     #Continuum subtracted image
     plt.subplot(1,3,3)
-    plt.imshow(cs,cmap='gray_r',vmin=v1,vmax=v2)
+    plt.imshow(cs,cmap='gray_r',vmin=v1,vmax=v2,origin='lower')
     plt.title('contsub')
     plt.gca().set_yticks(())
-    plt.gca().invert_yaxis()
     plt.show(block=False)
     need_input = True
     while need_input:
         t=raw_input('Does continuum-subtracted image show Halpha emission? (y or n, q to quit) \n')
         if t.find('n') > -1: # no Halpha emission
             need_input = False
+            plt.savefig(prefix+'-noHa.png')
         elif t.find('y') > -1:
             # move cutouts to specified directory
             need_input = False
             os.rename(rimage,args.output_dir+'/'+rimage)
             os.rename(haimage,args.output_dir+'/'+haimage)
             os.rename(csimage,args.output_dir+'/'+csimage)
+            plt.savefig(args.output_dir+'/'+prefix+'-Ha-emission.png')
         elif t.find('q') > -1:
             need_input = False
             sys.exit()
