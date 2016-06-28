@@ -48,9 +48,9 @@ Research Team Summer 2016 --> Grant Boughton, Natasha Collova, Sandy Spicer
 
 import argparse
 import glob
-import ccdproc
 #from astropy import coordinates as coord
 from astropy import units as u
+import ccdproc
 #from astropy.coordinates import SkyCoord
 from astropy.io import fits
 

@@ -17,7 +17,7 @@ USEAGE:
 
 run in ipython -pylab
 
-   %run ~/github/HalphaImaging/uat_runellipse.py --r r_image.fits --ha ha_image.fits
+   %run ~/github/HalphaImaging/uat_runellipse.py --cluster A1367 --id 113111
 
 '''
 
