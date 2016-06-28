@@ -5,19 +5,41 @@
 
 GOAL:
 
-PROCEDURE:
-   scale R band by a factor
-   subtract from Halpha
-   save resultant imaage
-  
-EXAMPLE:
-   from within ipython type:
+To create a continuum-subtracted image given
+(1) an R-band and Halpha image, and
+(2) the scale factor to apply to the R-band image.
 
-   %run ~/github/HalphaImaging/uat_subtract_continuum.py --r A1367-h02_R.coadd.fits --ha A1367-h02_ha12.coadd.fits --scale .055
+PROCEDURE:
+
+- scale R band by a factor
+- subtract from Halpha
+- iterate until the you are happy
+- save resultant continuum-subtracted image if desired
+  
+EXAMPLES:
+
+(1) to run within ipython type:
+
+%run ~/github/HalphaImaging/uat_subtract_continuum.py --r A1367-h02_R.coadd.fits --ha A1367-h02_ha12.coadd.fits --scale .055 --mosaic
+
+The mosaic flag increases the size of the images that are displayed so you can see the results better.
+
+(2) to run from the command line type:
+
+~/github/HalphaImaging/uat_subtract_continuum.py --r A1367-h02_R.coadd.fits --ha A1367-h02_ha12.coadd.fits --scale .055
+
+(3) to run on cutout images rather than mosaics:
+
+ ~/github/HalphaImaging/uat_subtract_continuum.py --cluster A1367 --scale 0.044 --id 113364
 
 INPUT/OUPUT:
 
 REQUIRED MODULES:
+
+astropy
+argparse
+matplotlib
+scipy
 
 EXTRA NOTES:
 
@@ -31,19 +53,30 @@ from matplotlib import pyplot as plt
 from scipy.stats import scoreatpercentile
 
 parser = argparse.ArgumentParser(description ='subtract scaled R-band image from Halpha')
+parser.add_argument('--cluster',dest = 'cluster', default = None, help = 'Cluster prefix of image for continuum subtraction.  Use this if you are subtracting continuum from a cutout rather than a mosaic.')
+parser.add_argument('--id',dest = 'id', default = None, help = 'NSAID of image for continuum subtraction.  Use this if you are subtracting continuum from a cutout rather than a mosaic.')
 parser.add_argument('--r', dest = 'r', default = None, help = 'R-band image')
-parser.add_argument('--ha', dest = 'ha', default = None, help = 'R-band image')
-parser.add_argument('--scale', dest = 'scale', default = 0.06, help = 'R-band image')
-parser.add_argument('--mosaic', dest = 'mos', default = False, action = 'store_true', help = 'specifies mosaic image')
+parser.add_argument('--ha', dest = 'ha', default = None, help = 'Halpha image')
+parser.add_argument('--scale', dest = 'scale', default = 0.0445, help = 'factor to scale R-band image by before subtracting from Halpha image')
+parser.add_argument('--mosaic', dest = 'mos', default = False, action = 'store_true', help = 'set this if subtracting mosaic images rather than cutouts')
 args = parser.parse_args()
 
 figure_size=(10,4)
 if args.mos:
     figure_size=(15,8)
     
+if args.id:
+    rimage = args.cluster+'-'+args.id+'-R.fits'
+    haimage = args.cluster+'-'+args.id+'-Ha.fits'
+    id = args.id
+else:
+    rimage = args.r
+    haimage = args.ha
+    t = args.r.split('-')
+    id = t[0]
+r,r_header = fits.getdata(rimage,header=True)
+ha,ha_header = fits.getdata(haimage,header=True)
 
-r,r_header = fits.getdata(args.r,header=True)
-ha,ha_header = fits.getdata(args.ha,header=True)
 scale = float(args.scale)
 
 adjust_scale = True
@@ -55,24 +88,21 @@ while adjust_scale:
     plt.subplots_adjust(hspace=0,wspace=0)
     #Halpha plus continuum
     plt.subplot(1,3,1)
-    plt.imshow(ha,cmap='gray_r',vmin=v1,vmax=v2)
+    plt.imshow(ha,cmap='gray_r',vmin=v1,vmax=v2,origin='lower')
     plt.title('Halpha + cont')
-    plt.gca().set_yticks(())
-    plt.gca().invert_yaxis()
+    #plt.gca().set_yticks(())
+    plt.xlabel('NSA ID '+id,fontsize=14)
     #R
     plt.subplot(1,3,2)
-    plt.imshow(r,cmap='gray_r',vmin=v1,vmax=v2)
+    plt.imshow(r,cmap='gray_r',vmin=v1/.0445,vmax=v2/.0445,origin='lower')
     plt.title('R')
     plt.gca().set_yticks(())
-    plt.gca().invert_yaxis()
     #Continuum subtracted image
     plt.subplot(1,3,3)
-    plt.imshow(cs,cmap='gray_r',vmin=v1,vmax=v2)
-    plt.title('contsub, scale = %4.3f'%(scale))
+    plt.imshow(cs,origin='lower',cmap='gray_r',vmin=v1,vmax=v2)
     plt.gca().set_yticks(())
-    plt.gca().invert_yaxis()
-    plt.draw()
-    plt.show()
+    plt.title('contsub, scale = %4.3f'%(scale))
+    plt.show(block=False)
     
     
     t=raw_input('enter new value for scale factor;\n   w to write output and quit;\n   q to quit without saving\n')
@@ -83,10 +113,10 @@ while adjust_scale:
         if t.find('q') > -1:
             break
         if t.find('w') > -1:
-            if args.ha.find('Ha') > -1:
-                outimage = args.ha.split('-Ha')[0]+'-CS.fits'
-            elif args.ha.find('ha') > -1:
-                outimage = args.ha.split('_ha')[0]+'-CS.fits'
+            if haimage.find('Ha') > -1:
+                outimage = haimage.split('-Ha')[0]+'-CS.fits'
+            elif haimage.find('ha') > -1:
+                outimage = haimage.split('_ha')[0]+'-CS.fits'
             newfile = fits.PrimaryHDU()
             newfile.data = cs
             newfile.header = ha_header
