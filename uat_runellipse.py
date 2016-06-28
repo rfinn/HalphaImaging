@@ -52,7 +52,7 @@ args = parser.parse_args()
 #if args.display:
 #    import ds9
 
-def call_measure_disk(input_image,mask_image=None,ipa=0,xcenter=None,ycenter=None,minr=2,initialr=30,iellip = .05,wave_band=0,keepfixed=0):
+def call_measure_disk(input_image,mask_image=None,ipa=0,xcenter=None,ycenter=None,minr=2,initialr=15,iellip = .05,wave_band=0,keepfixed=0):
     print 'mask image = ',mask_image
     fdulist = fits.open(input_image)
     t=fdulist[0].data
@@ -225,7 +225,7 @@ if __name__ == '__main__':
     mask=args.cluster+'-'+args.id+'-mask.fits'
     
     # run ellipse on r image
-    newxcenter,newycenter,newellip,newPA=call_measure_disk(rimage,wave_band=0,mask_image=mask)
+    newxcenter,newycenter,newellip,newPA=call_measure_disk(rimage,wave_band=0,mask_image=mask,initialr=20)
 
     # use ellipse parameters from r-band as input for Halpha
     newxcenter,newycenter,newellip,newPA=call_measure_disk(haimage,wave_band=1,ipa=newPA,xcenter=newxcenter,ycenter=newycenter,minr=2,initialr=20,iellip = newellip,keepfixed=1,mask_image=mask)

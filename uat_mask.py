@@ -60,6 +60,8 @@ def read_se_cat():
     return objNumber[0] # not sure why above line returns a list
 
 def runse():
+    print 'using a deblending threshold = ',args.threshold
+    
     os.system('sex %s -c %s -CATALOG_NAME test.cat -CATALOG_TYPE FITS_1.0 -DEBLEND_MINCONT %f'%(args.image,defaultcat,args.threshold))
     maskdat = fits.getdata('segmentation.fits')
     center_object = read_se_cat()
@@ -86,14 +88,15 @@ v1,v2=scoreatpercentile(image,[5.,95.])
 maskdat = runse()
 
 while adjust_mask:
+    plt.close('all')
     plt.figure(1,figsize=figure_size)
     plt.clf()
     plt.subplots_adjust(hspace=0,wspace=0)
     plt.subplot(1,2,1)
-    plt.imshow(image,cmap='gray_r',vmin=v1,vmax=v2)
+    plt.imshow(image,cmap='gray_r',vmin=v1,vmax=v2,origin='lower')
     plt.title('image')
     plt.subplot(1,2,2)
-    plt.imshow(maskdat,cmap='gray_r',vmin=v1,vmax=v2)
+    plt.imshow(maskdat,cmap='gray_r',origin='lower')
     plt.title('mask')
     plt.gca().set_yticks(())
     #plt.draw()

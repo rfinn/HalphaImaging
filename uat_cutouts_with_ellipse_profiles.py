@@ -155,7 +155,7 @@ def makeplots(rimage,haimage):
     plt.xlabel('$ sma \ (arcsec) $',fontsize=20)
     putlabel('$Flux(<r) $')
 
-    outfile=prefix+'-ellipse-profiles.png'
+    outfile=prefix+'-'+args.id+'-ellipse-profiles.png'
     print 'saving result as ',outfile
     plt.savefig(outfile)
     #plt.close()
