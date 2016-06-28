@@ -101,7 +101,7 @@ while adjust_scale:
     plt.subplot(1,3,3)
     plt.imshow(cs,origin='lower',cmap='gray_r',vmin=v1,vmax=v2)
     plt.gca().set_yticks(())
-    plt.title('contsub, scale = %4.3f'%(scale))
+    plt.title('contsub, scale = %4.4f'%(scale))
     plt.show(block=False)
     
     

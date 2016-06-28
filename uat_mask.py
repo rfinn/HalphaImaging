@@ -32,7 +32,6 @@ REQUIRED MODULES:
 import os
 from astropy.io import fits
 import numpy as np
-#from pyraf import iraf
 import argparse
 from matplotlib import pyplot as plt
 from scipy.stats import scoreatpercentile

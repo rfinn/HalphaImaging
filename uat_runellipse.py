@@ -31,8 +31,11 @@ import argparse
 
 
 parser = argparse.ArgumentParser(description ='Run ellipse on R and Halpha images')
-parser.add_argument('--r', dest = 'r', default = None, help = 'R-band image')
-parser.add_argument('--ha', dest = 'ha', default = None, help = 'R-band image')
+parser.add_argument('--cluster',dest = 'cluster', default = None, help = 'Cluster prefix of image to run ellipse on.')
+parser.add_argument('--id',dest = 'id', default = None, help = 'NSAID of image to run ellipse on.')
+
+#parser.add_argument('--r', dest = 'r', default = None, help = 'R-band image')
+#parser.add_argument('--ha', dest = 'ha', default = None, help = 'Halpha image')
 #parser.add_argument('--scale', dest = 'scale', default = 0.06, help = 'R-band image')
 args = parser.parse_args()
 
@@ -214,10 +217,12 @@ iraf.ttools()
 #rimage=sys.argv[1]
 
 if __name__ == '__main__':
-    rimage=args.r
-    haimage=args.ha
-    t = rimage.split('-')
-    mask=t[0]+'-'+t[1]+'-mask.fits'
+    rimage=args.cluster+'-'+args.id+'-R.fits'
+    haimage=args.cluster+'-'+args.id+'-CS.fits'
+
+    #rimage=args.r
+    #haimage=args.ha
+    mask=args.cluster+'-'+args.id+'-mask.fits'
     
     # run ellipse on r image
     newxcenter,newycenter,newellip,newPA=call_measure_disk(rimage,wave_band=0,mask_image=mask)
