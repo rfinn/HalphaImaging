@@ -10,7 +10,7 @@ EXAMPLE:
 
 from within ipython -pylab
 
-%run ~/github/HalphaImaging/uat_cutouts_with_ellipse_profiles.py --r A1367-140231-R.fits --ha A1367-140231-Ha.fits
+%run ~/github/HalphaImaging/uat_cutouts_with_ellipse_profiles.py --cluster A1367 --id 140231
 
 REQUIRED MODULES:
 
