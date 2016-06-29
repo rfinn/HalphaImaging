@@ -36,21 +36,21 @@ parser = argparse.ArgumentParser(description ='Run ellipse on R and Halpha image
 #parser.add_argument('--ha', dest = 'ha', default = None, help = 'R-band image')
 parser.add_argument('--cluster', dest = 'cluster', default = None, help = 'cluster and prefix of image names (e.g. A1367)')
 parser.add_argument('--id', dest = 'id', default = None, help = 'NSA ID number')
-
-#parser.add_argument('--scale', dest = 'scale', default = 0.06, help = 'R-band image')
+parser.add_argument('--scale', dest = 'scale', default = 0.0445, help = 'Filter ratio of R-band to Halpha.  Default is 0.0445.')
 args = parser.parse_args()
 
+ratio_r2ha=1./args.scale
 
-ratio_r2ha=18.43
-
-def plotintens(data_file,pls='-',pcolor='k',pixelscale=.423,scale=1):
-
+def plotintens(data_file,pls='-',pcolor='k',pixelscale=.425,scale=1,label=None,legend=False):
     data1 = np.genfromtxt(data_file)
     sma_pix = data1[:,1]*pixelscale
     intens, intens_err = data1[:,2], data1[:,3]
     plt.plot(sma_pix,intens*scale,ls=pls,color=pcolor)
-    plt.errorbar(sma_pix,intens*scale,intens_err,fmt=None,ecolor=pcolor)
-    plt.axhline(y=0,ls='--',color='k')
+    plt.errorbar(sma_pix,intens*scale,intens_err,fmt=None,ecolor=pcolor,label='__nolegend__')
+    plt.axhline(y=0,ls='--',color='k',label='_nolegend_')
+    if legend:
+        plt.legend(['$R$',r'$H\alpha$'])
+    return intens[0]
 
 
 def plotfenclosed(data_file,pls='-',pcolor='k',pixelscale=0.425):
@@ -81,7 +81,7 @@ def plotimage(fits_image,vmin=0,vmax=4):
     plt.axis('equal')
     logscale=0
     vmin,vmax=scoreatpercentile(im,[5.,95.])
-    plt.imshow((im),interpolation='nearest',origin='upper',cmap='binary',vmin=vmin,vmax=vmax)        
+    plt.imshow((im),interpolation='nearest',origin='lower',cmap='binary',vmin=vmin,vmax=vmax)        
     ax.set_yticklabels(([]))
     ax.set_xticklabels(([]))
 
@@ -101,7 +101,7 @@ def makeplots(rimage,haimage):
     # plot r-band cutout image
     rfits=rimage
     plotimage(rfits,vmin=-.05,vmax=500)
-    putlabel('$R-band $')
+    plt.title('$R-band $')
     t=rimage.split('-')
     agcnumber=t[1]
     plt.xlabel('$'+str(agcnumber)+'$',fontsize=20)
@@ -109,7 +109,7 @@ def makeplots(rimage,haimage):
     # plot 24um cutout
     hafits=haimage
     plotimage(hafits,vmin=-.05,vmax=100)
-    putlabel(r'$H \alpha $')
+    plt.title(r'$H \alpha $')
     
     plt.subplot(ny,nx,3)
     # plot r and 24 profiles
@@ -121,39 +121,47 @@ def makeplots(rimage,haimage):
 
     chadat='c'+hadat
 
-    plotintens(rdat,pixelscale=mosaic_pixelscale,pcolor='b')
-    plotintens(hadat,pixelscale=mosaic_pixelscale,pcolor='r',scale=ratio_r2ha)
+    central_intens_R = plotintens(rdat,pixelscale=mosaic_pixelscale,pcolor='b',label='$R-band$')
+    central_intens_ha = plotintens(hadat,pixelscale=mosaic_pixelscale,pcolor='r',scale=ratio_r2ha,label='$H\alpha$',legend=True)
 
-    try:
-        plotintens(chadat,pixelscale=mosaic_pixelscale,pcolor='m',scale=ratio_r2ha)
-    except:
-        print 'no convolved Halpha'
-    plt.gca().set_yscale('log')
+    #try:
+    #    plotintens(chadat,pixelscale=mosaic_pixelscale,pcolor='m',scale=ratio_r2ha)
+    #except:
+    #    print 'no convolved Halpha'
+    #plt.gca().set_yscale('log')
     #gca().set_xscale('log')
     #plt.axis([.3,100,.1,1000])
     #axis([.3,40,-10,400.])
     plt.xlabel('$ sma \ (arcsec) $',fontsize=20)
-    putlabel('$Intensity $')
+    plt.title('$Intensity $')
     # 21 total flux enclosed by ellipse
     plt.subplot(ny,nx,4)
 
+    # plot normalized intensity
+
+    t = plotintens(rdat,pixelscale=mosaic_pixelscale,pcolor='b',label='R-band',scale = 1./central_intens_R)
+    t = plotintens(hadat,pixelscale=mosaic_pixelscale,pcolor='r',scale=1./central_intens_ha,label='H-alpha',legend=True)
+    '''
     plotfenclosed(rdat,pixelscale=mosaic_pixelscale,pcolor='b')
     plotfenclosed(hadat,pixelscale=mosaic_pixelscale,pcolor='r')
     try:
         plotfenclosed(chadat,pixelscale=mosaic_pixelscale,pcolor='m')
     except:
         print 'no convolved Halpha'
-
+    '''
     ax=plt.gca()
-    plt.axis([.3,10,5.,120.])
-    ax.set_yscale('log')
+    #ax.set_yscale('log')
+    ax.legend(loc = 'upper right')
+    plt.ylim(-.05,1.05)
     #ax.set_xscale('log')
-    plt.axis([.3,40,5.,120.])
+    #plt.axis([.3,40,5.,120.])
 
-    plt.axhline(y=50,ls=':',color='k')
-    plt.axhline(y=70,ls=':',color='k')
+    #plt.axhline(y=50,ls=':',color='k')
+    #plt.axhline(y=70,ls=':',color='k')
     plt.xlabel('$ sma \ (arcsec) $',fontsize=20)
-    putlabel('$Flux(<r) $')
+    plt.legend(loc = 'lower left')
+    #putlabel('$Flux(<r) $')
+    plt.title('$Normalized  \ Intensity $')
 
     outfile=prefix+'-'+args.id+'-ellipse-profiles.png'
     print 'saving result as ',outfile

@@ -7,9 +7,9 @@ EXAMPLE:  Running reduction of A1367-h02
 ** Make cutouts
 ---------------
 
-~/github/HalphaImaging/uat_make_cutouts.py --image A1367-h02-CS.fits --catalog ~/research/NSA/nsa_v0_1_2.fits --filter CS --nhalpha 12 --cluster A1367
+~/github/HalphaImaging/uat_make_cutouts.py --image A1367-h02-cs.fits --catalog ~/research/NSA/nsa_v0_1_2.fits --filter CS --nhalpha 12 --cluster A1367
 
-~/github/HalphaImaging/uat_make_cutouts.py --image A1367-h02_ha12.coadd.fits --catalog ~/research/NSA/nsa_v0_1_2.fits --filter  --nhalpha 12 --cluster A1367
+~/github/HalphaImaging/uat_make_cutouts.py --image A1367-h02_ha12.coadd.fits --catalog ~/research/NSA/nsa_v0_1_2.fits --filter Ha --nhalpha 12 --cluster A1367
 
 ~/github/HalphaImaging/uat_make_cutouts.py --image A1367-h02_R.coadd.fits --catalog ~/research/NSA/nsa_v0_1_2.fits --filter R --nhalpha 12 --cluster A1367
 
