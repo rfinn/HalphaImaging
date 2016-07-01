@@ -48,7 +48,8 @@ defaultcat='default.sex.HDI.mask'
 parser = argparse.ArgumentParser(description ='Create a mask for extraneous objects in field')
 parser.add_argument('--image', dest = 'image', default = None, help = 'image to mask')
 parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files')
-parser.add_argument('--threshold', dest = 'threshold', default = .005, help = "sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store") 
+parser.add_argument('--threshold', dest = 'threshold', default = .005, help = "sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store")
+parser.add_argument('--snr', dest = 'snr', default = .005, help = "sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store") 
 args = parser.parse_args()
 
 sextractor_files=['default.sex.HDI.mask','default.param','default.conv','default.nnw']

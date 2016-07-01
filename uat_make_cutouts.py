@@ -134,9 +134,12 @@ def makecuts(image,imagefilter):
         #print image, radius[i], position, size
         #cutout = Cutout2D(fdulist[0].data, position, size, wcs=w, mode='strict') #require entire image to be on parent image
         try:
-            cutout = Cutout2D(f[0].data, position, size, wcs=w, mode='strict') #require entire image to be on parent image
+            cutout = Cutout2D(f[0].data, position, size, wcs=w, mode='trim') #require entire image to be on parent image
         except astropy.nddata.utils.PartialOverlapError:# PartialOverlapError:
             print 'galaxy is only partially covered by mosaic - skipping ',IDNUMBER[i]
+            continue
+        except astropy.nddata.utils.NoOverlapError:# PartialOverlapError:
+            print 'galaxy is not covered by mosaic - skipping ',IDNUMBER[i]
             continue
         if args.plot:
             plt.figure()

@@ -1,7 +1,13 @@
 EXAMPLE:  Running reduction of A1367-h02
 
 
-** 
+** Subtract Continuum
+---------------------
+
+~/github/HalphaImaging/uat_subtract_continuum.py --r NRGb247_R.coadd.fits --ha NRGb247_ha16.coadd.fits --scale 0.0445 --mosaic
+
+ended up writing each trial and then I used ds9 to exam the continuum-subtracted image.  It is too difficult to tell
+if the continuum-subtraction worked well from the python plot.
 
 
 ** Make cutouts
@@ -12,6 +18,16 @@ EXAMPLE:  Running reduction of A1367-h02
 ~/github/HalphaImaging/uat_make_cutouts.py --image A1367-h02_ha12.coadd.fits --catalog ~/research/NSA/nsa_v0_1_2.fits --filter Ha --nhalpha 12 --cluster A1367
 
 ~/github/HalphaImaging/uat_make_cutouts.py --image A1367-h02_R.coadd.fits --catalog ~/research/NSA/nsa_v0_1_2.fits --filter R --nhalpha 12 --cluster A1367
+
+
+For MKW11
+
+~/github/HalphaImaging/uat_make_cutouts.py --image NRGb247-cs.fits --catalog ~/research/NSA/nsa_v0_1_2.fits --filter CS --nhalpha 16 --cluster MKW11
+
+~/github/HalphaImaging/uat_make_cutouts.py --image NRGb247_R.coadd.fits --catalog ~/research/NSA/nsa_v0_1_2.fits --filter R --nhalpha 16 --cluster MKW11
+
+~/github/HalphaImaging/uat_make_cutouts.py --image NRGb247_ha16.coadd.fits --catalog ~/research/NSA/nsa_v0_1_2.fits --filter Ha --nhalpha 16 --cluster MKW11
+
 
 
 ** Review continuum-subtracted images
