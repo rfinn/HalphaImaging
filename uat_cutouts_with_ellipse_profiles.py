@@ -150,11 +150,11 @@ def makeplots(rimage,haimage):
         print 'no convolved Halpha'
     '''
     ax=plt.gca()
-    #ax.set_yscale('log')
+    ax.set_yscale('log')
     ax.legend(loc = 'upper right')
     plt.ylim(-.05,1.05)
-    #ax.set_xscale('log')
-    #plt.axis([.3,40,5.,120.])
+    ax.set_xscale('log')
+    plt.axis([.3,40,5.,120.])
 
     #plt.axhline(y=50,ls=':',color='k')
     #plt.axhline(y=70,ls=':',color='k')
