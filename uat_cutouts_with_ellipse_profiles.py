@@ -128,10 +128,10 @@ def makeplots(rimage,haimage):
     #    plotintens(chadat,pixelscale=mosaic_pixelscale,pcolor='m',scale=ratio_r2ha)
     #except:
     #    print 'no convolved Halpha'
-    #plt.gca().set_yscale('log')
-    #gca().set_xscale('log')
+    plt.gca().set_yscale('log')
+    #plt.gca().set_xscale('log')
     #plt.axis([.3,100,.1,1000])
-    #axis([.3,40,-10,400.])
+    #plt.axis([.3,40,-10,400.])
     plt.xlabel('$ sma \ (arcsec) $',fontsize=20)
     plt.title('$Intensity $')
     # 21 total flux enclosed by ellipse
@@ -152,9 +152,9 @@ def makeplots(rimage,haimage):
     ax=plt.gca()
     ax.set_yscale('log')
     ax.legend(loc = 'upper right')
-    plt.ylim(-.05,1.05)
-    ax.set_xscale('log')
-    plt.axis([.3,40,5.,120.])
+
+    #ax.set_xscale('log')
+    #plt.axis([.3,40,5.,120.])
 
     #plt.axhline(y=50,ls=':',color='k')
     #plt.axhline(y=70,ls=':',color='k')
