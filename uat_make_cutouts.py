@@ -6,7 +6,6 @@ GOAL:
 
     to create postage-stamp cutouts of galaxies
 
-
 PROCEDURE:
 
     read catalog containing RA, Dec and some measure of galaxy size (e.g. NSA THETA_50)
@@ -32,9 +31,6 @@ If running on coma, you don't need to specify the catalog path - the default sho
 
     uat_make_cutouts.py catalog image Halpha_filter_number
 
-    To run type CutoutGenerator.py catalog filter_number into the commandline.
-    Catalog is the path to the AGC table 
-    The filter number is obtainted from the Kitt Peak National observatory webpage.
 
 EXAMPLE:
 
@@ -47,7 +43,6 @@ REQUIRED MODULES:
 
 NOTES:
     You may need to change the variables Haimage, Rimage and Hawcimage if your image names are different
-
 
 REFERENCES:
 
