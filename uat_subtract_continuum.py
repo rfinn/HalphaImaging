@@ -82,8 +82,10 @@ scale = float(args.scale)
 
 adjust_scale = True
 while adjust_scale:
+    plt.close('all')
     cs = ha  - scale*r
-    v1,v2=scoreatpercentile(ha,[5.,95.])
+    v1,v2=scoreatpercentile(ha,[.5,99.])
+    
     plt.figure(1,figsize=figure_size)
     plt.clf()
     plt.subplots_adjust(hspace=0,wspace=0)
@@ -95,11 +97,12 @@ while adjust_scale:
     plt.xlabel('NSA ID '+id,fontsize=14)
     #R
     plt.subplot(1,3,2)
-    plt.imshow(r,cmap='gray_r',vmin=v1/.0445,vmax=v2/.0445,origin='lower')
+    plt.imshow(r,cmap='gray_r',vmin=v1/scale,vmax=v2/scale,origin='lower')
     plt.title('R')
     plt.gca().set_yticks(())
     #Continuum subtracted image
     plt.subplot(1,3,3)
+    v3,v4=scoreatpercentile(cs,[1.,99.])
     plt.imshow(cs,origin='lower',cmap='gray_r',vmin=v1,vmax=v2)
     plt.gca().set_yticks(())
     plt.title('contsub, scale = %4.4f'%(scale))
@@ -122,3 +125,5 @@ while adjust_scale:
             newfile.data = cs
             newfile.header = ha_header
             fits.writeto(outimage, newfile.data, header = newfile.header, clobber=True)
+            output = outimage.split('.fits')
+            plt.savefig(output[0]+'.png')
