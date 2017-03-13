@@ -64,3 +64,71 @@ http://photutils.readthedocs.io/en/latest/photutils/aperture.html
 
 
 '''
+
+from astropy.io import fits
+import numpy as np
+from astropy.modeling import models, fitting
+from astropy.modeling.models import Ellipse2D
+from astropy.coordinates import Angle
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import warnings
+
+image_path = '/Users/rfinn/github/H-alpha_cutouts/R-band-cutouts/'
+im1='A1367-113394-R.fits'
+#A1367-113078.fits
+
+image = image_path+im1
+# read in image
+imdat = fits.getdata(image)
+plt.imshow(imdat)
+
+
+
+# fit ellipse
+'''
+p_init = models.Polynomial2D(degree=2)
+fit_p = fitting.LevMarLSQFitter()
+
+x=np.arange(imdat.shape[0])
+y=np.arange(imdat.shape[1])
+with warnings.catch_warnings():
+    # Ignore model linearity warning from the fitter
+    warnings.simplefilter('ignore')
+    p = fit_p(p_init, x,y,imdat)
+
+'''
+
+np.random.seed(0)
+y, x = np.mgrid[:imdat.shape[0], :imdat.shape[1]]
+#z = 2. * x ** 2 - 0.5 * x ** 2 + 1.5 * x * y - 1.
+#z += np.random.normal(0., 0.1, z.shape) * 50000.
+z = imdat
+# Fit the data using astropy.modeling
+x0 = imdat.shape[1]/2.
+y0 = imdat.shape[0]/2.
+a = imdat.shape[0]/5.
+b = .6*a
+theta=Angle(0,'deg')
+p_init = models.Ellipse2D(amplitude=np.max(imdat),x_0 = x0,y_0 = y0, a=a, b=b, theta=theta.radian)
+fit_p = fitting.LevMarLSQFitter()
+
+#imdat=50000*imdat
+with warnings.catch_warnings():
+    # Ignore model linearity warning from the fitter
+    warnings.simplefilter('ignore')
+    #p = fit_p(p_init, x, y, z)
+    p = fit_p(p_init, x, y, imdat)
+
+# Plot the data with the best-fit model
+plt.figure(figsize=(8, 2.5))
+plt.subplot(1, 3, 1)
+plt.imshow(imdat, origin='lower', interpolation='nearest', vmin=-1, vmax=12)
+plt.title("Data")
+plt.subplot(1, 3, 2)
+plt.imshow(p(x, y), origin='lower', interpolation='nearest', vmin=-1, vmax=12)
+plt.title("Model")
+plt.subplot(1, 3, 3)
+plt.imshow(imdat - p(x, y), origin='lower', interpolation='nearest', vmin=-1,vmax=12)
+plt.title("Residual")
+# display image and ellipse

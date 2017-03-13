@@ -13,12 +13,11 @@ EXAMPLE:
    In the directory containing all flattened objects with fixed headers to run sextractor type in the command line:
       '/Users/alfalfa/Github/HalphaImaging/uat_sextractor_2image.py --s'(or whatever the path is to where this program is stored)
 
-   To get swarp to create aligned images in multiple bans (e.g. Halpha and R-band), do the following
-    uat_astr_mosaic.py --swarp --l A1367-h02_ha12
+    from within ipython:
+    
+    %run ~/github/HalphaImaging/uat_sextractor_2image.py --s --image1 A1367_R
+   ...: .coadd.fits --image2 A1367_ha12.coadd.fits --plot
 
-    uat_astr_mosaic.py --swarp --l A1367-h02_R --refimage 'A1367-h02_ha12.coadd.fits'
-
-    uat_astr_mosaic.py --swarp --l A1367-h02_ha12 --refimage 'A1367-h02_ha12.coadd.fits'
 
 
 WHAT THIS CODE DOES:
@@ -41,7 +40,7 @@ import numpy as np
 parser = argparse.ArgumentParser(description ='Run sextractor in two-image mode')
 parser.add_argument('--s', dest = 's', default = False, action = 'store_true', help = 'Run sextractor to create object catalogs')
 parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files')
-parser.add_argument('--image1',dest = 'image1', default = None,  help = 'image used to define apertures')
+parser.add_argument('--image1',dest = 'image1', default = None,  help = 'image used to define apertures (R-band)')
 parser.add_argument('--image2',dest = 'image2', default = None,  help = 'image used to for measuring phot based on image1 (typically this is the Halpha image)')
 parser.add_argument('--plot',dest = 'plot', default = False, action = 'store_true', help = 'make diagnostic plots')
 parser.add_argument('--imagedir',dest = 'imagedir', default = '/Users/rfinn/research/HalphaGroups/plots/', help = 'directory for saving plots')
