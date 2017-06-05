@@ -30,8 +30,8 @@ def convolve_images():
 prefix=raw_input('Give image prefix (EX: ifwcs_data08???.fits)')
 files=glob.glob(prefix)
 nfiles=len(files)
-image_fwhm=zeros(nfiles,'f')
-image_fwhm_std=zeros(nfiles,'f')
+image_fwhm=np.zeros(nfiles,'f')
+image_fwhm_std=np.zeros(nfiles,'f')
 
 
 get_fwhm()
