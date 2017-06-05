@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import glob
+import numpy as np
 #from uat_astr_mosaic --s import *
 from pyraf.iraf import gauss
 
