@@ -42,7 +42,7 @@ for i in range(nfiles): print i, files[i],image_fwhm[i],image_fwhm_std[i]
 
     
 # get worst fwhm
-fwhm_max=np.maximum(image_fwhm)
+fwhm_max=max(image_fwhm)
 print 'the largest FWHM = ',fwhm_max
 
 
