@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import glob
-#from uat_astr_mosaic --s import *
+from uat_astr_mosaic --s import *
 from pyraf.iraf import gauss
 
 # run sextractor
