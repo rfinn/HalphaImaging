@@ -4,6 +4,7 @@ import glob
 import numpy as np
 #from uat_astr_mosaic --s import *
 from pyraf.iraf import gauss
+import math
 
 # run sextractor
 
@@ -41,7 +42,7 @@ for i in range(nfiles): print i, files[i],image_fwhm[i],image_fwhm_std[i]
 
     
 # get worst fwhm
-fwhm_max=max(image_fwhm)
+fwhm_max=np.maximum(image_fwhm)
 print 'the largest FWHM = ',fwhm_max
 
 
@@ -50,6 +51,6 @@ print 'the largest FWHM = ',fwhm_max
 # use pyraf.iraf.gauss (sigma = FWHM/2.35)
 # (sigma_out)^2 = (sigma_in)^2 + (sigma_filter)^2
 #
-# (sigma_filter) = sqrt[(fwhm_out/2.35)^2 - (sigma_in/2.35)^2] 
-sigma_filter = sqrt((fwhm_max/2.35)**2 - (image_fwhm/2.35)**2)
+# (sigma_filter) = np.sqrt[(fwhm_out/2.35)^2 - (sigma_in/2.35)^2] 
+sigma_filter = np.sqrt((fwhm_max/2.35)**2 - (image_fwhm/2.35)**2)
 #convolve_images()
