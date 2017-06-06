@@ -27,8 +27,8 @@ EXAMPLE:
       (or whatever the path is to where this program is stored)
    
 INPUT/OUPUT:
-    Input --> all ftr*.fits in directory or dtr*.fits, have to specify flag
-    Output --> cftr*.fits
+    Input --> all ftr*.fits in directory
+    Output --> hftr*.fits
 
 REQUIRED MODULES:
     argparse
