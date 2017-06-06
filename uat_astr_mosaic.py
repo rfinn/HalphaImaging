@@ -26,12 +26,13 @@ EXAMPLE:
       '/Users/alfalfa/Github/HalphaImaging/uat_astr_mosaic.py --s'(or whatever the path is to where this program is stored)
 
    To get swarp to create aligned images in multiple bans (e.g. Halpha and R-band), do the following
-    uat_astr_mosaic.py --swarp --l A1367-h02_ha12
-
-    uat_astr_mosaic.py --swarp --l A1367-h02_R --refimage 'A1367-h02_ha12.coadd.fits'
+    uat_astr_mosaic.py --swarp --l A1367-h02_R
 
     uat_astr_mosaic.py --swarp --l A1367-h02_ha12 --refimage 'A1367-h02_ha12.coadd.fits'
 
+    uat_astr_mosaic.py --swarp --l A1367-h02_R --refimage 'A1367-h02_ha12.coadd.fits'
+
+refimage should be R-band always because visible light more extended obviously than Ha
 
 WHAT THIS CODE DOES:
 INPUT/OUPUT:
