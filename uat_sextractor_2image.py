@@ -15,7 +15,7 @@ EXAMPLE:
 
     from within ipython:
     
-    %run ~/github/HalphaImaging/uat_sextractor_2image.py --s --image1 A1367_R
+    %run ~/github/HalphaImaging/uat_sextractor_2image.py --image1 A1367_R
    ...: .coadd.fits --image2 A1367_ha12.coadd.fits --plot
 
 
@@ -37,7 +37,7 @@ import subprocess
 
 import numpy as np
 
-parser = argparse.ArgumentParser(description ='Run sextractor in two-image mode')
+parser = argparse.ArgumentParser(description ="Run sextractor in two-image mode.  \n To run from within ipython:\n %run ~/github/HalphaImaging/uat_sextractor_2image.py --image1 pointing-1_R.coadd.fits --image2 pointing-1_ha4.coadd.fits --plot --imagedir './' ")
 #parser.add_argument('--s', dest = 's', default = False, action = 'store_true', help = 'Run sextractor to create object catalogs')
 parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files')
 parser.add_argument('--image1',dest = 'image1', default = None,  help = 'image used to define apertures (R-band)')
