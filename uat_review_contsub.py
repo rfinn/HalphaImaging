@@ -78,8 +78,8 @@ infiles = glob.glob(args.cluster+'*-CS.fits')
 for csimage in infiles:
     prefix = csimage.split('-CS.fits')[0]
     print 'prefix = ',prefix
-    haimage = prefix+'*-Ha.fits'
-    rimage = prefix+'*-R.fits'
+    haimage = prefix+'-*-Ha.fits'
+    rimage = prefix+'-*-R.fits'
 
     r,r_header = fits.getdata(rimage,header=True)
     ha,ha_header = fits.getdata(haimage,header=True)
