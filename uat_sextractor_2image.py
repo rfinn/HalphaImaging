@@ -34,11 +34,11 @@ from astropy.io import fits
 from astropy.wcs import WCS
 import argparse
 import subprocess
-from matplotlib import pyplot as plt
+
 import numpy as np
 
 parser = argparse.ArgumentParser(description ='Run sextractor in two-image mode')
-parser.add_argument('--s', dest = 's', default = False, action = 'store_true', help = 'Run sextractor to create object catalogs')
+#parser.add_argument('--s', dest = 's', default = False, action = 'store_true', help = 'Run sextractor to create object catalogs')
 parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files')
 parser.add_argument('--image1',dest = 'image1', default = None,  help = 'image used to define apertures (R-band)')
 parser.add_argument('--image2',dest = 'image2', default = None,  help = 'image used to for measuring phot based on image1 (typically this is the Halpha image)')
@@ -57,27 +57,20 @@ os.system('cp ' +args.d + '/default.* .')
 i = 1
 
 
-if args.s:
+print 'RUNNING SEXTRACTOR'
+t = args.image1.split('.fits')
+froot1 = t[0]
+os.system('sex ' + args.image1+','+args.image1 + ' -c default.sex.hdi -CATALOG_NAME ' + froot1 + '.cat')
+os.rename('check.fits', froot1 + 'check.fits')
+# run on second image
+t = args.image2.split('.fits')
+froot2 = t[0]
+os.system('sex ' + args.image1+','+args.image2 + ' -c default.sex.hdi -CATALOG_NAME ' + froot2 + '.cat')
+os.rename('check.fits', froot2 + 'check.fits')
 
-    print 'RUNNING SEXTRACTOR'
-    t = args.image1.split('.fits')
-    froot1 = t[0]
-    os.system('sex ' + args.image1+','+args.image1 + ' -c default.sex.hdi -CATALOG_NAME ' + froot1 + '.cat')
-    os.rename('check.fits', froot1 + 'check.fits')
-    # run on second image
-    t = args.image2.split('.fits')
-    froot2 = t[0]
-    os.system('sex ' + args.image1+','+args.image2 + ' -c default.sex.hdi -CATALOG_NAME ' + froot2 + '.cat')
-    os.rename('check.fits', froot2 + 'check.fits')
-
-    #plt.figure()
-    #plt.imshow(froot1+'check.fits')
-    #plt.title('Image 1')
-    #plt.figure()
-    #plt.imshow(froot2+'check.fits')
-    #plt.title('Image 2')
 
 if args.plot:
+    from matplotlib import pyplot as plt
     t = args.image1.split('.fits')
     froot1 = t[0]
     cat1 = fits.getdata(froot1+'.cat',2)

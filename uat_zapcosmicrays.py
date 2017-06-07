@@ -2,16 +2,16 @@
 
 '''
 BASIC INFORMATION ABOUT THIS CODE:
-  -This is the FIFTH program you need to run in order to perform the reduction o  f HDI images.
-  -This code will fix all the headers to contain basic WCS information so that i  n the future we can feed the fits images into stacking programs like SCamp and  SWarp. 
+  -This is the FIFTH program you need to run in order to perform the reduction of HDI images.
+  -This code will fix all the headers to contain basic WCS information so that in the future we can feed the fits images into stacking programs like SCamp and  SWarp. 
   -Updates CMMTOBS --> FILTER
         RASTRNG --> CRVAL1
         DECSTRNG --> CRVAL2
   -Adds CRPIX1, CRPIX2, CD1_1, CD2_2, CTYPE1, CTYPE2
 
 BEFORE RUNNING THIS CODE:
-  -Be sure to type ur_setup in the terminal everytime you open a new terminal     window so that ureka is activated.
-  -Ensure that pyraf is still activated by retyping the commands listed in the c  omments of the FIRST program titled "uat_HDIgroupflatfiles.py".
+  -Be sure to type ur_setup in the terminal everytime you open a new terminal window so that ureka is activated.
+  -Ensure that pyraf is still activated by retyping the commands listed in the comments of the FIRST program titled "uat_HDIgroupflatfiles.py".
 
 PROCEDURE:
   -This code uses the python task .rename and .append to the list of header information so that the header contains basic WCS information that can be easily read by astronomy programs. 
