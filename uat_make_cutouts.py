@@ -95,7 +95,7 @@ Zmin=(((lmin[args.nhalpha])/6563.)-1)
 print 'Galaxies detectable in Halpha have redshifts between ',Zmin,' and ', Zmax
 
 def makecuts(image,imagefilter):
-    catdat= fits.getdata(image)
+    catdat= fits.getdata(args.catalog)
     print 'Cutting out', image    
     
     zFlag = (catdat.Z > Zmin) & (catdat.Z < Zmax)
