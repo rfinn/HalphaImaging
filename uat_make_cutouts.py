@@ -122,7 +122,7 @@ def makecuts(image,imagefilter):
         if (radius[i]<.01):
             size=120.
         else:
-            size=float(args.scale)*radius[i]
+            size=float(args.Re-scale)*radius[i]
             
         position = SkyCoord(ra=RA[i],dec=DEC[i],unit='deg')
         size = u.Quantity((size, size), u.arcsec)
