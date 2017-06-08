@@ -76,7 +76,7 @@ parser.add_argument('--image', dest = 'image', default = None, help = 'mosaic/HD
 parser.add_argument('--catalog', dest = 'catalog', default = '/home/share/catalogs/nsa_v0_1_2.fits', help = 'full path to the NSA catalog')
 parser.add_argument('--filter',dest = 'filter', default ='R', help = 'Filter for the input mosaic image (e.g. r, R, Ha).  Default value is R.')
 parser.add_argument('--nhalpha',dest = 'nhalpha', default ='12', help = 'H-alpha filter number (e.g. 4, 8, 12 or 16).  Default value is 12.')
-parser.add_argument('--Re-scale',dest = 'scale', default =15., help = 'cutout size = (scale x Re, scale x Re) - increase scale to increase size of cutout.  Default value is 15.')
+parser.add_argument('--Rscale',dest = 'scale', default =15., help = 'cutout size = (scale x Re, scale x Re) - increase scale to increase size of cutout.  Default value is 15.')
 parser.add_argument('--prefix',dest = 'prefix', default ='A1367', help = 'cluster name to preprend to cutout image names (no spaces!).  Default value is A1367.')
 parser.add_argument('--plot', dest = 'plot', default = False, action = 'store_true', help = 'plot cutouts and position wrt mosaic.  Default value is False.')
 #parser.add_argument('--l', dest = 'l', default = False, help = 'List of images to input to swarp')
@@ -122,7 +122,7 @@ def makecuts(image,imagefilter):
         if (radius[i]<.01):
             size=120.
         else:
-            size=float(args.Re-scale)*radius[i]
+            size=float(args.scale)*radius[i]
             
         position = SkyCoord(ra=RA[i],dec=DEC[i],unit='deg')
         size = u.Quantity((size, size), u.arcsec)
