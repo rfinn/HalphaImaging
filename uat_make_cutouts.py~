@@ -95,7 +95,7 @@ Zmin=(((lmin[args.nhalpha])/6563.)-1)
 print 'Galaxies detectable in Halpha have redshifts between ',Zmin,' and ', Zmax
 
 def makecuts(image,imagefilter):
-    catdat= fits.getdata(args.prefix)
+    catdat= fits.getdata(args.catalog)
     print 'Cutting out', image    
     
     zFlag = (catdat.Z > Zmin) & (catdat.Z < Zmax)
@@ -122,7 +122,7 @@ def makecuts(image,imagefilter):
         if (radius[i]<.01):
             size=120.
         else:
-            size=float(args.Re-scale)*radius[i]
+            size=float(args.scale)*radius[i]
             
         position = SkyCoord(ra=RA[i],dec=DEC[i],unit='deg')
         size = u.Quantity((size, size), u.arcsec)
@@ -244,7 +244,7 @@ def cutout(filename, xc, yc, xw=25, yw=25, units='pixels', outfile=None,
         if ymin >= head.get('NAXIS2') or xmin >= head.get('NAXIS1'):
             raise ValueError("Min Coordinate is outside of map: %f,%f." % (xmin,ymin))
 
-
+       
         head['CRPIX1']-=xmin
         head['CRPIX2']-=ymin
         head['NAXIS1']=int(xmax-xmin)
@@ -265,6 +265,3 @@ def cutout(filename, xc, yc, xw=25, yw=25, units='pixels', outfile=None,
 
     return newfile  
 #End of galaxy cutout
-
-
-
