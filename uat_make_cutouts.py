@@ -81,8 +81,8 @@ parser.add_argument('--nhalpha',dest = 'nhalpha', default ='12', help = 'H-alpha
 parser.add_argument('--Rscale',dest = 'scale', default =15., help = 'cutout size = (scale x Re, scale x Re) - increase scale to increase size of cutout.  Default value is 15.')
 parser.add_argument('--prefix',dest = 'prefix', default ='A1367', help = 'cluster name to preprend to cutout image names (no spaces!).  Default value is A1367.')
 parser.add_argument('--plot', dest = 'plot', default = False, action = 'store_true', help = 'plot cutouts and position wrt mosaic.  Default value is False.')
-parser.add_argument('--both',dest = 'both', default = False, help = 'Runs cutouts for both Ha and R images at same time')
-parse.add_argument('--filter2',dest = 'filter2',default = 'Ha', help = 'Filter for the mosaic image of Ha, helps to run both at same time')
+#parser.add_argument('--both',dest = 'both', default = False, help = 'Runs cutouts for both Ha and R images at same time')
+#parse.add_argument('--filter2',dest = 'filter2',default = 'Ha', help = 'Filter for the mosaic image of Ha, helps to run both at same time')
 #parser.add_argument('--l', dest = 'l', default = False, help = 'List of images to input to swarp')
 
 args = parser.parse_args()
