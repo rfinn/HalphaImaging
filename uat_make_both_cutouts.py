@@ -50,6 +50,8 @@ REFERENCES:
 
 http://docs.astropy.org/en/stable/nddata/utils.html
 
+TASH WRITE EXAMPLE HERE IF IT WORKS:
+
 """
 import numpy as np
 from matplotlib import pyplot as plt
@@ -74,16 +76,16 @@ from matplotlib.colors import LogNorm
 
 
 parser = argparse.ArgumentParser(description ='Get cutouts for NSA galaxies within field of view of mosaic and redshift range of designated H-alpha filter')
-parser.add_argument('--image', dest = 'image', default = None, help = 'mosaic/HDI image to make cutouts from')
+parser.add_argument('--Rimage', dest = 'Rimage', default = None, help = 'R-band HDI/mosaic image to make cutouts from')
+parser.add_argument('--Haimage', dest = 'Haimage', default = None, help = 'H-alpha HDI/mosaic image to make cutouts from')
 parser.add_argument('--catalog', dest = 'catalog', default = '/home/share/catalogs/nsa_v0_1_2.fits', help = 'full path to the NSA catalog')
-parser.add_argument('--filter',dest = 'filter', default ='R', help = 'Filter for the input mosaic image (e.g. r, R, Ha).  Default value is R.')
+parser.add_argument('--filter1',dest = 'filter1', default ='R', help = 'Filter for the input mosaic image (e.g. r, R, Ha).  Default value is R.')
+parser.add_argument('--filter2',dest = 'filter2', default ='Ha', help = 'Filter for the input mosaic image (e.g. r, R, Ha).  Default value is Ha.')
 parser.add_argument('--nhalpha',dest = 'nhalpha', default ='12', help = 'H-alpha filter number (e.g. 4, 8, 12 or 16).  Default value is 12.')
-parser.add_argument('--Rscale',dest = 'scale', default =15., help = 'cutout size = (scale x Re, scale x Re) - increase scale to increase size of cutout.  Default value is 15.')
+parser.add_argument('--Rscale',dest = 'scale', default =16., help = 'cutout size = (scale x Re, scale x Re) - increase scale to increase size of cutout.  Default value is 16.')
 parser.add_argument('--prefix',dest = 'prefix', default ='A1367', help = 'cluster name to preprend to cutout image names (no spaces!).  Default value is A1367.')
 parser.add_argument('--plot', dest = 'plot', default = False, action = 'store_true', help = 'plot cutouts and position wrt mosaic.  Default value is False.')
-#parser.add_argument('--both',dest = 'both', default = False, help = 'Runs cutouts for both Ha and R images at same time')
-#parse.add_argument('--filter2',dest = 'filter2',default = 'Ha', help = 'Filter for the mosaic image of Ha, helps to run both at same time')
-#parser.add_argument('--l', dest = 'l', default = False, help = 'List of images to input to swarp')
+
 
 args = parser.parse_args()
 
@@ -98,17 +100,23 @@ Zmax=(((lmax[args.nhalpha])/6563.)-1)
 Zmin=(((lmin[args.nhalpha])/6563.)-1)
 print 'Galaxies detectable in Halpha have redshifts between ',Zmin,' and ', Zmax
 
-def makecuts(image,imagefilter):
+
+def makebothcuts(Rimage,filter1,Haimage,filter2):
     catdat= fits.getdata(args.catalog)
-    print 'Cutting out', image    
+    print 'Cutting out', Rimage
+    print 'Cutting out', Haimage
+   
     
     zFlag = (catdat.Z > Zmin) & (catdat.Z < Zmax)
     
-    f = fits.open(image)
+    f = fits.open(Rimage)
+    g = fits.open(Haimage)
     prihdr = f[0].header
-    n2,n1 = f[0].data.shape
+    prihdr1 = g[0].header
+    n2,n1 = f[0].data.shape #should be same for Ha too, maybe? IDK
+    n4,n3 = g[0].data.shape 
     
-    w= WCS(image)
+    w= WCS(Rimage)#OF R IMAGE, SO THAT HA MATCHES WCS OF R, SO THEY'RE THE SAME
     px,py = w.wcs_world2pix(catdat.RA,catdat.DEC,1)
     onimageflag=(px < n1) & (px >0) & (py < n2) & (py > 0)
     
@@ -133,7 +141,8 @@ def makecuts(image,imagefilter):
         #print image, radius[i], position, size
         #cutout = Cutout2D(fdulist[0].data, position, size, wcs=w, mode='strict') #require entire image to be on parent image
         try:
-            cutout = Cutout2D(f[0].data, position, size, wcs=w, mode='trim') #require entire image to be on parent image
+            cutoutR = Cutout2D(f[0].data, position, size, wcs=w, mode='trim') #require entire image to be on parent image
+            cutoutHa = Cutout2D(g[0].data, position, size, wcs=w, mode = 'trim')
         except astropy.nddata.utils.PartialOverlapError:# PartialOverlapError:
             print 'galaxy is only partially covered by mosaic - skipping ',IDNUMBER[i]
             continue
@@ -141,25 +150,59 @@ def makecuts(image,imagefilter):
             print 'galaxy is not covered by mosaic - skipping ',IDNUMBER[i]
             continue
         if args.plot:
-            plt.figure()
+            plt.figure() #R cutout
             plt.imshow(f[0].data, origin='lower',cmap='gray', norm=LogNorm())
-            cutout.plot_on_original(color='white')
+            cutoutR.plot_on_original(color='white')
             plt.show()
             r = raw_input('type any key to continue (p to skip plotting) \n')
             if r.find('p') > -1:
                 args.plot = False
-        # figure out how to save the cutout as fits image
-        ((ymin,ymax),(xmin,xmax)) = cutout.bbox_original
-        outimage = args.prefix+'-'+(str(IDNUMBER[i])+'-'+ args.filter+".fits")
+            plt.figure() #Ha cutout
+            plt.imshow(g[0].data, origin='lower',cmap='gray', norm=LogNorm())
+            cutoutHa.plot_on_original(color='white')
+            plt.show()
+            r = raw_input('type any key to continue (p to skip plotting) \n')
+            if r.find('p') > -1:
+                args.plot = False
+        # saving R Cutout as fits image
+        ((ymin,ymax),(xmin,xmax)) = cutoutR.bbox_original
+        outimage = args.prefix+'-'+(str(IDNUMBER[i])+'-'+ args.filter1+".fits")
         newfile = fits.PrimaryHDU()
         newfile.data = f[0].data[ymin:ymax,xmin:xmax]
         newfile.header = f[0].header
         newfile.header.update(w[ymin:ymax,xmin:xmax].to_header())
         
         fits.writeto(outimage, newfile.data, header = newfile.header, clobber=True)
-    return cutout
+        # saving Ha Cutout as fits image
+        ((ymin1,ymax1),(xmin1,xmax1)) = cutoutHa.bbox_original
+        outimage1 = args.prefix+'-'+(str(IDNUMBER[i])+'-'+ args.filter2+".fits")
+        newfile1 = fits.PrimaryHDU()
+        newfile1.data = g[0].data[ymin1:ymax1,xmin1:xmax1]
+        newfile1.header = g[0].header
+        newfile1.header.update(w[ymin1:ymax1,xmin1:xmax1].to_header())
+        
+        fits.writeto(outimage1, newfile1.data, header = newfile1.header, clobber=True)
+    return cutoutR
+    return cutoutHa
+           # plt.figure()
+           # plt.imshow(g[0].data, origin='lower',cmap='gray', norm=LogNorm())
+           # cutoutHa.plot_on_original(color='white')
+           # plt.show()
+           # r = raw_input('type any key to continue (p to skip plotting) \n')
+           # if r.find('p') > -1:
+            #    args.plot = False
+        # figure out how to save the cutout as fits image
+        #((ymin,ymax),(xmin,xmax)) = cutoutHa.bbox_original
+       # outimage = args.prefix+'-'+(str(IDNUMBER[i])+'-'+ args.filter2+".fits")
+       # newfile = fits.PrimaryHDU()
+       # newfile.data = g[0].data[ymin:ymax,xmin:xmax]
+       # newfile.header = g[0].header
+       # newfile.header.update(w[ymin:ymax,xmin:xmax].to_header())
+        
+       # fits.writeto(outimage, newfile.data, header = newfile.header, clobber=True)
 if __name__ == '__main__':
-    imcutout = makecuts(args.image,args.filter)
+    imcutout1 = makebothcuts(args.Rimage,args.filter1,args.Haimage,args.filter2)
+    imcutout2 = makebothcuts(args.Rimage,args.filter1,args.Haimage,args.filter2)
 
 #NATASHA NEW STUFF TO RUN BOTH:
 #I want to use the known argument Filter to run both --filter R and --filter Ha at the same time, so it can display Ha, then R.

@@ -4,7 +4,7 @@
 PURPOSE:
 
 The goal of the program is to call uat_mask.py for all
-R-band image cutouts with a prefix that matches the input string.  
+R-band images with a prefix that matches the input string.  
 
 USAGE:
 
@@ -15,7 +15,6 @@ run uat_mask.py on each image.
 
 We use the same mask for the R and Halpha images, so you
 just need to run this on R-band images.
-
 
 
 PROCEDURE:

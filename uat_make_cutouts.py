@@ -76,6 +76,7 @@ from matplotlib.colors import LogNorm
 parser = argparse.ArgumentParser(description ='Get cutouts for NSA galaxies within field of view of mosaic and redshift range of designated H-alpha filter')
 parser.add_argument('--image', dest = 'image', default = None, help = 'mosaic/HDI image to make cutouts from')
 parser.add_argument('--catalog', dest = 'catalog', default = '/home/share/catalogs/nsa_v0_1_2.fits', help = 'full path to the NSA catalog')
+parser.add_argument('--Haimage', dest = 'Haimage', default = None, help = 'H-alpha HDI/mosaic image to make cutouts from')
 parser.add_argument('--filter',dest = 'filter', default ='R', help = 'Filter for the input mosaic image (e.g. r, R, Ha).  Default value is R.')
 parser.add_argument('--nhalpha',dest = 'nhalpha', default ='12', help = 'H-alpha filter number (e.g. 4, 8, 12 or 16).  Default value is 12.')
 parser.add_argument('--Rscale',dest = 'scale', default =15., help = 'cutout size = (scale x Re, scale x Re) - increase scale to increase size of cutout.  Default value is 15.')

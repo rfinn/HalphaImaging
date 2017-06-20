@@ -80,8 +80,7 @@ figure_size = (6,3)
 
 # create name for output mask file
 t = args.image.split('-')
-mask_image=t[0]+'-'+t[1]+'-'+t[2]+'-mask.fits'
-print 'saving image as: ',mask_image
+mask_image=t[0]+'-'+t[1]+'-mask.fits'
 
 # read in image and define center coords
 image, imheader = fits.getdata(args.image,header = True)
