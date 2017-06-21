@@ -145,7 +145,6 @@ outfile.close()
 if args.plot:
     plt.figure()
     plt.plot(a,flux,'bo')
-    plt.show()
     plt.xlabel('semi-major axis (pixels)')
     plt.ylabel('Enclosed flux')
                
