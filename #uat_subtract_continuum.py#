@@ -111,7 +111,7 @@ while adjust_scale:
     plt.show(block=False)
     
     
-    t=raw_input('enter new value for scale factor;\n   a to adjust contrast percentages(e.g. [.5,98], default is [50,99]). Enter min max.;\n   w to write output and quit;\n   q to quit without saving\n') #TASH after lunch, work on writing code for a
+    t=raw_input('enter new value for scale factor;\n   a to adjust contrast percentages(e.g. [.5,98], default is [50,99]). Enter min max.;\n   w to write output and quit;\n   q to quit without saving\n') 
     try:
         scale=float(t)
     except ValueError:

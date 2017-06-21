@@ -43,7 +43,7 @@ parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromat
 parser.add_argument('--image1',dest = 'image1', default = None,  help = 'image used to define apertures (R-band)')
 parser.add_argument('--image2',dest = 'image2', default = None,  help = 'image used to for measuring phot based on image1 (typically this is the Halpha image)')
 parser.add_argument('--plot',dest = 'plot', default = False, action = 'store_true', help = 'make diagnostic plots')
-parser.add_argument('--imagedir',dest = 'imagedir', default = '.', help = 'directory for saving plots')
+parser.add_argument('--imagedir',dest = 'imagedir', default = '/Users/rfinn/research/HalphaGroups/plots/', help = 'directory for saving plots')
 
 
 args = parser.parse_args()
