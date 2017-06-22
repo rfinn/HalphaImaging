@@ -70,15 +70,14 @@ if args.plot:
 #image_path = '/Users/rfinn/github/H-alpha_cutouts/test/'
 image_path = args.imagepath
 #im1='A1367-113394-R'
-im1 = args.imfile
+im1 = args.imfile_
 
 image = image_path+im1+'.fits'
 # read in image
 imdat = fits.getdata(image)
-#if args.plot:
-plt.imshow(imdat)
-plt.colorbar()
- 
+if args.plot:
+    plt.imshow(imdat)
+    plt.colorbar()
 
 
 
@@ -147,9 +146,9 @@ outfile.close()
 if args.plot:
     plt.figure()
     plt.plot(a,flux,'bo')
+    plt.show()
     plt.xlabel('semi-major axis (pixels)')
     plt.ylabel('Enclosed flux')
-    plt.show()
                
 
 

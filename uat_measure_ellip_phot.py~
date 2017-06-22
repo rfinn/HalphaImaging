@@ -77,6 +77,7 @@ image = image_path+im1+'.fits'
 imdat = fits.getdata(image)
 if args.plot:
     plt.imshow(imdat)
+    plt.colorbar()
 
 
 
@@ -145,6 +146,7 @@ outfile.close()
 if args.plot:
     plt.figure()
     plt.plot(a,flux,'bo')
+    plt.show()
     plt.xlabel('semi-major axis (pixels)')
     plt.ylabel('Enclosed flux')
                
