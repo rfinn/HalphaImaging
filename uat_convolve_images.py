@@ -90,7 +90,7 @@ for i in range(len(input_images)):
     #if image_fwhm[i] == fwhm_max:
     #    continue
     imdata = fits.getdata(input_images[i])
-    convolved_image = 'g'+ image
+    convolved_image = 'g'+ input_images[i]
     kernel = Gaussian2DKernel(sigma_filter[i])
     outfile = convolve(imdata, kernel)
     fits.writeto(convolved_image,np.array(outfile))
