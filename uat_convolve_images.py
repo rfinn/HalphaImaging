@@ -43,7 +43,7 @@ from argparse import RawDescriptionHelpFormatter
 
 
 def get_fwhm(input_images): #measure FWHM of SE catalogs
-    nfiles = len(input_image)
+    nfiles = len(input_images)
     image_fwhm = np.zeros(nfiles,'f')
     image_fwhm_std = np.zeros(nfiles,'f')   
     for i in range(len(input_images)):
@@ -56,13 +56,6 @@ def get_fwhm(input_images): #measure FWHM of SE catalogs
     
 #All of the above is new  stuff
 
-def convolve_images(input_images,kernel):    
-    for image in input_images:
-        imdata = fits.getdata(image)
-        convolved_image = 'g'+ image
-        outfile = convolve(imdata, kernel)
-        fits.writeto(convolved_image,np.array(outfile))
-        print np.shape(outfile)
 
 #from run_sextractor import *
 #The goal of this program is to have a python-based convolution routine
@@ -93,11 +86,20 @@ print 'the largest FWHM = ',fwhm_max
 # (sigma_filter) = np.sqrt[(fwhm_out/2.35)^2 - (sigma_in/2.35)^2] 
 sigma_filter = np.sqrt((fwhm_max/2.35)**2 - (image_fwhm/2.35)**2)
 #convolve_images()
+for i in range(len(input_images)):
+    #if image_fwhm[i] == fwhm_max:
+    #    continue
+    imdata = fits.getdata(input_images[i])
+    convolved_image = 'g'+ image
+    kernel = Gaussian2DKernel(sigma_filter[i])
+    outfile = convolve(imdata, kernel)
+    fits.writeto(convolved_image,np.array(outfile))
+    print np.shape(outfile)
 
-kernel = Gaussian2DKernel(sigma_filter)
 
 
-convolve_images(kernal=kernal)
+
+#convolve_images(kernal=kernal)
 
 '''
 #BELOW IS KELLYS STUFF
