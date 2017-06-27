@@ -1,10 +1,35 @@
 #!/usr/bin/env python
 
-import glob
-import numpy as np
-#from uat_astr_mosaic --s import *
-from pyraf.iraf import gauss
-import math
+'''
+GOAL:
+  The goal of this program is to convolve the R and Halpha mosaics so that they have the same FWHM.
+  This should be done BEFORE subtracting the continuum.
+
+PROCEDURE:
+  - before running, run sextractor.  For example:
+
+       uat_astr_mosaic.py --s --filestring 'pointing-16*coadd.fits'
+  - read in the sextractor catalogs and calculate the FWHM of each image
+  - 
+
+
+EXAMPLE:
+
+
+
+INPUT/OUPUT:
+
+REQUIRED MODULES:
+
+EXTRA NOTES:
+
+WRITTEN BY:
+Rose Finn
+
+EDITED BY:
+
+'''
+
 
 #!/usr/bin/env python
 
@@ -20,56 +45,60 @@ from argparse import RawDescriptionHelpFormatter
 #The goal of this program is to have a python-based convolution routine
 parser = argparse.ArgumentParser(description ='This code will convolve image cutouts that have bad focus so that we can get a more precise continuum subtraction.')
 parser.add_argument('--prefix', dest = 'prefix', default = False, action = 'store_true', help = 'Input the string of images to be convolved (before continuum subtraction, after cutouts). Enter prefix pointing (e.g. pointing-1)')
-parser.add_argument('--filter', dest = 'filter' default = Ha, help = 'Input filter (e.g. Ha or R) for input string of images to convolve for each input pointing prefix')
 args = parser.parse_args()
 
+
+
+
+def get_fwhm(input_images): #measure FWHM of SE catalogs
+    nfiles = len(input_image)
+    image_fwhm = np.zeros(nfiles,'f')
+    image_fwhm_std = np.zeros(nfiles,'f')   
+    for i in range(len(input_images)):
+        t = input_images.split('.fits')
+        se_cat = t[0]+'.cat'
+        data = fits.getdata(se_cat,2)
+        image_fwhm[i] = np.mean(data.FWHM_IMAGE)
+        image_fwhm_std[i] = np.std(data.FWHM_IMAGE)
+    return image_fwhm, image_fwhm_std
+    
+#All of the above is new  stuff
+
+def convolve_images(input_images,kernel):    
+    for image in input_images:
+        imdata = fits.getdata(image)
+        convolved_image = 'g'+ image
+        outfile = convolve(imdata, kernel)
+        fits.writeto(convolved_image,np.array(outfile))
+        print np.shape(outfile)
+
+
 #search_prefix = args.string+'*-Ha.fits'
-search_prefix = args.prefix+'*-'+args.filter+'.fits'
+search_prefix = args.prefix+'*coadd.fits'
 print search_prefix
 input_images = glob.glob(search_prefix)
 
 
 
-def get_fwhm():
-    for image in input_images:
-        hdulist = fits.open(input_images[image])
-        data = hdulist[2].data
-    
-        fwhm = np.mean(data.FWHM_IMAGE)
-        fwhm_std = np.std(data.FWHM_IMAGE)
-    
-        image_fwhm[image] = fwhm
-        image_fwhm_std = fwhm_std
-        
-    
-#All of the above is new  stuff
-
-def convolve_images():    
-    for image in input_images:
-        hdulist = fits.open(input_images[image])
-        data = hdulist[2].data
-        coords = [data.X_IMAGE, data.Y_IMAGE]
-        convolved_image = 'g'+ input_images[image]
-        outfile = convolve(coords, kernel)
-        fits.writeto(convolved_image,np.array(outfile))
-    print np.shape(outfile)
-
-files = glob.glob(args.prefix)
-nfiles = len(files)
-image_fwhm = np.zeros(nfiles,'f')
-image_fwhm_std = np.zeros(nfiles,'f')   
 #convolved_image = np.zeros(nfiles,'f')
-get_fwhm()
+image_fwhm, image_fwhm_std = get_fwhm(input_images)
 
 #Need worst FWHM to convolve to
 fwhm_max=np.max(image_fwhm)
 print 'the largest FWHM = ',fwhm_max
 
-#(sigma_out)^2 = (sigma_in)^2 + (sigma_filter)^2
-sigma_filter = np.sqrt((fwhm_max/2.35)**2 - (1./2.35)**2)
+# convolve all images to worst seeing
+# use pyraf.iraf.gauss (sigma = FWHM/2.35)
+# (sigma_out)^2 = (sigma_in)^2 + (sigma_filter)^2
+#
+# (sigma_filter) = np.sqrt[(fwhm_out/2.35)^2 - (sigma_in/2.35)^2] 
+sigma_filter = np.sqrt((fwhm_max/2.35)**2 - (image_fwhm/2.35)**2)
+#convolve_images()
+
 kernel = Gaussian2DKernel(sigma_filter)
 
-convolve_images()
+
+convolve_images(kernal=kernal)
 
 '''
 #BELOW IS KELLYS STUFF
@@ -162,11 +191,5 @@ print 'the largest FWHM = ',fwhm_max
 
 
 
-# convolve all images to worst seeing
-# use pyraf.iraf.gauss (sigma = FWHM/2.35)
-# (sigma_out)^2 = (sigma_in)^2 + (sigma_filter)^2
-#
-# (sigma_filter) = np.sqrt[(fwhm_out/2.35)^2 - (sigma_in/2.35)^2] 
-sigma_filter = np.sqrt((fwhm_max/2.35)**2 - (image_fwhm/2.35)**2)
-#convolve_images()
+
 '''
