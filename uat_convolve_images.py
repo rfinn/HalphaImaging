@@ -84,6 +84,7 @@ print 'the largest FWHM = ',fwhm_max
 if args.test:
     #try to double the FWHM of one image
     sigma_filter = np.sqrt((2*image_fwhm[0]/2.35)**2 - (image_fwhm[0]/2.35)**2) # filter to double FWHM
+    print sigma_filter
     kernal = Gaussian2DKernel(sigma_filter)
     input_image = fits.getdata(input_images[0])
     plt.imshow(input_image)
