@@ -41,14 +41,6 @@ from astropy.modeling.models import Gaussian2D
 import argparse
 from argparse import RawDescriptionHelpFormatter
 
-#from run_sextractor import *
-#The goal of this program is to have a python-based convolution routine
-parser = argparse.ArgumentParser(description ='This code will convolve image cutouts that have bad focus so that we can get a more precise continuum subtraction.')
-parser.add_argument('--prefix', dest = 'prefix', default = False, action = 'store_true', help = 'Input the string of images to be convolved (before continuum subtraction, after cutouts). Enter prefix pointing (e.g. pointing-1)')
-args = parser.parse_args()
-
-
-
 
 def get_fwhm(input_images): #measure FWHM of SE catalogs
     nfiles = len(input_image)
@@ -71,6 +63,13 @@ def convolve_images(input_images,kernel):
         outfile = convolve(imdata, kernel)
         fits.writeto(convolved_image,np.array(outfile))
         print np.shape(outfile)
+
+#from run_sextractor import *
+#The goal of this program is to have a python-based convolution routine
+parser = argparse.ArgumentParser(description ='This code will convolve image cutouts that have bad focus so that we can get a more precise continuum subtraction.')
+parser.add_argument('--prefix', dest = 'prefix', default = 'pointing-1',  help = 'Input the string of images to be convolved (before continuum subtraction, after cutouts). Enter prefix pointing (e.g. pointing-1)')
+args = parser.parse_args()
+
 
 
 #search_prefix = args.string+'*-Ha.fits'
