@@ -40,6 +40,7 @@ from astropy.convolution import convolve, Gaussian2DKernel
 from astropy.modeling.models import Gaussian2D
 import argparse
 from argparse import RawDescriptionHelpFormatter
+from matplotlib import pyplot as plt
 
 
 def get_fwhm(input_images): #measure FWHM of SE catalogs
@@ -50,8 +51,10 @@ def get_fwhm(input_images): #measure FWHM of SE catalogs
         t = input_images[i].split('.fits')
         se_cat = t[0]+'.cat'
         data = fits.getdata(se_cat,2)
-        image_fwhm[i] = np.mean(data.FWHM_IMAGE)
-        image_fwhm_std[i] = np.std(data.FWHM_IMAGE)
+        # select unsaturated stars using : class_star > 0.9 and (10 < m < 13)
+        flag = (data.CLASS_STAR > 0.9) & (data.MAG_AUTO > 10.) & (data.MAG_AUTO < 13.)
+        image_fwhm[i] = np.mean(data.FWHM_IMAGE[flag])
+        image_fwhm_std[i] = np.std(data.FWHM_IMAGE[flag])
     return image_fwhm, image_fwhm_std
     
 #All of the above is new  stuff
@@ -61,6 +64,7 @@ def get_fwhm(input_images): #measure FWHM of SE catalogs
 #The goal of this program is to have a python-based convolution routine
 parser = argparse.ArgumentParser(description ='This code will convolve image cutouts that have bad focus so that we can get a more precise continuum subtraction.')
 parser.add_argument('--prefix', dest = 'prefix', default = 'pointing-1',  help = 'Input the string of images to be convolved (before continuum subtraction, after cutouts). Enter prefix pointing (e.g. pointing-1)')
+parser.add_argument('--test',dest = 'test', default = False, action='store-true')
 args = parser.parse_args()
 
 
@@ -70,8 +74,6 @@ search_prefix = args.prefix+'*coadd.fits'
 print search_prefix
 input_images = glob.glob(search_prefix)
 
-
-
 #convolved_image = np.zeros(nfiles,'f')
 image_fwhm, image_fwhm_std = get_fwhm(input_images)
 
@@ -79,22 +81,34 @@ image_fwhm, image_fwhm_std = get_fwhm(input_images)
 fwhm_max=np.max(image_fwhm)
 print 'the largest FWHM = ',fwhm_max
 
-# convolve all images to worst seeing
-# use pyraf.iraf.gauss (sigma = FWHM/2.35)
-# (sigma_out)^2 = (sigma_in)^2 + (sigma_filter)^2
-#
-# (sigma_filter) = np.sqrt[(fwhm_out/2.35)^2 - (sigma_in/2.35)^2] 
-sigma_filter = np.sqrt((fwhm_max/2.35)**2 - (image_fwhm/2.35)**2)
-#convolve_images()
-for i in range(len(input_images)):
-    #if image_fwhm[i] == fwhm_max:
-    #    continue
-    imdata = fits.getdata(input_images[i])
-    convolved_image = 'g'+ input_images[i]
-    kernel = Gaussian2DKernel(sigma_filter[i])
-    outfile = convolve(imdata, kernel)
-    fits.writeto(convolved_image,np.array(outfile))
-    print np.shape(outfile)
+if args.test:
+    #try to double the FWHM of one image
+    sigma_filter = np.sqrt((2*image_fwhm[0]/2.35)**2 - (image_fwhm[0]/2.35)**2) # filter to double FWHM
+    kernal = Gaussian2DKernel(sigma_filter)
+    input_image = fits.getdata(input_images[0])
+    plt.imshow(input_image)
+    outfile = convolve(input_image,kernel)
+    plt.imshow(outfile)
+    fits.writeto('test.fits',np.array(outfile))
+else:
+
+
+    # convolve all images to worst seeing
+    # use pyraf.iraf.gauss (sigma = FWHM/2.35)
+    # (sigma_out)^2 = (sigma_in)^2 + (sigma_filter)^2
+    #
+    # (sigma_filter) = np.sqrt[(fwhm_out/2.35)^2 - (sigma_in/2.35)^2] 
+    sigma_filter = np.sqrt((fwhm_max/2.35)**2 - (image_fwhm/2.35)**2)
+    #convolve_images()
+    for i in range(len(input_images)):
+        #if image_fwhm[i] == fwhm_max:
+        #    continue
+        imdata = fits.getdata(input_images[i])
+        convolved_image = 'g'+ input_images[i]
+        kernel = Gaussian2DKernel(sigma_filter[i])
+        outfile = convolve(imdata, kernel)
+        fits.writeto(convolved_image,np.array(outfile))
+        print np.shape(outfile)
 
 
 
@@ -155,7 +169,7 @@ original sketch by RF
 
 # read in output
 
-# select unsaturated stars using : class_star > 0.9 and (10 < m < 13)
+
 
 # measure mean and std of FWHM
 
