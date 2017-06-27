@@ -47,7 +47,7 @@ def get_fwhm(input_images): #measure FWHM of SE catalogs
     image_fwhm = np.zeros(nfiles,'f')
     image_fwhm_std = np.zeros(nfiles,'f')   
     for i in range(len(input_images)):
-        t = input_images.split('.fits')
+        t = input_images[i].split('.fits')
         se_cat = t[0]+'.cat'
         data = fits.getdata(se_cat,2)
         image_fwhm[i] = np.mean(data.FWHM_IMAGE)
