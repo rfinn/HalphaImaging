@@ -64,7 +64,7 @@ def get_fwhm(input_images): #measure FWHM of SE catalogs
 #The goal of this program is to have a python-based convolution routine
 parser = argparse.ArgumentParser(description ='This code will convolve image cutouts that have bad focus so that we can get a more precise continuum subtraction.')
 parser.add_argument('--prefix', dest = 'prefix', default = 'pointing-1',  help = 'Input the string of images to be convolved (before continuum subtraction, after cutouts). Enter prefix pointing (e.g. pointing-1)')
-parser.add_argument('--test',dest = 'test', default = False, action='store-true')
+parser.add_argument('--test',dest = 'test', default = False, action='store_true')
 args = parser.parse_args()
 
 
