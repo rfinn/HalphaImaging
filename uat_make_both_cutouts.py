@@ -17,7 +17,7 @@ INPUTS:
     catalog - catalog or subcatalog of NASA Sloan atlas
     halpha filter number - this is the filter number used to refer to the Halpha filter for your group/cluster (e.g. Ha8 would be 8)
 
-USAGE:
+USAGE(this is more for the uat_make_cutouts code when not running both cutout filters at the same time):
 
 When running from macbook (not coma):
 
@@ -32,14 +32,6 @@ If running on coma, you don't need to specify the catalog path - the default sho
     uat_make_cutouts.py catalog image Halpha_filter_number
 
 
-EXAMPLE:
-
-    uat_make_cutouts.py --image A1367-h02_R.coadd.fits --filter R --nhalpha 12 --cluster coma
-
-    uat_make_cutouts.py --image A1367-h02_R.coadd.fits --catalog /Users/rfinn/research/NSA/nsa_v0_1_2.fits --filter R --nhalpha 12 --plot
-
-NATASHA NOTES:
-dest is the user parameters and the argument is just used in the code
 
 REQUIRED MODULES:
 
@@ -50,7 +42,8 @@ REFERENCES:
 
 http://docs.astropy.org/en/stable/nddata/utils.html
 
-TASH WRITE EXAMPLE HERE IF IT WORKS:
+EXAMPLE:
+%run ~/github/HalphaImaging/uat_make_both_cutouts.py --Rimage pointing-1_r.coadd.fits --Haimage pointing-1_ha4.coadd.fits --nhalpha 4 --prefix pointing-1
 
 """
 import numpy as np
