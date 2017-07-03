@@ -54,7 +54,7 @@ from matplotlib import pyplot as plt
 from scipy.stats import scoreatpercentile
 
 parser = argparse.ArgumentParser(description ='This program subtracts scaled R-band image from Halpha.\n \nTo subtract mosaics:\n~/github/HalphaImaging/uat_subtract_continuum.py --r A1367-h02_R.coadd.fits --ha A1367-h02_ha12.coadd.fits --scale 0.0445 --mosaic \n\nTo subtract cutouts:\n~/github/HalphaImaging/uat_subtract_continuum.py --cluster A1367 --scale 0.044 --id 113364', formatter_class=RawDescriptionHelpFormatter)
-parser.add_argument('--cluster',dest = 'cluster', default = None, help = 'Cluster prefix of image for continuum subtraction.  Use this if you are subtracting continuum from a cutout rather than a mosaic.')
+parser.add_argument('--pointing',dest = 'pointing', default = None, help = 'Cluster prefix of image for continuum subtraction.  Use this if you are subtracting continuum from a cutout rather than a mosaic.')
 parser.add_argument('--id',dest = 'id', default = None, help = 'NSAID of image for continuum subtraction.  Use this if you are subtracting continuum from a cutout rather than a mosaic.')
 parser.add_argument('--r', dest = 'r', default = None, help = 'R-band image.  Use this if you are subtracting mosaic images rather than cutouts.')
 parser.add_argument('--ha', dest = 'ha', default = None, help = 'Halpha image.  Use this if you are subtracting mosaic images rather than cutouts.')
@@ -67,8 +67,8 @@ if args.mos:
     figure_size=(14,6)
     
 if args.id:
-    rimage = args.cluster+'-'+args.id+'-R.fits'
-    haimage = args.cluster+'-'+args.id+'-Ha.fits'
+    rimage = args.pointing+'-'+args.id+'-R.fits'
+    haimage = args.pointing+'-'+args.id+'-Ha.fits'
     id = args.id
 else:
     rimage = args.r
