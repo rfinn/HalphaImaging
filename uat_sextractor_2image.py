@@ -18,6 +18,8 @@ EXAMPLE:
     %run ~/github/HalphaImaging/uat_sextractor_2image.py --image1 A1367_R
    ...: .coadd.fits --image2 A1367_ha12.coadd.fits --plot
 
+    -You want to run rimage against the rimage to create .cat file for R, then use R image with the Haimage (image 2) to create .cat file for Ha.
+
 
 
 WHAT THIS CODE DOES:
