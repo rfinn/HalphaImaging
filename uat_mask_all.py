@@ -39,7 +39,7 @@ import glob
 import sys
 
 parser = argparse.ArgumentParser(description ='Run uat_mask.py on all images that match input string')
-parser.add_argument('--cluster', dest = 'string', default = None, help = 'image string to match (e.g. A1367)')
+parser.add_argument('--pointing', dest = 'string', default = None, help = 'image string to match (e.g. A1367)')
 parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/', help = 'Directory that contains uat_mask.py')
 args = parser.parse_args()
 
