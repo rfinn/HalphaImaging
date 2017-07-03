@@ -44,7 +44,11 @@ ratio_r2ha=1./args.scale
 def plotintens(data_file,pls='-',pcolor='k',pixelscale=.425,scale=1,label=None,legend=False):
     data1 = np.genfromtxt(data_file)
     sma_pix = data1[:,1]*pixelscale
-    intens, intens_err = data1[:,2], data1[:,3]
+    #print data1[:,1]
+    # print data1[:,2]
+    print data1
+    #intens, intens_err = data1[:,1], data1[:,2]
+    intens, intens_err = data1[:,1], data1[:,3]
     plt.plot(sma_pix,intens*scale,ls=pls,color=pcolor)
     plt.errorbar(sma_pix,intens*scale,intens_err,fmt=None,ecolor=pcolor,label='__nolegend__')
     plt.axhline(y=0,ls='--',color='k',label='_nolegend_')
@@ -98,6 +102,7 @@ def makeplots(rimage,haimage):
 
     plt.subplot(ny,nx,1)
 
+    
     # plot r-band cutout image
     rfits=rimage
     plotimage(rfits,vmin=-.05,vmax=500)
