@@ -112,7 +112,7 @@ b = (1.-cat.ELLIPTICITY[objectID][0])*a
 flux = np.zeros(len(a),'f')
 
 for i in range(len(a)):
-    ap = EllipticalAperture(position,a[i],b[i],theta)#,ai,bi,theta) for ai,bi in zip(a,b)]
+    ap = EllipticalAperture(position,a[i],b[i],theta+90)#,ai,bi,theta) for ai,bi in zip(a,b)]
     phot_table = aperture_photometry(imdat, ap)
     flux[i] = phot_table[0][3]
 
