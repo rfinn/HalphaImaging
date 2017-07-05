@@ -46,9 +46,7 @@ def plotintens(data_file,pls='-',pcolor='k',pixelscale=.425,scale=1,label=None,l
     sma_pix = data1[:,1]*pixelscale
     #print data1[:,1]
     # print data1[:,2]
-    print data1
-    #intens, intens_err = data1[:,1], data1[:,2]
-    intens, intens_err = data1[:,1], data1[:,3]
+    intens, intens_err = data1[:,1], data1[:,2]
     plt.plot(sma_pix,intens*scale,ls=pls,color=pcolor)
     plt.errorbar(sma_pix,intens*scale,intens_err,fmt=None,ecolor=pcolor,label='__nolegend__')
     plt.axhline(y=0,ls='--',color='k',label='_nolegend_')
@@ -91,7 +89,8 @@ def plotimage(fits_image,vmin=0,vmax=4):
 
 def putlabel(s):
     plt.text(.08,.9,s,fontsize=16,transform=plt.gca().transAxes,horizontalalignment='left')
-    
+
+
 def makeplots(rimage,haimage):
     # subplot dimensions
     nx=4
@@ -118,9 +117,16 @@ def makeplots(rimage,haimage):
     
     plt.subplot(ny,nx,3)
     # plot r and 24 profiles
+
+    rrimage = rimage.split('.')
+    rimage = rrimage[0]+'_phot'+'.fits'
     t=rimage.split('fits')
     rdat=t[0]+'dat'
+  
 
+
+    rhaimage = haimage.split('.')
+    haimage = rhaimage[0]+'_phot'+'.fits'
     t=haimage.split('fits')
     hadat=t[0]+'dat'
 
