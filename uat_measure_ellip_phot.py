@@ -125,8 +125,7 @@ if args.plot:
     plt.colorbar()
     ax = plt.gca()
 
-    ellipse = Ellipse(xy=position, width=a[-1],height=b[-1], 
-                        edgecolor='r', fc='None', lw=2)
+    ellipse = Ellipse(xy=(cat.X_IMAGE[objectID][0],cat.Y_IMAGE[objectID][0]), width=a[-1],height=b[-1],edgecolor='r', fc='None', lw=2)
     ax.add_patch(ellipse)
 
 # calculate surface brightness in each aperture
