@@ -137,7 +137,7 @@ for i in range(1,len(a)):
 
 # write out photometry
 # radius enclosed flux
-outfile = open(im1+'.dat','w')#used to be _phot.dat, but changing it to .dat so that it can be read into code for ellipse profiles
+outfile = open(im1+'_phot.dat','w')#used to be _phot.dat, but changing it to .dat so that it can be read into code for ellipse profiles
 
 outfile.write('# X_IMAGE Y_IMAGE ELLIPTICITY THETA_J2000 \n')
 outfile.write('# %.2f %.2f %.2f %.2f \n'%(cat.X_IMAGE[objectID][0],cat.Y_IMAGE[objectID][0],cat.ELLIPTICITY[objectID][0],cat.THETA_J2000[objectID][0]))
