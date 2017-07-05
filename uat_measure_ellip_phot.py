@@ -67,19 +67,16 @@ args = parser.parse_args()
 if args.plot:
     import matplotlib.pyplot as plt
     import matplotlib.patches as mpatches
+    from matplotlib.patches import Ellipse
 
 #image_path = '/Users/rfinn/github/H-alpha_cutouts/test/'
 image_path = args.imagepath
 #im1='A1367-113394-R'
 im1 = args.imfile
-
 image = image_path+im1+'.fits'
 # read in image
 imdat = fits.getdata(image)
 #if args.plot:
-plt.imshow(imdat)
-plt.colorbar()
- 
 
 
 
@@ -118,6 +115,19 @@ for i in range(len(a)):
     ap = EllipticalAperture(position,a[i],b[i],theta)#,ai,bi,theta) for ai,bi in zip(a,b)]
     phot_table = aperture_photometry(imdat, ap)
     flux[i] = phot_table[0][3]
+
+
+# plot image with outer ellipse
+
+if args.plot
+    plt.figure()
+    plt.imshow(imdat,cmap='grey_r')
+    plt.colorbar()
+    ax = plt.gca()
+
+    ellipse = Ellipse(xy=position, width=a[-1],height=b[-1], 
+                        edgecolor='r', fc='None', lw=2)
+    ax.add_patch(ellipse)
 
 # calculate surface brightness in each aperture
 
