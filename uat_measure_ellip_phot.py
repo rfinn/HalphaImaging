@@ -117,7 +117,7 @@ flux = np.zeros(len(a),'f')
 for i in range(len(a)):
     ap = EllipticalAperture(position,a[i],b[i],theta)#,ai,bi,theta) for ai,bi in zip(a,b)]
     phot_table = aperture_photometry(imdat, ap)
-    flux[i] = phot_table[0][4]
+    flux[i] = phot_table[0][3]
 
 # calculate surface brightness in each aperture
 
