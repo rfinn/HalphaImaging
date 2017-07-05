@@ -121,7 +121,7 @@ for i in range(len(a)):
 
 if args.plot:
     plt.figure()
-    plt.imshow(imdat,cmap='grey_r')
+    plt.imshow(imdat)#,cmap='gray_r')
     plt.colorbar()
     ax = plt.gca()
 
