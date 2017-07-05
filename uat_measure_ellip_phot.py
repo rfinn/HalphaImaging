@@ -119,7 +119,7 @@ for i in range(len(a)):
 
 # plot image with outer ellipse
 
-if args.plot
+if args.plot:
     plt.figure()
     plt.imshow(imdat,cmap='grey_r')
     plt.colorbar()
