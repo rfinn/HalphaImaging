@@ -51,7 +51,7 @@ from astropy.coordinates import Angle
 import warnings
 import argparse
 from matplotlib import pyplot as plt
-
+from scipy.stats import scoreatpercentile
 from photutils import EllipticalAperture
 #from photutils import CircularAperture
 from photutils import aperture_photometry
@@ -59,6 +59,7 @@ from photutils import aperture_photometry
 
 parser = argparse.ArgumentParser(description = 'This code takes an image, and a SExtractor catalog.  ')
 parser.add_argument('--imfile', dest = 'imfile', default='A1367-113394-R',help = 'input image, without fits suffix')
+parser.add_argument('--mask', dest = 'mask', default=None,help = 'mask to use when measuring photometry')
 parser.add_argument('--imagepath', dest = 'imagepath', default = '', help = 'path to image.  default is current directory')
 parser.add_argument('--plot', dest = 'plot', default = False, action = 'store_true', help = 'generate plot of enclosed flux vs radius using matplotlib.  default is False.')
 args = parser.parse_args()
@@ -102,30 +103,37 @@ objectID = distance == min(distance)
 # find R90 - radius enclosing 90% of flux
 
 R90 = cat.FLUX_RADIUS[objectID][0][0]
-rmax = 4*R90
+rmax = 5*R90
 
 position = [(cat.X_IMAGE[objectID][0],cat.Y_IMAGE[objectID][0])]
 theta = np.radians(90.-cat.THETA_J2000[objectID][0])
-a = np.arange(2,rmax,1)
+a = np.linspace(2,rmax,100)
 b = (1.-cat.ELLIPTICITY[objectID][0])*a
 
 flux = np.zeros(len(a),'f')
-
+if args.mask:
+    maskdat = fits.getdata(args.mask)
 for i in range(len(a)):
     ap = EllipticalAperture(position,a[i],b[i],theta)#,ai,bi,theta) for ai,bi in zip(a,b)]
-    phot_table = aperture_photometry(imdat, ap)
-    flux[i] = phot_table[0][3]
+
+    if args.mask:
+        phot_table = aperture_photometry(imdat, ap, mask=maskdat)
+    else:
+        phot_table = aperture_photometry(imdat, ap)
+        
+    flux[i] = phot_table['aperture_sum'][0]
 
 
 # plot image with outer ellipse
 
 if args.plot:
     plt.figure()
-    plt.imshow(imdat,cmap='gray_r')
+    vmin,vmax=scoreatpercentile(imdat,[.5,99.9])
+    plt.imshow(imdat,cmap='gray_r',vmin=vmin,vmax=vmax,origin='lower')
     plt.colorbar()
     ax = plt.gca()
 
-    ellipse = Ellipse(xy=(cat.X_IMAGE[objectID][0],cat.Y_IMAGE[objectID][0]), width=a[-1],height=b[-1],edgecolor='r', fc='None', lw=2, angle=theta+90)
+    ellipse = Ellipse(xy=(cat.X_IMAGE[objectID][0],cat.Y_IMAGE[objectID][0]), width=a[-1],height=b[-1],edgecolor='r', fc='None', lw=2, angle=-1*np.degrees(theta))
     ax.add_patch(ellipse)
 
 # calculate surface brightness in each aperture
@@ -152,7 +160,7 @@ outfile.write('# X_IMAGE Y_IMAGE ELLIPTICITY THETA_J2000 \n')
 outfile.write('# %.2f %.2f %.2f %.2f \n'%(cat.X_IMAGE[objectID][0],cat.Y_IMAGE[objectID][0],cat.ELLIPTICITY[objectID][0],cat.THETA_J2000[objectID][0]))
 outfile.write('# radius enclosed_flux \n')
 for i in range(len(a)):
-    outfile.write('%.3f %.3f %.3f \n'%(a[i],flux[i],surface_brightness[i]))
+    outfile.write('%.2f %.3e %.3e \n'%(a[i],flux[i],surface_brightness[i]))
 outfile.close()
 
 if args.plot:

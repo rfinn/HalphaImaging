@@ -20,6 +20,8 @@ WRITTEN BY:
 Rose Finn
 updated 2016-06-23
 
+updated 2017-07-05
+
 '''
 
 
@@ -31,7 +33,7 @@ from scipy.stats import scoreatpercentile
 mosaic_pixelscale=.425
 
 
-parser = argparse.ArgumentParser(description ='Run ellipse on R and Halpha images')
+parser = argparse.ArgumentParser(description ='Plot R and Halpha images with radial profiles')
 #parser.add_argument('--r', dest = 'r', default = None, help = 'R-band image')
 #parser.add_argument('--ha', dest = 'ha', default = None, help = 'R-band image')
 parser.add_argument('--cluster', dest = 'cluster', default = None, help = 'cluster and prefix of image names (e.g. A1367)')
@@ -43,12 +45,13 @@ ratio_r2ha=1./args.scale
 
 def plotintens(data_file,pls='-',pcolor='k',pixelscale=.425,scale=1,label=None,legend=False):
     data1 = np.genfromtxt(data_file)
-    sma_pix = data1[:,1]*pixelscale
+    sma_pix = data1[:,0]*pixelscale
     #print data1[:,1]
     # print data1[:,2]
-    intens, intens_err = data1[:,1], data1[:,2]
+    #intens, intens_err = data1[:,1], data1[:,2]
+    encl_flux, intens = data1[:,1], data1[:,2]
     plt.plot(sma_pix,intens*scale,ls=pls,color=pcolor)
-    plt.errorbar(sma_pix,intens*scale,intens_err,fmt=None,ecolor=pcolor,label='__nolegend__')
+    #plt.errorbar(sma_pix,intens*scale,intens_err,fmt=None,ecolor=pcolor,label='__nolegend__')
     plt.axhline(y=0,ls='--',color='k',label='_nolegend_')
     if legend:
         plt.legend(['$R$',r'$H\alpha$'])
@@ -82,7 +85,7 @@ def plotimage(fits_image,vmin=0,vmax=4):
     ax=plt.gca()
     plt.axis('equal')
     logscale=0
-    vmin,vmax=scoreatpercentile(im,[5.,95.])
+    vmin,vmax=scoreatpercentile(im,[.5,99.9])
     plt.imshow((im),interpolation='nearest',origin='lower',cmap='binary',vmin=vmin,vmax=vmax)        
     ax.set_yticklabels(([]))
     ax.set_xticklabels(([]))
@@ -119,27 +122,23 @@ def makeplots(rimage,haimage):
     # plot r and 24 profiles
 
     rrimage = rimage.split('.')
-    rimage = rrimage[0]+'_phot'+'.fits'
-    t=rimage.split('fits')
-    rdat=t[0]+'dat'
-  
-
-
+    rdat=rrimage[0]+'_phot.dat'
+    print rdat
     rhaimage = haimage.split('.')
-    haimage = rhaimage[0]+'_phot'+'.fits'
-    t=haimage.split('fits')
-    hadat=t[0]+'dat'
+    hadat=rhaimage[0]+'_phot.dat'
 
     chadat='c'+hadat
 
     central_intens_R = plotintens(rdat,pixelscale=mosaic_pixelscale,pcolor='b',label='$R-band$')
     central_intens_ha = plotintens(hadat,pixelscale=mosaic_pixelscale,pcolor='r',scale=ratio_r2ha,label='$H\alpha$',legend=True)
+    
 
     #try:
     #    plotintens(chadat,pixelscale=mosaic_pixelscale,pcolor='m',scale=ratio_r2ha)
     #except:
     #    print 'no convolved Halpha'
     plt.gca().set_yscale('log')
+    plt.ylim(4.e-4,6)
     #plt.gca().set_xscale('log')
     #plt.axis([.3,100,.1,1000])
     #plt.axis([.3,40,-10,400.])
@@ -162,6 +161,7 @@ def makeplots(rimage,haimage):
     '''
     ax=plt.gca()
     ax.set_yscale('log')
+    plt.ylim(4.e-4,6)
     ax.legend(loc = 'upper right')
 
     #ax.set_xscale('log')
