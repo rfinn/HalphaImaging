@@ -163,7 +163,7 @@ if __name__ == '__main__':
             plt.plot(radius, intensity, 'b.', label='R',markersize=6)
             plt.plot(radius_ha, intensity_ha, 'c.', label='Ha',markersize=6)
         plt.axvline(x=rmax,color='k',ls='-',label='max r for fit')
-        plt.legend()
+        plt.legend(loc = 'upper right')
 
         plt.gca().set_yscale('log')
         if i == 0:
