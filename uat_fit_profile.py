@@ -175,6 +175,7 @@ if __name__ == '__main__':
             plt.xlabel('Radius (arcsec)')
         plt.ylim(1.e-4,2)
         plt.xlim(-2,np.max(radius_ha))
+    plt.savefig(args.cluster+'-'+args.id+'-radial-profile.png')
     print 'R-BAND FIT RESULTS:'
     print 'I0 = %.2f'%(popt[0])
     #print 'n =  %.2f'%(popt[1])

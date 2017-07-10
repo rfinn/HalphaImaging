@@ -143,7 +143,7 @@ if args.plot:
 
     ellipse = Ellipse(xy=(cat.X_IMAGE[objectID][0],cat.Y_IMAGE[objectID][0]), width=a[-1],height=b[-1],edgecolor='r', fc='None', lw=2, angle=-1*np.degrees(theta))
     ax.add_patch(ellipse)
-
+    plt.savefig(args.imfile+'-snapshot.png')
 # calculate surface brightness in each aperture
 
 area = np.pi*a*b # area of each ellipse
