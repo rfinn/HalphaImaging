@@ -13,6 +13,9 @@ BACKGROUND:
 
 EXAMPLE:
 
+from within ipython
+
+%run ~/github/HalphaImaging/uat_fit_profile.py --cluster pointing-1 --id 118647 --compareNSA
 
 WRITTEN BY:
    Rose A. Finn
