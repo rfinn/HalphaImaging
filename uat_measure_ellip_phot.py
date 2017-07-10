@@ -68,7 +68,7 @@ parser = argparse.ArgumentParser(description = 'This code takes an image, and a 
 parser.add_argument('--imfile', dest = 'imfile', default='A1367-113394-R',help = 'input image, without fits suffix')
 parser.add_argument('--mask', dest = 'mask', default=None,help = 'mask to use when measuring photometry')
 parser.add_argument('--imagepath', dest = 'imagepath', default = '', help = 'path to image.  default is current directory')
-parser.add_argument('--rmax', dest = 'rmax', default = 5., help = 'maximum radius to measure photometry out to.  This is a multiple of what sextractor measures as R90.  Default is 5 R90.')
+parser.add_argument('--rmax', dest = 'rmax', default = 6., help = 'maximum radius to measure photometry out to.  This is a multiple of what sextractor measures as R90.  Default is 6xR90.')
 parser.add_argument('--plot', dest = 'plot', default = False, action = 'store_true', help = 'generate plot of enclosed flux vs radius using matplotlib.  default is False.')
 args = parser.parse_args()
 
