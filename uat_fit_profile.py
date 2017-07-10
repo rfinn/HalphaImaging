@@ -63,6 +63,7 @@ parser.add_argument('--cluster', dest = 'cluster', default = None, help = 'clust
 parser.add_argument('--id', dest = 'id', default = None, help = 'NSA ID number')
 parser.add_argument('--scale', dest = 'scale', default = 0.0445, help = 'Filter ratio of R-band to Halpha.  Default is 0.0445.')
 parser.add_argument('--pixelscale', dest = 'pixelscale', default = 0.43, help = 'Pixel scale.  Default is set to HDI pixel scale of 0.43 arcsec/pixel.')
+parser.add_argument('--rmax', dest = 'rmax', default = 4., help = 'maximum radius to fit profile out to.  This is a multiple of what sextractor measures as R90.  Default is 4xR90.')
 parser.add_argument('--compareNSA', dest = 'compareNSA', default = False, action='store_true', help = 'Compare results to the NSA fit')
 parser.add_argument('--NSApath', dest = 'NSApath', default = '/Users/rfinn/research/NSA/',  help = 'Path to NSA file.  Default is ~/research/NSA/.  Set this if using compareNSA.')
 args = parser.parse_args()
@@ -104,7 +105,7 @@ if __name__ == '__main__':
 
     
     # set maximum for fitting radius
-    rmax = 2.*R90  # selected this to give a Re that was relatively close to NSA value
+    rmax = args.rmax*R90  # selected this to give a Re that was relatively close to NSA value
 
     # read in Rband file
     radius,intensity = read_phot_file(filenameR)
