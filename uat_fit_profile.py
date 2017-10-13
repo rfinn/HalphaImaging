@@ -29,6 +29,7 @@ from matplotlib import pyplot as plt
 from astropy.io import fits
 import argparse
 import scipy
+import scipy.optimize
 
 def simple_fit(plotsingle=False):
     # function to test fitting in log space
@@ -163,7 +164,7 @@ if __name__ == '__main__':
             plt.plot(radius, intensity, 'b.', label='R',markersize=6)
             plt.plot(radius_ha, intensity_ha, 'c.', label='Ha',markersize=6)
         plt.axvline(x=rmax,color='k',ls='-',label='max r for fit')
-        plt.legend(loc = 'upper right')
+        plt.legend(loc = 'upper right',prop={'size':7})
 
         plt.gca().set_yscale('log')
         if i == 0:
