@@ -54,11 +54,11 @@ from astropy.coordinates import SkyCoord
 from astropy.io import fits
 
 parser = argparse.ArgumentParser(description ='Edit image headers to include basic WCS information to the HDI image headers')
-parser.add_argument('--filestring', dest='filestring', default='cftr*.fits', help='match string for input files (default =  cftr*.fits)')
+parser.add_argument('--filestring', dest='filestring', default='cftr', help='match string for input files (default =  cftr, which operates on all cftr*.fits files)')
 parser.add_argument('--pixscalex', dest='pixelscalex', default='0.00011805', help='pixel scale in x (default = 0.00011808)')
 parser.add_argument('--pixscaley', dest='pixelscaley', default='0.00011805', help='pixel scale in y (default = 0.00011808)')
 args = parser.parse_args()
-files = sorted(glob.glob(args.filestring))
+files = sorted(glob.glob(args.filestring+'*.fits'))
 nfiles=len(files)
 i=1
 for f in files:
