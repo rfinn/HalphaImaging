@@ -52,7 +52,7 @@ import argparse
 import subprocess
 
 parser = argparse.ArgumentParser(description ='Run sextractor, scamp, and swarp to determine WCS solution and make mosaics')
-parser.add_argument('--filestring', dest = 'filestring', default = 'hcftr*o00.fits', help = 'string to use to get input files (default = "hcftr*o00.fits")')
+parser.add_argument('--filestring', dest = 'filestring', default = 'hcftr', help = 'string to use to get input files (default = "hcftr", which grabs all of the files "hcftr*o00.fits")')
 parser.add_argument('--s', dest = 's', default = False, action = 'store_true', help = 'Run sextractor to create object catalogs')
 parser.add_argument('--scamp', dest = 'scamp', default = False, action = 'store_true', help = 'Run scamp')
 parser.add_argument('--swarp', dest = 'swarp', default = False, action = 'store_true', help = 'Run swarp to create mosaics')
@@ -70,7 +70,7 @@ if args.refimage:
 # get input files
 #print 'cp ' +args.d + '/default.* .'
 os.system('cp ' +args.d + '/default.* .')
-files = sorted(glob.glob(args.filestring))
+files = sorted(glob.glob(args.filestring+"*.fits"))
 
 nfiles = len(files)
 i = 1
