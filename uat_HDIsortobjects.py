@@ -29,7 +29,7 @@ import argparse
 from astropy.io import fits
 
 parser = argparse.ArgumentParser(description ='group objects by filter and target for combining with swarp')
-parser.add_argument('--filestring', dest = 'filestring', default = 'hcftr*o00.fits', help = 'string to use to get input files (default = "hcftr*o00.fits")')
+parser.add_argument('--filestring', dest = 'filestring', default = 'hcftr', help = 'string to use to get input files (default = "hcftr" which grabs all files "hcftr*o00.fits")')
 
 args = parser.parse_args()
 
@@ -39,8 +39,9 @@ args = parser.parse_args()
 # OBJECT - title of observed object
 # EXPTIME - exposure time
 
+filestring = args.filestring+'*o00.fits'
 try:
-    os.system('gethead '+args.filestring+' FILTER, OBJECT, EXPTIME > junkfile2')
+    os.system('gethead '+filestring+' FILTER, OBJECT, EXPTIME > junkfile2')
     infile=open('junkfile2','r')
     fnames=[]      #creates empty list to contain file name
     ftype=[]       #creates empty list to contain type of filter
@@ -56,7 +57,7 @@ try:
     infile.close()
 
 except:
-    files = glob.glob(args.filestring)
+    files = glob.glob(filestring)
 
     fnames=[]      #creates empty list to contain file name
     ftype=[]       #creates empty list to contain type of filter
