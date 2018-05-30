@@ -88,7 +88,7 @@ for f in filters:
             print "skipping to next filter"
             continue
         else:
-            flatdata = fits.getdata("ndomeflat"+f)
+            flatdata = fits.getdata("ndomeflat"+f+".fits")
             for i in indices[0]:
                 data,header = fits.getdata(filenames[i],header=True)
                 dataout = data / flatdata
