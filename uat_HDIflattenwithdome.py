@@ -83,7 +83,7 @@ for f in filters:
     indices=np.where(filefilter == f)
     if len(indices[0]) > 0:
         # open flat file
-        if not(os.exists("ndomeflat"+f)):
+        if not(os.path.exists("ndomeflat"+f)):
             continue
         else:
             flatdata = fits.getdata("ndomeflat"+f)
