@@ -39,6 +39,7 @@ EDITED BY:
 import glob
 import os
 import numpy as np
+from astropy.io import fits
 
 
 os.system('gethead tr*o00.fits CMMTOBS > junkfile1')
