@@ -3,7 +3,6 @@
 '''
 GOAL:
 - Takes all object images and flattens them using a normalized dome flat in the same filter
-- We need to perform this step so that the variations in quantum efficiency within the CCD can be removed using dome flats which correct for temperature fluctuations within the CCD. 
 
 PROCEDURE:
 - get all files that start with tr*.fits
@@ -77,6 +76,7 @@ filefilter=np.array(filefilter) # make into character array
 
 ffilter=np.array(filefilter) # make into character array
 for f in filters:
+    print 'PROCESSING IMAGES IN FILTER ',f
     objectgroup='object_'+f
     fobjectgroup='fobject_'+f
     print 'objectgroup = ',objectgroup
@@ -84,6 +84,8 @@ for f in filters:
     if len(indices[0]) > 0:
         # open flat file
         if not(os.path.exists("ndomeflat"+f)):
+            print "can't find "+"ndomeflat"+f
+            print "skipping to next filter"
             continue
         else:
             flatdata = fits.getdata("ndomeflat"+f)
