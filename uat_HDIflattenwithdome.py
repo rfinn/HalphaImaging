@@ -93,7 +93,7 @@ for f in filters:
                 data,header = fits.getdata(filenames[i],header=True)
                 dataout = data / flatdata
                 header['HISTORY'] = 'Flattened using ndomeflat'+f
-                fits.writeto('d'+filenames[i],dataout,header,overwrite=True)
+                fits.writeto('d'+filenames[i],dataout,header,clobber=True)
 os.remove('junkfile1')
 
 
