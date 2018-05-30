@@ -83,12 +83,15 @@ for f in filters:
     indices=np.where(filefilter == f)
     if len(indices[0]) > 0:
         # open flat file
-        flatdata = fits.getdata("ndomeflat"+f)
-        for i in indices[0]:
-            data,header = fits.getdata(filenames[i],header=True)
-            dataout = data / flatdata
-            header['HISTORY'] = 'Flattened using ndomeflat'+f
-            fits.writeto('d'+filenames[i],dataout,header,overwrite=True)
+        if not(os.exists("ndomeflat"+f)):
+            continue
+        else:
+            flatdata = fits.getdata("ndomeflat"+f)
+            for i in indices[0]:
+                data,header = fits.getdata(filenames[i],header=True)
+                dataout = data / flatdata
+                header['HISTORY'] = 'Flattened using ndomeflat'+f
+                fits.writeto('d'+filenames[i],dataout,header,overwrite=True)
 os.remove('junkfile1')
 
 
