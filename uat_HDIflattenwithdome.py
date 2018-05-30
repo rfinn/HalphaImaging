@@ -52,6 +52,7 @@ for line in infile:
     filefilter.append(t[1].rstrip('\n').replace(' ',''))
 infile.close()
 filters=set(filefilter)
+print 'these are the filters I got: ',filters
 
 filefilter=np.array(filefilter) # make into character array
 
