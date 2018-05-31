@@ -36,8 +36,8 @@ infile = open(args.filename)
 for line in infile:
     if line.find('-') > -1:
         t = line.split('-')
-        print r'mv *{'+t[0]+'..'+t[1]+r'}*.fits junk/.'
-        os.system(r"mv *{"+t[0]+".."+t[1]+r"}*.fits junk/.")
+        print r'mv *{'+t[0]+'..'+t[1]+r'}}*.fits junk/.'
+        os.system(r"mv *{"+t[0]+".."+t[1]+r"}}*.fits junk/.")
     else:
         os.system('mv *'+line+'*.fits junk/.')
 
