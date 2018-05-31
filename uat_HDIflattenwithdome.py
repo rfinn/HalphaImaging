@@ -80,7 +80,10 @@ for f in filters:
     objectgroup='object_'+f
     fobjectgroup='fobject_'+f
     print 'objectgroup = ',objectgroup
-    indices=np.where(filefilter == f)
+    if f == 'ha4':
+        indices=np.where((filefilter == f) | (filefilter == '6620'))
+    else:
+        indices=np.where(filefilter == f)
     if len(indices[0]) > 0:
         # open flat file
         if not(os.path.exists("ndomeflat"+f+".fits")):
