@@ -88,15 +88,25 @@ for f in filters:
         # open flat file
         if not(os.path.exists("ndomeflat"+f+".fits")):
             print "can't find "+"ndomeflat"+f
+            if f == 'ha4':
+                print 'looking for ndomeflat6620.fits'
+                f = 'ndomeflat6620.fits'
+                if os.path.exists(f):
+                    flagfile = f
+                else:
+                    print "skipping to next filter"
+                    continue
+                
             print "skipping to next filter"
             continue
         else:
-            flatdata = fits.getdata("ndomeflat"+f+".fits")
-            for i in indices[0]:
-                data,header = fits.getdata(filenames[i],header=True)
-                dataout = data / flatdata
-                header['HISTORY'] = 'Flattened using ndomeflat'+f
-                fits.writeto('d'+filenames[i],dataout,header,clobber=True)
+            flatfile = "ndomeflat"+f+".fits"
+        flatdata = fits.getdata()
+        for i in indices[0]:
+            data,header = fits.getdata(filenames[i],header=True)
+            dataout = data / flatdata
+            header['HISTORY'] = 'Flattened using ndomeflat'+f
+            fits.writeto('d'+filenames[i],dataout,header,clobber=True)
 os.remove('junkfile1')
 
 
