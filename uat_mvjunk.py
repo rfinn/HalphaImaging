@@ -14,7 +14,9 @@ PROCEDURE
 0100-0153
 
 USAGE:
+from within ipython
 
+%run ~/github/HalphaImaging/uat_mvjunk.py --filename junkfiles
 
 '''
 
@@ -34,6 +36,7 @@ infile = open(args.filename)
 for line in infile:
     if line.find('-') > -1:
         t = line.split('-')
+        print 'mv *{'+t[0]+'..'+t[1]+'}*.fits junk/.'
         os.system('mv *{'+t[0]+'..'+t[1]+'}*.fits junk/.')
     else:
         os.system('mv *'+line+'*.fits junk/.')
