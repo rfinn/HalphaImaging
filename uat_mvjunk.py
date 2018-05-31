@@ -36,7 +36,7 @@ infile = open(args.filename)
 for line in infile:
     if line.find('-') > -1:
         t = line.split('-')
-        for i in range(int(t[0],t[1]+1)):
+        for i in range(int(t[0],int(t[1])+1)):
             os.system('mv *%04i*.fits junk/.'%(i))
                        
     else:
