@@ -36,7 +36,7 @@ infile = open(args.filename)
 for line in infile:
     if line.find('-') > -1:
         t = line.split('-')
-        s = 'mv *{{{%i..%i}}}*.fits junk/.'%(t[0],t[1])
+        s = 'mv *{%s..%s}*.fits junk/.'%(t[0],t[1])
         os.system(s)
         #print r'mv *{'+t[0]+'..'+t[1]+r'}}*.fits junk/.'
         #os.system(r"mv *{"+t[0]+".."+t[1]+r"}}*.fits junk/.")
