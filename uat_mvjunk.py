@@ -35,11 +35,9 @@ if not(os.path.exists('junk')):
 infile = open(args.filename)
 for line in infile:
     if line.find('-') > -1:
-        t = line.split('-')
-        s = 'mv *{{{%s..%s}}}*.fits junk/.'%(t[0],t[1])
-        os.system(s)
-        #print r'mv *{'+t[0]+'..'+t[1]+r'}}*.fits junk/.'
-        #os.system(r"mv *{"+t[0]+".."+t[1]+r"}}*.fits junk/.")
+        for i in range(int(t[0],t[1]+1)):
+            os.system('mv *%04i*.fits junk/.'%(i))
+                       
     else:
         os.system('mv *'+line+'*.fits junk/.')
 
