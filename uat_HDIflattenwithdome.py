@@ -91,6 +91,8 @@ for f in filters:
             if f == 'ha4':
                 print 'looking for ndomeflat6620.fits'
                 f = 'ndomeflat6620.fits'
+                print f
+                print os.path.exists(f)
                 if os.path.exists(f):
                     flatfile = f
                 else:
