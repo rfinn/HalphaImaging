@@ -92,7 +92,7 @@ for f in filters:
                 print 'looking for ndomeflat6620.fits'
                 f = 'ndomeflat6620.fits'
                 if os.path.exists(f):
-                    flagfile = f
+                    flatfile = f
                 else:
                     print "skipping to next filter"
                     continue
@@ -101,7 +101,7 @@ for f in filters:
             continue
         else:
             flatfile = "ndomeflat"+f+".fits"
-        flatdata = fits.getdata()
+        flatdata = fits.getdata(flatfile)
         for i in indices[0]:
             data,header = fits.getdata(filenames[i],header=True)
             dataout = data / flatdata
