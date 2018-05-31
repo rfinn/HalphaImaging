@@ -98,9 +98,9 @@ for f in filters:
                 else:
                     print "skipping to next filter"
                     continue
-                
-            print "skipping to next filter"
-            continue
+            else:   
+                print "skipping to next filter"
+                continue
         else:
             flatfile = "ndomeflat"+f+".fits"
         flatdata = fits.getdata(flatfile)
