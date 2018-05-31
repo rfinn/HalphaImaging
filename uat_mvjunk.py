@@ -35,7 +35,7 @@ if not(os.path.exists('junk')):
 infile = open(args.filename)
 for line in infile:
     if line.find('-') > -1:
-        t = line.split('-')
+        t = line.rstrip().split('-')
         print t
         a = int(t[0])
         b = int(t[1])+1
@@ -43,6 +43,6 @@ for line in infile:
             os.system('mv *%04i*.fits junk/.'%(i))
                        
     else:
-        os.system('mv *'+line+'*.fits junk/.')
+        os.system('mv *'+line.rstrip()+'*.fits junk/.')
 
 infile.close()
