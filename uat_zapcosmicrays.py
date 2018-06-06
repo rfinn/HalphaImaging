@@ -6,8 +6,11 @@ GOAL:
 
 EXAMPLE:
    In the directory containing all flattened objects with incorrect headers type in the command line:
-      /home/share/research/pythonCode/uat_HDIfixheader.py
 
+   from within ipython
+
+   %run ~/github/HalphaImaging/uat_zipcosmic.py --filestring tr
+   
 INPUT/OUPUT:
     Input --> all tr*.fits  -- best to run on the trimmed files
     Output --> ztr*.fits
@@ -34,10 +37,10 @@ import ccdproc
 from astropy.io import fits
 
 parser = argparse.ArgumentParser(description ='Remove cosmic rays using LAcosmic')
-parser.add_argument('--filestring', dest='filestring', default='tr*.fits', help='match string for input files (default =  tr*.fits)')
+parser.add_argument('--filestring', dest='filestring', default='tr', help='match string for input files (default =  tr, which gets tr*.fits)')
 #parser.add_argument('--', dest='pixelscalex', default='0.00011808', help='pixel scale in x (default = 0.00011808)')
 args = parser.parse_args()
-files = sorted(glob.glob(args.filestring))
+files = sorted(glob.glob(args.filestring+'*.fits'))
 nfiles=len(files)
 i=1
 for f in files:
