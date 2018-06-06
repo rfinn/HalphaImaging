@@ -1,24 +1,7 @@
 #!/usr/bin/env python
 
 '''
-  BASIC INFORMATION ABOUT THIS CODE:
-  -This is the FIRST program you need to run in order to perform the data reduct  ion of HDI images.
-  -This code will create trimmed files of your original images which will remove  overscan regions in addition to combining the flats by grouping together the f  ilter and flat type and normalizing those combined images.
  
-  BEFORE RUNNING THIS CODE:
-  -Type "ur_setup" into the terminal to enable ureka
-  -Make sure that you are able to run these codes even if your images are in a s  eperate directory. In order to do so, you must type the following into terminal 
-          emacs -nw .profile
-          export PATH=$PATH:~/directory_of_your_python_code
-      -Check to see if this added path was successfully added by typing: 
-          echo $PATH
-  -Create a junk director to put pointing tests, focus frames, and bad exposures  into within the directory where all your images are stored so that they are el  iminated from the data reduction process.
-  -IN ORDER TO START PYRAF --> type the following into terminal
-          pyraf
-          imred
-          ccdred
-          epar ccdproc --> use parameters that are listed on our authorea websit          e titled "Halpha Imaging of Nearby Galaxy Groups" written by Dr. Rose           Finn, Grant Boughton, Natasha Collova, Sandy Spicer, and Kelly Whalen. 
-
   GOAL:
   Make lists of files that contain
   - dome flats with same filter
@@ -36,9 +19,6 @@
      In the directory containing all flats type in the command line:
      '/home/share/research/pythonCode/uat_HDIgroupflatfiles.py'(or whatever the      path is to where this program is stored)
 
-  WHAT THIS CODE DOES:
-  -This program combines and stores the information of the normalized flats of t  hat same filter so that this additive effect could be subtracted from our data  This code also subtracts the overscan regions.
-  -This program does the above be grouping all the flat files by filter and flat   type so that they can be combined accordingly and normalized thereafter.  
   
   INPUT/OUTPUT:
   Input: 'skyflat(type of filter)' or 'domeflat(type of filter)'
@@ -66,18 +46,34 @@
 import glob
 import os
 import numpy as np
-from pyraf import iraf
 
+import ccdproc
+from astropy.io import fits
+
+'''
+from pyraf import iraf
 iraf.noao()
 iraf.imred()
 iraf.ccdred()    
+'''
 
-os.system('gethead tr*f00.fits CMMTOBS > tempflats')    #tempflats is the name of a "junk file" that contains the gethead information from all the flat images. This file will be deleted after the information is read out in the future. We are left with multiple arrays of information from the headers.
-#we assume that the flat images are trimmed and the file name starts with 'tr'
+parser = argparse.ArgumentParser(description ='Groups images by filter and creates flatfield images')
+parser.add_argument('--filestring', dest='filestring', default='ztr', help='match string for input files (default =  ztr, which gets ztr*.fits)')
+#parser.add_argument('--', dest='pixelscalex', default='0.00011808', help='pixel scale in x (default = 0.00011808)')
+args = parser.parse_args()
+files = sorted(glob.glob(args.filestring+'*.fits'))
+nfiles=len(files)
+
+os.system('gethead '+args.filestring+'*f00.fits CMMTOBS > tempflats')
+# tempflats is the name of a "junk file" that contains the gethead information from all the flat images.
+# This file will be deleted after the information is read out in the future.
+
+# We assume that the flat images are trimmed and the file name starts with 'ztr'
 infile=open('tempflats','r')
 fnames=[]
 filter=[]
 ftype=[]   #skyflat or domeflat
+
 for line in infile:
     t=line.split()
     fnames.append(t[0])
@@ -104,10 +100,16 @@ os.remove('tempflats')
 flats = glob.glob('*flat*')
 flats=set(flats)-set(glob.glob('c*.fits'))-set(glob.glob('n*.fits'))     # doesn't include flat files that have already been combined or normalized in the following loop
 for f in flats:
-    iraf.imcombine(input='@'+f, output='c'+f, combine='median', scale='median') # combine flat, create e.g. cdomeflatR
-    flat_mean = iraf.imstat(images='c'+f, fields='mean', lower='INDEF', format=0, Stdout=1) # find mean of combined flat image
-    iraf.imarith(operand1='c'+f, op='/', operand2=flat_mean[0], result='n'+f) # normalize the combined flat
-    
+    flatimages = []
+    filelist = open(f,'r')
+    for fname in filelist:
+        ccd = ccdproc.CCDData.read(fname, unit='adu')
+        flatimages.append(ccd)
+    # combine flat images using median combine
+    med_flat = ccdproc.combine(flatimages, output_file = 'c'+f, method = 'median', scale='median') 
+    # normalize flat image by dividing by mean
+    norm_med = med / np.mean(med_flat)
+    norm_med.write('nc'+f, clobber=True)
 
                 
 
