@@ -114,7 +114,8 @@ for f in flats:
         print 'finished inner loop'
     # combine flat images using median combine
     print 'calculating median flat'
-    med_flat = np.median(flatimages, axis=0)
+    #med_flat = np.median(flatimages, axis=0)
+    med_flat = ccdproc.combine(flatimages, method='median)
     # normalize flat image by dividing by mean
     print 'normalizing flat'
     norm_med_flat = med_flat / np.mean(med_flat)
