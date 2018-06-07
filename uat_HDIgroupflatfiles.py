@@ -109,7 +109,7 @@ for f in flats:
         data = data / np.median(data)
         flatimages.append(data)
     # combine flat images using median combine
-    med_flat = np.median(filelist, axis=0)
+    med_flat = np.median(flatimages, axis=0)
     # normalize flat image by dividing by mean
     norm_med_flat = med_flat / np.mean(med_flat)
     header['HISTORY'] = 'Combined and normalized flat field'
