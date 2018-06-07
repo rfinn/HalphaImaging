@@ -109,7 +109,7 @@ for f in flats:
         print 'fname = ',fname
         fname = fname.rstrip()
         data,header = fits.getdata(fname, header=True)
-        data = data / np.median(data)
+        data = ccdproc.CCDData(data, unit='adu') / np.median(data)
         flatimages.append(data)
         print 'finished inner loop'
     # combine flat images using median combine
