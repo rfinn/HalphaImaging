@@ -109,13 +109,13 @@ for f in flats:
         print 'fname = ',fname
         fname = fname.rstrip()
         data,header = fits.getdata(fname, header=True)
-        data = ccdproc.CCDData(np.ndarray(data.shape,buffer=data), unit='adu') / np.median(data)
+        #data = ccdproc.CCDData(np.ndarray(data.shape,buffer=data), unit='adu') / np.median(data)
         flatimages.append(data)
         print 'finished inner loop'
     # combine flat images using median combine
     print 'calculating median flat'
-    #med_flat = np.median(flatimages, axis=0)
-    med_flat = ccdproc.combine(flatimages, method='median')
+    med_flat = np.median(flatimages, axis=0)
+    #med_flat = ccdproc.combine(flatimages, method='median')
     # normalize flat image by dividing by mean
     print 'normalizing flat'
     norm_med_flat = med_flat / np.mean(med_flat)
