@@ -105,13 +105,16 @@ for f in flats:
     filelist = open(f,'r')
     for fname in filelist:
         print fname
-        ccd = ccdproc.CCDData.read(fname, unit='adu')
-        flatimages.append(ccd)
+        data,header = fits.getdata(fname, header=True)
+        data = data / np.median(data)
+        flatimages.append(data)
     # combine flat images using median combine
-    med_flat = ccdproc.combine(flatimages, output_file = 'c'+f, method = 'median', scale='median') 
+    med_flat = np.median(filelist, axis=0)
     # normalize flat image by dividing by mean
-    norm_med = med / np.mean(med_flat)
-    norm_med.write('nc'+f, clobber=True)
+    norm_med_flat = med_flat / np.mean(med_flat)
+    header['HISTORY'] = 'Combined and normalized flat field'
+    fits.writeto('nc'+f,norm_med_flat,header)
+
 
                 
 
