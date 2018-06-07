@@ -100,19 +100,27 @@ for f in set_ftype:
 os.remove('tempflats')            
 flats = glob.glob('*flat*')
 flats=set(flats)-set(glob.glob('c*.fits'))-set(glob.glob('n*.fits'))     # doesn't include flat files that have already been combined or normalized in the following loop
+print 'flats = ',flats
 for f in flats:
+    print 'filelist = ',f
     flatimages = []
     filelist = open(f,'r')
     for fname in filelist:
+        print 'fname = ',fname
         fname = fname.rstrip()
         data,header = fits.getdata(fname, header=True)
         data = data / np.median(data)
         flatimages.append(data)
+        print 'finished inner loop'
     # combine flat images using median combine
+    print 'calculating median flat'
     med_flat = np.median(flatimages, axis=0)
     # normalize flat image by dividing by mean
+    print 'normalizing flat'
     norm_med_flat = med_flat / np.mean(med_flat)
+    print 'updating header'
     header['HISTORY'] = 'Combined and normalized flat field'
+    print 'writing fits'
     fits.writeto('nc'+f,norm_med_flat,header)
 
 
