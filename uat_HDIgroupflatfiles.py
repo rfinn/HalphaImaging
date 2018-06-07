@@ -104,6 +104,7 @@ for f in flats:
     flatimages = []
     filelist = open(f,'r')
     for fname in filelist:
+        print fname
         ccd = ccdproc.CCDData.read(fname, unit='adu')
         flatimages.append(ccd)
     # combine flat images using median combine
