@@ -104,7 +104,7 @@ for f in flats:
     flatimages = []
     filelist = open(f,'r')
     for fname in filelist:
-        print fname
+        fname = fname.rstrip()
         data,header = fits.getdata(fname, header=True)
         data = data / np.median(data)
         flatimages.append(data)
