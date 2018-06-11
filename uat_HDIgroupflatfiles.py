@@ -122,7 +122,7 @@ for f in flats:
     print 'updating header'
     header['HISTORY'] = 'Combined and normalized flat field'
     print 'writing fits'
-    fits.writeto('nc'+f+'.fits',norm_med_flat,header)
+    fits.writeto('n'+f+'.fits',norm_med_flat,header)
 
 
                 
