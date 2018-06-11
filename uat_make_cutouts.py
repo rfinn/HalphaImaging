@@ -32,7 +32,7 @@ To run on Virgo filament imaging:
 
 ~/github/HalphaImaging/uat_make_cutouts.py --image pointing-13_R.coadd.fits --catalog ~/github/Virgo/tables/nsa.virgo.fits --filter R --nhalpha 4 --prefix pointing13
 
-~/github/HalphaImaging/uat_make_cutouts.py --image pointing-13_ha4.coadd.fits --catalog ~/github/Virgo/tables/nsa.virgo.fits --filter ha4 --nhalpha 4 --prefix pointing13 
+~/github/HalphaImaging/uat_make_cutouts.py --image pointing-13_ha4.coadd.fits --catalog ~/github/Virgo/tables/nsa.virgo.fits --filter ha4 --nhalpha 4 --prefix pointing13 --plot
 
     
 
