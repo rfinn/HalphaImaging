@@ -41,7 +41,7 @@ import numpy as np
 from astropy.io import fits
 
 
-os.system('gethead tr*o00.fits CMMTOBS > junkfile1')
+os.system('gethead ztr*o00.fits CMMTOBS > junkfile1')
 infile=open('junkfile1','r')
 filenames=[]
 filefilter=[]
