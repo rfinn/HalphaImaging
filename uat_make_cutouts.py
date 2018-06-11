@@ -27,9 +27,8 @@ When running from macbook (not coma):
 
 ~/github/HalphaImaging/uat_make_cutouts.py --image A1367-h02-CS.fits --catalog ~/research/NSA/nsa_v0_1_2.fits --filter CS --nhalpha 12 
 
-If running on coma, you don't need to specify the catalog path - the default should be the correct value.
 
-    uat_make_cutouts.py catalog image Halpha_filter_number
+To run on Virgo filament imaging:
 
 ~/github/HalphaImaging/uat_make_cutouts.py --image pointing-13_R.coadd.fits --catalog ~/github/Virgo/tables/nsa.virgo.fits --filter R --nhalpha 4 --prefix pointing13
 
