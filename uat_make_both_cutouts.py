@@ -110,9 +110,8 @@ def makebothcuts(Rimage,filter1,Haimage,filter2):
     n2,n1 = f[0].data.shape #should be same for Ha too, maybe? IDK
     n4,n3 = g[0].data.shape 
     
-    wR= WCS(Rimage)#OF R IMAGE, SO THAT HA MATCHES WCS OF R, SO THEY'RE THE SAME
-    wHa= WCS(Haimage)#OF R IMAGE, SO THAT HA MATCHES WCS OF R, SO THEY'RE THE SAME
-    px,py = wR.wcs_world2pix(catdat.RA,catdat.DEC,1)
+    w= WCS(Rimage)#OF R IMAGE, SO THAT HA MATCHES WCS OF R, SO THEY'RE THE SAME
+    px,py = w.wcs_world2pix(catdat.RA,catdat.DEC,1)
     onimageflag=(px < n1) & (px >0) & (py < n2) & (py > 0)
     
     keepflag=zFlag & onimageflag
@@ -136,8 +135,8 @@ def makebothcuts(Rimage,filter1,Haimage,filter2):
         #print image, radius[i], position, size
         #cutout = Cutout2D(fdulist[0].data, position, size, wcs=w, mode='strict') #require entire image to be on parent image
         try:
-            cutoutR = Cutout2D(f[0].data, position, size, wcs=wR, mode='trim') #require entire image to be on parent image
-            cutoutHa = Cutout2D(g[0].data, position, size, wcs=wHa, mode = 'trim')
+            cutoutR = Cutout2D(f[0].data, position, size, wcs=w, mode='trim') #require entire image to be on parent image
+            cutoutHa = Cutout2D(g[0].data, position, size, wcs=w, mode = 'trim')
         except astropy.nddata.utils.PartialOverlapError:# PartialOverlapError:
             print 'galaxy is only partially covered by mosaic - skipping ',IDNUMBER[i]
             continue
@@ -165,7 +164,7 @@ def makebothcuts(Rimage,filter1,Haimage,filter2):
         newfile = fits.PrimaryHDU()
         newfile.data = f[0].data[ymin:ymax,xmin:xmax]
         newfile.header = f[0].header
-        newfile.header.update(wR[ymin:ymax,xmin:xmax].to_header())
+        newfile.header.update(w[ymin:ymax,xmin:xmax].to_header())
         
         fits.writeto(outimage, newfile.data, header = newfile.header, clobber=True)
         # saving Ha Cutout as fits image
@@ -174,7 +173,7 @@ def makebothcuts(Rimage,filter1,Haimage,filter2):
         newfile1 = fits.PrimaryHDU()
         newfile1.data = g[0].data[ymin1:ymax1,xmin1:xmax1]
         newfile1.header = g[0].header
-        newfile1.header.update(wHa[ymin1:ymax1,xmin1:xmax1].to_header())
+        newfile1.header.update(w[ymin1:ymax1,xmin1:xmax1].to_header())
         
         fits.writeto(outimage1, newfile1.data, header = newfile1.header, clobber=True)
         if args.plot:
