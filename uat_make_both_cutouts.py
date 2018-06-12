@@ -165,7 +165,7 @@ def makebothcuts(Rimage,filter1,Haimage,filter2):
         newfile = fits.PrimaryHDU()
         newfile.data = f[0].data[ymin:ymax,xmin:xmax]
         newfile.header = f[0].header
-        newfile.header.update(w[ymin:ymax,xmin:xmax].to_header())
+        newfile.header.update(wR[ymin:ymax,xmin:xmax].to_header())
         
         fits.writeto(outimage, newfile.data, header = newfile.header, clobber=True)
         # saving Ha Cutout as fits image
@@ -174,7 +174,7 @@ def makebothcuts(Rimage,filter1,Haimage,filter2):
         newfile1 = fits.PrimaryHDU()
         newfile1.data = g[0].data[ymin1:ymax1,xmin1:xmax1]
         newfile1.header = g[0].header
-        newfile1.header.update(w[ymin1:ymax1,xmin1:xmax1].to_header())
+        newfile1.header.update(wHa[ymin1:ymax1,xmin1:xmax1].to_header())
         
         fits.writeto(outimage1, newfile1.data, header = newfile1.header, clobber=True)
         if args.plot:
