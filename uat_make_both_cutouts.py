@@ -112,7 +112,7 @@ def makebothcuts(Rimage,filter1,Haimage,filter2):
     
     wR= WCS(Rimage)#OF R IMAGE, SO THAT HA MATCHES WCS OF R, SO THEY'RE THE SAME
     wHa= WCS(Rimage)#OF R IMAGE, SO THAT HA MATCHES WCS OF R, SO THEY'RE THE SAME
-    px,py = w.wcs_world2pix(catdat.RA,catdat.DEC,1)
+    px,py = wR.wcs_world2pix(catdat.RA,catdat.DEC,1)
     onimageflag=(px < n1) & (px >0) & (py < n2) & (py > 0)
     
     keepflag=zFlag & onimageflag
