@@ -89,6 +89,7 @@ args = parser.parse_args()
 lmin={'4':6573., '8':6606.,'12':6650.,'16':6682.}
 lmax={'4':6669., '8':6703.,'12':6747., '16':6779.}
 
+# convert filter min and max wavelength to redshift for halpha emission
 Zmax=(((lmax[args.nhalpha])/6563.)-1)
 Zmin=(((lmin[args.nhalpha])/6563.)-1)
 print 'Galaxies detectable in Halpha have redshifts between ',Zmin,' and ', Zmax
@@ -109,7 +110,8 @@ def makebothcuts(Rimage,filter1,Haimage,filter2):
     n2,n1 = f[0].data.shape #should be same for Ha too, maybe? IDK
     n4,n3 = g[0].data.shape 
     
-    w= WCS(Rimage)#OF R IMAGE, SO THAT HA MATCHES WCS OF R, SO THEY'RE THE SAME
+    wR= WCS(Rimage)#OF R IMAGE, SO THAT HA MATCHES WCS OF R, SO THEY'RE THE SAME
+    wHa= WCS(Rimage)#OF R IMAGE, SO THAT HA MATCHES WCS OF R, SO THEY'RE THE SAME
     px,py = w.wcs_world2pix(catdat.RA,catdat.DEC,1)
     onimageflag=(px < n1) & (px >0) & (py < n2) & (py > 0)
     
@@ -134,8 +136,8 @@ def makebothcuts(Rimage,filter1,Haimage,filter2):
         #print image, radius[i], position, size
         #cutout = Cutout2D(fdulist[0].data, position, size, wcs=w, mode='strict') #require entire image to be on parent image
         try:
-            cutoutR = Cutout2D(f[0].data, position, size, wcs=w, mode='trim') #require entire image to be on parent image
-            cutoutHa = Cutout2D(g[0].data, position, size, wcs=w, mode = 'trim')
+            cutoutR = Cutout2D(f[0].data, position, size, wcs=wR, mode='trim') #require entire image to be on parent image
+            cutoutHa = Cutout2D(g[0].data, position, size, wcs=wHa, mode = 'trim')
         except astropy.nddata.utils.PartialOverlapError:# PartialOverlapError:
             print 'galaxy is only partially covered by mosaic - skipping ',IDNUMBER[i]
             continue
