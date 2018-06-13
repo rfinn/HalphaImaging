@@ -116,7 +116,7 @@ rmax = args.rmax*R90
 print('max radius for measuring photometry is '+str(rmax))
 position = [(cat.X_IMAGE[objectID][0],cat.Y_IMAGE[objectID][0])]
 theta = np.radians(90.-cat.THETA_J2000[objectID][0])
-a = np.linspace(2,rmax,10)
+a = np.linspace(2,rmax,5)
 b = (1.-cat.ELLIPTICITY[objectID][0])*a
 
 
@@ -124,14 +124,14 @@ flux = np.zeros(len(a),'f')
 if args.mask:
     maskdat = fits.getdata(args.mask)
 for i in range(len(a)):
-    print('measuring flux in elliptical apertures '+str(i)+' ap size = ',str(a[i]))
+    print('defining elliptical aperture '+str(i)+' ap size = ',str(a[i]))
     ap = EllipticalAperture(position,a[i],b[i],theta)#,ai,bi,theta) for ai,bi in zip(a,b)]
 
     if args.mask:
         phot_table = aperture_photometry(imdat, ap, mask=maskdat)
     else:
         phot_table = aperture_photometry(imdat, ap)
-        
+    print('measuring flux in aperture '+str(i)+' ap size = ',str(a[i]))
     flux[i] = phot_table['aperture_sum'][0]
 
 
