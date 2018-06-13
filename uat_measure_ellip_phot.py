@@ -124,7 +124,7 @@ flux = np.zeros(len(a),'f')
 if args.mask:
     maskdat = fits.getdata(args.mask)
 for i in range(len(a)):
-    print('measuring flux in elliptical apertures '+str(i))
+    print('measuring flux in elliptical apertures '+str(i)+' ap size = ',str(a[i]))
     ap = EllipticalAperture(position,a[i],b[i],theta)#,ai,bi,theta) for ai,bi in zip(a,b)]
 
     if args.mask:
