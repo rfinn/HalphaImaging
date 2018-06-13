@@ -90,7 +90,7 @@ imdat = fits.getdata(image)
 
 
 
-    
+print('reading sextractor catalog\n')    
 ### get ellipse info from sextractor output
 SEcat = image_path+im1+'.cat'
 cat = fits.getdata(SEcat,2)
@@ -113,15 +113,18 @@ objectID = distance == min(distance)
 R90 = cat.FLUX_RADIUS[objectID][0][0]
 rmax = args.rmax*R90
 
+print('max radius for measuring photometry is '+str(rmax))
 position = [(cat.X_IMAGE[objectID][0],cat.Y_IMAGE[objectID][0])]
 theta = np.radians(90.-cat.THETA_J2000[objectID][0])
-a = np.linspace(2,rmax,100)
+a = np.linspace(2,rmax,10)
 b = (1.-cat.ELLIPTICITY[objectID][0])*a
+
 
 flux = np.zeros(len(a),'f')
 if args.mask:
     maskdat = fits.getdata(args.mask)
 for i in range(len(a)):
+    print('measuring flux in elliptical apertures '+str(i))
     ap = EllipticalAperture(position,a[i],b[i],theta)#,ai,bi,theta) for ai,bi in zip(a,b)]
 
     if args.mask:
@@ -135,6 +138,7 @@ for i in range(len(a)):
 # plot image with outer ellipse
 
 if args.plot:
+    print('plotting results \n')
     plt.figure()
     vmin,vmax=scoreatpercentile(imdat,[.5,99.9])
     plt.imshow(imdat,cmap='gray_r',vmin=vmin,vmax=vmax,origin='lower')
