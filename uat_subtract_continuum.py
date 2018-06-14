@@ -136,6 +136,6 @@ while adjust_scale:
             newfile = fits.PrimaryHDU()
             newfile.data = cs
             newfile.header = ha_header
-            fits.writeto(outimage, newfile.data, header = newfile.header, overwrite=True)
+            fits.writeto(outimage, newfile.data, header = newfile.header, clobber=True)
             output = outimage.split('.fits')
             plt.savefig(output[0]+'.png')
