@@ -69,7 +69,9 @@ parser.add_argument('--imfile', dest = 'imfile', default='A1367-113394-R',help =
 parser.add_argument('--mask', dest = 'mask', default=None,help = 'mask to use when measuring photometry')
 parser.add_argument('--imagepath', dest = 'imagepath', default = '', help = 'path to image.  default is current directory')
 parser.add_argument('--rmax', dest = 'rmax', default = 6., help = 'maximum radius to measure photometry out to.  This is a multiple of what sextractor measures as R90.  Default is 6xR90.')
+parser.add_argument('--naper', dest = 'naper', default = 20, help = 'Number of apertures to use.  Default is 20.')
 parser.add_argument('--plot', dest = 'plot', default = False, action = 'store_true', help = 'generate plot of enclosed flux vs radius using matplotlib.  default is False.')
+parser.add_argument('--verbose', dest = 'verbose', default = False, action = 'store_true', help = 'print statements to monitor progress of code')
 args = parser.parse_args()
 
 
@@ -86,6 +88,8 @@ image = image_path+im1+'.fits'
 # read in image
 imdat = fits.getdata(image)
 #if args.plot:
+
+
 
 
 
@@ -115,37 +119,54 @@ rmax = args.rmax*R90
 
 print('max radius for measuring photometry is '+str(rmax))
 position = [(cat.X_IMAGE[objectID][0],cat.Y_IMAGE[objectID][0])]
+
+## create an array of central positions
+#positions = np.zeros([int(args.naper),2],'f')
+#positions[:,0] = np.ones(int(args.naper))*cat.X_IMAGE[objectID][0]
+#positions[:,1] = np.ones(int(args.naper))*cat.Y_IMAGE[objectID][0]
+
+# you can't define multiple concentric apertures
+# because a, b, and theta can't be arrays :(
+
+# define ellipse shape
 theta = np.radians(90.-cat.THETA_J2000[objectID][0])
-a = np.linspace(2,rmax,5)
+a = np.linspace(2,rmax,int(args.naper))
 b = (1.-cat.ELLIPTICITY[objectID][0])*a
+
 
 
 flux = np.zeros(len(a),'f')
 if args.mask:
     maskdat = fits.getdata(args.mask)
 for i in range(len(a)):
-    print('defining elliptical aperture '+str(i)+' ap size = ',str(a[i]))
+    if args.verbose:
+        print('defining elliptical aperture '+str(i)+' ap size = ',str(a[i]))
     ap = EllipticalAperture(position,a[i],b[i],theta)#,ai,bi,theta) for ai,bi in zip(a,b)]
 
     if args.mask:
         phot_table = aperture_photometry(imdat, ap, mask=maskdat)
     else:
         phot_table = aperture_photometry(imdat, ap)
-    print('measuring flux in aperture '+str(i)+' ap size = ',str(a[i]))
+    if args.verbose:
+        print('measuring flux in aperture '+str(i)+' ap size = ',str(a[i]))
     flux[i] = phot_table['aperture_sum'][0]
+
+
+
 
 
 # plot image with outer ellipse
 
 if args.plot:
-    print('plotting results \n')
+    if args.verbose:
+        print('plotting results \n')
     plt.figure()
     vmin,vmax=scoreatpercentile(imdat,[.5,99.9])
     plt.imshow(imdat,cmap='gray_r',vmin=vmin,vmax=vmax,origin='lower')
     plt.colorbar()
     ax = plt.gca()
 
-    ellipse = Ellipse(xy=(cat.X_IMAGE[objectID][0],cat.Y_IMAGE[objectID][0]), width=a[-1],height=b[-1],edgecolor='r', fc='None', lw=2, angle=-1*np.degrees(theta))
+    ellipse = Ellipse(xy=(cat.X_IMAGE[objectID][0],cat.Y_IMAGE[objectID][0]), width=2*a[-1],height=2*b[-1],edgecolor='r', fc='None', lw=2, angle=-1*np.degrees(theta))
     ax.add_patch(ellipse)
     plt.savefig(args.imfile+'-snapshot.png')
 # calculate surface brightness in each aperture
