@@ -49,7 +49,8 @@ parser = argparse.ArgumentParser(description ='Create a mask for extraneous obje
 parser.add_argument('--image', dest = 'image', default = None, help = 'image to mask')
 parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files')
 parser.add_argument('--threshold', dest = 'threshold', default = .005, help = "sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store")
-parser.add_argument('--snr', dest = 'snr', default = .005, help = "sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store") 
+parser.add_argument('--snr', dest = 'snr', default = .005, help = "sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store")
+parser.add_argument('--cmap', dest = 'cmap', default = 'winter', help = "color map to use when displaying image mask.  default is winter.") 
 args = parser.parse_args()
 
 sextractor_files=['default.sex.HDI.mask','default.param','default.conv','default.nnw']
@@ -89,7 +90,7 @@ yc,xc = image.shape
 xc = xc/2.
 yc = yc/2.
 
-v1,v2=scoreatpercentile(image,[5.,95.])
+v1,v2=scoreatpercentile(image,[5.,99.])
 
 # run sextractor on input image
 # return segmentation image with central object removed
@@ -104,7 +105,8 @@ while adjust_mask:
     plt.imshow(image,cmap='gray_r',vmin=v1,vmax=v2,origin='lower')
     plt.title('image')
     plt.subplot(1,2,2)
-    plt.imshow(maskdat,cmap='gray_r',origin='lower')
+    #plt.imshow(maskdat,cmap='gray_r',origin='lower')
+    plt.imshow(maskdat,cmap=args.cmap,origin='lower')
     plt.title('mask')
     plt.gca().set_yticks(())
     #plt.draw()
