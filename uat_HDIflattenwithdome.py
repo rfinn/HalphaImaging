@@ -48,7 +48,18 @@ filefilter=[]
 for line in infile:
     t=line.split('.fits')
     filenames.append(t[0]+'.fits')
-    filefilter.append(t[1].rstrip('\n').replace(' ',''))
+    if t[1].find('ha4') > -1:
+        filefilter.append('ha4')
+    elif t[1].find('6620') > -1:
+        filefilter.append('ha4')
+    elif t[1].find('R') > -1:
+        filefilter.append('R')
+    elif t[1].find(' r ') > -1:
+        filefilter.append('r')
+    elif t[1].find('V') > -1:
+        filefilter.append('V')
+        
+    #filefilter.append(t[1].rstrip('\n').replace(' ',''))
 infile.close()
 filters=set(filefilter)
 print 'these are the filters I got: ',filters
