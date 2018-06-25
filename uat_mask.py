@@ -50,7 +50,7 @@ parser.add_argument('--image', dest = 'image', default = None, help = 'image to 
 parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files')
 parser.add_argument('--threshold', dest = 'threshold', default = .005, help = "sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store")
 parser.add_argument('--snr', dest = 'snr', default = .005, help = "sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store")
-parser.add_argument('--cmap', dest = 'cmap', default = 'winter', help = "color map to use when displaying image mask.  default is winter.") 
+parser.add_argument('--cmap', dest = 'cmap', default = 'gist_heat_r', help = "color map to use when displaying image mask.  default is gist_heat_r.") 
 args = parser.parse_args()
 
 sextractor_files=['default.sex.HDI.mask','default.param','default.conv','default.nnw']
@@ -90,7 +90,7 @@ yc,xc = image.shape
 xc = xc/2.
 yc = yc/2.
 
-v1,v2=scoreatpercentile(image,[5.,99.])
+v1,v2=scoreatpercentile(image,[5.,99.5])
 
 # run sextractor on input image
 # return segmentation image with central object removed
