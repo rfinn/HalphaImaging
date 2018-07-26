@@ -115,7 +115,7 @@ objectID = distance == min(distance)
 # find R90 - radius enclosing 90% of flux
 
 R90 = cat.FLUX_RADIUS[objectID][0][0]
-rmax = args.rmax*R90
+rmax = float(args.rmax)*R90
 
 print('max radius for measuring photometry is '+str(rmax))
 position = [(cat.X_IMAGE[objectID][0],cat.Y_IMAGE[objectID][0])]
