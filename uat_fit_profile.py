@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
     
     # set maximum for fitting radius
-    rmax = args.rmax*R90  # selected this to give a Re that was relatively close to NSA value
+    rmax = float(args.rmax)*R90  # selected this to give a Re that was relatively close to NSA value
 
     # read in Rband file
     radius,intensity = read_phot_file(filenameR)
