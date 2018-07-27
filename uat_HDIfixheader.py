@@ -68,9 +68,15 @@ for f in files:
     header.rename_keyword('FILTER2','FWHEEL2')
 
     FILTER = header['CMMTOBS']
-    
-    ccdsec = header['CCDSEC']
-    
+
+    try:    
+        ccdsec = header['CCDSEC']
+    except:
+        print 'WARNING'
+        print '\t no CCDSEC in header'
+        print '\t assuming HDI values'
+        ccdsec = '[1:4095, 1:4109]'
+
 
     RASTRNG = header['RASTRNG']
     DECSTRNG = header['DECSTRNG']
