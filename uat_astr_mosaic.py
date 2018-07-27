@@ -1,12 +1,6 @@
 #!/usr/bin/env python
 
 '''
-BASIC INFORMATION ABOUT THIS CODE:
-  -This is the SIXTH program you need to run in order to perform the data reduct  ion of HDI images. 
-  -This program has SCamp compute the astrometric solution and then has SWarp c   reate image mosaics. 
-BEFORE RUNNNING THIS CODE:
-  -Be sure to type ur_setup in the terminal everytime you open a new terminal window so that ureka is activated.
-  -Ensure that pyraf is still activated by retyping the commands listed in the c  omments of the FIRST program titled "uat_HDIgroupflatfiles.py".
 GOAL:
   The goal of this program is to have scamp compute the astrometric 
   solution and then have swarp create image mosaics.
@@ -52,12 +46,12 @@ import argparse
 import subprocess
 
 parser = argparse.ArgumentParser(description ='Run sextractor, scamp, and swarp to determine WCS solution and make mosaics')
-parser.add_argument('--filestring', dest = 'filestring', default = 'hcftr', help = 'string to use to get input files (default = "hcftr", which grabs all of the files "hcftr*o00.fits")')
+parser.add_argument('--filestring', dest = 'filestring', default = 'h', help = 'string to use to get input files (default = "h", which grabs all of the files "h*o00.fits")')
 parser.add_argument('--s', dest = 's', default = False, action = 'store_true', help = 'Run sextractor to create object catalogs')
 parser.add_argument('--scamp', dest = 'scamp', default = False, action = 'store_true', help = 'Run scamp')
 parser.add_argument('--swarp', dest = 'swarp', default = False, action = 'store_true', help = 'Run swarp to create mosaics')
 parser.add_argument('--l', dest = 'l', default = False, help = 'List of images to input to swarp')
-parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files')
+parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
 parser.add_argument('--refimage',dest = 'refimage', default = None,  help = 'use a reference image to set center and size of output mosaic')
 parser.add_argument('--m',dest = 'm', default = False, action = 'store_true', help = 'set if running for mosaic data')
 
