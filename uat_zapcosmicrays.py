@@ -36,7 +36,7 @@ from astropy.nddata import CCDData
 from astropy.io import fits
 
 parser = argparse.ArgumentParser(description ='Remove cosmic rays using LAcosmic')
-parser.add_argument('--filestring', dest='filestring', default='tr', help='match string for input files (default =  tr, which gets tr*.fits)')
+parser.add_argument('--filestring', dest='filestring', default='tr*o00', help='match string for input files (default =  tr*o00, which gets tr*o00*.fits)')
 parser.add_argument('--gain', dest ='gain', default= 1.3, help = 'gain in e-/ADU.  default is 1.3, which applies to HDI camera')
 parser.add_argument('--rdnoise', dest = 'rdnoise', default= 7.3, help = 'gain in e-/ADU.  default is 1.3, which applies to HDI camera')
 

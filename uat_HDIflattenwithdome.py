@@ -5,7 +5,7 @@ GOAL:
 - Takes all object images and flattens them using a normalized dome flat in the same filter
 
 PROCEDURE:
-- get all files that start with tr*.fits
+- get all files that start with ztr*.fits
 - get filter for each image
 - create a list of unique filters
 - divide each image by the corresponding flat
@@ -29,19 +29,28 @@ EXTRA NOTES:
   
 
 WRITTEN BY:
-  Dr. Rose Finn
+  Rose Finn
   
 EDITED BY:
   Research Team Summer 2015 --> Grant Boughton, Natasha Collova, Tiffany Flood, Kaitlyn Hoag, and Kelly Whalen
   Finn May 2018 to use python and not pyraf
+
+  updated 7/27/18 by RAF
+  
 '''
 import glob
 import os
 import numpy as np
 from astropy.io import fits
+import argparse
+
+parser = argparse.ArgumentParser(description ='Flatten images with dome flat taken in corresponding filter')
+parser.add_argument('--filestring', dest='filestring', default='ztr', help='match string for input files (default =  ztr, which gets ztr*.fits)')
+args = parser.parse_args()
 
 
-os.system('gethead ztr*o00.fits CMMTOBS > junkfile1')
+
+os.system('gethead '+args.filestring+'*o00.fits CMMTOBS > junkfile1')
 infile=open('junkfile1','r')
 filenames=[]
 filefilter=[]
