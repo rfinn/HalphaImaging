@@ -48,10 +48,12 @@ defaultcat='default.sex.HDI.mask'
 parser = argparse.ArgumentParser(description ='Create a mask for extraneous objects in field')
 parser.add_argument('--image', dest = 'image', default = None, help = 'image to mask')
 parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files')
+parser.add_argument('--param',dest = 'param', default ='default.sex.HDI.mask', help = 'sextractor parameter file')
 parser.add_argument('--threshold', dest = 'threshold', default = .005, help = "sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store")
 parser.add_argument('--snr', dest = 'snr', default = .005, help = "sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store")
 parser.add_argument('--cmap', dest = 'cmap', default = 'gist_heat_r', help = "color map to use when displaying image mask.  default is gist_heat_r.") 
 args = parser.parse_args()
+
 
 sextractor_files=['default.sex.HDI.mask','default.param','default.conv','default.nnw']
 for file in sextractor_files:
@@ -70,7 +72,7 @@ def read_se_cat():
 def runse():
     print 'using a deblending threshold = ',args.threshold
     
-    os.system('sex %s -c %s -CATALOG_NAME test.cat -CATALOG_TYPE FITS_1.0 -DEBLEND_MINCONT %f'%(args.image,defaultcat,args.threshold))
+    os.system('sex %s -c %s -CATALOG_NAME test.cat -CATALOG_TYPE FITS_1.0 -DEBLEND_MINCONT %f'%(args.image,args.param,args.threshold))
     maskdat = fits.getdata('segmentation.fits')
     center_object = read_se_cat()
     maskdat[maskdat == center_object] = 0
