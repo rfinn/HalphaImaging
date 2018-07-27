@@ -17,8 +17,6 @@ INPUT/OUPUT:
 
 REQUIRED MODULES:
     
-EXTRA NOTES:
-
 
 WRITTEN BY:
 Rose Finn
@@ -33,11 +31,15 @@ import glob
 #from astropy import coordinates as coord
 from astropy import units as u
 import ccdproc
+from astropy.nddata import CCDData
 #from astropy.coordinates import SkyCoord
 from astropy.io import fits
 
 parser = argparse.ArgumentParser(description ='Remove cosmic rays using LAcosmic')
 parser.add_argument('--filestring', dest='filestring', default='tr', help='match string for input files (default =  tr, which gets tr*.fits)')
+parser.add_argument('--gain', dest ='gain', default= 1.3, help = 'gain in e-/ADU.  default is 1.3, which applies to HDI camera')
+parser.add_argument('--rdnoise', dest = 'rdnoise', default= 7.3, help = 'gain in e-/ADU.  default is 1.3, which applies to HDI camera')
+
 #parser.add_argument('--', dest='pixelscalex', default='0.00011808', help='pixel scale in x (default = 0.00011808)')
 args = parser.parse_args()
 files = sorted(glob.glob(args.filestring+'*.fits'))
@@ -45,9 +47,16 @@ nfiles=len(files)
 i=1
 for f in files:
     print 'ZAPPING COSMIC RAYS FOR FILE %i OF %i'%(i,nfiles)
-    data = ccdproc.CCDData.read(f,unit = u.adu)
-    cr_cleaned = ccdproc.cosmicray_lacosmic(data, sigclip=5)
-    cr_cleaned.write('z'+f,clobber=True)
+    with fits.open(f) as hdu1:
+        print 'working on ',f
+
+        # convert data to CCDData format and save header
+        ccd = CCDData(hdu1[0].data, unit=u.adu)
+        header = hdu1[0].header
+        crimage = ccdproc.cosmicray_lacosmic(ccd, gain = float(args.gain), readnoise = float(args.rdnoise))
+        header['HISTORY'] = 'Cosmic rays rejected using ccdproc.cosmicray_lacosmic '
+        fits.writeto('ztr'+f,crimage,header)
+        hdu1.close()
     i += 1
     print '\n'
 
