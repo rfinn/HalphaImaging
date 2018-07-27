@@ -24,8 +24,8 @@ from within ipython
 import os
 import argparse
 
-parser = argparse.ArgumentParser(description ='Reads in images numbers and moves images to a subdirectory called junk.  File should contain 4 digit numbers that uniquely identify the image.  Ranges can be specified on one line using a dash.  For example:\n 0001 \n 0034-0042 \n')
-parser.add_argument('--filename', dest = 'filename', default = 'junkfiles', help = 'file containing list of image numbers to move to junk.  Default filename is junkfiles.')
+parser = argparse.ArgumentParser(description ='Reads in images numbers and moves images to a subdirectory called junk.  File should contain 4 digit numbers that uniquely identify the image.  Ranges can be specified on one line using a dash.  \n For example: \n\n 0001 \n 0034-0042 \n')
+parser.add_argument('--filename', dest = 'filename', default = 'junkfiles', help = 'file containing list of 4-digit image numbers to move to junk.  Default filename is junkfiles.')
 
 args = parser.parse_args()
 
@@ -36,7 +36,7 @@ infile = open(args.filename)
 for line in infile:
     if line.find('-') > -1:
         t = line.rstrip().split('-')
-        print t
+        #print t
         a = int(t[0])
         b = int(t[1])+1
         for i in range(a,b):
