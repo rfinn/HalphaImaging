@@ -55,7 +55,7 @@ for f in files:
         header = hdu1[0].header
         crimage = ccdproc.cosmicray_lacosmic(ccd, gain = float(args.gain), readnoise = float(args.rdnoise))
         header['HISTORY'] = 'Cosmic rays rejected using ccdproc.cosmicray_lacosmic '
-        fits.writeto('ztr'+f,crimage,header)
+        fits.writeto('z'+f,crimage,header)
         hdu1.close()
     i += 1
     print '\n'
