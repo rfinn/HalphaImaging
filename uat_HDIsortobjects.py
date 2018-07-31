@@ -29,7 +29,7 @@ import argparse
 from astropy.io import fits
 
 parser = argparse.ArgumentParser(description ='group objects by filter and target for combining with swarp')
-parser.add_argument('--filestring', dest = 'filestring', default = 'hcftr', help = 'string to use to get input files (default = "hcftr" which grabs all files "hcftr*o00.fits")')
+parser.add_argument('--filestring', dest = 'filestring', default = 'h', help = 'string to use to get input files (default = "h" which grabs all files "h*o00.fits")')
 
 args = parser.parse_args()
 

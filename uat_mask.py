@@ -115,7 +115,7 @@ while adjust_mask:
     plt.show(block=False)
     
     
-    t=raw_input('enter:\n   pixel value to remove object in mask;\n   t to adjust SE threshold (0=no deblend, 1=lots); \n   w to write output and quit; \n   q to quit without saving\n')
+    t=raw_input('enter:\n \t pixel value to remove object in mask;\n \t o if your object is off center (and program is removing the wrong object);\n \t a to mask additional pixels;\n \t t to adjust SE threshold (0=no deblend, 1=lots); \n \t w to write output and quit; \n \t q to quit without saving\n')
     try:
         objID = int(t)
         maskdat[maskdat == objID] = 0.
@@ -125,6 +125,10 @@ while adjust_mask:
             t = raw_input('enter new threshold')
             args.threshold = float(t)
             runse()
+        if t.find('a') > -1:
+            print 'working on this'
+        if t.find('o') > -1:
+            print 'working on off-center problem'
         if t.find('q') > -1:
             sys.exit()
         if t.find('w') > -1:

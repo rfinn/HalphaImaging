@@ -33,6 +33,8 @@ REFERENCES:
 
 
 *******
+NOTES ON HOW TO USE photutils
+
 Measure aperture flux
 
 http://photutils.readthedocs.io/en/latest/photutils/aperture.html

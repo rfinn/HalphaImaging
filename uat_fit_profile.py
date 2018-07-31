@@ -59,9 +59,14 @@ def read_phot_file(pfile):
     dat = np.genfromtxt(pfile)
     return dat[:,0],dat[:,2]
 
-parser = argparse.ArgumentParser(description ='Fit a Sersic function to R and Halpha radial profiles')
-parser.add_argument('--cluster', dest = 'cluster', default = None, help = 'cluster and prefix of image names (e.g. A1367)')
-parser.add_argument('--id', dest = 'id', default = None, help = 'NSA ID number')
+parser = argparse.ArgumentParser(description ='Fit a Sersic function to R and Halpha radial profiles.  \n    This read in photometry files from uat_measure_ellip_phot.py and a SExtractor catalog.  This assumes these files are named rimage_phot.dat and rimage.cat, respectively
+')
+# making this more general so that user puts in name of input images
+#parser.add_argument('--cluster', dest = 'cluster', default = None, help = 'cluster and prefix of image names (e.g. A1367)')
+parser.add_argument('--id', dest = 'id', default = None, help = 'NSA ID number.  Only necessary if you want to compare with the NSA catalog values.')
+parser.add_argument('--rimage', dest = 'rimage', default = None, help = 'R-band image name.  This assumes that the SExtractor catalog is rimage.cat')
+parser.add_argument('--haimage', dest = 'haimage', default = None, help = 'H-alpha image name')
+
 parser.add_argument('--scale', dest = 'scale', default = 0.0445, help = 'Filter ratio of R-band to Halpha.  Default is 0.0445.')
 parser.add_argument('--pixelscale', dest = 'pixelscale', default = 0.43, help = 'Pixel scale.  Default is set to HDI pixel scale of 0.43 arcsec/pixel.')
 parser.add_argument('--rmax', dest = 'rmax', default = 4., help = 'maximum radius to fit profile out to.  This is a multiple of what sextractor measures as R90.  Default is 4xR90.')
@@ -73,20 +78,26 @@ args = parser.parse_args()
 if __name__ == '__main__':
         
     # this is the main part of the program
-
+    rootnameR,t = args.rimage.split('.fit')
+    rootnameCS,t = args.haimage.split('.fit')
     # names of R-band and continuum-subtracted Halpha photometry files
-    filenameR = args.cluster+'-'+args.id+'-R_phot.dat'
-    filenameHa = args.cluster+'-'+args.id+'-CS_phot.dat'
+    filenameR = rootnameR+'_phot.dat' # args.cluster+'-'+args.id+'-R_phot.dat'
+    filenameHa = rootnameCS+'_phot.dat' # args.cluster+'-'+args.id+'-CS_phot.dat'
 
+    # names of the R-band and continuum-subtracted Halpha sextractor files
     # read in R-band SE cat
-    secatR =  args.cluster+'-'+args.id+'-R.cat'
+
+    #secatR =  args.cluster+'-'+args.id+'-R.cat'
+    secatR =  rootnameR+'.cat'
     cat = fits.getdata(secatR,2)
     # read in Halpha SE cat
-    secat_ha =  args.cluster+'-'+args.id+'-CS.cat'
+
+    #secat_ha =  args.cluster+'-'+args.id+'-CS.cat'
+    secat_ha =  rootnameCS+'.cat'
     cat_ha = fits.getdata(secat_ha,2)
 
     # get dimensions of image
-    image =  args.cluster+'-'+args.id+'-R.fits'
+    image =  args.rimage # args.cluster+'-'+args.id+'-R.fits'
     imdat = fits.getdata(image)
     xdim,ydim = imdat.shape
     
@@ -176,7 +187,7 @@ if __name__ == '__main__':
             plt.xlabel('Radius (arcsec)')
         plt.ylim(1.e-4,2)
         plt.xlim(-2,np.max(radius_ha))
-    plt.savefig(args.cluster+'-'+args.id+'-radial-profile.png')
+    plt.savefig(rootnameR+'-radial-profile.png')
     print 'R-BAND FIT RESULTS:'
     print 'I0 = %.2f'%(popt[0])
     #print 'n =  %.2f'%(popt[1])
