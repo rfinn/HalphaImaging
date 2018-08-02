@@ -23,7 +23,7 @@ REFOUT_CATPATH         .               # Save path for reference catalogs
  
 #--------------------------- Merged output catalogs ---------------------------
  
-MERGEDOUTCAT_TYPE      NONE            # NONE, ASCII_HEAD, ASCII, FITS_LDAC
+MERGEDOUTCAT_TYPE      FITS_LDAC            # NONE, ASCII_HEAD, ASCII, FITS_LDAC
 MERGEDOUTCAT_NAME      merged.cat      # Merged output catalog filename
  
 #--------------------------- Full output catalogs ---------------------------
