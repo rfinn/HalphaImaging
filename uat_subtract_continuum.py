@@ -131,7 +131,9 @@ while adjust_scale:
         if t.find('w') > -1:
             if haimage.find('Ha') > -1:
                 outimage = haimage.split('-Ha')[0]+'-CS.fits'
-            elif haimage.find('ha') > -1:
+            elif haimage.find('-ha') > -1:
+                outimage = haimage.split('_ha')[0]+'-CS.fits'
+            elif haimage.find('_ha') > -1:
                 outimage = haimage.split('_ha')[0]+'-CS.fits'
             newfile = fits.PrimaryHDU()
             newfile.data = cs

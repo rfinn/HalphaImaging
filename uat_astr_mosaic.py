@@ -54,6 +54,7 @@ parser.add_argument('--l', dest = 'l', default = False, help = 'List of images t
 parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
 parser.add_argument('--refimage',dest = 'refimage', default = None,  help = 'use a reference image to set center and size of output mosaic')
 parser.add_argument('--m',dest = 'm', default = False, action = 'store_true', help = 'set if running for mosaic data')
+parser.add_argument('--int',dest = 'int', default = False, action = 'store_true', help = 'set if running on INT data')
 
 args = parser.parse_args()
 
@@ -80,8 +81,12 @@ if args.s:
         print 'RUNNING SEXTRACTOR ON FILE %i OF %i'%(i,nfiles)
         t = f.split('.fits')
         froot = t[0]
-        os.system('sex ' + f + ' -c default.sex.hdi -CATALOG_NAME ' + froot + '.cat')
+        if args.int:
+            os.system('sex ' + f + ' -c default.sex.INT -CATALOG_NAME ' + froot + '.cat')
+        else:
+            os.system('sex ' + f + ' -c default.sex.hdi -CATALOG_NAME ' + froot + '.cat')
         os.rename('check.fits', froot + 'check.fits')
+            
         i += 1
         
 if args.scamp:

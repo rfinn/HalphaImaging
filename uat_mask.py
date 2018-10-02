@@ -129,6 +129,8 @@ class mask_image():
         if len(self.deleted_objects) > 0:
             for objID in self.deleted_objects:
                 self.maskdat[self.maskdat == objID] = 0.
+        # write out mask image
+        fits.writeto(self.mask_image,self.maskdat,header = self.imheader,overwrite=True)
     def show_mask(self):
 
         if args.nods9:
@@ -257,6 +259,7 @@ class mask_image():
         while self.adjust_mask:    
             self.show_mask()
             self.print_menu()
+            fits.writeto(self.mask_image,self.maskdat,header = self.imheader,overwrite=True)
             
     def ds9_open(self):
         try:
