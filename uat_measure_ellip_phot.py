@@ -67,7 +67,7 @@ from photutils import aperture_photometry
 
 
 parser = argparse.ArgumentParser(description = 'This code takes an image, and a SExtractor catalog.  ')
-parser.add_argument('--imfile', dest = 'imfile', default='A1367-113394-R',help = 'input image, without fits suffix')
+parser.add_argument('--imfile', dest = 'imfile', default='A1367-113394-R.fits',help = 'input image')
 parser.add_argument('--mask', dest = 'mask', default=None,help = 'mask to use when measuring photometry')
 parser.add_argument('--imagepath', dest = 'imagepath', default = '', help = 'path to image.  default is current directory')
 parser.add_argument('--rmax', dest = 'rmax', default = 6., help = 'maximum radius to measure photometry out to.  This is a multiple of what sextractor measures as R90.  Default is 6xR90.')
@@ -85,8 +85,7 @@ if args.plot:
 #image_path = '/Users/rfinn/github/H-alpha_cutouts/test/'
 image_path = args.imagepath
 #im1='A1367-113394-R'
-im1 = args.imfile
-image = image_path+im1+'.fits'
+image = image_path+args.imfile
 # read in image
 imdat = fits.getdata(image)
 #if args.plot:
@@ -98,7 +97,7 @@ imdat = fits.getdata(image)
 
 print('reading sextractor catalog\n')    
 ### get ellipse info from sextractor output
-SEcat = image_path+im1+'.cat'
+SEcat = image_path+args.imfile.split('.fits')[0]+'.cat'
 cat = fits.getdata(SEcat,2)
 '''
 cat.X_IMAGE
@@ -163,14 +162,14 @@ if args.plot:
     if args.verbose:
         print('plotting results \n')
     plt.figure()
-    vmin,vmax=scoreatpercentile(imdat,[.5,99.9])
+    vmin,vmax=scoreatpercentile(imdat,[.5,99.5])
     plt.imshow(imdat,cmap='gray_r',vmin=vmin,vmax=vmax,origin='lower')
     plt.colorbar()
     ax = plt.gca()
 
     ellipse = Ellipse(xy=(cat.X_IMAGE[objectID][0],cat.Y_IMAGE[objectID][0]), width=2*a[-1],height=2*b[-1],edgecolor='r', fc='None', lw=2, angle=-1*np.degrees(theta))
     ax.add_patch(ellipse)
-    plt.savefig(args.imfile+'-snapshot.png')
+    plt.savefig(args.imfile.split('.fits')[0]+'-snapshot.png')
 # calculate surface brightness in each aperture
 
 area = np.pi*a*b # area of each ellipse
@@ -189,7 +188,7 @@ for i in range(1,len(a)):
 
 # write out photometry
 # radius enclosed flux
-outfile = open(im1+'_phot.dat','w')#used to be _phot.dat, but changing it to .dat so that it can be read into code for ellipse profiles
+outfile = open(args.imfile.split('.fits')[0]+'_phot.dat','w')#used to be _phot.dat, but changing it to .dat so that it can be read into code for ellipse profiles
 
 outfile.write('# X_IMAGE Y_IMAGE ELLIPTICITY THETA_J2000 \n')
 outfile.write('# %.2f %.2f %.2f %.2f \n'%(cat.X_IMAGE[objectID][0],cat.Y_IMAGE[objectID][0],cat.ELLIPTICITY[objectID][0],cat.THETA_J2000[objectID][0]))

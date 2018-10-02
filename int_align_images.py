@@ -24,5 +24,5 @@ im2new, im2footprint = reproject_interp(hdu2, hdu1.header)
 
 fits.writeto(args.image2.split('.fits')[0]+'-shifted.fits', im2new, hdu1.header, overwrite=True)
 
-hdu1.close()
-hdu2.close()
+#hdu1.close()
+#hdu2.close()

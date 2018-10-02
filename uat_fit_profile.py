@@ -59,8 +59,7 @@ def read_phot_file(pfile):
     dat = np.genfromtxt(pfile)
     return dat[:,0],dat[:,2]
 
-parser = argparse.ArgumentParser(description ='Fit a Sersic function to R and Halpha radial profiles.  \n    This read in photometry files from uat_measure_ellip_phot.py and a SExtractor catalog.  This assumes these files are named rimage_phot.dat and rimage.cat, respectively
-')
+parser = argparse.ArgumentParser(description ='Fit a Sersic function to R and Halpha radial profiles.  \n    This read in photometry files from uat_measure_ellip_phot.py and a SExtractor catalog.  This assumes these files are named rimage_phot.dat and rimage.cat, respectively')
 # making this more general so that user puts in name of input images
 #parser.add_argument('--cluster', dest = 'cluster', default = None, help = 'cluster and prefix of image names (e.g. A1367)')
 parser.add_argument('--id', dest = 'id', default = None, help = 'NSA ID number.  Only necessary if you want to compare with the NSA catalog values.')
@@ -149,11 +148,12 @@ if __name__ == '__main__':
     yl_ha = np.polyval(cc_ha,xl)
     
     
-    plt.figure(figsize=(6,8))
+    plt.figure(figsize=(5,8))
     plt.subplots_adjust(top=.925)
     
     for i in range(3):
         plt.subplot(3,1,i+1)
+        plt.subplots_adjust(left=.15)
         if i == 0:
             plt.plot(radius, intensity, 'b.', label='R',markersize=6)
             plt.plot(radius,sersic_neq1(radius, *popt),'r-',label='exp fit')
@@ -174,6 +174,7 @@ if __name__ == '__main__':
             # plot R and Halpha on the same axis
             plt.plot(radius, intensity, 'b.', label='R',markersize=6)
             plt.plot(radius_ha, intensity_ha, 'c.', label='Ha',markersize=6)
+            plt.ylabel(r'$\rm I(r) \ / \ max(I(r))$',fontsize=12)
         plt.axvline(x=rmax,color='k',ls='-',label='max r for fit')
         plt.legend(loc = 'upper right',prop={'size':7})
 
@@ -185,8 +186,8 @@ if __name__ == '__main__':
             plt.ylabel('$Normalized \ Intensity \ (ADU/pixel^2)$')
         elif i == 2:
             plt.xlabel('Radius (arcsec)')
-        plt.ylim(1.e-4,2)
-        plt.xlim(-2,np.max(radius_ha))
+        plt.ylim(1.e-2,2)
+        plt.xlim(-1*.02*np.max(radius_ha),np.max(radius_ha))
     plt.savefig(rootnameR+'-radial-profile.png')
     print 'R-BAND FIT RESULTS:'
     print 'I0 = %.2f'%(popt[0])

@@ -80,8 +80,8 @@ ha,ha_header = fits.getdata(haimage,header=True)
 
 scale = float(args.scale)
 
-vmin = 50
-vmax = 99
+vmin = .5
+vmax = 98
 adjust_scale = True
 while adjust_scale:
     plt.close('all')
@@ -132,7 +132,7 @@ while adjust_scale:
             if haimage.find('Ha') > -1:
                 outimage = haimage.split('-Ha')[0]+'-CS.fits'
             elif haimage.find('-ha') > -1:
-                outimage = haimage.split('_ha')[0]+'-CS.fits'
+                outimage = haimage.split('-ha')[0]+'-CS.fits'
             elif haimage.find('_ha') > -1:
                 outimage = haimage.split('_ha')[0]+'-CS.fits'
             newfile = fits.PrimaryHDU()
