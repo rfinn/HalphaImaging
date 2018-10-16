@@ -44,6 +44,16 @@ REFERENCES:
 
 http://docs.astropy.org/en/stable/nddata/utils.html
 
+INT filters from here
+http://catserver.ing.iac.es/filter/list.php?instrument=WFC
+
+Details for INT filter # 197
+central wavelength = 6568
+width = 95
+lmin = 6568 - .5*95 = 6540.5
+lmax = 6568 + 0.5*95 = 6615.5
+
+
 
 """
 import numpy as np
@@ -74,7 +84,7 @@ parser.add_argument('--Haimage', dest = 'Haimage', default = None, help = 'H-alp
 parser.add_argument('--catalog', dest = 'catalog', default = '/home/share/catalogs/nsa_v0_1_2.fits', help = 'full path to the NSA catalog')
 parser.add_argument('--filter1',dest = 'filter1', default ='R', help = 'Filter for the input mosaic image (e.g. r, R, Ha).  Default value is R.')
 parser.add_argument('--filter2',dest = 'filter2', default ='Ha', help = 'Filter for the input mosaic image (e.g. r, R, Ha).  Default value is Ha.')
-parser.add_argument('--nhalpha',dest = 'nhalpha', default ='4', help = 'H-alpha filter number (e.g. 4, 8, 12 or 16).  Default value is 4.')
+parser.add_argument('--nhalpha',dest = 'nhalpha', default ='4', help = 'H-alpha filter number (e.g. 4, 8, 12, 16 or INT197).  Default value is 4.')
 parser.add_argument('--Rscale',dest = 'scale', default =16., help = 'cutout size = (scale x Re, scale x Re) - increase scale to increase size of cutout.  Default value is 16.')
 parser.add_argument('--prefix',dest = 'prefix', default ='A1367', help = 'cluster name to preprend to cutout image names (no spaces!).  Default value is A1367.')
 parser.add_argument('--plot', dest = 'plot', default = False, action = 'store_true', help = "add '--plot ' to plot cutouts and position wrt mosaic.  Default value is False.")
@@ -83,11 +93,10 @@ parser.add_argument('--plot', dest = 'plot', default = False, action = 'store_tr
 args = parser.parse_args()
 
 
-
 # setting up filter information
 #dictionary of Halpha filters
-lmin={'4':6573., '8':6606.,'12':6650.,'16':6682.}
-lmax={'4':6669., '8':6703.,'12':6747., '16':6779.}
+lmin={'4':6573., '8':6606.,'12':6650.,'16':6682.,'INT197':6540.5}
+lmax={'4':6669., '8':6703.,'12':6747., '16':6779.,'INT197':6615.5}
 
 # convert filter min and max wavelength to redshift for halpha emission
 Zmax=(((lmax[args.nhalpha])/6563.)-1)

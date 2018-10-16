@@ -54,6 +54,17 @@ REFERENCES:
 
 http://docs.astropy.org/en/stable/nddata/utils.html
 
+INT filters from here
+http://catserver.ing.iac.es/filter/list.php?instrument=WFC
+
+Details for INT filter # 197
+central wavelength = 6568
+width = 95
+lmin = 6568 - .5*95 = 6540.5
+lmax = 6568 + 0.5*95 = 6615.5
+
+
+
 """
 import numpy as np
 from matplotlib import pyplot as plt
@@ -96,8 +107,8 @@ args = parser.parse_args()
 
 # setting up filter information
 #dictionary of Halpha filters
-lmin={'4':6573., '8':6606.,'12':6650.,'16':6682.}
-lmax={'4':6669., '8':6703.,'12':6747., '16':6779.}
+lmin={'4':6573., '8':6606.,'12':6650.,'16':6682.,'INT197':6540.5}
+lmax={'4':6669., '8':6703.,'12':6747., '16':6779.,'INT197':6615.5}
 
 Zmax=(((lmax[args.nhalpha])/6563.)-1)
 Zmin=(((lmin[args.nhalpha])/6563.)-1)
