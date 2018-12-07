@@ -139,6 +139,7 @@ b = (1.-cat.ELLIPTICITY[objectID][0])*a
 flux = np.zeros(len(a),'f')
 if args.mask:
     maskdat = fits.getdata(args.mask)
+    maskdat = np.array(maskdat,'bool')
 for i in range(len(a)):
     if args.verbose:
         print('defining elliptical aperture '+str(i)+' ap size = ',str(a[i]))
