@@ -11,6 +11,8 @@ GOAL:
 
 from astropy.io import fits
 from astropy.io import ascii
+from astropy.table import Table
+from astropy.table import Column
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 import numpy as np
@@ -19,6 +21,8 @@ import numpy as np
 # redshifts for targets not in RASSCALS or WBL file
 ##############################################################
 alt_redshift = {b'MKW8s':0.027, b'MKW8':0.027, b'NGC5846':0.00571, b'HCG79':0.01450, b'Coma':0.02310, b'Abell1367':0.02200}
+
+alt_coords = {b'MKW8':[220.159167, 3.476389], b'NGC5846':[226.622017, 1.605625],  b'HCG79':[239.799454, 20.758555]} #RA and Dec
 
 ##############################################################
 # dictionary of Halpha filters 
@@ -37,7 +41,7 @@ nsapath = '/Users/rfinn/research/NSA/'
 # read in NSA file
 ##############################################################
 nsa = fits.getdata(nsapath+'nsa_v0_1_2.fits')
-
+mstar = fits.getdata(nsapath+'nsa_v1_2_fsps_v2.4_miles_chab_charlot_sfhgrid01.fits')
 ##############################################################
 # read in galaxy tables
 ##############################################################
@@ -123,12 +127,18 @@ dtheta[mosaic_flag] = 2.*dtheta[mosaic_flag]
 idxc, idxcatalog, d2d, d3d = nsa_coord.search_around_sky(group_coord, 1.45*u.deg)
 
 newnsa = nsa[idxcatalog]
+
 compra = group_coord.ra[idxc]
 compdec = group_coord.dec[idxc]
 compz = redshift[idxc]
 compzmin = zmin[idxc]
 compzmax = zmax[idxc]
 compdtheta = dtheta[idxc]
+
+##############################################################
+# get distance from group centers, not center of pointings
+##############################################################
+
 
 ##############################################################
 # Now cut again based on square FOV and redshift range
@@ -143,13 +153,26 @@ dflag = (newnsa.DEC > (compdec.value - compdtheta)) & (newnsa.DEC < (compdec.val
 
 
 finalnsa = newnsa[(zflag & rflag & dflag)]
+finalmstar = mstar[idxcatalog][(zflag & rflag & dflag)]
 gname = gc['Target'][idxc][(zflag & rflag & dflag)]
 gra = group_coord.ra[idxc][(zflag & rflag & dflag)]
 gdec = group_coord.dec[idxc][(zflag & rflag & dflag)]
 
+dist3d = d3d[(zflag & rflag & dflag)]
+dist2d = d2d.deg[(zflag & rflag & dflag)]
+##############################################################
+# Write out nsa table for galaxies w/in Halpha FOV
+##############################################################
+
+fits.writeto(catalog_dir+'uat_halpha_nsa.fits',finalnsa, overwrite=True)
+
+fits.writeto(catalog_dir+'uat_halpha_moustakas_mstar.fits',finalmstar, overwrite=True)
 
 ##############################################################
 # Write out table with extra columns appended
 ##############################################################
 
-fits.writeto(catalog_dir+'uat_halpha_nsa.fits',finalnsa, overwrite=True)
+# group_name, group_ra, group_dec, group_redshift, dist_2d, dist_3d, local density
+
+g = Table([gname,gra,gdec,dist2d,dist3d],names=('group_name', 'group_RA', 'group_DEC', 'dist_2d','dist_3d'))
+g.write(catalog_dir+'uat_halpha_group_info.fits')
