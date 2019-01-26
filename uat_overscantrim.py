@@ -52,9 +52,9 @@ for f in files:
         # trim image
         trimmed = ccdproc.trim_image(o_subtracted, fits_section = args.iraftrimsec)
         header['HISTORY'] = 'trimmed '+args.iraftrimsec
-
-        fits.writeto('tr'+f,trimmed,header, overwrite='True')
         
+        fits.writeto('tr'+f,trimmed,header, overwrite='True')
+        header.append(card=('CCDSEC',args.iraftrimsec,'CCD SECTION'))
 #        # remove cosmic rays
 #        crmask, crimage = ccdproc.cosmicray_lacosmic(trimmed, gain = float(args.gain), readnoise = float(args.rdnoise))
 #        header['HISTORY'] = 'Cosmic rays rejected using ccdproc.cosmicray_lacosmic '

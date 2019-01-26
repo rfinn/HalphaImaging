@@ -49,6 +49,7 @@ import numpy as np
 
 import ccdproc
 from astropy.io import fits
+import astropy.units as u
 import argparse
 
 '''
@@ -60,12 +61,19 @@ iraf.ccdred()
 
 parser = argparse.ArgumentParser(description ='Groups images by filter and creates flatfield images')
 parser.add_argument('--filestring', dest='filestring', default='ztr', help='match string for input files (default =  ztr, which gets ztr*.fits)')
-#parser.add_argument('--', dest='pixelscalex', default='0.00011808', help='pixel scale in x (default = 0.00011808)')
+parser.add_argument('--siena', dest='siena', default=False,action='store_true', help='set this if reducing data from Siena STL11000M CCD')
 args = parser.parse_args()
 files = sorted(glob.glob(args.filestring+'*.fits'))
 nfiles=len(files)
 
-os.system('gethead '+args.filestring+'*f00.fits CMMTOBS > tempflats')
+if args.siena:
+    print 'running on Siena data - woo hoo!'
+    os.system('gethead '+args.filestring+'*.fits IMAGETYP FILTER > tempflats')
+else:
+    print 'running on HDI data - woo hoo!'
+    print('gethead '+args.filestring+'*f00.fits CMMTOBS > tempflats')
+    os.system('gethead '+args.filestring+'*f00.fits CMMTOBS > tempflats')
+
 # tempflats is the name of a "junk file" that contains the gethead information from all the flat images.
 # This file will be deleted after the information is read out in the future.
 
@@ -74,6 +82,7 @@ infile=open('tempflats','r')
 fnames=[]
 filter=[]
 ftype=[]   #skyflat or domeflat
+
 
 for line in infile:
     t=line.split()
@@ -86,10 +95,12 @@ set_ftype=set(ftype)
 array_ftype=np.array(ftype)
 array_filter=np.array(filter)
 
+flat_filelist = []
 for f in set_ftype:
     print "flat type=",f
     for element in set_filter:
         ftype_filter = str(f)+str(element)
+        flat_filelist.append(ftype_filter)
         print 'grouping files for filter type = ',element
         indices=np.where((array_ftype == f)&(array_filter == element))
         if len(indices[0]) > 0:
@@ -97,32 +108,26 @@ for f in set_ftype:
             for i in indices[0]:
                 outfile.write(fnames[i]+'\n')
             outfile.close()
-os.remove('tempflats')            
-flats = glob.glob('*flat*')
-flats=set(flats)-set(glob.glob('c*.fits'))-set(glob.glob('n*.fits'))     # doesn't include flat files that have already been combined or normalized in the following loop
-print 'flats = ',flats
-for f in flats:
+#os.remove('tempflats')            
+for f in flat_filelist:
     print 'filelist = ',f
     flatimages = []
-    filelist = open(f,'r')
-    for fname in filelist:
-        print 'fname = ',fname
-        fname = fname.rstrip()
-        data,header = fits.getdata(fname, header=True)
-        #data = ccdproc.CCDData(np.ndarray(data.shape,buffer=data), unit='adu') / np.median(data)
-        flatimages.append(data)
-        print 'finished inner loop'
-    # combine flat images using median combine
-    print 'calculating median flat'
-    med_flat = np.median(flatimages, axis=0)
+    try:
+        filelist = open(f,'r')
+    except IOError:
+        print('Problem opening file ',f)
+        print('Hope that is ok...')
+    for q in filelist: flatimages.append(q.rstrip())
+        
+    # combine flat images using average combine, scale by median, sigma clip
+    flat = ccdproc.combine(flatimages,scale=np.median,method='average',sigma_clip=True,unit=u.adu)
     #med_flat = ccdproc.combine(flatimages, method='median')
     # normalize flat image by dividing by mean
-    print 'normalizing flat'
-    norm_med_flat = med_flat / np.mean(med_flat)
-    print 'updating header'
-    header['HISTORY'] = 'Combined and normalized flat field'
+    norm_flat = flat / np.mean(flat)
     print 'writing fits'
-    fits.writeto('n'+f+'.fits',norm_med_flat,header)
+    norm_flat.write('n'+f+'.fits', overwrite=True)
+
+
 
 
                 
