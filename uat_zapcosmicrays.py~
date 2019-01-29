@@ -46,9 +46,9 @@ files = sorted(glob.glob(args.filestring+'*.fits'))
 nfiles=len(files)
 i=1
 for f in files:
-    print ('ZAPPING COSMIC RAYS FOR FILE %i OF %i'%(i,nfiles))
+    print 'ZAPPING COSMIC RAYS FOR FILE %i OF %i'%(i,nfiles)
     with fits.open(f) as hdu1:
-        print ('working on ',f)
+        print 'working on ',f
 
         # convert data to CCDData format and save header
         ccd = CCDData(hdu1[0].data, unit=u.adu)
@@ -58,7 +58,7 @@ for f in files:
         fits.writeto('z'+f,crimage,header)
         hdu1.close()
     i += 1
-    print ('\n')
+    print '\n'
 
     
     
