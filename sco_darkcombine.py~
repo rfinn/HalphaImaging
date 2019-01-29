@@ -80,7 +80,7 @@ array_exptime=np.array(exptime)
 
 filelist = []
 for f in set_ftype:
-    print ("dark exposure time=",f)
+    print "dark exposure time=",f
     ftype_group = 'dark'+str(f)
     filelist.append(ftype_group)
     indices=np.where((array_ftype == f))
@@ -91,7 +91,7 @@ for f in set_ftype:
         outfile.close()
 #os.remove('tempflats')            
 for f in filelist:
-    print ('filelist = ',f)
+    print 'filelist = ',f
     fimages = []
 
     try:
@@ -104,7 +104,7 @@ for f in filelist:
         
     # combine flat images using average combine, scale by median, sigma clip
     dark = ccdproc.combine(fimages,method='average',sigma_clip=True,unit=u.adu)
-    print ('writing fits')
+    print 'writing fits'
     dark.write(f+'.fits',overwrite=True)
     
 
