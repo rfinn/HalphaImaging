@@ -39,31 +39,18 @@ poly_model = models.Polynomial1D(1)
 for f in files:
     # read in image
     # was having trouble getting image into the format that ccdproc wants
-    with fits.open(f) as hdu1:
-        print 'working on ',f
-        # convert data to CCDData format and save header
-        ccd = CCDData(hdu1[1].data, unit='adu')
-        header = hdu1[0].header
+    print 'working on ',f
+    # convert data to CCDData format and save header
+    ccd = CCDData.read(f, unit='adu')
 
-        # subtract overscan
-        o_subtracted = ccdproc.subtract_overscan(ccd, fits_section = args.irafbiassec, model=poly_model)
-        header['HISTORY'] = 'overscan subtracted '+args.irafbiassec
+    # subtract overscan
+    o_subtracted = ccdproc.subtract_overscan(ccd, fits_section = args.irafbiassec, model=poly_model)
+    header['HISTORY'] = 'overscan subtracted '+args.irafbiassec
 
-        # trim image
-        trimmed = ccdproc.trim_image(o_subtracted, fits_section = args.iraftrimsec)
-        header['HISTORY'] = 'trimmed '+args.iraftrimsec
-        
-        fits.writeto('tr'+f,trimmed,header, overwrite='True')
-        header.append(card=('CCDSEC',args.iraftrimsec,'CCD SECTION'))
-#        # remove cosmic rays
-#        crmask, crimage = ccdproc.cosmicray_lacosmic(trimmed, gain = float(args.gain), readnoise = float(args.rdnoise))
-#        header['HISTORY'] = 'Cosmic rays rejected using ccdproc.cosmicray_lacosmic '
-        
-        # save output as t*orgininal_name
+    # trim image
+    trimmed = ccdproc.trim_image(o_subtracted, fits_section = args.iraftrimsec)
 
-#        fits.writeto('ztr'+f,crimage,header)
-        
+    head_updates = {'CCDSEC':args.iraftrimsec}
+    
+    trimmed.write('tr'+f,add_keyword=head_updates)    
 
-        # close images if necessary - happens automatically
-
-        hdu1.close()
