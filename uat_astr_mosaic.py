@@ -65,9 +65,10 @@ if args.refimage:
 # get input files
 #print 'cp ' +args.d + '/default.* .'
 os.system('cp ' +args.d + '/default.* .')
-files = sorted(glob.glob(args.filestring+"*.fits"))
+files = sorted(glob.glob(args.filestring+"*.fit*"))
 
 nfiles = len(files)
+print('number of files = ',nfiles)
 i = 1
 
 
