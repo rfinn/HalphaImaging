@@ -107,7 +107,7 @@ args = parser.parse_args()
 
 # setting up filter information
 #dictionary of Halpha filters
-lmin={'4':6573., '8':6606.,'12':6650.,'16':6682.,'INT197':6540.5}
+lmin={'4':6573., '8':6606.,'12':6650.,'16':6682.,'INT197':6520.5}
 lmax={'4':6669., '8':6703.,'12':6747., '16':6779.,'INT197':6615.5}
 
 Zmax=(((lmax[args.nhalpha])/6563.)-1)
