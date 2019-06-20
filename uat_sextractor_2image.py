@@ -58,16 +58,39 @@ os.system('cp ' +args.d + '/default.* .')
 #nfiles = len(files)
 i = 1
 
+# get magnitude zeropoint for image 1 and image 2
+header1 = fits.getheader(args.image1)
+header2 = fits.getheader(args.image2)
+try:
+    ZP1 = header1['PHOTZP']
+    zp1flag = True
+except KeyError:
+    print('no PHOTZP found in image 1 header.  Too bad :(')
+    print('did you run getzp.py?')
+    zp1flag = False
+try:
+    ZP2 = header2['PHOTZP']
+    zp2flag = True
+except KeyError:
+    print('no PHOTZP found in image 2 header.  Too bad :(')
+    print('did you run getzp.py?')
+    zp2flag = False
 
 print 'RUNNING SEXTRACTOR'
 t = args.image1.split('.fits')
 froot1 = t[0]
-os.system('sex ' + args.image1+','+args.image1 + ' -c default.sex.hdi -CATALOG_NAME ' + froot1 + '.cat')
+if zp1flag:
+    os.system('sex ' + args.image1+','+args.image1 + ' -c default.sex.hdi -CATALOG_NAME ' + froot1 + '.cat -MAG_ZEROPOINT '+str(ZP1))
+else:
+    os.system('sex ' + args.image1+','+args.image1 + ' -c default.sex.hdi -CATALOG_NAME ' + froot1 + '.cat')
 os.rename('check.fits', froot1 + 'check.fits')
 # run on second image
 t = args.image2.split('.fits')
 froot2 = t[0]
-os.system('sex ' + args.image1+','+args.image2 + ' -c default.sex.hdi -CATALOG_NAME ' + froot2 + '.cat')
+if zp2flag:
+    os.system('sex ' + args.image1+','+args.image2 + ' -c default.sex.hdi -CATALOG_NAME ' + froot2 + '.cat -MAG_ZEROPOINT '+str(ZP2))
+else:
+    os.system('sex ' + args.image1+','+args.image2 + ' -c default.sex.hdi -CATALOG_NAME ' + froot2 + '.cat')
 os.rename('check.fits', froot2 + 'check.fits')
 
 
