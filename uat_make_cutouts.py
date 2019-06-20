@@ -133,6 +133,9 @@ def makecuts(image,imagefilter):
     DEC=catdat.DEC[keepflag]
     radius=catdat.SERSIC_TH50[keepflag]
     IDNUMBER=catdat.NSAID[keepflag]
+    redshift = catdat.Z[keepflag]
+    zdist = catdat.ZDIST[keepflag]
+
     print 'number of galaxies to keep = ', sum(keepflag)
 
 #    if args.region_file:
@@ -171,6 +174,10 @@ def makecuts(image,imagefilter):
         newfile.data = f[0].data[ymin:ymax,xmin:xmax]
         newfile.header = f[0].header
         newfile.header.update(w[ymin:ymax,xmin:xmax].to_header())
+        newfile.header.set('REDSHIFT',float('{:.6f}'.format(redshift[i])))
+        newfile.header.set('ZDIST',float('{:.6f}'.format(zdist[i])))
+        newfile.header.set('NSAID',float('{:i}'.format(IDNUMBER[i])))
+            
         
         fits.writeto(outimage, newfile.data, header = newfile.header, clobber=True)
     return cutout
