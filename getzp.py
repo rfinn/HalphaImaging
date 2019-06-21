@@ -5,7 +5,7 @@ USAGE:
 
 from within ipython:
 
-%run ~/github/Virgo/programs/getzp.py --image pointing031-r.coadd.fits --instrument i --filter r
+%run ~/github/HalphaImaging/getzp.py --image pointing031-r.coadd.fits --instrument i --filter r
 
 The y intercept is -1*ZP
 
@@ -86,17 +86,9 @@ def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=20,
     :param maxsources: maximum number of sources
     :return: astropy.table object
     """
-    vquery = Vizier(columns=['objID', 'RAJ2000', 'DEJ2000',
-                             'e_RAJ2000', 'e_DEJ2000',
-                             'objID', 'f_objID', 'Qual',
-                             'gmag', 'e_gmag',
-                             'rmag', 'e_rmag',
-                             'imag', 'e_imag',
-                             'zmag', 'e_zmag',
-                             'ymag', 'e_ymag'],
-                    column_filters={"gmag":
-                                    ("<%f" % maxmag)},
-                    row_limit=maxsources)
+    pan_columns =['objID', 'RAJ2000', 'DEJ2000','e_RAJ2000', 'e_DEJ2000', 'f_objID', 'Qual','gmag', 'e_gmag','rmag', 'e_rmag','imag', 'e_imag','zmag', 'e_zmag','ymag', 'e_ymag']
+    #print(pan_columns)
+    vquery = Vizier(columns=pan_columns,column_filters={"gmag":("<%f" % maxmag)},row_limit=maxsources)
 
     field = coord.SkyCoord(ra=ra_deg, dec=dec_deg,
                            unit=(u.deg, u.deg),
@@ -330,7 +322,7 @@ if __name__ == '__main__':
     parser.add_argument('--image', dest = 'image', default = 'test.coadd.fits', help = 'Image for ZP calibration')
     parser.add_argument('--instrument', dest = 'instrument', default = None, help = 'HDI = h, KPNO mosaic = m, INT = i')
     parser.add_argument('--filter', dest = 'filter', default = 'R', help = 'filter (R or r; use r for Halpha)')
-    parser.add_argument('--nexptime', dest = 'nexptime', default = True, action = 'store_false', help = "set this flag if the image is in ADU rather than ADU/s")
+    parser.add_argument('--nexptime', dest = 'nexptime', default = True, action = 'store_false', help = "set this flag if the image is in ADU rather than ADU/s.  Swarp produces images in ADU/s.")
     parser.add_argument('--naper', dest = 'naper', default = 4,help = "select fixed aperture magnitude.  0=3pix; 1=5pix; 2=7pix")
     parser.add_argument('--nsigma', dest = 'nsigma', default = 2.5, help = 'number of std to use in iterative rejection of ZP fitting.  default is 2.5')
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
