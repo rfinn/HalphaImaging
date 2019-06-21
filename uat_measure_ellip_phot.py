@@ -66,6 +66,7 @@ from photutils import EllipticalAperture
 from photutils import aperture_photometry
 
 
+
 parser = argparse.ArgumentParser(description = 'This code takes an image, and a SExtractor catalog.  ')
 parser.add_argument('--pointing',dest = 'pointing', default = None, help = 'Cluster prefix of image for continuum subtraction.  Use this if you are subtracting continuum from a cutout rather than a mosaic.')
 parser.add_argument('--id',dest = 'id', default = None, help = 'NSAID of image for continuum subtraction.  Use this if you are subtracting continuum from a cutout rather than a mosaic.')
@@ -94,32 +95,8 @@ if args.id:
     name_ha = args.pointing+'-'+args.id+'-CS.fits'
     id = args.id
 
-#im1='A1367-113394-R'
-rimage = image_path+name_r
-# read in image
-imdat_r, header_r = fits.getdata(rimage, header=True)
-try:
-    ZP_r = header_r['PHOTZP']
-    zpr_flag = True
-except KeyError:
-    print('no PHOTZP found in r header.  Too bad :(')
-    print('did you run getzp.py?')
-    zpr_flag = False
-#if args.plot:
 
-haimage = image_path+name_ha
-# read in image
-imdat_ha, header_ha = fits.getdata(haimage, header=True)
-try:
-    ZP_ha = header_ha['PHOTZP']
-    zpha_flag = True
-except KeyError:
-    print('no PHOTZP found in ha header.  Too bad :(')
-    print('did you run getzp.py?')
-    zpha_flag = False
-
-#if args.plot:
-
+    
 
 
 print('reading sextractor catalog\n')    
