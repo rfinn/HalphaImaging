@@ -106,7 +106,7 @@ args = parser.parse_args()
 
 
 # setting up filter information
-#dictionary of Halpha filters
+# dictionary of Halpha filters
 lmin={'4':6573., '8':6606.,'12':6650.,'16':6682.,'INT197':6520.5}
 lmax={'4':6669., '8':6703.,'12':6747., '16':6779.,'INT197':6615.5}
 
@@ -176,10 +176,9 @@ def makecuts(image,imagefilter):
         newfile.header.update(w[ymin:ymax,xmin:xmax].to_header())
         newfile.header.set('REDSHIFT',float('{:.6f}'.format(redshift[i])))
         newfile.header.set('ZDIST',float('{:.6f}'.format(zdist[i])))
-        newfile.header.set('NSAID',float('{:i}'.format(IDNUMBER[i])))
-            
+        newfile.header.set('NSAID',float('{:d}'.format(IDNUMBER[i])))
         
-        fits.writeto(outimage, newfile.data, header = newfile.header, clobber=True)
+        fits.writeto(outimage, newfile.data, header = newfile.header, overwrite=True)
     return cutout
 if __name__ == '__main__':
     imcutout = makecuts(args.image,args.filter)
