@@ -87,10 +87,10 @@ else:
 
 # check to see if user provided redshift
 if args.redshift:
-    redshift = args.redshift
+    redshift = float(args.redshift)
 else:
     try:
-        redshift = header[args.redshift_keyword]
+        redshift = float(header[args.redshift_keyword])
     except KeyError:
         print('could not read redshift from header!')
         print('please provide redshift at the command line.')
@@ -123,7 +123,7 @@ header.set('nuFnu',flux.cgs.value,comment='conversion from image counts to erg/s
 header.set('log10(nuLnu)',np.log10(lumin.cgs.value),comment='conversion from image counts to erg/s (nuLnu); WMAP9')
 
 ## convert to SFR if halpha filter
-if imfilter.find('ha') > -1:
+if (imfilter.find('ha') > -1) | (imfilter.find('197') > -1):
     # kennicutt & evans
     # L in units of erg/s (not what I have!!!)
     # Cx = 41.27
