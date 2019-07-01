@@ -76,10 +76,10 @@ else:
 
 # check to see if user provided ZP
 if args.ZP:
-    ZP = args.ZP
+    ZP = float(args.ZP)
 else:
     try:
-        ZP = header['PHOTZP']
+        ZP = float(header['PHOTZP'])
     except KeyError:
         print('could not read PHOTZP from header!')
         print('please provide ZP at the command line.')
