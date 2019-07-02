@@ -131,7 +131,7 @@ class getzp():
             ADUlimit = 40000./float(expt)
             print('saturation limit in ADU/s {:.1f}'.format(ADUlimit))
             t = 'sex ' + args.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)
-            print(t)
+            #print(t)
             os.system(t)
         else:
             os.system('sex ' + args.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0')
@@ -323,7 +323,7 @@ if __name__ == '__main__':
     parser.add_argument('--instrument', dest = 'instrument', default = None, help = 'HDI = h, KPNO mosaic = m, INT = i')
     parser.add_argument('--filter', dest = 'filter', default = 'R', help = 'filter (R or r; use r for Halpha)')
     parser.add_argument('--nexptime', dest = 'nexptime', default = True, action = 'store_false', help = "set this flag if the image is in ADU rather than ADU/s.  Swarp produces images in ADU/s.")
-    parser.add_argument('--naper', dest = 'naper', default = 4,help = "select fixed aperture magnitude.  0=3pix; 1=5pix; 2=7pix")
+    parser.add_argument('--naper', dest = 'naper', default = 4,help = "select fixed aperture magnitude.  0=5pix,1=10pix,2=12pix,3=15pix,4=20pix,5=25pix.  Default is 4 (20 pixel diameter)")
     parser.add_argument('--nsigma', dest = 'nsigma', default = 2.5, help = 'number of std to use in iterative rejection of ZP fitting.  default is 2.5')
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
     args = parser.parse_args()
