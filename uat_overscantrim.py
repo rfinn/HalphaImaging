@@ -53,5 +53,5 @@ for f in files:
 
     
     
-    #trimmed.write('tr'+f,add_keyword=head_updates)    
+    trimmed.write('tr'+f)    
 
