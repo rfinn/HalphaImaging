@@ -59,6 +59,12 @@ for line in infile:
     filenames.append(t[0]+'.fits')
     if t[1].find('ha4') > -1:
         filefilter.append('ha4')
+    elif t[1].find('ha8') > -1:
+        filefilter.append('ha8')
+    elif t[1].find('ha12') > -1:
+        filefilter.append('ha12')
+    elif t[1].find('ha16') > -1:
+        filefilter.append('ha16')
     elif t[1].find('6620') > -1:
         filefilter.append('ha4')
     elif t[1].find('R') > -1:
@@ -128,7 +134,7 @@ for f in filters:
             data,header = fits.getdata(filenames[i],header=True)
             dataout = data / flatdata
             header['HISTORY'] = 'Flattened using ndomeflat'+f
-            fits.writeto('d'+filenames[i],dataout,header,clobber=True)
+            fits.writeto('d'+filenames[i],dataout,header,overwrite=True)
 os.remove('junkfile1')
 
 
