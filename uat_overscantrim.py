@@ -45,12 +45,13 @@ for f in files:
 
     # subtract overscan
     o_subtracted = ccdproc.subtract_overscan(ccd, fits_section = args.irafbiassec, model=poly_model)
-    header['HISTORY'] = 'overscan subtracted '+args.irafbiassec
+    #header['HISTORY'] = 'overscan subtracted '+args.irafbiassec
 
     # trim image
-    trimmed = ccdproc.trim_image(o_subtracted, fits_section = args.iraftrimsec)
+    head_updates = {'CCDSEC':args.iraftrimsec, 'BIASSEC':args.irafbiassec}
+    trimmed = ccdproc.trim_image(o_subtracted, fits_section = args.iraftrimsec, add_keyword = head_updates)
 
-    head_updates = {'CCDSEC':args.iraftrimsec}
     
-    trimmed.write('tr'+f,add_keyword=head_updates)    
+    
+    #trimmed.write('tr'+f,add_keyword=head_updates)    
 
