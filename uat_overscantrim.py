@@ -53,5 +53,5 @@ for f in files:
 
     
     
-    trimmed.write('tr'+f)    
+    trimmed.write('tr'+f, overwrite=True)    
 
