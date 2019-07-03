@@ -172,7 +172,7 @@ for f in files:
     #    header.append(card=('TELDEC',c2000.dec.value,'DEC of reference point'))
     #    header.append(card=('TELEQUIN','J2000.0','Epoch (years)'))    
     print 'WRITING UPDATED FILE'
-    fits.writeto('h'+f,data,header,clobber=True)
+    fits.writeto('h'+f,data,header,overwrite=True)
     i += 1
     print '\n'
 
