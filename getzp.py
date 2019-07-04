@@ -99,12 +99,21 @@ def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=20,
 
 
 class getzp():
-    def __init__(self, image, instrument='h', filter='r', astromatic_dir = '~/github/HalphaImaging/astromatic/'):
+    def __init__(self, image, instrument='h', filter='r', astromatic_dir = '~/github/HalphaImaging/astromatic/',norm_exptime = True,nsigma = 2.5):
 
         self.image = image
         self.astrodir = astromatic_dir
         self.instrument = instrument
         self.filter = filter
+        # if image is in ADU rather than ADU/s, divide image by exptime before running sextractor
+        if not(norm_exptime):
+            im, header = fits.getdata(self.image,header=True)
+            exptime = header['EXPTIME']
+            norm_im = im/float(exptime)
+            fits.writeto('n'+self.image, norm_im, header, overwrite=True)
+            self.image = 'n'+self.image
+        print(self.image)
+        self.nsigma = nsigma
     def getzp(self):
         self.runse()
         self.get_panstarrs()
@@ -125,16 +134,13 @@ class getzp():
             defaultcat = 'default.sex.HDI'
         elif self.instrument == 'm':
             defaultcat = 'default.sex.HDI'
-        if args.nexptime: # image is in ADU/S
-            header = fits.getheader(self.image)
-            expt = header['EXPTIME']
-            ADUlimit = 40000./float(expt)
-            print('saturation limit in ADU/s {:.1f}'.format(ADUlimit))
-            t = 'sex ' + args.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)
-            #print(t)
-            os.system(t)
-        else:
-            os.system('sex ' + args.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0')
+        header = fits.getheader(self.image)
+        expt = header['EXPTIME']
+        ADUlimit = 40000./float(expt)
+        print('saturation limit in ADU/s {:.1f}'.format(ADUlimit))
+        t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)
+        print(t)
+        os.system(t)
 
         # clean up SE files
         # skipping for now in case the following command accidentally deletes user files
@@ -195,23 +201,38 @@ class getzp():
         ###################################
 
 
-        self.fitflag = matchflag  & (self.pan['rmag'] > 6.)& (self.matchedarray1['FLAGS'] == 0)  & (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.pan['rmag'] < 17.) 
+        self.fitflag = matchflag  & (self.pan['rmag'] > 9.)& (self.matchedarray1['FLAGS'] == 0)  & (self.matchedarray1['CLASS_STAR'] > 0.95) & (self.pan['Qual'] < 64) #& (self.pan['rmag'] < 15.5) #& (self.matchedarray1['MAG_AUTO'] > -11.)
 
         if self.filter == 'R':
             ###################################
             # Calculate Johnson R
+            # from http://www.sdss3.org/dr8/algorithms/sdssUBVRITransform.php
             ###################################
             self.R = self.pan['rmag'] + (-0.153)*(self.pan['rmag']-self.pan['imag']) - 0.117
+
+            ###################################
+            # Other transformations from 
+            # https://arxiv.org/pdf/1706.06147.pdf
+            # R - r = C0 + C1 x (r-i)  (-0.166, -0.275)
+            # R - r = C0 + C1 x (g-r)  (-0.142, -0.166)
+            ###################################
+            #
+            #self.R = self.pan['rmag'] + (-0.142)*(self.pan['gmag']-self.pan['rmag']) - 0.142
+            self.R = self.pan['rmag'] + (-0.166)*(self.pan['rmag']-self.pan['imag']) - 0.275
         else:
             self.R = self.pan['rmag']
-    def plot_fitresults(self, x, y, polyfit_results = [0,0]):
+    def plot_fitresults(self, x, y, yerr=None, polyfit_results = [0,0]):
         # plot best-fit results
         yfit = np.polyval(polyfit_results,x)
-        residual = (yfit - y)/yfit 
+        residual = (yfit - y)
         plt.figure(figsize=(8,8))
 
         plt.subplot(2,1,1)
-        plt.plot(x,y,'bo',label='MAG_AUTO')
+        if yerr == None:
+            plt.plot(x,y,'bo',label='MAG_AUTO')
+            
+        else:
+            plt.errorbar(x,y,yerr=yerr,fmt='bo',ecolor='b',label='SE MAG')
         plt.xlabel('Pan-STARRS r',fontsize=16)
         plt.ylabel('SE R-band MAG',fontsize=16)
         xl = np.linspace(14,17,10)
@@ -222,9 +243,13 @@ class getzp():
         
         plt.subplot(2,1,2)
         s = 'std = %.4f'%(np.std(residual))
-        plt.plot(x,residual, 'ko',label=s)
+        if yerr == None:
+            plt.plot(x,residual, 'ko',label=s)
+            
+        else:
+            plt.errorbar(x,residual,yerr=yerr,fmt='None',ecolor='b',label='SE MAG')
         plt.xlabel('Pan-STARRS r',fontsize=16)
-        plt.ylabel('YFIT - SE R-band MAG_AUTO',fontsize=16)
+        plt.ylabel('YFIT - SE R-band MAG',fontsize=16)
         plt.legend()
         plt.axhline(y=0,color='r')
 
@@ -267,8 +292,13 @@ class getzp():
         delta = 100.     
         x = self.R[flag]
         # fixed radii apertures: [:,0] = 3 pix, [:,1] = 5 pix, [:,2] = 7 pixels
-        y = self.matchedarray1['MAG_APER'][:,args.naper][flag]
-        yerr = self.matchedarray1['MAGERR_APER'][:,args.naper][flag]
+        
+        #y = self.matchedarray1['MAG_APER'][:,args.naper][flag]
+        #yerr = self.matchedarray1['MAGERR_APER'][:,args.naper][flag]
+        # trying other magnitudes to see which gives the best match to landolt standards
+        #
+        y = self.matchedarray1['MAG_PETRO'][flag]
+        yerr = self.matchedarray1['MAGERR_PETRO'][flag]
         while delta > 1.e-3:
             #c = np.polyfit(x,y,1)
             t = curve_fit(zpfunc,x,y,sigma = yerr)
@@ -278,13 +308,13 @@ class getzp():
             yfit = np.polyval(c,x)
             residual = (yfit - y)/yfit 
             if plotall:
-                self.plot_fitresults(x,y,polyfit_results = c)
+                self.plot_fitresults(x,y,yerr=yerr,polyfit_results = c)
     
             # check for convergence
             print('new ZP = {:.3f}, previous ZP = {:.3f}'.format(self.bestc[1],c[1]))
             delta = abs(self.bestc[1] - c[1])
             self.bestc = c
-            flag =  (abs(residual) < 2.0*np.std(residual))
+            flag =  (abs(residual) < self.nsigma*np.std(residual))
             x = x[flag]
             y = y[flag]
             yerr = yerr[flag]
@@ -294,7 +324,7 @@ class getzp():
         self.zpcovar = t[1]
         self.zperr = np.sqrt(self.zpcovar[0][0])
         self.zp = self.bestc[1]
-        self.plot_fitresults(x,y,polyfit_results = self.bestc)
+        self.plot_fitresults(x,y,yerr=yerr,polyfit_results = self.bestc)
                 
     def update_header(self):
         print('working on this')
@@ -329,7 +359,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     args.nexptime = bool(args.nexptime)
     args.naper = int(args.naper)
-    zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d)
+    zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma))
     zp.getzp()
     print('ZP = {:.3f} +/- {:.3f}'.format(-1*zp.zp,zp.zperr))
 
