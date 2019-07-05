@@ -99,7 +99,7 @@ def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=20,
 
 
 class getzp():
-    def __init__(self, image, instrument='h', filter='r', astromatic_dir = '~/github/HalphaImaging/astromatic/',norm_exptime = True,nsigma = 2.5, useri = False, naper = 4):
+    def __init__(self, image, instrument='h', filter='r', astromatic_dir = '~/github/HalphaImaging/astromatic/',norm_exptime = True,nsigma = 2.5, useri = False, naper = 4, mag=0):
 
         self.image = image
         self.astrodir = astromatic_dir
@@ -116,6 +116,7 @@ class getzp():
         self.nsigma = nsigma
         self.useri = useri
         self.naper = naper
+        self.mag = mag
     def getzp(self):
         self.runse()
         self.get_panstarrs()
@@ -298,15 +299,19 @@ class getzp():
         delta = 100.     
         x = self.R[flag]
         # fixed radii apertures: [:,0] = 3 pix, [:,1] = 5 pix, [:,2] = 7 pixels
-        
-        #y = self.matchedarray1['MAG_APER'][:,self.naper][flag]
-        #yerr = self.matchedarray1['MAGERR_APER'][:,self.naper][flag]
-        # trying other magnitudes to see which gives the best match to landolt standards
-        #
-        #y = self.matchedarray1['MAG_PETRO'][flag]
-        #yerr = self.matchedarray1['MAGERR_PETRO'][flag]
-        y = self.matchedarray1['MAG_BEST'][flag]
-        yerr = self.matchedarray1['MAGERR_BEST'][flag]
+
+        if self.mag == 0:
+            print('Using Aperture Magnitudes')
+            y = self.matchedarray1['MAG_APER'][:,self.naper][flag]
+            yerr = self.matchedarray1['MAGERR_APER'][:,self.naper][flag]
+        elif self.mag == 1:
+            print('Using MAG_BEST')
+            y = self.matchedarray1['MAG_BEST'][flag]
+            yerr = self.matchedarray1['MAGERR_BEST'][flag]
+        elif self.mag == 2:
+            print('Using MAG_PETRO')
+            y = self.matchedarray1['MAG_PETRO'][flag]
+            yerr = self.matchedarray1['MAGERR_PETRO'][flag]
         while delta > 1.e-3:
             #c = np.polyfit(x,y,1)
             t = curve_fit(zpfunc,x,y,sigma = yerr)
@@ -363,13 +368,13 @@ if __name__ == '__main__':
     parser.add_argument('--useri',dest = 'useri', default = False, action = 'store_true', help = 'Use r->R transformation as a function of r-i rather than the g-r relation.  g-r is the default.')
     parser.add_argument('--nexptime', dest = 'nexptime', default = True, action = 'store_false', help = "set this flag if the image is in ADU rather than ADU/s.  Swarp produces images in ADU/s.")
     parser.add_argument('--mag', dest = 'mag', default = 0,help = "select SE magnitude to use when solving for ZP.  0=MAG_APER,1=MAG_BEST,2=MAG_PETRO.  Default is MAG_APER ")
-        parser.add_argument('--naper', dest = 'naper', default = 5,help = "select fixed aperture magnitude.  0=10pix,1=12pix,2=15pix,3=20pix,4=25pix,5=30pix.  Default is 5 (30 pixel diameter)")
+    parser.add_argument('--naper', dest = 'naper', default = 5,help = "select fixed aperture magnitude.  0=10pix,1=12pix,2=15pix,3=20pix,4=25pix,5=30pix.  Default is 5 (30 pixel diameter)")
     parser.add_argument('--nsigma', dest = 'nsigma', default = 2.5, help = 'number of std to use in iterative rejection of ZP fitting.  default is 2.5')
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
     args = parser.parse_args()
     args.nexptime = bool(args.nexptime)
     args.naper = int(args.naper)
-    zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper)
+    zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
     zp.getzp()
     print('ZP = {:.3f} +/- {:.3f}'.format(-1*zp.zp,zp.zperr))
 
