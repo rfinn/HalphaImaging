@@ -183,7 +183,11 @@ def makebothcuts(Rimage,filter1,Haimage,filter2):
         newfile1.data = g[0].data[ymin1:ymax1,xmin1:xmax1]
         newfile1.header = g[0].header
         newfile1.header.update(w[ymin1:ymax1,xmin1:xmax1].to_header())
+        newfile.header.set('REDSHIFT',float('{:.6f}'.format(redshift[i])))
+        newfile.header.set('ZDIST',float('{:.6f}'.format(zdist[i])))
+        newfile.header.set('NSAID',float('{:d}'.format(IDNUMBER[i])))
         
+
         fits.writeto(outimage1, newfile1.data, header = newfile1.header, clobber=True)
         if args.plot:
            plt.figure()
