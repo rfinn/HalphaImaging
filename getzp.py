@@ -55,6 +55,7 @@ t = SDSS.query_sql(query, data_release=14)
 import argparse
 import os
 import numpy as np
+import sys
 from matplotlib import pyplot as plt
 import matplotlib.patches as patches
 import astropy.units as u
@@ -62,7 +63,6 @@ import astropy.coordinates as coord
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from scipy.optimize import curve_fit
-from scipy.stats import median_absolute_deviation as MAD
 from astroquery.vizier import Vizier
 
 # function for fitting ZP equation
@@ -99,7 +99,7 @@ def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=20,
 
 
 class getzp():
-    def __init__(self, image, instrument='h', filter='r', astromatic_dir = '~/github/HalphaImaging/astromatic/',norm_exptime = True,nsigma = 2.5, useri = False, naper = 4, mag=0):
+    def __init__(self, image, instrument='h', filter='r', astromatic_dir = '~/github/HalphaImaging/astromatic/',norm_exptime = True,nsigma = 2., useri = False, naper = 5, mag=0):
 
         self.image = image
         self.astrodir = astromatic_dir
@@ -204,7 +204,7 @@ class getzp():
         ###################################
 
 
-        self.fitflag = matchflag  & (self.pan['rmag'] > 9.)& (self.matchedarray1['FLAGS'] == 0)  & (self.matchedarray1['CLASS_STAR'] > 0.95) & (self.pan['Qual'] < 64) #& (self.pan['rmag'] < 15.5) #& (self.matchedarray1['MAG_AUTO'] > -11.)
+        self.fitflag = matchflag  & (self.pan['rmag'] > 9.)& (self.matchedarray1['FLAGS'] == 0)  & (self.matchedarray1['CLASS_STAR'] > 0.95) & (self.pan['Qual'] < 64) & (self.pan['rmag'] < 15.5) #& (self.matchedarray1['MAG_AUTO'] > -11.)
 
         if self.filter == 'R':
             ###################################
@@ -234,7 +234,7 @@ class getzp():
         plt.figure(figsize=(8,8))
         plt.title(self.image)
         plt.subplot(2,1,1)
-        if yerr == None:
+        if len(yerr) < len(y): 
             plt.plot(x,y,'bo',label='MAG_AUTO')
             
         else:
@@ -249,7 +249,7 @@ class getzp():
         
         plt.subplot(2,1,2)
         s = 'std = %.4f'%(np.std(residual))
-        if yerr == None:
+        if len(yerr) < len(y):
             plt.plot(x,residual, 'ko',label=s)
             
         else:
@@ -319,18 +319,32 @@ class getzp():
             c = np.array([1.,t[0][0]])
             print('number of points retained = ',sum(flag))
             yfit = np.polyval(c,x)
-            residual = (yfit - y)/yfit 
+            residual = (yfit - y)
+
             if plotall:
                 self.plot_fitresults(x,y,yerr=yerr,polyfit_results = c)
+
     
             # check for convergence
             print('new ZP = {:.3f}, previous ZP = {:.3f}'.format(self.bestc[1],c[1]))
             delta = abs(self.bestc[1] - c[1])
             self.bestc = c
-            flag =  (abs(residual) < self.nsigma*MAD(residual))
+            MAD = 1.48*np.median(abs(residual - np.median(residual)))
+            flag =  (abs(residual - np.median(residual)) < self.nsigma*MAD)
+            if sum(flag) < 2:
+                print('WARNING: ONLY ONE DATA POINT LEFT')
+                self.x = x
+                self.y = y
+                self.residual = residual
+                sys.exit()
+            #flag =  (abs(residual) < self.nsigma*np.std(residual))
+            self.x = x
+            self.y = y
+            self.residual =residual
             x = x[flag]
             y = y[flag]
             yerr = yerr[flag]
+
         self.x = x
         self.y = y
         self.yerr = yerr
@@ -369,7 +383,7 @@ if __name__ == '__main__':
     parser.add_argument('--nexptime', dest = 'nexptime', default = True, action = 'store_false', help = "set this flag if the image is in ADU rather than ADU/s.  Swarp produces images in ADU/s.")
     parser.add_argument('--mag', dest = 'mag', default = 0,help = "select SE magnitude to use when solving for ZP.  0=MAG_APER,1=MAG_BEST,2=MAG_PETRO.  Default is MAG_APER ")
     parser.add_argument('--naper', dest = 'naper', default = 5,help = "select fixed aperture magnitude.  0=10pix,1=12pix,2=15pix,3=20pix,4=25pix,5=30pix.  Default is 5 (30 pixel diameter)")
-    parser.add_argument('--nsigma', dest = 'nsigma', default = 2.5, help = 'number of std to use in iterative rejection of ZP fitting.  default is 2.5')
+    parser.add_argument('--nsigma', dest = 'nsigma', default = 2., help = 'number of std to use in iterative rejection of ZP fitting.  default is 2.')
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
     args = parser.parse_args()
     args.nexptime = bool(args.nexptime)

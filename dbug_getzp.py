@@ -17,6 +17,7 @@ parser.add_argument('--useri',dest = 'useri', default = False, action = 'store_t
 
 parser.add_argument('--mag', dest = 'mag', default = 0,help = "select SE magnitude to use when solving for ZP.  0=MAG_APER,1=MAG_BEST,2=MAG_PETRO.  Default is MAG_APER ")
 parser.add_argument('--naper', dest = 'naper', default = 5,help = "select fixed aperture magnitude.  0=10pix,1=12pix,2=15pix,3=20pix,4=25pix,5=30pix.  Default is 5 (30 pixel diameter)")
+parser.add_argument('--nsigma', dest = 'nsigma', default = 3, help = 'number of MAD to use in iterative rejection of ZP fitting.  default is 3.  (Remember std = 1.4 MAD, so do not make this too small.)')
 args = parser.parse_args()
 args.mag = int(args.mag)
 args.naper = int(args.naper)
@@ -33,7 +34,7 @@ myzperr = 0.1*np.ones(len(standard_images),'f')
 # measure ZP
 if args.fitzp:
     for i,im in enumerate(standard_images):
-        zp = getzp.getzp(im, instrument='h', filter='R', nsigma = 2.5, useri = args.useri, mag = args.mag, naper = args.naper)
+        zp = getzp.getzp(im, instrument='h', filter='R', useri = args.useri, mag = args.mag, naper = args.naper,nsigma=float(args.nsigma))
         zp.getzp()
         myzp[i] = -1.*zp.zp
         myzperr[i] = zp.zperr
@@ -44,10 +45,10 @@ zperrdict = dict((a,b) for a,b in zip(standard_images,myzperr))
 
 # read in positions and mags of Landolt standards
 stand = ascii.read('mystandards.csv', data_start=1, delimiter=',')
-sfile = stand['col1']
-landolt_rmag = stand['col5']
-ximage = np.array(stand['col6'],'f')
-yimage = np.array(stand['col7'],'f')
+sfile = stand['IMAGE']
+landolt_rmag = stand['R']
+ximage = np.array(stand['XIMAGE'],'f')
+yimage = np.array(stand['YIMAGE'],'f')
 zp = np.zeros(len(sfile),'f')
 zperr = np.zeros(len(sfile),'f')
 for i,f in enumerate(sfile):
@@ -84,8 +85,8 @@ for c in secats:
 # plot measured mag vs known mag
 if args.mag == 0:
 
-    testmag = newarray['MAG_APER'][:,self.naper]
-    testmagerr = newarray['MAG_APER'][:,self.naper]
+    testmag = newarray['MAG_APER'][:,args.naper]
+    testmagerr = newarray['MAGERR_APER'][:,args.naper]
 elif args.mag == 1:
     testmag = newarray['MAG_BEST']
     testmagerr = newarray['MAGERR_BEST']
@@ -93,6 +94,7 @@ elif args.mag == 2:
     testmag = newarray['MAG_PETRO']
     testmagerr = newarray['MAGERR_PETRO']
 
+mytitles = {0:'MAG_APER',1:'MAG_BEST',2:'MAG_PETRO'}
 plt.figure()
 residual = zp + testmag - landolt_rmag
 plt.errorbar(landolt_rmag[0:5], residual[0:5],yerr=testmagerr[0:5],fmt='bo',label='PG0918+029')
@@ -102,16 +104,28 @@ plt.errorbar(landolt_rmag[16:-1], residual[16:-1],yerr=testmagerr[16:-1],fmt='mo
 plt.legend()
 plt.xlabel('Landolt R mag',fontsize=14)
 plt.ylabel('Measured mag',fontsize=14)
+mystat = 'residual = {:.4f} ({:.4f}) +/- {:.4f}'.format(np.mean(residual),np.median(residual),np.std(residual))
+plt.text(.5,.1,mystat, horizontalalignment='center',transform = plt.gca().transAxes)
+s = 'Aperture = '+mytitles[args.mag]
+if args.mag == 0:
+    s = s + ' naper = '+str(args.naper)
+plt.title(s)
 plt.axhline(y=0)
-plt.figure()
-VR = stand['col4']
-plt.plot(VR[0:5], residual[0:5],'bo',label='PG0918+029')
-plt.plot(VR[5:13], residual[5:13],'go',label='RU_149A')
-plt.plot(VR[13:16], residual[13:16],'co',label='PG1528')
-plt.plot(VR[16:-1], residual[16:-1],'mo',label='PG1633')
-plt.legend()
-plt.xlabel('Landolt V-R',fontsize=14)
-plt.ylabel('Measured mag - Landolt Mag',fontsize=14)
-plt.axhline(y=0)
+plt.subplots_adjust(left=.15,bottom=.2)
+
+plotcolor = False
+if plotcolor:
+    plt.figure()
+    VR = stand['V-R']
+    plt.errorbar(VR[0:5], residual[0:5],yerr=testmagerr[0:5],fmt='bo',label='PG0918+029')
+    plt.errorbar(VR[5:13], residual[5:13],yerr=testmagerr[5:13],fmt='go',label='RU_149A')
+    plt.errorbar(VR[13:16], residual[13:16],yerr=testmagerr[13:16],fmt='co',label='PG1528')
+    plt.errorbar(VR[16:-1], residual[16:-1],yerr=testmagerr[16:-1],fmt='mo',label='PG1633')
+    plt.legend()
+    plt.xlabel('Landolt V-R',fontsize=14)
+    plt.ylabel('Measured mag - Landolt Mag',fontsize=14)
+    plt.subplots_adjust(left=.15,bottom=.2)
+    plt.axhline(y=0)
+    plt.title(s)
 
 
