@@ -62,7 +62,7 @@ import astropy.coordinates as coord
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from scipy.optimize import curve_fit
-
+from scipy.stats import median_absolute_deviation as MAD
 from astroquery.vizier import Vizier
 
 # function for fitting ZP equation
@@ -99,7 +99,7 @@ def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=20,
 
 
 class getzp():
-    def __init__(self, image, instrument='h', filter='r', astromatic_dir = '~/github/HalphaImaging/astromatic/',norm_exptime = True,nsigma = 2.5):
+    def __init__(self, image, instrument='h', filter='r', astromatic_dir = '~/github/HalphaImaging/astromatic/',norm_exptime = True,nsigma = 2.5, useri = False, naper = 4):
 
         self.image = image
         self.astrodir = astromatic_dir
@@ -114,6 +114,8 @@ class getzp():
             self.image = 'n'+self.image
         print(self.image)
         self.nsigma = nsigma
+        self.useri = useri
+        self.naper = naper
     def getzp(self):
         self.runse()
         self.get_panstarrs()
@@ -125,7 +127,7 @@ class getzp():
         # Run Source Extractor on image to measure magnitudes
         ####
 
-        os.system('cp ' +args.d + '/default.* .')
+        os.system('cp ' +self.astrodir + '/default.* .')
         t = self.image.split('.fits')
         froot = t[0]
         if self.instrument == 'h':
@@ -217,8 +219,11 @@ class getzp():
             # R - r = C0 + C1 x (g-r)  (-0.142, -0.166)
             ###################################
             #
-            #self.R = self.pan['rmag'] + (-0.142)*(self.pan['gmag']-self.pan['rmag']) - 0.142
-            self.R = self.pan['rmag'] + (-0.166)*(self.pan['rmag']-self.pan['imag']) - 0.275
+            if self.useri:
+                self.R = self.pan['rmag'] + (-0.166)*(self.pan['rmag']-self.pan['imag']) - 0.275
+            else:
+                self.R = self.pan['rmag'] + (-0.142)*(self.pan['gmag']-self.pan['rmag']) - 0.142
+
         else:
             self.R = self.pan['rmag']
     def plot_fitresults(self, x, y, yerr=None, polyfit_results = [0,0]):
@@ -226,7 +231,7 @@ class getzp():
         yfit = np.polyval(polyfit_results,x)
         residual = (yfit - y)
         plt.figure(figsize=(8,8))
-
+        plt.title(self.image)
         plt.subplot(2,1,1)
         if yerr == None:
             plt.plot(x,y,'bo',label='MAG_AUTO')
@@ -264,7 +269,7 @@ class getzp():
 
         if plotall:
             plt.figure(figsize=(8,6))
-
+            plt.title(self.image)
             plt.plot(self.pan['rmag'][flag],self.matchedarray1['MAG_AUTO'][flag],'bo')
             plt.errorbar(self.pan['rmag'][flag],self.matchedarray1['MAG_AUTO'][flag],xerr= self.pan['e_rmag'][flag],yerr=self.matchedarray1['MAGERR_AUTO'][flag],fmt='none')
             plt.plot(self.pan['rmag'][flag],self.matchedarray1['MAG_BEST'][flag],'ro',label='MAG_BEST')
@@ -287,18 +292,21 @@ class getzp():
         # Show location of residuals
         ###################################
         plt.figure()
+        plt.title(self.image)
         plt.scatter(self.matchedarray1['X_IMAGE'][flag],self.matchedarray1['Y_IMAGE'][flag],c = (residual[flag]))
         plt.colorbar()
         delta = 100.     
         x = self.R[flag]
         # fixed radii apertures: [:,0] = 3 pix, [:,1] = 5 pix, [:,2] = 7 pixels
         
-        #y = self.matchedarray1['MAG_APER'][:,args.naper][flag]
-        #yerr = self.matchedarray1['MAGERR_APER'][:,args.naper][flag]
+        #y = self.matchedarray1['MAG_APER'][:,self.naper][flag]
+        #yerr = self.matchedarray1['MAGERR_APER'][:,self.naper][flag]
         # trying other magnitudes to see which gives the best match to landolt standards
         #
-        y = self.matchedarray1['MAG_PETRO'][flag]
-        yerr = self.matchedarray1['MAGERR_PETRO'][flag]
+        #y = self.matchedarray1['MAG_PETRO'][flag]
+        #yerr = self.matchedarray1['MAGERR_PETRO'][flag]
+        y = self.matchedarray1['MAG_BEST'][flag]
+        yerr = self.matchedarray1['MAGERR_BEST'][flag]
         while delta > 1.e-3:
             #c = np.polyfit(x,y,1)
             t = curve_fit(zpfunc,x,y,sigma = yerr)
@@ -314,7 +322,7 @@ class getzp():
             print('new ZP = {:.3f}, previous ZP = {:.3f}'.format(self.bestc[1],c[1]))
             delta = abs(self.bestc[1] - c[1])
             self.bestc = c
-            flag =  (abs(residual) < self.nsigma*np.std(residual))
+            flag =  (abs(residual) < self.nsigma*MAD(residual))
             x = x[flag]
             y = y[flag]
             yerr = yerr[flag]
@@ -335,11 +343,11 @@ class getzp():
         if self.filter == 'R':
             # conversion from Blanton+2007
             # http://www.astronomy.ohio-state.edu/~martini/usefuldata.html
-            header.set('PHOTZP',float('{:.3f}'.format(-1.*zp.bestc[1]+.21)))
+            header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1]+.21)))
             header.set('LAMBDA_EFF (um)',float(.6442))
 
         else:
-            header.set('PHOTZP',float('{:.3f}'.format(-1.*zp.bestc[1])))
+            header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1])))
             
         header.set('PHOTSYS','AB')
         header.set('FLUXZPJY',float(3631))
@@ -352,14 +360,16 @@ if __name__ == '__main__':
     parser.add_argument('--image', dest = 'image', default = 'test.coadd.fits', help = 'Image for ZP calibration')
     parser.add_argument('--instrument', dest = 'instrument', default = None, help = 'HDI = h, KPNO mosaic = m, INT = i')
     parser.add_argument('--filter', dest = 'filter', default = 'R', help = 'filter (R or r; use r for Halpha)')
+    parser.add_argument('--useri',dest = 'useri', default = False, action = 'store_true', help = 'Use r->R transformation as a function of r-i rather than the g-r relation.  g-r is the default.')
     parser.add_argument('--nexptime', dest = 'nexptime', default = True, action = 'store_false', help = "set this flag if the image is in ADU rather than ADU/s.  Swarp produces images in ADU/s.")
-    parser.add_argument('--naper', dest = 'naper', default = 4,help = "select fixed aperture magnitude.  0=5pix,1=10pix,2=12pix,3=15pix,4=20pix,5=25pix.  Default is 4 (20 pixel diameter)")
+    parser.add_argument('--mag', dest = 'mag', default = 0,help = "select SE magnitude to use when solving for ZP.  0=MAG_APER,1=MAG_BEST,2=MAG_PETRO.  Default is MAG_APER ")
+        parser.add_argument('--naper', dest = 'naper', default = 5,help = "select fixed aperture magnitude.  0=10pix,1=12pix,2=15pix,3=20pix,4=25pix,5=30pix.  Default is 5 (30 pixel diameter)")
     parser.add_argument('--nsigma', dest = 'nsigma', default = 2.5, help = 'number of std to use in iterative rejection of ZP fitting.  default is 2.5')
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
     args = parser.parse_args()
     args.nexptime = bool(args.nexptime)
     args.naper = int(args.naper)
-    zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma))
+    zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper)
     zp.getzp()
     print('ZP = {:.3f} +/- {:.3f}'.format(-1*zp.zp,zp.zperr))
 
