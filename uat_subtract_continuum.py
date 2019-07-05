@@ -133,11 +133,13 @@ while adjust_scale:
                 outimage = haimage.split('-Ha')[0]+'-CS.fits'
             elif haimage.find('-ha') > -1:
                 outimage = haimage.split('-ha')[0]+'-CS.fits'
+            elif haimage.find('.ha') > -1:
+                outimage = haimage.split('.ha')[0]+'-CS.fits'
             elif haimage.find('_ha') > -1:
                 outimage = haimage.split('_ha')[0]+'-CS.fits'
             newfile = fits.PrimaryHDU()
             newfile.data = cs
             newfile.header = ha_header
-            fits.writeto(outimage, newfile.data, header = newfile.header, clobber=True)
+            fits.writeto(outimage, newfile.data, header = newfile.header, overwrite=True)
             output = outimage.split('.fits')
             plt.savefig(output[0]+'.png')
