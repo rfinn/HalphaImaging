@@ -96,8 +96,13 @@ if args.id:
     id = args.id
 
 
-    
+rimage = image_path+name_r
+# read in image
+imdat_r, header_r = fits.getdata(rimage, header=True)
 
+haimage = image_path+name_ha
+# read in image
+imdat_ha, header_ha = fits.getdata(haimage, header=True)
 
 print('reading sextractor catalog\n')    
 ### get ellipse info from sextractor output
