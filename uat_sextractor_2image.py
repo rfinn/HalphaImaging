@@ -36,70 +36,52 @@ from astropy.io import fits
 from astropy.wcs import WCS
 import argparse
 import subprocess
-
 import numpy as np
 
-parser = argparse.ArgumentParser(description ="Run sextractor in two-image mode.  \n To run from within ipython:\n %run ~/github/HalphaImaging/uat_sextractor_2image.py --image1 pointing-1_R.coadd.fits --image2 pointing-1_ha4.coadd.fits --plot --imagedir './' ")
-#parser.add_argument('--s', dest = 's', default = False, action = 'store_true', help = 'Run sextractor to create object catalogs')
-parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files')
-parser.add_argument('--image1',dest = 'image1', default = None,  help = 'image used to define apertures (R-band)')
-parser.add_argument('--image2',dest = 'image2', default = None,  help = 'image used to for measuring phot based on image1 (typically this is the Halpha image)')
-parser.add_argument('--plot',dest = 'plot', default = False, action = 'store_true', help = 'make diagnostic plots')
-parser.add_argument('--imagedir',dest = 'imagedir', default = '.', help = 'directory for saving plots')
 
 
-args = parser.parse_args()
+def run_sextractor(image1,image2, default_se_dir = '~/github/HalphaImaging/astromatic'):
+    # get magnitude zeropoint for image 1 and image 2
+    header1 = fits.getheader(image1)
+    header2 = fits.getheader(image2)
+    try:
+        ZP1 = header1['PHOTZP']
+        zp1flag = True
+    except KeyError:
+        print('no PHOTZP found in image 1 header.  Too bad :(')
+        print('did you run getzp.py?')
+        zp1flag = False
+    try:
+        ZP2 = header2['PHOTZP']
+        zp2flag = True
+    except KeyError:
+        print('no PHOTZP found in image 2 header.  Too bad :(')
+        print('did you run getzp.py?')
+        zp2flag = False
 
-# get input files
-#print 'cp ' +args.d + '/default.* .'
-os.system('cp ' +args.d + '/default.* .')
-#files = sorted(glob.glob(args.filestring))
+    print 'RUNNING SEXTRACTOR'
+    t = image1.split('.fits')
+    froot1 = t[0]
+    if zp1flag:
+        os.system('sex ' + image1+','+image1 + ' -c default.sex.hdi -CATALOG_NAME ' + froot1 + '.cat -MAG_ZEROPOINT '+str(ZP1))
+    else:
+        os.system('sex ' + image1+','+image1 + ' -c default.sex.hdi -CATALOG_NAME ' + froot1 + '.cat')
+    os.rename('check.fits', froot1 + 'check.fits')
+    # run on second image
+    t = image2.split('.fits')
+    froot2 = t[0]
+    if zp2flag:
+        os.system('sex ' + image1+','+image2 + ' -c default.sex.hdi -CATALOG_NAME ' + froot2 + '.cat -MAG_ZEROPOINT '+str(ZP2))
+    else:
+        os.system('sex ' + image1+','+image2 + ' -c default.sex.hdi -CATALOG_NAME ' + froot2 + '.cat')
+    os.rename('check.fits', froot2 + 'check.fits')
 
-#nfiles = len(files)
-i = 1
-
-# get magnitude zeropoint for image 1 and image 2
-header1 = fits.getheader(args.image1)
-header2 = fits.getheader(args.image2)
-try:
-    ZP1 = header1['PHOTZP']
-    zp1flag = True
-except KeyError:
-    print('no PHOTZP found in image 1 header.  Too bad :(')
-    print('did you run getzp.py?')
-    zp1flag = False
-try:
-    ZP2 = header2['PHOTZP']
-    zp2flag = True
-except KeyError:
-    print('no PHOTZP found in image 2 header.  Too bad :(')
-    print('did you run getzp.py?')
-    zp2flag = False
-
-print 'RUNNING SEXTRACTOR'
-t = args.image1.split('.fits')
-froot1 = t[0]
-if zp1flag:
-    os.system('sex ' + args.image1+','+args.image1 + ' -c default.sex.hdi -CATALOG_NAME ' + froot1 + '.cat -MAG_ZEROPOINT '+str(ZP1))
-else:
-    os.system('sex ' + args.image1+','+args.image1 + ' -c default.sex.hdi -CATALOG_NAME ' + froot1 + '.cat')
-os.rename('check.fits', froot1 + 'check.fits')
-# run on second image
-t = args.image2.split('.fits')
-froot2 = t[0]
-if zp2flag:
-    os.system('sex ' + args.image1+','+args.image2 + ' -c default.sex.hdi -CATALOG_NAME ' + froot2 + '.cat -MAG_ZEROPOINT '+str(ZP2))
-else:
-    os.system('sex ' + args.image1+','+args.image2 + ' -c default.sex.hdi -CATALOG_NAME ' + froot2 + '.cat')
-os.rename('check.fits', froot2 + 'check.fits')
-
-
-if args.plot:
+def make_plot(image1, image2, return_flag = False):
     from matplotlib import pyplot as plt
-    t = args.image1.split('.fits')
+    t = image1.split('.fits')
     froot1 = t[0]
     cat1 = fits.getdata(froot1+'.cat',2)
-    t = args.image2.split('.fits')
+    t = image2.split('.fits')
     froot2 = t[0]
     cat2 = fits.getdata(froot2+'.cat',2)
     plt.figure(figsize=(6,4))
@@ -117,8 +99,35 @@ if args.plot:
     print '%.4f (%.4f)'%(ave,std)
     plt.ylabel('$Flux (Halpha)/Flux(R) $',fontsize=20)
     plt.xlabel('$Flux(R) \ (ADU)$',fontsize=20)
-    plt.text(20,.07,'$ ratio = %.4f (%.4f)$'%(ave,std),fontsize=16)
+    plt.text(20,.07,'$ ratio = %.4f (%.4f)$'%(ave,std),fontsize=12)
     plt.gca().set_xscale('log')
     t = args.image2.split('.coadd')
     plt.title(t[0],fontsize=20)
+    plt.show()
     plt.savefig(args.imagedir+t[0]+'-filter-ratio.png')
+    if return_flag:
+        return ave, std
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description ="Run sextractor in two-image mode.  \n To run from within ipython:\n %run ~/github/HalphaImaging/uat_sextractor_2image.py --image1 pointing-1_R.coadd.fits --image2 pointing-1_ha4.coadd.fits --plot --imagedir './' ")
+    #parser.add_argument('--s', dest = 's', default = False, action = 'store_true', help = 'Run sextractor to create object catalogs')
+    parser.add_argument('--d',dest = 'd', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files')
+    parser.add_argument('--image1',dest = 'image1', default = None,  help = 'image used to define apertures (R-band)')
+    parser.add_argument('--image2',dest = 'image2', default = None,  help = 'image used to for measuring phot based on image1 (typically this is the Halpha image)')
+    parser.add_argument('--plot',dest = 'plot', default = False, action = 'store_true', help = 'make diagnostic plots')
+    parser.add_argument('--imagedir',dest = 'imagedir', default = '.', help = 'directory for saving plots')
+
+    args = parser.parse_args()
+
+    # get input files
+    #print 'cp ' +args.d + '/default.* .'
+    os.system('cp ' +args.d + '/default.* .')
+    #files = sorted(glob.glob(args.filestring))
+
+    #nfiles = len(files)
+    i = 1
+    run_sextractor(args.image1, args.image2, default_se_dir=args.d)
+    if args.plot:
+        make_plot(args.image1, args.image2)
+
+    
