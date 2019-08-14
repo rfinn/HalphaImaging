@@ -78,36 +78,18 @@ from matplotlib.colors import LogNorm
 
 
 
-parser = argparse.ArgumentParser(description ='Get cutouts for NSA galaxies within field of view of mosaic and redshift range of designated H-alpha filter \n example: \n %run ~/github/HalphaImaging/uat_make_both_cutouts.py --Rimage pointing-4_r.coadd.fits --Haimage pointing-4_ha4.coadd.fits --catalog ~/github/Virgo/tables/nsa.virgo.fits --filter1 R --filter2 Ha --nhalpha 4 --prefix pointing4  ')
-parser.add_argument('--Rimage', dest = 'Rimage', default = None, help = 'R-band HDI/mosaic image to make cutouts from')
-parser.add_argument('--Haimage', dest = 'Haimage', default = None, help = 'H-alpha HDI/mosaic image to make cutouts from')
-parser.add_argument('--catalog', dest = 'catalog', default = '/home/share/catalogs/nsa_v0_1_2.fits', help = 'full path to the NSA catalog')
-parser.add_argument('--filter1',dest = 'filter1', default ='R', help = 'Filter for the input mosaic image (e.g. r, R, Ha).  Default value is R.')
-parser.add_argument('--filter2',dest = 'filter2', default ='Ha', help = 'Filter for the input mosaic image (e.g. r, R, Ha).  Default value is Ha.')
-parser.add_argument('--nhalpha',dest = 'nhalpha', default ='4', help = 'H-alpha filter number (e.g. 4, 8, 12, 16 or INT197).  Default value is 4.')
-parser.add_argument('--Rscale',dest = 'scale', default =16., help = 'cutout size = (scale x Re, scale x Re) - increase scale to increase size of cutout.  Default value is 16.')
-parser.add_argument('--prefix',dest = 'prefix', default ='A1367', help = 'cluster name to preprend to cutout image names (no spaces!).  Default value is A1367.')
-parser.add_argument('--plot', dest = 'plot', default = False, action = 'store_true', help = "add '--plot ' to plot cutouts and position wrt mosaic.  Default value is False.")
-
-
-args = parser.parse_args()
-
 
 # setting up filter information
 #dictionary of Halpha filters
 lmin={'4':6573., '8':6606.,'12':6650.,'16':6682.,'INT197':6540.5}
 lmax={'4':6669., '8':6703.,'12':6747., '16':6779.,'INT197':6615.5}
 
-# convert filter min and max wavelength to redshift for halpha emission
-Zmax=(((lmax[args.nhalpha])/6563.)-1)
-Zmin=(((lmin[args.nhalpha])/6563.)-1)
-print 'Galaxies detectable in Halpha have redshifts between ',Zmin,' and ', Zmax
 
 
 def makebothcuts(Rimage,filter1,Haimage,filter2):
     catdat= fits.getdata(args.catalog)
-    print 'Cutting out', Rimage
-    print 'Cutting out', Haimage
+    print('Cutting out', Rimage)
+    print('Cutting out', Haimage)
    
     
     zFlag = (catdat.Z > Zmin) & (catdat.Z < Zmax)
@@ -128,7 +110,11 @@ def makebothcuts(Rimage,filter1,Haimage,filter2):
     DEC=catdat.DEC[keepflag]
     radius=catdat.SERSIC_TH50[keepflag]
     IDNUMBER=catdat.NSAID[keepflag]
-    print 'number of galaxies to keep = ', sum(keepflag)
+
+    redshift = catdat.Z[keepflag]
+    zdist = catdat.ZDIST[keepflag]
+
+    print('number of galaxies to keep = ', sum(keepflag))
 
 #    if args.region_file:
         
@@ -147,10 +133,10 @@ def makebothcuts(Rimage,filter1,Haimage,filter2):
             cutoutR = Cutout2D(f[0].data, position, size, wcs=w, mode='trim') #require entire image to be on parent image
             cutoutHa = Cutout2D(g[0].data, position, size, wcs=w, mode = 'trim')
         except astropy.nddata.utils.PartialOverlapError:# PartialOverlapError:
-            print 'galaxy is only partially covered by mosaic - skipping ',IDNUMBER[i]
+            print('galaxy is only partially covered by mosaic - skipping ',IDNUMBER[i])
             continue
         except astropy.nddata.utils.NoOverlapError:# PartialOverlapError:
-            print 'galaxy is not covered by mosaic - skipping ',IDNUMBER[i]
+            print('galaxy is not covered by mosaic - skipping ',IDNUMBER[i])
             continue
         if args.plot:
             plt.figure() #R cutout
@@ -174,8 +160,11 @@ def makebothcuts(Rimage,filter1,Haimage,filter2):
         newfile.data = f[0].data[ymin:ymax,xmin:xmax]
         newfile.header = f[0].header
         newfile.header.update(w[ymin:ymax,xmin:xmax].to_header())
-        
-        fits.writeto(outimage, newfile.data, header = newfile.header, clobber=True)
+        newfile.header.set('REDSHIFT',float('{:.6f}'.format(redshift[i])))
+        newfile.header.set('ZDIST',float('{:.6f}'.format(zdist[i])))
+        newfile.header.set('NSAID',float('{:d}'.format(IDNUMBER[i])))
+        fits.writeto(outimage, newfile.data, header = newfile.header, overwrite=True)
+
         # saving Ha Cutout as fits image
         ((ymin1,ymax1),(xmin1,xmax1)) = cutoutHa.bbox_original
         outimage1 = args.prefix+'-'+(str(IDNUMBER[i])+'-'+ args.filter2+".fits")
@@ -183,12 +172,11 @@ def makebothcuts(Rimage,filter1,Haimage,filter2):
         newfile1.data = g[0].data[ymin1:ymax1,xmin1:xmax1]
         newfile1.header = g[0].header
         newfile1.header.update(w[ymin1:ymax1,xmin1:xmax1].to_header())
-        newfile.header.set('REDSHIFT',float('{:.6f}'.format(redshift[i])))
-        newfile.header.set('ZDIST',float('{:.6f}'.format(zdist[i])))
-        newfile.header.set('NSAID',float('{:d}'.format(IDNUMBER[i])))
+        newfile1.header.set('REDSHIFT',float('{:.6f}'.format(redshift[i])))
+        newfile1.header.set('ZDIST',float('{:.6f}'.format(zdist[i])))
+        newfile1.header.set('NSAID',float('{:d}'.format(IDNUMBER[i])))
+        fits.writeto(outimage1, newfile1.data, header = newfile1.header, overwrite=True)
         
-
-        fits.writeto(outimage1, newfile1.data, header = newfile1.header, clobber=True)
         if args.plot:
            plt.figure()
            plt.imshow(g[0].data, origin='lower',cmap='gray', norm=LogNorm())
@@ -197,16 +185,32 @@ def makebothcuts(Rimage,filter1,Haimage,filter2):
            r = raw_input('type any key to continue (p to skip plotting) \n')
            if r.find('p') > -1:
                 args.plot = False
-        # figure out how to save the cutout as fits image
-        #((ymin,ymax),(xmin,xmax)) = cutoutHa.bbox_original
-       # outimage = args.prefix+'-'+(str(IDNUMBER[i])+'-'+ args.filter2+".fits")
-       # newfile = fits.PrimaryHDU()
-       # newfile.data = g[0].data[ymin:ymax,xmin:xmax]
-       # newfile.header = g[0].header
-       # newfile.header.update(w[ymin:ymax,xmin:xmax].to_header())
-        
-       # fits.writeto(outimage, newfile.data, header = newfile.header, clobber=True)
+
+
+
+                
 if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description ='Get cutouts for NSA galaxies within field of view of mosaic and redshift range of designated H-alpha filter \n example: \n %run ~/github/HalphaImaging/uat_make_both_cutouts.py --Rimage pointing-4_r.coadd.fits --Haimage pointing-4_ha4.coadd.fits --catalog ~/github/Virgo/tables/nsa.virgo.fits --filter1 R --filter2 Ha --nhalpha 4 --prefix pointing4  ')
+    parser.add_argument('--Rimage', dest = 'Rimage', default = None, help = 'R-band HDI/mosaic image to make cutouts from')
+    parser.add_argument('--Haimage', dest = 'Haimage', default = None, help = 'H-alpha HDI/mosaic image to make cutouts from')
+    parser.add_argument('--catalog', dest = 'catalog', default = '/home/share/catalogs/nsa_v0_1_2.fits', help = 'full path to the NSA catalog')
+    parser.add_argument('--filter1',dest = 'filter1', default ='R', help = 'Filter for the input mosaic image (e.g. r, R, Ha).  Default value is R.')
+    parser.add_argument('--filter2',dest = 'filter2', default ='Ha', help = 'Filter for the input mosaic image (e.g. r, R, Ha).  Default value is Ha.')
+    parser.add_argument('--nhalpha',dest = 'nhalpha', default ='4', help = 'H-alpha filter number (e.g. 4, 8, 12, 16 or INT197).  Default value is 4.')
+    parser.add_argument('--Rscale',dest = 'scale', default =16., help = 'cutout size = (scale x Re, scale x Re) - increase scale to increase size of cutout.  Default value is 16.')
+    parser.add_argument('--prefix',dest = 'prefix', default ='A1367', help = 'cluster name to preprend to cutout image names (no spaces!).  Default value is A1367.')
+    parser.add_argument('--plot', dest = 'plot', default = False, action = 'store_true', help = "add '--plot ' to plot cutouts and position wrt mosaic.  Default value is False.")
+
+
+    args = parser.parse_args()
+    
+    # convert filter min and max wavelength to redshift for halpha emission
+    Zmax=(((lmax[args.nhalpha])/6563.)-1)
+    Zmin=(((lmin[args.nhalpha])/6563.)-1)
+    print('Galaxies detectable in Halpha have redshifts between ',Zmin,' and ', Zmax)
+
+
     imcutout1 = makebothcuts(args.Rimage,args.filter1,args.Haimage,args.filter2)
     #imcutout2 = makebothcuts(args.Rimage,args.filter1,args.Haimage,args.filter2)
 

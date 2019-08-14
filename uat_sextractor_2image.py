@@ -26,6 +26,8 @@ WHAT THIS CODE DOES:
 INPUT/OUPUT:
 REQUIRED MODULES:
 EXTRA NOTES:
+- updated 8/14/19 to encase code in two functions.  this makes it easier to import into other programs, like the Halpha gui.
+
 WRITTEN BY:
 Rose Finn, 04 Jan 2017
 
@@ -40,7 +42,7 @@ import numpy as np
 
 
 
-def run_sextractor(image1,image2, default_se_dir = '~/github/HalphaImaging/astromatic'):
+def run_sextractor(image1,image2, default_se_dir = '/Users/rfinn/github/HalphaImaging/astromatic'):
     # get magnitude zeropoint for image 1 and image 2
     header1 = fits.getheader(image1)
     header2 = fits.getheader(image2)
@@ -59,7 +61,7 @@ def run_sextractor(image1,image2, default_se_dir = '~/github/HalphaImaging/astro
         print('did you run getzp.py?')
         zp2flag = False
 
-    print 'RUNNING SEXTRACTOR'
+    print('RUNNING SEXTRACTOR')
     t = image1.split('.fits')
     froot1 = t[0]
     if zp1flag:
@@ -76,7 +78,7 @@ def run_sextractor(image1,image2, default_se_dir = '~/github/HalphaImaging/astro
         os.system('sex ' + image1+','+image2 + ' -c default.sex.hdi -CATALOG_NAME ' + froot2 + '.cat')
     os.rename('check.fits', froot2 + 'check.fits')
 
-def make_plot(image1, image2, return_flag = False):
+def make_plot(image1, image2, return_flag = False, image_dir = './'):
     from matplotlib import pyplot as plt
     t = image1.split('.fits')
     froot1 = t[0]
@@ -96,15 +98,16 @@ def make_plot(image1, image2, return_flag = False):
     ave = np.median(y[(x> 50) & flag])
     std = np.std(y[(x > 50) & flag])
     plt.axhline(y=ave)
-    print '%.4f (%.4f)'%(ave,std)
+    print('%.4f (%.4f)'%(ave,std))
     plt.ylabel('$Flux (Halpha)/Flux(R) $',fontsize=20)
     plt.xlabel('$Flux(R) \ (ADU)$',fontsize=20)
     plt.text(20,.07,'$ ratio = %.4f (%.4f)$'%(ave,std),fontsize=12)
     plt.gca().set_xscale('log')
-    t = args.image2.split('.coadd')
-    plt.title(t[0],fontsize=20)
+    filename = os.path.basename(image2)
+    t = filename.split('.coadd')
+    plt.title(t[0],fontsize=12)
     plt.show()
-    plt.savefig(args.imagedir+t[0]+'-filter-ratio.png')
+    plt.savefig(image_dir+t[0]+'-filter-ratio.png')
     if return_flag:
         return ave, std
 
@@ -128,6 +131,6 @@ if __name__ == '__main__':
     i = 1
     run_sextractor(args.image1, args.image2, default_se_dir=args.d)
     if args.plot:
-        make_plot(args.image1, args.image2)
+        make_plot(args.image1, args.image2, image_dir = args.imagedir)
 
     

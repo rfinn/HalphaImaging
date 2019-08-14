@@ -47,43 +47,39 @@ from scipy.stats import scoreatpercentile
 
 defaultcat='default.sex.HDI.mask'
 
-
-parser = argparse.ArgumentParser(description ='Create a mask for extraneous objects in field')
-parser.add_argument('--R-image', dest = 'image', default = None, help = 'R-band image to mask')
-parser.add_argument('--Ha-image', dest = 'haimage', default = None, help = 'Halpha image to mask to use as a comparison when identifying stars')
-parser.add_argument('--path',dest = 'path', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
-parser.add_argument('--nods9',dest = 'nods9', default = False, action="store_true", help = 'Set this if you DO NOT want to use ds9 to display mask')
-parser.add_argument('--param',dest = 'param', default ='default.sex.HDI.mask', help = 'sextractor parameter file.  Default is default.sex.HDI.mask')
-parser.add_argument('--threshold', dest = 'threshold', default = .005, help = "sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store")
-parser.add_argument('--snr', dest = 'snr', default = 2, help = "snr to use for sextractor detections (default is 2).",action="store")
-parser.add_argument('--cmap', dest = 'cmap', default = 'gist_heat_r', help = "color map to use when displaying image mask.  default is gist_heat_r.") 
-args = parser.parse_args()
-
-
-sextractor_files=['default.sex.HDI.mask','default.param','default.conv','default.nnw']
-for file in sextractor_files:
-    os.system('ln -s '+args.path+'/'+file+' .')
-
+   parser.add_argument('--R', dest = 'image', default = None, help = 'R-band image to mask')
+    parser.add_argument('--Ha', dest = 'haimage', default = None, help = 'Halpha image to mask to use as a comparison when identifying stars')
+    parser.add_argument('--path',dest = 'path', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
+    parser.add_argument('--nods9',dest = 'nods9', default = False, action="store_true", help = 'Set this if you DO NOT want to use ds9 to display mask')
+    parser.add_argument('--param',dest = 'param', default ='default.sex.HDI.mask', help = 'sextractor parameter file.  Default is default.sex.HDI.mask')
+    parser.add_argument('--threshold', dest = 'threshold', default = .005, help = "sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store")
+    parser.add_argument('--snr', dest = 'snr', default = 2, help = "snr to use for sextractor detections (default is 2).",action="store")
+    parser.add_argument('--cmap', dest = 'cmap', default = 'gist_heat_r', help = "color map to use when displaying image mask.  default is gist_heat_r.") 
 
 class mask_image():
-    def __init__(self):
-        self.image_name = args.image
-        if args.haimage != None:
-            self.haimage_name = args.haimage
-        self.snr = args.snr
-        self.threshold = args.threshold
-        self.param = args.param
-        self.sedir = args.path
+    def __init__(self, image, haimage=None, sepath='~/github/HalphaImaging/astromatic/', nods9=False,
+                 param='default.sex.HDI.mask', threshold=0.05,snr=2,cmap='gist_heat_r'):
+
+        self.image_name = image
+        if haimage != None:
+            self.haimage_name = haimage
+        self.sepath = sepath
+        self.nods9 = nods9
+        self.param = param
+        self.threshold = threshold
+        self.snr = snr        
+        self.cmap = cmap
         self.xcursor_old = -99
         self.xcursor = -99
 
         # create name for output mask file
-        t = args.image.split('.fit')
+        t = self.image_name.split('.fit')
         self.mask_image=t[0]+'-mask.fits'
-        print 'saving image as: ',self.mask_image
+        self.mask_inv_image=t[0]+'-inv-mask.fits'
+        print('saving image as: ',self.mask_image)
         
         # read in image and define center coords
-        self.image, self.imheader = fits.getdata(args.image,header = True)
+        self.image, self.imheader = fits.getdata(self.image,header = True)
         self.ymax,self.xmax = self.image.shape
         self.xc = self.xmax/2.
         self.yc = self.ymax/2.
@@ -102,21 +98,47 @@ class mask_image():
         # keep track of extra objects that the user deletes from mask
 
         self.deleted_objects = []
-        
+        self.link_files()
+        if not(nods9):
+             # open ds9
+            try:
+                d.set('frame delete all')
+            except NameError:
+                d=pyds9.DS9()
+                d.set('frame delete all')
+
+
+    def link_files(self):
+        sextractor_files=['default.sex.HDI.mask','default.param','default.conv','default.nnw']
+        for file in sextractor_files:
+            os.system('ln -s '+sepath+'/'+file+' .')
+    def clean_links(self):
+        # clean up
+        #sextractor_files=['default.sex.sdss','default.param','default.conv','default.nnw']
+        sextractor_files=['default.sex.HDI.mask','default.param','default.conv','default.nnw']
+        for file in sextractor_files:
+            os.system('unlink '+file)
+
     def read_se_cat(self):
         sexout=fits.getdata('test.cat')
-        xsex=sexout['XWIN_IMAGE']
-        ysex=sexout['YWIN_IMAGE']
-        dist=np.sqrt((self.yc-ysex)**2+(self.xc-xsex)**2)
+        self.xsex=sexout['XWIN_IMAGE']
+        self.ysex=sexout['YWIN_IMAGE']
+        self.fwhm = sexout['FWHM_IMAGE']
+        dist=np.sqrt((self.yc-self.ysex)**2+(self.xc-self.xsex)**2)
         #   find object ID
         objIndex=np.where(dist == min(dist))
         objNumber=sexout['NUMBER'][objIndex]
         return objNumber[0] # not sure why above line returns a list
 
     def runse(self,galaxy_id = None):
-        print 'using a deblending threshold = ',args.threshold
-        os.system('sex %s -c %s -CATALOG_NAME test.cat -CATALOG_TYPE FITS_1.0 -DEBLEND_MINCONT %f -DETECT_THRESH %f -ANALYSIS_THRESH %f'%(args.image,args.param,float(args.threshold),float(args.snr),float(args.snr)))
+        print('using a deblending threshold = ',self.threshold)
+        os.system('sex %s -c %s -CATALOG_NAME test.cat -CATALOG_TYPE FITS_1.0 -DEBLEND_MINCONT %f -DETECT_THRESH %f -ANALYSIS_THRESH %f'%(self.image,self.param,float(self.threshold),float(self.snr),float(self.snr)))
         self.maskdat = fits.getdata('segmentation.fits')
+        # grow masked areas
+        bool_array = np.array(self.maskdat.shape,'bool')
+        #for i in range(len(self.xsex)):
+            
+            
         if self.off_center_flag:
             print('setting center object to objid ',self.galaxy_id)
             self.center_object = self.galaxy_id
@@ -131,8 +153,10 @@ class mask_image():
                 self.maskdat[self.maskdat == objID] = 0.
         # write out mask image
         fits.writeto(self.mask_image,self.maskdat,header = self.imheader,overwrite=True)
+        invmask = self.maskdat > 0.
+        invmask = np.array(~invmask,'i')
+        fits.writeto(self.mask_inv_image,invmask,header = self.imheader,overwrite=True)
     def show_mask(self):
-
         if args.nods9:
             plt.close('all')
             self.fig = plt.figure(1,figsize=self.figure_size)
@@ -164,9 +188,9 @@ class mask_image():
  
         
     def ds9_adjust(self):
-            d.set('scale log')
-            d.set('zoom to fit')
-            d.set('scale mode 99.5')      
+        d.set('scale log')
+        d.set('zoom to fit')
+        d.set('scale mode 99.5')      
 
     def ds9_onclick(self):
         s=d.get('iexam')
@@ -182,7 +206,7 @@ class mask_image():
         self.ycursor =  event.ydata
 
     def get_usr_mask(self):
-        print 'click on the location to add object mask'
+        print('click on the location to add object mask')
         if args.nods9:
             a = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
     
@@ -205,11 +229,11 @@ class mask_image():
             xmax = self.xmax
         if ymax > self.ymax:
             ymax = self.ymax
-        print 'xcursor, ycursor = ',self.xcursor, self.ycursor
+        print('xcursor, ycursor = ',self.xcursor, self.ycursor)
         mask_value = np.max(self.maskdat) + 1
         self.usr_mask[ymin:ymin+int(self.mask_size),xmin:xmin+int(self.mask_size)] = mask_value*np.ones([self.mask_size,self.mask_size])
         self.maskdat = self.maskdat + self.usr_mask
-        fits.writeto(self.mask_image, self.maskdat, header = self.imheader, clobber=True)
+        fits.writeto(self.mask_image, self.maskdat, header = self.imheader, overwrite=True)
         print('added mask object '+str(mask_value))
         self.xcursor_old = self.xcursor 
 
@@ -252,7 +276,7 @@ class mask_image():
             newfile = fits.PrimaryHDU()
             newfile.data = self.maskdat
             newfile.header = self.imheader
-            fits.writeto(self.mask_image, newfile.data, header = newfile.header, clobber=True)
+            fits.writeto(self.mask_image, newfile.data, header = newfile.header, overwrite=True)
             self.adjust_mask = False
     def edit_mask(self):
         self.runse()
@@ -275,27 +299,32 @@ class mask_image():
 # return segmentation image with central object removed
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description ='Create a mask for extraneous objects in field')
+    parser.add_argument('--R', dest = 'image', default = None, help = 'R-band image to mask')
+    parser.add_argument('--Ha', dest = 'haimage', default = None, help = 'Halpha image to mask to use as a comparison when identifying stars')
+    parser.add_argument('--path',dest = 'path', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
+    parser.add_argument('--nods9',dest = 'nods9', default = False, action="store_true", help = 'Set this if you DO NOT want to use ds9 to display mask')
+    parser.add_argument('--param',dest = 'param', default ='default.sex.HDI.mask', help = 'sextractor parameter file.  Default is default.sex.HDI.mask')
+    parser.add_argument('--threshold', dest = 'threshold', default = .005, help = "sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store")
+    parser.add_argument('--snr', dest = 'snr', default = 2, help = "snr to use for sextractor detections (default is 2).",action="store")
+    parser.add_argument('--cmap', dest = 'cmap', default = 'gist_heat_r', help = "color map to use when displaying image mask.  default is gist_heat_r.") 
+    args = parser.parse_args()
 
-    # open ds9
-    try:
-        d.set('frame delete all')
-    except NameError:
-        d=pyds9.DS9()
-        d.set('frame delete all')
+
+
+
 
 
     
-    m = mask_image()
+    m = mask_image(args.image, haimage=args.haimage, sepath=args.path, nods9=args.nods9,
+                 param=args.param, threshold=args.threshold,snr=args.snr,cmap=args.cmap)
     m.edit_mask()
+    m.clean_links()
 
 
     
-    
 
-# clean up
-#sextractor_files=['default.sex.sdss','default.param','default.conv','default.nnw']
-for file in sextractor_files:
-    os.system('unlink '+file)
+
 
 
     

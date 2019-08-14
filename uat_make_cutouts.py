@@ -164,7 +164,7 @@ def makecuts(image,imagefilter):
             plt.imshow(f[0].data, origin='lower',cmap='gray', norm=LogNorm())
             cutout.plot_on_original(color='white')
             plt.show()
-            r = raw_input('type any key to continue (p to skip plotting) \n')
+            r = input('type any key to continue (p to skip plotting) \n')
             if r.find('p') > -1:
                 args.plot = False
         # figure out how to save the cutout as fits image
