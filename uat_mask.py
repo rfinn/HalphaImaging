@@ -170,7 +170,7 @@ class mask_image():
             self.d.set(s)
             self.ds9_adjust()
 
-            if self.haimage != None:
+            if self.haimage_name != None:
                 s='file new '+self.haimage_name
                 self.d.set(s)
                 self.ds9_adjust()
