@@ -49,7 +49,7 @@ defaultcat='default.sex.HDI.mask'
 
 
 class mask_image():
-    def __init__(self, image, haimage=None, sepath='~/github/HalphaImaging/astromatic/', nods9=False,
+    def __init__(self, image=image, haimage=None, sepath='~/github/HalphaImaging/astromatic/', nods9=False,
                  param='default.sex.HDI.mask', threshold=0.05,snr=2,cmap='gist_heat_r'):
 
         self.image_name = image
@@ -71,7 +71,7 @@ class mask_image():
         print('saving image as: ',self.mask_image)
         
         # read in image and define center coords
-        self.image, self.imheader = fits.getdata(self.image,header = True)
+        self.image, self.imheader = fits.getdata(self.image_name,header = True)
         self.ymax,self.xmax = self.image.shape
         self.xc = self.xmax/2.
         self.yc = self.ymax/2.
