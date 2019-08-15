@@ -49,7 +49,7 @@ defaultcat='default.sex.HDI.mask'
 
 
 class mask_image():
-    def __init__(self, image=image, haimage=None, sepath='~/github/HalphaImaging/astromatic/', nods9=False,
+    def __init__(self, image=None, haimage=None, sepath='~/github/HalphaImaging/astromatic/', nods9=False,
                  param='default.sex.HDI.mask', threshold=0.05,snr=2,cmap='gist_heat_r'):
 
         self.image_name = image
@@ -91,7 +91,7 @@ class mask_image():
 
         self.deleted_objects = []
         self.link_files()
-        if not(nods9):
+        if not(self.nods9):
              # open ds9
             try:
                 d.set('frame delete all')
@@ -103,7 +103,7 @@ class mask_image():
     def link_files(self):
         sextractor_files=['default.sex.HDI.mask','default.param','default.conv','default.nnw']
         for file in sextractor_files:
-            os.system('ln -s '+sepath+'/'+file+' .')
+            os.system('ln -s '+self.sepath+'/'+file+' .')
     def clean_links(self):
         # clean up
         #sextractor_files=['default.sex.sdss','default.param','default.conv','default.nnw']
@@ -124,7 +124,7 @@ class mask_image():
 
     def runse(self,galaxy_id = None):
         print('using a deblending threshold = ',self.threshold)
-        os.system('sex %s -c %s -CATALOG_NAME test.cat -CATALOG_TYPE FITS_1.0 -DEBLEND_MINCONT %f -DETECT_THRESH %f -ANALYSIS_THRESH %f'%(self.image,self.param,float(self.threshold),float(self.snr),float(self.snr)))
+        os.system('sex %s -c %s -CATALOG_NAME test.cat -CATALOG_TYPE FITS_1.0 -DEBLEND_MINCONT %f -DETECT_THRESH %f -ANALYSIS_THRESH %f'%(self.image_name,self.param,float(self.threshold),float(self.snr),float(self.snr)))
         self.maskdat = fits.getdata('segmentation.fits')
         # grow masked areas
         bool_array = np.array(self.maskdat.shape,'bool')
@@ -149,7 +149,7 @@ class mask_image():
         invmask = np.array(~invmask,'i')
         fits.writeto(self.mask_inv_image,invmask,header = self.imheader,overwrite=True)
     def show_mask(self):
-        if args.nods9:
+        if self.nods9:
             plt.close('all')
             self.fig = plt.figure(1,figsize=self.figure_size)
             plt.clf()
@@ -159,7 +159,7 @@ class mask_image():
             plt.title('image')
             plt.subplot(1,2,2)
             #plt.imshow(maskdat,cmap='gray_r',origin='lower')
-            plt.imshow(self.maskdat,cmap=args.cmap,origin='lower')
+            plt.imshow(self.maskdat,cmap=self.cmap,origin='lower')
             plt.title('mask')
             plt.gca().set_yticks(())
             #plt.draw()
@@ -167,25 +167,25 @@ class mask_image():
         else:
             self.ds9_open()
             s='file new '+self.image_name
-            d.set(s)
+            self.d.set(s)
             self.ds9_adjust()
 
-            if args.haimage != None:
+            if self.haimage != None:
                 s='file new '+self.haimage_name
-                d.set(s)
+                self.d.set(s)
                 self.ds9_adjust()
             s='file new '+self.mask_image
-            d.set(s)
+            self.d.set(s)
             self.ds9_adjust()
  
         
     def ds9_adjust(self):
-        d.set('scale log')
-        d.set('zoom to fit')
-        d.set('scale mode 99.5')      
+        self.d.set('scale log')
+        self.d.set('zoom to fit')
+        self.d.set('scale mode 99.5')      
 
     def ds9_onclick(self):
-        s=d.get('iexam')
+        s=self.d.get('iexam')
         print(s)
         a,b = s.split()
         print(a)
@@ -199,7 +199,7 @@ class mask_image():
 
     def get_usr_mask(self):
         print('click on the location to add object mask')
-        if args.nods9:
+        if self.nods9:
             a = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
     
             while self.xcursor == self.xcursor_old: # stay in while loop until mouse is clicked
@@ -239,7 +239,7 @@ class mask_image():
             adjust_scale = False
             if t.find('t') > -1:
                 t = raw_input('enter new threshold')
-                args.threshold = float(t)
+                self.threshold = float(t)
                 self.runse()
             if t.find('s') > -1:
                 t = raw_input('enter new SNR')
@@ -279,11 +279,11 @@ class mask_image():
             
     def ds9_open(self):
         try:
-            d.set('frame delete all')
-        except NameError:
-            d=pyds9.DS9()
-            d.set('frame delete all')
-
+            self.d.set('frame delete all')
+        except AttributeError:
+            self.d=pyds9.DS9()
+            self.d.set('frame delete all')
+                
    
 
         

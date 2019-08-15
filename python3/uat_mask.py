@@ -149,7 +149,7 @@ class mask_image():
         invmask = np.array(~invmask,'i')
         fits.writeto(self.mask_inv_image,invmask,header = self.imheader,overwrite=True)
     def show_mask(self):
-        if args.nods9:
+        if self.nods9:
             plt.close('all')
             self.fig = plt.figure(1,figsize=self.figure_size)
             plt.clf()
@@ -159,7 +159,7 @@ class mask_image():
             plt.title('image')
             plt.subplot(1,2,2)
             #plt.imshow(maskdat,cmap='gray_r',origin='lower')
-            plt.imshow(self.maskdat,cmap=args.cmap,origin='lower')
+            plt.imshow(self.maskdat,cmap=self.cmap,origin='lower')
             plt.title('mask')
             plt.gca().set_yticks(())
             #plt.draw()
@@ -170,7 +170,7 @@ class mask_image():
             self.d.set(s)
             self.ds9_adjust()
 
-            if args.haimage != None:
+            if self.haimage != None:
                 s='file new '+self.haimage_name
                 self.d.set(s)
                 self.ds9_adjust()
@@ -199,7 +199,7 @@ class mask_image():
 
     def get_usr_mask(self):
         print('click on the location to add object mask')
-        if args.nods9:
+        if self.nods9:
             a = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
     
             while self.xcursor == self.xcursor_old: # stay in while loop until mouse is clicked
@@ -239,7 +239,7 @@ class mask_image():
             adjust_scale = False
             if t.find('t') > -1:
                 t = raw_input('enter new threshold')
-                args.threshold = float(t)
+                self.threshold = float(t)
                 self.runse()
             if t.find('s') > -1:
                 t = raw_input('enter new SNR')
