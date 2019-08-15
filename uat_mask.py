@@ -47,14 +47,6 @@ from scipy.stats import scoreatpercentile
 
 defaultcat='default.sex.HDI.mask'
 
-   parser.add_argument('--R', dest = 'image', default = None, help = 'R-band image to mask')
-    parser.add_argument('--Ha', dest = 'haimage', default = None, help = 'Halpha image to mask to use as a comparison when identifying stars')
-    parser.add_argument('--path',dest = 'path', default =' ~/github/HalphaImaging/astromatic', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
-    parser.add_argument('--nods9',dest = 'nods9', default = False, action="store_true", help = 'Set this if you DO NOT want to use ds9 to display mask')
-    parser.add_argument('--param',dest = 'param', default ='default.sex.HDI.mask', help = 'sextractor parameter file.  Default is default.sex.HDI.mask')
-    parser.add_argument('--threshold', dest = 'threshold', default = .005, help = "sextractor DEBLEND_MINCONT: 0=lots of deblending; 1=none (default = .005)",action="store")
-    parser.add_argument('--snr', dest = 'snr', default = 2, help = "snr to use for sextractor detections (default is 2).",action="store")
-    parser.add_argument('--cmap', dest = 'cmap', default = 'gist_heat_r', help = "color map to use when displaying image mask.  default is gist_heat_r.") 
 
 class mask_image():
     def __init__(self, image, haimage=None, sepath='~/github/HalphaImaging/astromatic/', nods9=False,
