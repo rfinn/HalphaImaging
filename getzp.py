@@ -142,7 +142,7 @@ class getzp():
         ADUlimit = 40000./float(expt)
         print('saturation limit in ADU/s {:.1f}'.format(ADUlimit))
         t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)
-        print(t)
+        #print(t)
         os.system(t)
 
         # clean up SE files
@@ -204,7 +204,7 @@ class getzp():
         ###################################
 
 
-        self.fitflag = matchflag  & (self.pan['rmag'] > 9.)& (self.matchedarray1['FLAGS'] == 0)  & (self.matchedarray1['CLASS_STAR'] > 0.95) & (self.pan['Qual'] < 64) & (self.pan['rmag'] < 15.5) #& (self.matchedarray1['MAG_AUTO'] > -11.)
+        self.fitflag = matchflag  & (self.pan['rmag'] > 9.)& (self.matchedarray1['FLAGS'] == 0)  & (self.matchedarray1['CLASS_STAR'] > 0.95) & (self.pan['Qual'] < 64) #& (self.pan['rmag'] < 15.5) #& (self.matchedarray1['MAG_AUTO'] > -11.)
 
         if self.filter == 'R':
             ###################################
@@ -258,6 +258,7 @@ class getzp():
         plt.ylabel('YFIT - SE R-band MAG',fontsize=16)
         plt.legend()
         plt.axhline(y=0,color='r')
+        plt.savefig('getzp-fig2.png')
 
     def fitzp(self,plotall=False):
         ###################################
@@ -282,6 +283,7 @@ class getzp():
             xl = np.linspace(14,17,10)
             yl = np.polyval(c,xl)
             plt.plot(xl,yl,'k--')
+            #plt.savefig('getzp-fig2.png')
             #plt.plot(xl,1.2*yl,'k:')
             #print(c)
     
@@ -296,6 +298,7 @@ class getzp():
         plt.title(self.image)
         plt.scatter(self.matchedarray1['X_IMAGE'][flag],self.matchedarray1['Y_IMAGE'][flag],c = (residual[flag]))
         plt.colorbar()
+        plt.savefig('getzp-fig1.png')
         delta = 100.     
         x = self.R[flag]
         # fixed radii apertures: [:,0] = 3 pix, [:,1] = 5 pix, [:,2] = 7 pixels
@@ -363,7 +366,7 @@ class getzp():
             # conversion from Blanton+2007
             # http://www.astronomy.ohio-state.edu/~martini/usefuldata.html
             header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1]+.21)))
-            header.set('LAMBDA_EFF (um)',float(.6442))
+            header.set('LAMB(um)',float(.6442))
 
         else:
             header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1])))
@@ -375,7 +378,7 @@ class getzp():
 if __name__ == '__main__':
 
 
-    parser = argparse.ArgumentParser(description ='Run sextractor, get Pan-STARRS catalog, and then computer photometric ZP\n \n from within ipython: \n %run ~/github/Virgo/programs/getzp.py --image pointing031-r.coadd.fits --instrument i \n\n then:\n x,y = fitzp() \n \n The y intercept is -1*ZP. \n \n x and y data are returned in case you want to make additional plots.', formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(description ='Run sextractor, get Pan-STARRS catalog, and then computer photometric ZP\n \n from within ipython: \n %run ~/github/Virgo/programs/getzp.py --image pointing031-r.coadd.fits --instrument i \n \n The y intercept is -1*ZP. \n \n x and y data can be accessed at zp.x and zp.y in case you want to make additional plots.', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--image', dest = 'image', default = 'test.coadd.fits', help = 'Image for ZP calibration')
     parser.add_argument('--instrument', dest = 'instrument', default = None, help = 'HDI = h, KPNO mosaic = m, INT = i')
     parser.add_argument('--filter', dest = 'filter', default = 'R', help = 'filter (R or r; use r for Halpha)')
