@@ -112,7 +112,7 @@ class getzp():
             norm_im = im/float(exptime)
             fits.writeto('n'+self.image, norm_im, header, overwrite=True)
             self.image = 'n'+self.image
-        print(self.image)
+        print('output image = ',self.image)
         self.nsigma = nsigma
         self.useri = useri
         self.naper = naper
