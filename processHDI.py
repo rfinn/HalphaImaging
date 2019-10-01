@@ -15,7 +15,7 @@ reduction (pointing check, focus, saturated sky flat, guided failed, etc.)
 import os
 import sys
 
-gitpath = os.getenv('HOME')+'/github/HalphaImaging/'
+gitpath = os.getenv('HOME')+'/github/HalphaImaging/python3/'
 sys.path.append('~/github/HalphaImaging/')
 
 current_dir = os.getcwd()
