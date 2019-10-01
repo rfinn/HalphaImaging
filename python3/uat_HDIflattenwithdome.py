@@ -69,6 +69,8 @@ for line in infile:
         filefilter.append('ha4')
     elif t[1].find('R') > -1:
         filefilter.append('R')
+    elif t[1].find('r') > -1:
+        filefilter.append('r')
     elif t[1].find(' r ') > -1:
         filefilter.append('r')
     elif t[1].find('V') > -1:
