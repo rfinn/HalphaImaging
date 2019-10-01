@@ -26,7 +26,7 @@ zap = False
 group_flat = True
 dflat = True
 fixheader=True
-astr = True
+astr = False
 
 if trim:
     os.system('python '+gitpath+'uat_overscantrim.py --filestring c')
@@ -64,8 +64,15 @@ if fixheader:
         os.mkdir(mylist[0])
         os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
 
-# run sextractor to create object lists
+
+# best approach is to create a directory of all flattened images
+# from a given run.
+# then run scamp in this folder.
+# this will automatically scale images from different nights
+# and you can swarp images with different exptime and
+# images taken on different nights. :)
 if astr:
+    # run sextractor to create object lists
     os.system('python '+gitpath+'uat_astr_mosaic.py --s --filestring h')
 
     # run scamp to solve for astrometry
