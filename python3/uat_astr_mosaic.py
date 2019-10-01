@@ -89,7 +89,7 @@ if args.s:
         elif args.siena:
             os.system('sex ' + f + ' -c default.sex.siena -CATALOG_NAME ' + froot + '.cat')
         else:
-            os.system('sex ' + f + ' -c default.sex.hdi -CATALOG_NAME ' + froot + '.cat')
+            os.system('sex ' + f + ' -c default.sex.HDI -CATALOG_NAME ' + froot + '.cat')
         os.rename('check.fits', froot + 'check.fits')
             
         i += 1
