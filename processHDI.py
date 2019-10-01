@@ -23,7 +23,7 @@ current_dir = os.getcwd()
 
 trim = False
 zap = False
-group_flat = False
+group_flat = True
 dflat = True
 fixheader=True
 astr = True
@@ -50,19 +50,19 @@ if group_flat:
 # flatten science frames with dome flats
 if dflat:
     os.system('python '+gitpath+'uat_HDIflattenwithdome.py --filestring ztr')
-mylist = ['ZAPPED','z']
-if not(os.path.exists(mylist[0])):
-    os.mkdir(mylist[0])
-    os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
+    mylist = ['ZAPPED','z']
+    if not(os.path.exists(mylist[0])):
+        os.mkdir(mylist[0])
+        os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
 
 
 # fix the HDI header
 if fixheader:
     os.system('python '+gitpath+' uat_HDIfixheader.py --filestring d')
-mylist = ['FLATTENED','d']
-if not(os.path.exists(mylist[0])):
-    os.mkdir(mylist[0])
-    os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
+    mylist = ['FLATTENED','d']
+    if not(os.path.exists(mylist[0])):
+        os.mkdir(mylist[0])
+        os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
 
 # run sextractor to create object lists
 if astr:
