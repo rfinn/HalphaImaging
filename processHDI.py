@@ -21,7 +21,7 @@ sys.path.append('~/github/HalphaImaging/')
 current_dir = os.getcwd()
 # trim and overscan correct
 
-os.system('python '+gitpath+'uat_HDIoverscantrim.py --filestring c')
+os.system('python '+gitpath+'uat_overscantrim.py --filestring c')
 # zap cosmic rays
 os.system('python '+gitpath+'uat_zapcosmicrays.py --filestring tr')
 
