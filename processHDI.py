@@ -29,7 +29,7 @@ os.system('python '+gitpath+'uat_zapcosmicrays.py --filestring tr')
 os.system('python '+gitpath+'uat_HDIgroupflatfiles.py --filestring ztr')
 
 # flatten science frames with dome flats
-os.system('python '+gitpath+'uat_flattendwithdome.py --filestring ztr')
+os.system('python '+gitpath+'uat_HDIflattendwithdome.py --filestring ztr')
 
 # fix the HDI header
 os.system('python '+gitpath+' uat_HDIfixheader.py --filestring d')
