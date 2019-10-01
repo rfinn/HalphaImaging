@@ -88,7 +88,16 @@ for line in infile:
     t=line.split()
     fnames.append(t[0])
     ftype.append(t[1]+t[2])
-    filter.append(t[3].rstrip('\n'))
+    if len(line)> 4:
+        if line.find('6620') > -1:
+            filter.append('ha4')
+        else:
+            print('problem with determing filter!!!')
+            print('probably got a multi-word entry for CMMTOBS')
+            print("I'm storing the second word...")
+            filter.append(t[4].rstrip('\n'))
+    else:
+        filter.append(t[3].rstrip('\n'))
 infile.close()
 set_filter=set(filter)
 set_ftype=set(ftype)
