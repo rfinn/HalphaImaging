@@ -88,7 +88,7 @@ for line in infile:
     t=line.split()
     fnames.append(t[0])
     ftype.append(t[1]+t[2])
-    if len(line)> 4:
+    if len(t)> 4:
         if line.find('6620') > -1:
             filter.append('ha4')
         else:
