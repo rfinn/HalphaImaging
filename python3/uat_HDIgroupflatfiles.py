@@ -105,9 +105,13 @@ set_ftype=set(ftype)
 array_ftype=np.array(ftype)
 array_filter=np.array(filter)
 
+
+# create files that contain all flats taken in same filter
 flat_filelist = []
 for f in set_ftype:
+    print('####################################')
     print("flat type=",f)
+    print('####################################')
     for element in set_filter:
         ftype_filter = str(f)+str(element)
         flat_filelist.append(ftype_filter)
@@ -118,7 +122,7 @@ for f in set_ftype:
             for i in indices[0]:
                 outfile.write(fnames[i]+'\n')
             outfile.close()
-#os.remove('tempflats')            
+
 for f in flat_filelist:
     print('filelist = ',f)
     flatimages = []
@@ -127,8 +131,11 @@ for f in flat_filelist:
     except IOError:
         print(('Problem opening file ',f))
         print('Hope that is ok...')
+        continue
     for q in filelist: flatimages.append(q.rstrip())
-        
+    if len(flatimages) < 3:
+        print('problem combining images from ',f)
+        continue
     # combine flat images using average combine, scale by median, sigma clip
     flat = ccdproc.combine(flatimages,scale=np.median,method='average',sigma_clip=True,unit=u.adu)
     #med_flat = ccdproc.combine(flatimages, method='median')
@@ -141,4 +148,5 @@ for f in flat_filelist:
 
 
                 
-
+# clean up
+os.remove('tempflats')            
