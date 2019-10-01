@@ -48,6 +48,7 @@ if args.siena:
 try:
     os.system('gethead '+filestring+' FILTER, OBJECT, EXPTIME > junkfile2')
     infile=open('junkfile2','r')
+    print('in here')
     fnames=[]      #creates empty list to contain file name
     ftype=[]       #creates empty list to contain type of filter
     fobject=[]     #creates empty list to contain name of object
@@ -63,7 +64,7 @@ try:
 
 except:
     files = glob.glob(filestring)
-
+    print(files)
     fnames=[]      #creates empty list to contain file name
     ftype=[]       #creates empty list to contain type of filter
     fobject=[]     #creates empty list to contain name of object
