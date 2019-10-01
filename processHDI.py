@@ -30,14 +30,18 @@ astr = True
 
 if trim:
     os.system('python '+gitpath+'uat_overscantrim.py --filestring c')
-os.mkdir('ORIGINALS')
-os.system('mv c*.fits ORIGINALS/.')
+mylist = ['ORIGINALS','c']
+if not(os.path.exists(mylist[0])):
+    os.mkdir(mylist[0])
+    os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
 
 # zap cosmic rays
 if zap:
     os.system('python '+gitpath+'uat_zapcosmicrays.py --filestring tr')
-os.mkdir('TRIMMED')
-os.system('mv tr*.fits TRIMMED/.')
+    mylist = ['TRIMMED','tr']
+    if not(os.path.exists(mylist[0])):
+        os.mkdir(mylist[0])
+        os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
 
 # group flat files
 if group_flat:
@@ -46,13 +50,19 @@ if group_flat:
 # flatten science frames with dome flats
 if dflat:
     os.system('python '+gitpath+'uat_HDIflattenwithdome.py --filestring ztr')
-    os.mkdir('ZAPPED')
-    os.system('mv z*.fits ZAPPED/.')
+mylist = ['ZAPPED','z']
+if not(os.path.exists(mylist[0])):
+    os.mkdir(mylist[0])
+    os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
 
 
 # fix the HDI header
 if fixheader:
     os.system('python '+gitpath+' uat_HDIfixheader.py --filestring d')
+mylist = ['FLATTENED','d']
+if not(os.path.exists(mylist[0])):
+    os.mkdir(mylist[0])
+    os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
 
 # run sextractor to create object lists
 if astr:
