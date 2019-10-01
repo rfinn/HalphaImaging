@@ -95,6 +95,7 @@ for line in infile:
             print('problem with determing filter!!!')
             print('probably got a multi-word entry for CMMTOBS')
             print("I'm storing the second word...")
+            print('filter = ',t[4].rstrip('\n'))
             filter.append(t[4].rstrip('\n'))
     else:
         filter.append(t[3].rstrip('\n'))
