@@ -28,7 +28,7 @@ MERGEDOUTCAT_NAME      merged.cat      # Merged output catalog filename
  
 #--------------------------- Full output catalogs ---------------------------
  
-FULLOUTCAT_TYPE        NONE            # NONE, ASCII_HEAD, ASCII, FITS_LDAC
+FULLOUTCAT_TYPE        FITS_LDAC            # NONE, ASCII_HEAD, ASCII, FITS_LDAC
 FULLOUTCAT_NAME        full.cat        # Full output catalog filename
  
 #----------------------------- Pattern matching -------------------------------
