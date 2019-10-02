@@ -35,7 +35,7 @@ parser.add_argument('--fixheader', dest='fixheader', default=False,action='store
 parser.add_argument('--astr', dest='astr', default=False,action='store_true', help='run sextractor, scamp, and group files.  best to do this on all files from an observing run at once.')
 parser.add_argument('--swarp', dest='swarp', default=False,action='store_true', help='run swarp to make coadded images.')
 parser.add_argument('--filelist', dest='filelist', default='swarp_input', help='list of image sets to run swarp on.  the file should contain the list of all Rband groups, for example: ls pointing*_R > swarp_input.  This will look for the corresponding list of halpha images.')
-
+parser.add_argument('--zp', dest='zp', default=False,action='store_true', help='run getzp.py on all *coadd.fits images')
 args = parser.parse_args()
 
 trim = args.trim
@@ -132,4 +132,15 @@ if args.swarp:
         #break
     infile.close()
 
-
+# solve for photometric zp
+if args.zp:
+    filelist = glob.glob('*coadd.fits')
+    for f in filelist:
+        if f.find('_h') > -1:
+            photfilter = 'r'
+        elif f.find('_r') > -1:
+            photfilter = 'r'
+        elif f.find('_R') > -1:
+            photfilter = 'R'
+        os.system('python '+gitpath+'getzp.py --image '+f+' --filter '+photfilter+' --instrument h')
+     
