@@ -42,7 +42,7 @@ for line in infile:
     number = t[1]
     if number.find('-') > -1:
         t = number.rstrip().split('-')
-        #print t
+        print t
         a = int(t[0])
         b = int(t[1])+1
         for i in range(a,b):
