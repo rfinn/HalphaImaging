@@ -15,8 +15,8 @@ DETECT_TYPE      CCD            # CCD (linear) or PHOTO (with gamma correction)
 
 #FLAG_IMAGE       flag.fits      # filename for an input FLAG-image
 DETECT_MINAREA   10              # minimum number of pixels above threshold
-DETECT_THRESH    7           # <sigmas> or <threshold>,<ZP> in mag.arcsec-2
-ANALYSIS_THRESH  7            # <sigmas> or <threshold>,<ZP> in mag.arcsec-2
+DETECT_THRESH    10           # <sigmas> or <threshold>,<ZP> in mag.arcsec-2
+ANALYSIS_THRESH  10            # <sigmas> or <threshold>,<ZP> in mag.arcsec-2
  
 FILTER           Y              # apply filter for detection (Y or N)?
 FILTER_NAME      default.conv   # name of the file containing the filter
@@ -32,7 +32,7 @@ MASK_TYPE        CORRECT        # type of detection MASKing: can be one of
  
 #------------------------------ Photometry -----------------------------------
 PHOT_FLUXFRAC    0.9,0.5,0.3
-PHOT_APERTURES   5,10,12, 15,20,25              # MAG_APER aperture diameter(s) in pixels
+PHOT_APERTURES   10,12,15,20,25,30              # MAG_APER aperture diameter(s) in pixels
 PHOT_AUTOPARAMS  2.5, 3.5       # MAG_AUTO parameters: <Kron_fact>,<min_radius>
 PHOT_PETROPARAMS 2.0, 3.5       # MAG_PETRO parameters: <Petrosian_fact>,
                                 # <min_radius>
