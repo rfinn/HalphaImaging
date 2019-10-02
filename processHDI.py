@@ -15,6 +15,7 @@ reduction (pointing check, focus, saturated sky flat, guided failed, etc.)
 import os
 import sys
 import argparse
+import glob
 
 gitpath = os.getenv('HOME')+'/github/HalphaImaging/python3/'
 sys.path.append('~/github/HalphaImaging/')
@@ -32,6 +33,9 @@ parser.add_argument('--groupflat', dest='groupflat', default=False,action='store
 parser.add_argument('--flatwdome', dest='flatwdome', default=False,action='store_true', help='flatten images with dome flats')
 parser.add_argument('--fixheader', dest='fixheader', default=False,action='store_true', help='fix headeer to get files ready for scamp.')
 parser.add_argument('--astr', dest='astr', default=False,action='store_true', help='run sextractor, scamp, and group files.  best to do this on all files from an observing run at once.')
+parser.add_argument('--swarp', dest='swarp', default=False,action='store_true', help='run swarp to make coadded images.')
+parser.add_argument('--filelist', dest='filelist', default='swarp_input', help='list of image sets to run swarp on.  the file should contain the list of all Rband groups, for example: ls pointing*_R > swarp_input.  This will look for the corresponding list of halpha images.')
+
 args = parser.parse_args()
 
 trim = args.trim
@@ -96,3 +100,32 @@ if astr:
 
 # run swarp?
 #os.system('python '+gitpath+'uat_HDIsortobjects.py --filestring h')
+if args.swarp:
+    infile = open(args.filelist,'r')
+    for f in infile:
+        rootname = f.split('_R')[0]
+        # get set of halpha images
+        fnames = glob.glob(rootname+'_h*')
+        if len(fnames) > 1:
+            print('got more than one Halpha image - crazy!')
+            print('hope this is ok...')
+            multiha = True
+        else:
+            multiha = False
+            halist = fnames[0]
+        # get name of R-band coadd
+        rcoadd_image = f+'.coadd.fits'
+        # run swarp on r images
+        os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --filestring '+f)
+        # run swarp on r, with r as reference image
+        os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --filestring '+f+' --refimage '+rcoadd_image)
+
+        if multiha:
+            for h in fnames:
+                # run swarp on halpha, with r as reference image
+                os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --filestring '+h+' --refimage '+rcoadd_image)
+        else:
+            # run swarp on r, with r as reference image
+            os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --filestring '+halist+' --refimage '+rcoadd_image)
+
+
