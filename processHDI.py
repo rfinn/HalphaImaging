@@ -14,6 +14,7 @@ reduction (pointing check, focus, saturated sky flat, guided failed, etc.)
 
 import os
 import sys
+import argparse
 
 gitpath = os.getenv('HOME')+'/github/HalphaImaging/python3/'
 sys.path.append('~/github/HalphaImaging/')
@@ -21,12 +22,24 @@ sys.path.append('~/github/HalphaImaging/')
 current_dir = os.getcwd()
 # trim and overscan correct
 
-trim = True
-zap = True
-group_flat = True
-dflat = True
-fixheader=True
-astr = False
+parser = argparse.ArgumentParser(description ='Reduce HDI data, trim through scamp')
+
+
+
+parser.add_argument('--trim', dest='trim', default=False,action='store_true', help='trim images')
+parser.add_argument('--zap', dest='zap', default=False,action='store_true', help='run cosmic ray reject (this takes a long time)')
+parser.add_argument('--groupflat', dest='groupflat', default=False,action='store_true', help='group files by filter and create normalized flats')
+parser.add_argument('--flatwdome', dest='flatwdome', default=False,action='store_true', help='flatten images with dome flats')
+parser.add_argument('--fixheader', dest='fixheader', default=False,action='store_true', help='fix headeer to get files ready for scamp.')
+parser.add_argument('--astr', dest='astr', default=False,action='store_true', help='run sextractor, scamp, and group files.  best to do this on all files from an observing run at once.')
+args = parser.parse_args()
+
+trim = args.trim
+zap = args.zap
+group_flat = args.groupflat
+dflat = args.flatwdome
+fixheader=args.fixheader
+astr = args.astr
 
 if trim:
     os.system('python '+gitpath+'uat_overscantrim.py --filestring c')
