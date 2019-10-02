@@ -119,8 +119,7 @@ if args.swarp:
         # run swarp on r images
         print('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f)
         os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f)
-        # run swarp on r, with r as reference image
-        os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image)
+        
 
         if multiha:
             for h in fnames:
@@ -129,6 +128,8 @@ if args.swarp:
         else:
             # run swarp on r, with r as reference image
             os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+halist+' --refimage '+rcoadd_image)
+        # run swarp on r, with r as reference image
+        os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image)
         #break
     infile.close()
 
