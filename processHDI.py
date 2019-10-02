@@ -21,10 +21,10 @@ sys.path.append('~/github/HalphaImaging/')
 current_dir = os.getcwd()
 # trim and overscan correct
 
-trim = False
-zap = False
-group_flat = False
-dflat = False
+trim = True
+zap = True
+group_flat = True
+dflat = True
 fixheader=True
 astr = False
 
