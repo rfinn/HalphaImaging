@@ -23,8 +23,8 @@ current_dir = os.getcwd()
 
 trim = False
 zap = False
-group_flat = True
-dflat = True
+group_flat = False
+dflat = False
 fixheader=True
 astr = False
 
@@ -49,7 +49,7 @@ if group_flat:
 
 # flatten science frames with dome flats
 if dflat:
-    os.system('python '+gitpath+'uat_HDIflattenwithdome.py --filestring ztr')
+    os.system('python '+gitpath+'uat_HDIflattenwithdome.py')
     mylist = ['ZAPPED','z']
     if not(os.path.exists(mylist[0])):
         os.mkdir(mylist[0])
@@ -58,7 +58,7 @@ if dflat:
 
 # fix the HDI header
 if fixheader:
-    os.system('python '+gitpath+' uat_HDIfixheader.py --filestring d')
+    os.system('python '+gitpath+'uat_HDIfixheader.py --filestring d')
     mylist = ['FLATTENED','d']
     if not(os.path.exists(mylist[0])):
         os.mkdir(mylist[0])
