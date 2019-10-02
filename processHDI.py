@@ -103,6 +103,7 @@ if astr:
 if args.swarp:
     infile = open(args.filelist,'r')
     for f in infile:
+        f = f.rstrip()
         rootname = f.split('_R')[0]
         # get set of halpha images
         fnames = glob.glob(rootname+'_h*')
@@ -116,6 +117,7 @@ if args.swarp:
         # get name of R-band coadd
         rcoadd_image = f+'.coadd.fits'
         # run swarp on r images
+        print('python '+gitpath+'uat_astr_mosaic.py --swarp --filestring '+f)
         os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --filestring '+f)
         # run swarp on r, with r as reference image
         os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --filestring '+f+' --refimage '+rcoadd_image)
@@ -127,5 +129,6 @@ if args.swarp:
         else:
             # run swarp on r, with r as reference image
             os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --filestring '+halist+' --refimage '+rcoadd_image)
+        break
 
 
