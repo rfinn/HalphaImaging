@@ -117,18 +117,19 @@ if args.swarp:
         # get name of R-band coadd
         rcoadd_image = f+'.coadd.fits'
         # run swarp on r images
-        print('python '+gitpath+'uat_astr_mosaic.py --swarp --filestring '+f)
-        os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --filestring '+f)
+        print('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f)
+        os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f)
         # run swarp on r, with r as reference image
-        os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --filestring '+f+' --refimage '+rcoadd_image)
+        os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image)
 
         if multiha:
             for h in fnames:
                 # run swarp on halpha, with r as reference image
-                os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --filestring '+h+' --refimage '+rcoadd_image)
+                os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+h+' --refimage '+rcoadd_image)
         else:
             # run swarp on r, with r as reference image
-            os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --filestring '+halist+' --refimage '+rcoadd_image)
-        break
+            os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+halist+' --refimage '+rcoadd_image)
+        #break
+    infile.close()
 
 
