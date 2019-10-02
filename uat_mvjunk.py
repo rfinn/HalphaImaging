@@ -9,9 +9,12 @@ PROCEDURE
 - user creates a file called junkfiles with filenumbers to move
 - to create file, use 
 - example:
-0060-0068
-0074
-0100-0153
+f 0060-0068 
+o 0074 
+b 0100-0153
+
+- first letter signifies flat, object, bias
+- followed by file number
 
 USAGE:
 from within ipython
@@ -34,15 +37,18 @@ if not(os.path.exists('junk')):
 
 infile = open(args.filename)
 for line in infile:
-    if line.find('-') > -1:
-        t = line.rstrip().split('-')
+    t = line.split()
+    prefix = t[0]
+    number = t[1]
+    if number.find('-') > -1:
+        t = number.rstrip().split('-')
         #print t
         a = int(t[0])
         b = int(t[1])+1
         for i in range(a,b):
-            os.system('mv *%04i*.fits junk/.'%(i))
+            os.system('mv *%04i*%s00.fits junk/.'%(i,prefix))
                        
     else:
-        os.system('mv *'+line.rstrip()+'*.fits junk/.')
+        os.system('mv *'+number.rstrip()+'*'+prefix+'00.fits junk/.')
 
 infile.close()
