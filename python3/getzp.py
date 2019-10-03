@@ -192,11 +192,11 @@ class getzp():
         index,dist2d,dist3d = pancoords.match_to_catalog_sky(secoords)
 
         # only keep matches with matched RA and Dec w/in 5 arcsec
-        matchflag = dist2d.degree < 5./3600
+        self.matchflag = dist2d.degree < 5./3600
 
 
         self.matchedarray1=np.zeros(len(pancoords),dtype=self.secat.dtype)
-        self.matchedarray1[matchflag] = self.secat[index[matchflag]]
+        self.matchedarray1[self.matchflag] = self.secat[index[self.matchflag]]
 
         ###################################
         # remove any objects that are saturated, have FLAGS set, galaxies,
@@ -204,7 +204,7 @@ class getzp():
         ###################################
 
 
-        self.fitflag = matchflag  & (self.pan['rmag'] > 9.)& (self.matchedarray1['FLAGS'] == 0)  & (self.matchedarray1['CLASS_STAR'] > 0.95) & (self.pan['Qual'] < 64) #& (self.pan['rmag'] < 15.5) #& (self.matchedarray1['MAG_AUTO'] > -11.)
+        self.fitflag = matchflag  #& (self.pan['rmag'] > 9.) #& (self.matchedarray1['FLAGS'] == 0) & (self.pan['Qual'] < 64) # & (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.pan['rmag'] < 15.5) #& (self.matchedarray1['MAG_AUTO'] > -11.)
 
         if self.filter == 'R':
             ###################################
