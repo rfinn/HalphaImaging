@@ -71,6 +71,8 @@ zpfunc = lambda x, zp: x + zp
 # this function allows the slope to vary
 zpfuncwithslope = lambda x, m, zp: m*x + zp
 
+pixelscale = 0.43 # arcsec per pixel
+
 def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=20,
                     maxsources=10000):
     """
@@ -157,6 +159,23 @@ class getzp():
         secat_filename = froot+'.cat'
         self.secat = fits.getdata(secat_filename,2)
 
+        # get median fwhm of image
+        fwhm = np.median(self.secat['FWHM_IMAGE'])*pixelscale
+
+        #############################################################
+        # rerun Source Extractor catalog with updated SEEING_FWHM
+        #############################################################
+        t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)+' -SEEING_FWHM '+str(fwhm)
+        #print(t)
+        os.system(t)
+
+        ###################################
+        # Read in Source Extractor catalog
+        ###################################
+
+        secat_filename = froot+'.cat'
+        self.secat = fits.getdata(secat_filename,2)
+
         ###################################
         # get max/min RA and DEC for the image
         ###################################
@@ -204,7 +223,7 @@ class getzp():
         ###################################
 
 
-        self.fitflag = self.matchflag  & (self.pan['rmag'] > 9.) & (self.matchedarray1['FLAGS'] == 0) & (self.pan['Qual'] < 64) # & (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.pan['rmag'] < 15.5) #& (self.matchedarray1['MAG_AUTO'] > -11.)
+        self.fitflag = self.matchflag  & (self.pan['rmag'] > 9.) & (self.matchedarray1['FLAGS'] == 0) & (self.pan['Qual'] < 64)  & (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.pan['rmag'] < 15.5) #& (self.matchedarray1['MAG_AUTO'] > -11.)
 
         if self.filter == 'R':
             ###################################
