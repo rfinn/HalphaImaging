@@ -289,7 +289,7 @@ class getzp():
         c = np.polyfit(self.pan['rmag'][flag],self.matchedarray1['MAG_AUTO'][flag],1)
 
         if plotall:
-            plt.figure(figsize=(8,6))
+            plt.figure(figsize=(6,4))
             plt.title(self.image)
             plt.plot(self.pan['rmag'][flag],self.matchedarray1['MAG_AUTO'][flag],'bo')
             plt.errorbar(self.pan['rmag'][flag],self.matchedarray1['MAG_AUTO'][flag],xerr= self.pan['e_rmag'][flag],yerr=self.matchedarray1['MAGERR_AUTO'][flag],fmt='none')
@@ -313,11 +313,16 @@ class getzp():
         ###################################
         # Show location of residuals
         ###################################
-        plt.figure()
+        plt.figure(figsize=(6,4))
         plt.title(self.image)
-        plt.scatter(self.matchedarray1['X_IMAGE'][flag],self.matchedarray1['Y_IMAGE'][flag],c = (residual[flag]))
+        plt.scatter(self.matchedarray1['X_IMAGE'][flag],self.matchedarray1['Y_IMAGE'][flag],c = (residual[flag]),vmin=-.1,vmax=.1)
         plt.colorbar()
         plt.savefig('getzp-fig1.png')
+        plt.figure()
+        s = '%.3f +/- %.3f'%(np.mean(residual[flag].flatten()),np.std(residual[flag].flatten()))
+        t = plt.hist(residual[flag].flatten(),bins=np.linspace(-.1,.1,100))
+        plt.text(0.05,.85,s,horizontalalignment='left',transform=plt.gca().transAxes)
+        plt.savefig('getzp-residual-hist.png')
         delta = 100.     
         x = self.R[flag]
         # fixed radii apertures: [:,0] = 3 pix, [:,1] = 5 pix, [:,2] = 7 pixels
