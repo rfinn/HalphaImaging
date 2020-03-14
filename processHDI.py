@@ -1,14 +1,19 @@
 #!/usr/bin/env python
 
 '''
-this is a wrapper script to run the many programs
+This is a wrapper script to run the many programs
 that we use to reduce the HDI data.
 
+Before running this program, 
 the user should create a junkfile in each directory that
 contains a list of files that should not be included in the
 reduction (pointing check, focus, saturated sky flat, guided failed, etc.)
 
+USAGE:
 
+processHDI.py --trim --zap --groupflat --flatwdome --fixheader
+
+python ~/github/HalphaImaging/processHDI.py --trim --zap --groupflat --flatwdome --fixheader
 
 '''
 
