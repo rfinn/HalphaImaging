@@ -1,14 +1,19 @@
 #!/usr/bin/env python
 
 '''
-this is a wrapper script to run the many programs
+This is a wrapper script to run the many programs
 that we use to reduce the HDI data.
 
+Before running this program, 
 the user should create a junkfile in each directory that
 contains a list of files that should not be included in the
 reduction (pointing check, focus, saturated sky flat, guided failed, etc.)
 
+USAGE:
 
+processHDI.py --trim --zap --groupflat --flatwdome --fixheader
+
+python ~/github/HalphaImaging/processHDI.py --trim --zap --groupflat --flatwdome --fixheader
 
 '''
 
@@ -103,11 +108,24 @@ if args.scamp:
 #os.system('python '+gitpath+'uat_HDIsortobjects.py --filestring h')
 if args.swarp:
     infile = open(args.filelist,'r')
+    print('running swarp')
+    i = 0
     for f in infile:
         f = f.rstrip()
-        rootname = f.split('_R')[0]
+        print(f)
+        if f.find(r'_R') > -1:
+            print('R filter')
+            rootname = f.split('_R')[0]
+        elif f.find(r'_r') > -1:
+            print('sdss r filter')
+            rootname = f.split('_r')[0]
+        else:
+            print('unexpected file name format')
+            sys.exit()
         # get set of halpha images
+        print('rootname = ',rootname)
         fnames = glob.glob(rootname+'_h*')
+        print('halpha file = ',fnames)
         if len(fnames) > 1:
             print('got more than one Halpha image - crazy!')
             print('hope this is ok...')
@@ -131,7 +149,8 @@ if args.swarp:
             os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+halist+' --refimage '+rcoadd_image)
         # run swarp on r, with r as reference image
         os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image)
-        #break
+        break
+        
     infile.close()
 
 # solve for photometric zp

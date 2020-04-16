@@ -4,7 +4,6 @@
 USAGE:
 
 from within ipython:
-
 %run ~/github/HalphaImaging/getzp.py --image pointing031-r.coadd.fits --instrument i --filter r
 
 The y intercept is -1*ZP
@@ -28,7 +27,8 @@ NOTES:
 - added argument nexptime that allows user to toggle between images in ADU vs ADU/s.  If image is in ADU/s, then I grab the exptime from the image header and change SATUR_LEVEL to 40000./exptime
 
 
-
+Apertures:
+- by default, we are using aperture magnitudes, aperture 5 is default, which is
 REFERENCES:
 
 Pan-STARRS
@@ -289,7 +289,7 @@ class getzp():
         c = np.polyfit(self.pan['rmag'][flag],self.matchedarray1['MAG_AUTO'][flag],1)
 
         if plotall:
-            plt.figure(figsize=(8,6))
+            plt.figure(figsize=(6,4))
             plt.title(self.image)
             plt.plot(self.pan['rmag'][flag],self.matchedarray1['MAG_AUTO'][flag],'bo')
             plt.errorbar(self.pan['rmag'][flag],self.matchedarray1['MAG_AUTO'][flag],xerr= self.pan['e_rmag'][flag],yerr=self.matchedarray1['MAGERR_AUTO'][flag],fmt='none')
@@ -308,21 +308,19 @@ class getzp():
     
         yfit = np.polyval(c,self.pan['rmag'])
         residual = np.zeros(len(flag))
-        residual[flag] = (yfit[flag] - self.matchedarray1['MAG_AUTO'][flag])/yfit[flag]
+        ####################################
+        ## had been dividing by yfit, but that doesn't make sense
+        ## want residual to be in magnitudes
+        ## removing yfit normalization
+        ####################################
+        residual[flag] = (yfit[flag] - self.matchedarray1['MAG_AUTO'][flag])#/yfit[flag]
+
         self.bestc = np.array([0,0],'f')
-        ###################################
-        # Show location of residuals
-        ###################################
-        plt.figure()
-        plt.title(self.image)
-        plt.scatter(self.matchedarray1['X_IMAGE'][flag],self.matchedarray1['Y_IMAGE'][flag],c = (residual[flag]))
-        plt.colorbar()
-        plt.savefig('getzp-fig1.png')
         delta = 100.     
-        x = self.R[flag]
+        x = self.R[flag] # expected mag from panstarrs
         # fixed radii apertures: [:,0] = 3 pix, [:,1] = 5 pix, [:,2] = 7 pixels
 
-        if self.mag == 0:
+        if self.mag == 0: # this is the default magnitude
             print('Using Aperture Magnitudes')
             y = self.matchedarray1['MAG_APER'][:,self.naper][flag]
             yerr = self.matchedarray1['MAGERR_APER'][:,self.naper][flag]
@@ -366,6 +364,26 @@ class getzp():
             x = x[flag]
             y = y[flag]
             yerr = yerr[flag]
+        ###################################
+        ##  show histogram of residuals
+        ###################################
+        plt.figure()
+        yplot = self.matchedarray1['MAG_APER'][:,self.naper][self.fitflag]
+        magfit = np.polyval(self.bestc,self.R[self.fitflag])
+        residual_all = magfit - yplot
+        s = '%.3f +/- %.3f'%(np.mean(residual_all),np.std(residual_all))
+        crap = plt.hist(residual_all,bins=np.linspace(-.1,.1,20))
+        plt.text(0.05,.85,s,horizontalalignment='left',transform=plt.gca().transAxes)
+        plt.savefig('getzp-residual-hist.png')
+
+        ###################################
+        # Show location of residuals
+        ###################################
+        plt.figure(figsize=(6,4))
+        plt.title(self.image)
+        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=-.5,vmax=.5)
+        plt.colorbar()
+        plt.savefig('getzp-fig1.png')
 
         self.x = x
         self.y = y
@@ -407,6 +425,7 @@ if __name__ == '__main__':
     parser.add_argument('--naper', dest = 'naper', default = 5,help = "select fixed aperture magnitude.  0=10pix,1=12pix,2=15pix,3=20pix,4=25pix,5=30pix.  Default is 5 (30 pixel diameter)")
     parser.add_argument('--nsigma', dest = 'nsigma', default = 2., help = 'number of std to use in iterative rejection of ZP fitting.  default is 2.')
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
+    parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
     args = parser.parse_args()
     args.nexptime = bool(args.nexptime)
     args.naper = int(args.naper)
