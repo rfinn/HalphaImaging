@@ -32,7 +32,8 @@ parser.add_argument('--zap', dest='zap', default=False,action='store_true', help
 parser.add_argument('--groupflat', dest='groupflat', default=False,action='store_true', help='group files by filter and create normalized flats')
 parser.add_argument('--flatwdome', dest='flatwdome', default=False,action='store_true', help='flatten images with dome flats')
 parser.add_argument('--fixheader', dest='fixheader', default=False,action='store_true', help='fix headeer to get files ready for scamp.')
-parser.add_argument('--astr', dest='astr', default=False,action='store_true', help='run sextractor, scamp, and group files.  best to do this on all files from an observing run at once.')
+parser.add_argument('--se', dest='se', default=False,action='store_true', help='run sextractor.  best to do this on all files from an observing run at once.')
+parser.add_argument('--scamp', dest='scamp', default=False,action='store_true', help='run scamp, and group files.  best to do this on all files from an observing run at once.')
 parser.add_argument('--swarp', dest='swarp', default=False,action='store_true', help='run swarp to make coadded images.')
 parser.add_argument('--filelist', dest='filelist', default='swarp_input', help='list of image sets to run swarp on.  the file should contain the list of all Rband groups, for example: ls pointing*_R > swarp_input.  This will look for the corresponding list of halpha images.')
 parser.add_argument('--zp', dest='zp', default=False,action='store_true', help='run getzp.py on all *coadd.fits images')
@@ -43,7 +44,7 @@ zap = args.zap
 group_flat = args.groupflat
 dflat = args.flatwdome
 fixheader=args.fixheader
-astr = args.astr
+#astr = args.astr
 
 if trim:
     os.system('python '+gitpath+'uat_overscantrim.py --filestring c')
@@ -88,10 +89,10 @@ if fixheader:
 # this will automatically scale images from different nights
 # and you can swarp images with different exptime and
 # images taken on different nights. :)
-if astr:
+if args.se:
     # run sextractor to create object lists
     os.system('python '+gitpath+'uat_astr_mosaic.py --s --filestring h')
-
+if args.scamp:
     # run scamp to solve for astrometry
     os.system('python '+gitpath+'uat_astr_mosaic.py --scamp --filestring h')
 
