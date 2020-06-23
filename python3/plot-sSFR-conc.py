@@ -1,3 +1,12 @@
+'''
+Python version of Becky Koopmann's idl program fluxconc_groups_magcut_notype_ex.pro
+
+
+python version by Rose
+written Oct 22, 2019
+
+'''
+
 #!/usr/bin/env python
 from astropy.io import ascii, fits
 from astropy.table import Table
