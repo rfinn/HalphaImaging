@@ -112,7 +112,7 @@ if args.swarp:
     i = 0
     for f in infile:
         f = f.rstrip()
-        print(f)
+        print('PROCESSING INPUT FILE: ',f)
         if f.find(r'_R') > -1:
             print('R filter')
             rootname = f.split('_R')[0]
@@ -149,7 +149,7 @@ if args.swarp:
             os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+halist+' --refimage '+rcoadd_image)
         # run swarp on r, with r as reference image
         os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image)
-        break
+        #break
         
     infile.close()
 
