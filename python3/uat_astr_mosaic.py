@@ -51,6 +51,7 @@ parser.add_argument('--s', dest = 's', default = False, action = 'store_true', h
 parser.add_argument('--scamp', dest = 'scamp', default = False, action = 'store_true', help = 'Run scamp')
 
 parser.add_argument('--siena', dest = 'siena', default = False, action = 'store_true', help = 'set this when running Siena data')
+parser.add_argument('--pisces', dest = 'pisces', default = False, action = 'store_true', help = 'set this when running PISCES data')
 parser.add_argument('--swarp', dest = 'swarp', default = False, action = 'store_true', help = 'Run swarp to create mosaics')
 parser.add_argument('--l', dest = 'l', default = False, help = 'List of images to input to swarp')
 parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
@@ -88,6 +89,9 @@ if args.s:
             os.system('sex ' + f + ' -c default.sex.INT -CATALOG_NAME ' + froot + '.cat')
         elif args.siena:
             os.system('sex ' + f + ' -c default.sex.siena -CATALOG_NAME ' + froot + '.cat')
+        elif args.pisces:
+            os.system('sex ' + f + ' -c default.sex.siena -CATALOG_NAME ' + froot + '.cat -DETECT_MINAREA 10 -DETECT_THRESH 2 -ANALYSIS_THRESH 2 -BACK_SIZE 128 -GAIN 100')
+            print('HEY! PISCES!!!!!')
         else:
             os.system('sex ' + f + ' -c default.sex.HDI -CATALOG_NAME ' + froot + '.cat')
         os.rename('check.fits', froot + 'check.fits')
@@ -99,6 +103,8 @@ if args.scamp:
     print('RUNNING SCAMP')
     if args.siena:
         os.system('scamp @scamp_input_cats -c default.scamp.siena')
+    elif args.pisces:
+        os.system('scamp @scamp_input_cats -c default.scamp.pisces ')
     else:
         os.system('scamp @scamp_input_cats -c default.scamp')
     print('DONE')
