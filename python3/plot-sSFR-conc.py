@@ -2,7 +2,7 @@
 Python version of Becky Koopmann's idl program fluxconc_groups_magcut_notype_ex.pro
 
 
-python version by Rose
+python version by Rose Finn
 written Oct 22, 2019
 
 '''
