@@ -399,7 +399,7 @@ class getzp():
         ###################################
         plt.figure(figsize=(6,4))
         plt.title(self.image)
-        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=-.5,vmax=.5)
+        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=-.02,vmax=.02)
         plt.colorbar()
         plt.savefig('getzp-fig1.png')
 
