@@ -1,27 +1,23 @@
 #!/usr/bin/env python
 
 '''
-BASIC INFORMATION ABOUT THIS CODE:
-  -This is the FIFTH program you need to run in order to perform the reduction o  f HDI images.
-  -This code will fix all the headers to contain basic WCS information so that i  n the future we can feed the fits images into stacking programs like SCamp and  SWarp. 
-  -Updates CMMTOBS --> FILTER
-        RASTRNG --> CRVAL1
-        DECSTRNG --> CRVAL2
-  -Adds CRPIX1, CRPIX2, CD1_1, CD2_2, CTYPE1, CTYPE2
+GOAL:
+The goal of this code is to add header information that is not included in the HDI raw data frames.
 
-BEFORE RUNNING THIS CODE:
-  -Be sure to type ur_setup in the terminal everytime you open a new terminal     window so that ureka is activated.
-  -Ensure that pyraf is still activated by retyping the commands listed in the c  omments of the FIRST program titled "uat_HDIgroupflatfiles.py".
+BASIC INFORMATION ABOUT THIS CODE:
+-This code will fix all the headers to contain basic WCS information so that i  n the future we can feed the fits images into stacking programs like SCamp and  SWarp. 
+-Updates:
+ CMMTOBS --> FILTER
+ RASTRNG --> CRVAL1
+ DECSTRNG --> CRVAL2
+-Adds CRPIX1, CRPIX2, CD1_1, CD2_2, CTYPE1, CTYPE2
 
 PROCEDURE:
-  -This code uses the python task .rename and .append to the list of header information so that the header contains basic WCS information that can be easily read by astronomy programs. 
-  -In addition, we used different arguments using args.parse to call on adding the different header information.
-     
-GOAL:
-    The goal of this code is to successfully add header information that is not included in the HDI raw data frames.
+-This code uses the python task .rename and .append to the list of header information so that the header contains basic WCS information that can be easily read by astronomy programs. 
+
 
 EXAMPLE:
-   In the directory containing all flattened objects with incorrect headers type in the command line:
+In the directory containing all flattened objects with incorrect headers type in the command line:
       /home/share/research/pythonCode/uat_HDIfixheader.py
 
       (or whatever the path is to where this program is stored)
@@ -35,8 +31,6 @@ REQUIRED MODULES:
     glob
     astropy
     
-EXTRA NOTES:
-can be used on dome flattened images. To do so type '--filestring "dtr*.fits"' after the command
 
 WRITTEN BY:
 Rose Finn
@@ -57,18 +51,36 @@ parser = argparse.ArgumentParser(description ='Edit image headers to include bas
 parser.add_argument('--filestring', dest='filestring', default='d', help='match string for input files (default =  d, which operates on all d*.fits files)')
 parser.add_argument('--pixscalex', dest='pixelscalex', default='0.00011805', help='pixel scale in x (default = 0.00011808)')
 parser.add_argument('--pixscaley', dest='pixelscaley', default='0.00011805', help='pixel scale in y (default = 0.00011808)')
+#parser.add_argument('--Rpos',dest='Rpos',default=203,help='position of R filter in FWHEEL2; gethead CMMTOBS FILTER1 FILTER2 d*.fits')
+parser.add_argument('--rpos',dest='rpos',default=203,help='position of r filter in FWHEEL2; gethead CMMTOBS FILTER1 FILTER2 d*.fits')
+parser.add_argument('--hapos',dest='hapos',default=201,help='position of ha4 filter in FWHEEL2; gethead CMMTOBS FILTER1 FILTER2 d*.fits')
 args = parser.parse_args()
 files = sorted(glob.glob(args.filestring+'*.fits'))
 nfiles=len(files)
 i=1
+
+def get_filter_virgo2020(header):
+    fw1 = int(header['FWHEEL1'])
+    fw2 = int(header['FWHEEL2'])
+    if (fw1 == 106) & (fw2 == int(args.rpos)):
+        FILTER = 'r'
+    elif (fw1 == 106) & (fw2 == int(args.hapos)):
+        #print('found ha4 filter')
+        FILTER = 'ha4'
+    elif (fw1 == 105) & (fw2 == int(args.rpos)):
+        FILTER = 'r'
+    elif (fw1 == 105) & (fw2 == int(args.hapos)):
+        #print('found ha4 filter')
+        FILTER = 'ha4'
+    return FILTER
 for f in files:
     print('FIXING HEADER FOR FILE %i OF %i'%(i,nfiles))
     data, header = fits.getdata(f,header=True)
     header.rename_keyword('FILTER1','FWHEEL1')
     header.rename_keyword('FILTER2','FWHEEL2')
 
-    FILTER = header['CMMTOBS']
-
+    headerv0 = header.copy()
+    FILTER = get_filter_virgo2020(header)
     try:    
         ccdsec = header['CCDSEC']
     except:
@@ -77,7 +89,24 @@ for f in files:
         print('\t assuming HDI values')
         ccdsec = '[1:4095, 1:4109]'
 
+    fields2preserve = ['CMMTOBS',
+                       'RASTRNG',
+                       'DECSTRNG',
+                       'NAXIS1',
+                       'NAXIS2',
+                       'EQUINOX',
+                       'INSTRUME',
+                       'OBJECT',
+                       'EXPTIME',
+                       'AIRMASS',
+                       'DATE',
+                       'OBJECT',
+                       'INSTRUMENT',
+                       'FILENAME',
+                       'OBSERVER']
 
+
+        
     RASTRNG = header['RASTRNG']
     DECSTRNG = header['DECSTRNG']
     naxis1 = header['NAXIS1']
@@ -90,6 +119,9 @@ for f in files:
     EXPTIME = header['EXPTIME']
     AIRMASS = header['AIRMASS']
     DATE = header['DATE']
+    OBJECT = header['OBJECT']
+    MJD = header['MJD-OBS']
+    FILENAME = header['FILENAME']    
     # process coordinates to J2000 epoch
     c = SkyCoord(ra=RA.deg*u.degree,dec=DEC.degree*u.degree,frame='fk5',equinox='J'+str(EQUINOX))
     #print 'original coords = ',c
@@ -144,7 +176,9 @@ for f in files:
     header.append(card=('OBJECT', OBJECT,'Object Name'))
     header.append(card=('EXPTIME', EXPTIME,'Exposure Time (sec)'))
     header.append(card=('AIRMASS', AIRMASS,'Airmass secz'))
-    header.append(card=('DATE-OBS', DATE,'Date of observ'))
+    header.append(card=('OBSDATE', DATE,'Date of observ'))
+    header.append(card=('INSTRUMENT', INSTRUMENT,'Date of observ'))
+    header.append(card=('MJD', MJD,'Modified Julian date at start of observation'))        
     #if 'WCSDIM' in header:
     #    header['WCSDIM']=(2,'')
     #else:

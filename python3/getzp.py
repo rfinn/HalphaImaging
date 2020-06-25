@@ -120,10 +120,15 @@ class getzp():
         self.naper = naper
         self.mag = mag
     def getzp(self):
+        print('STATUS: running se')        
         self.runse()
-        self.get_panstarrs()
+        print('STATUS: getting panstarrs')
+        self.get_panstarrs() 
+        print('STATUS: matching se cat to panstarrs')       
         self.match_coords()
+        print('STATUS: fitting zeropoint')        
         self.fitzp()
+        print('STATUS: udating header')        
         self.update_header()
     def runse(self):
         #####
@@ -141,31 +146,44 @@ class getzp():
             defaultcat = 'default.sex.HDI'
         header = fits.getheader(self.image)
         expt = header['EXPTIME']
-        ADUlimit = 40000./float(expt)
+        ADUlimit = 4000000./float(expt)
         print('saturation limit in ADU/s {:.1f}'.format(ADUlimit))
-        t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)
-        #print(t)
-        os.system(t)
+        if args.fwhm is None:
+            t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)
+            #t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '
+            print('running SE first time to get estimate of FWHM')
+            print(t)
+            os.system(t)
 
-        # clean up SE files
-        # skipping for now in case the following command accidentally deletes user files
-        # os.system('rm default.* .')
+            # clean up SE files
+            # skipping for now in case the following command accidentally deletes user files
+            # os.system('rm default.* .')
 
 
-        ###################################
-        # Read in Source Extractor catalog
-        ###################################
-
-        secat_filename = froot+'.cat'
-        self.secat = fits.getdata(secat_filename,2)
-
-        # get median fwhm of image
-        fwhm = np.median(self.secat['FWHM_IMAGE'])*pixelscale
-
+            ###################################
+            # Read in Source Extractor catalog
+            ###################################
+            print('reading in SE catalog from first pass')
+            secat_filename = froot+'.cat'
+            self.secat = fits.getdata(secat_filename,2)
+            self.secat0 = self.secat
+            # get median fwhm of image
+            # for some images, this comes back as zero, and I don't know why
+            fwhm = np.median(self.secat['FWHM_IMAGE'])*pixelscale
+            
+            
+            t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)+' -SEEING_FWHM '+str(fwhm)
+            if float(fwhm) == 0:
+                print('WARNING: measured FWHM is zero!')
+            print('running SE again with new FWHM to get better estimate of CLASS_STAR')
+        else:
+            t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)+' -SEEING_FWHM '+args.fwhm
+            print(t)
+            print('running SE w/user input for FWHM to get better estimate of CLASS_STAR')            
         #############################################################
         # rerun Source Extractor catalog with updated SEEING_FWHM
         #############################################################
-        t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)+' -SEEING_FWHM '+str(fwhm)
+
         #print(t)
         os.system(t)
 
@@ -223,7 +241,7 @@ class getzp():
         ###################################
 
 
-        self.fitflag = self.matchflag  & (self.pan['rmag'] > 9.) & (self.matchedarray1['FLAGS'] == 0) & (self.pan['Qual'] < 64)  & (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.pan['rmag'] < 15.5) #& (self.matchedarray1['MAG_AUTO'] > -11.)
+        self.fitflag = self.matchflag  & (self.pan['rmag'] > 9.) & (self.matchedarray1['FLAGS'] <  5) & (self.pan['Qual'] < 64)  & (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.pan['rmag'] < 15.5) #& (self.matchedarray1['MAG_AUTO'] > -11.)
 
         if self.filter == 'R':
             ###################################
@@ -418,13 +436,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description ='Run sextractor, get Pan-STARRS catalog, and then computer photometric ZP\n \n from within ipython: \n %run ~/github/Virgo/programs/getzp.py --image pointing031-r.coadd.fits --instrument i \n \n The y intercept is -1*ZP. \n \n x and y data can be accessed at zp.x and zp.y in case you want to make additional plots.', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--image', dest = 'image', default = 'test.coadd.fits', help = 'Image for ZP calibration')
     parser.add_argument('--instrument', dest = 'instrument', default = None, help = 'HDI = h, KPNO mosaic = m, INT = i')
+    parser.add_argument('--fwhm', dest = 'fwhm', default = None, help = 'image FWHM in arcseconds.  Default is none, then SE assumes 1.5 arcsec')    
     parser.add_argument('--filter', dest = 'filter', default = 'R', help = 'filter (R or r; use r for Halpha)')
     parser.add_argument('--useri',dest = 'useri', default = False, action = 'store_true', help = 'Use r->R transformation as a function of r-i rather than the g-r relation.  g-r is the default.')
     parser.add_argument('--nexptime', dest = 'nexptime', default = True, action = 'store_false', help = "set this flag if the image is in ADU rather than ADU/s.  Swarp produces images in ADU/s.")
     parser.add_argument('--mag', dest = 'mag', default = 0,help = "select SE magnitude to use when solving for ZP.  0=MAG_APER,1=MAG_BEST,2=MAG_PETRO.  Default is MAG_APER ")
     parser.add_argument('--naper', dest = 'naper', default = 5,help = "select fixed aperture magnitude.  0=10pix,1=12pix,2=15pix,3=20pix,4=25pix,5=30pix.  Default is 5 (30 pixel diameter)")
     parser.add_argument('--nsigma', dest = 'nsigma', default = 2., help = 'number of std to use in iterative rejection of ZP fitting.  default is 2.')
-    parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
+    parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
     parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
     args = parser.parse_args()
     args.nexptime = bool(args.nexptime)
