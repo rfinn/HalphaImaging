@@ -5,47 +5,55 @@ import argparse
 from argparse import RawDescriptionHelpFormatter
 from matplotlib import pyplot as plt
 from scipy.stats import scoreatpercentile
-
+import sys
 
 vmin = .5
-vmax = 98
+vmax = 99.5
 
 class cutouts():
     def __init__(self, rimage):
-        self.r = rimage
-        if self.r.find('_R') > -1:
-            self.rootname = self.r.split('_R.fits')
-        elif self.r.find('-r') > -1:
-            self.rootname = self.r.split('_r.fits')            
-        self.ha = self.rootname+'_Ha.fits'
-        self.cs = self.rootname+'_CS.fits'        
+        self.r_name = rimage
+        if self.r_name.find('_R') > -1:
+            split_string = '_R.fits'
+
+        if self.r_name.find('-R') > -1:
+            split_string = '-R.fits'
+        elif self.r_name.find('-r') > -1:
+            split_string = '_r.fits'
+
+        self.rootname = self.r_name.split(split_string)[0]            
+        self.r = fits.getdata(self.r_name)
+        self.ha = fits.getdata(self.rootname+'-Ha.fits')
+        self.cs = fits.getdata(self.rootname+'-CS.fits')
     def plotcutouts(self):
         figure_size=(10,4)
         
         v1,v2=scoreatpercentile(self.ha,[vmin,vmax])#.5,99
     
-        plt.figure(1,figsize=figure_size)
+        plt.figure(figsize=figure_size)
         plt.clf()
         plt.subplots_adjust(hspace=0,wspace=0)
         #Halpha plus continuum
         plt.subplot(1,3,1)
-        plt.imshow(ha,cmap='gray_r',vmin=v1,vmax=v2,origin='lower')
-        plt.title('Halpha + cont')
+        plt.imshow(self.ha,cmap='gray_r',vmin=v1,vmax=v2,origin='lower')
+        plt.title(r'$H\alpha + cont$')
         #plt.gca().set_yticks(())
-        plt.xlabel(self.prefix,fontsize=14)
+        plt.xlabel(self.rootname,fontsize=14)
         #R
         plt.subplot(1,3,2)
         v1,v2=scoreatpercentile(self.r,[vmin,vmax])#.5,99        
-        plt.imshow(r,cmap='gray_r',vmin=v1,vmax=v2,origin='lower')
-        plt.title('R')
+        plt.imshow(self.r,cmap='gray_r',vmin=v1,vmax=v2,origin='lower')
+        plt.title(r'$R$')
         plt.gca().set_yticks(())
         #Continuum subtracted image
         plt.subplot(1,3,3)
         v1,v2=scoreatpercentile(self.cs,[vmin,vmax])
-        plt.imshow(cs,origin='lower',cmap='gray_r',vmin=v1,vmax=v2)
+        plt.imshow(self.cs,origin='lower',cmap='gray_r',vmin=v1,vmax=v2)
         plt.gca().set_yticks(())
-        plt.title('contsub')
+        plt.title(r'$H\alpha$')
         plt.show(block=False)
+        plt.savefig(self.rootname+'-cutouts.png')
+        plt.savefig(self.rootname+'-cutouts.pdf')        
 
 
 if __name__ == '__main__':
@@ -57,5 +65,6 @@ if __name__ == '__main__':
     if args.r is None:
         print('you must supply the r-band image name!')
         print('try again')
-    else:
-        cimage = cutouts(args.r)
+        sys.exit()
+    c = cutouts(args.r)
+    c.plotcutouts()

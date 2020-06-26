@@ -142,6 +142,7 @@ class getzp():
             defaultcat = 'default.sex.HDI'
         elif self.instrument == 'i':
             defaultcat = 'default.sex.HDI'
+            self.keepsection=[1000,5000,0,4000]
         elif self.instrument == 'm':
             defaultcat = 'default.sex.HDI'
         header = fits.getheader(self.image)
@@ -194,6 +195,7 @@ class getzp():
         secat_filename = froot+'.cat'
         self.secat = fits.getdata(secat_filename,2)
 
+        
         ###################################
         # get max/min RA and DEC for the image
         ###################################
@@ -243,6 +245,15 @@ class getzp():
 
         self.fitflag = self.matchflag  & (self.pan['rmag'] > 9.) & (self.matchedarray1['FLAGS'] <  5) & (self.pan['Qual'] < 64)  & (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.pan['rmag'] < 15.5) #& (self.matchedarray1['MAG_AUTO'] > -11.)
 
+        # for WFC on INT, restrict area to central region
+        # to avoid top chip and vignetted regions
+        if self.instrument == 'i':
+            self.goodarea_flag = (self.matchedarray1['X_IMAGE'] > self.keepsection[0]) & \
+                (self.matchedarray1['X_IMAGE'] < self.keepsection[1]) & \
+                (self.matchedarray1['Y_IMAGE'] > self.keepsection[2]) & \
+                (self.matchedarray1['Y_IMAGE'] < self.keepsection[3])
+            self.fitflag = self.fitflag & self.goodarea_flag
+                
         if self.filter == 'R':
             ###################################
             # Calculate Johnson R
@@ -399,9 +410,19 @@ class getzp():
         ###################################
         plt.figure(figsize=(6,4))
         plt.title(self.image)
-        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=-.02,vmax=.02)
+        yplot2 = self.matchedarray1['MAG_APER'][:,self.naper]
+        magfit2 = np.polyval(self.bestc,self.R)
+        residual_all2 = magfit2 - yplot2
+
+        plt.scatter(self.matchedarray1['X_IMAGE'],self.matchedarray1['Y_IMAGE'],c = (residual_all2),vmin=-.05,vmax=.05,s=15)
         plt.colorbar()
-        plt.savefig('getzp-fig1.png')
+        plt.savefig('getzp-position-residuals-all-fig1.png')
+        plt.figure(figsize=(6,4))
+        plt.title(self.image)
+
+        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=-.05,vmax=.05,s=15)
+        plt.colorbar()
+        plt.savefig('getzp-position-residuals-fitted-fig1.png')
 
         self.x = x
         self.y = y
