@@ -36,21 +36,22 @@ class cutouts():
         #Halpha plus continuum
         plt.subplot(1,3,1)
         plt.imshow(self.ha,cmap='gray_r',vmin=v1,vmax=v2,origin='lower')
-        plt.title(r'$H\alpha + cont$')
+        plt.title(r'$H\alpha + cont$',fontsize=14)
         #plt.gca().set_yticks(())
-        plt.xlabel(self.rootname,fontsize=14)
+
         #R
         plt.subplot(1,3,2)
         v1,v2=scoreatpercentile(self.r,[vmin,vmax])#.5,99        
         plt.imshow(self.r,cmap='gray_r',vmin=v1,vmax=v2,origin='lower')
-        plt.title(r'$R$')
+        plt.title(r'$R$',fontsize=14)
         plt.gca().set_yticks(())
         #Continuum subtracted image
+        plt.xlabel(self.rootname,fontsize=14)        
         plt.subplot(1,3,3)
         v1,v2=scoreatpercentile(self.cs,[vmin,vmax])
         plt.imshow(self.cs,origin='lower',cmap='gray_r',vmin=v1,vmax=v2)
         plt.gca().set_yticks(())
-        plt.title(r'$H\alpha$')
+        plt.title(r'$H\alpha$',fontsize=14)
         plt.show(block=False)
         plt.savefig(self.rootname+'-cutouts.png')
         plt.savefig(self.rootname+'-cutouts.pdf')        
