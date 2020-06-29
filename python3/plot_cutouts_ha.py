@@ -199,8 +199,11 @@ def get_galex_image(ra,dec,imsize):
     # should be able to construct path from the obs_id in data_products
     # this will let us check if the image is already downloaded
     #
-    # I can also save the cutout in a GALEX folder, and
+    # DONE: I can also save the cutout in a GALEX folder, and
     # look for the image before calling this function
+    #
+    # but I should also look for the image, because if I change the image
+    # size of the cutotu, I don't need to download the big FOV
     
     nuv,nuv_header = fits.getdata(nuv_path,header=True)
 
@@ -229,7 +232,12 @@ class cutouts():
         elif self.r_name.find('-r') > -1:
             split_string = '_r.fits'
         self.rootname = self.r_name.split(split_string)[0]
-
+        # check to make sure cutouts directory exists
+        if not os.path.exists('cutouts'):
+            os.mkdir('cutouts')
+        if not os.path.exists('galex'):
+            os.mkdir('galex')
+            
     def runall(self):
         self.get_halpha_cutouts()
         self.get_image_size()
@@ -240,7 +248,7 @@ class cutouts():
         self.download_unwise_images()
         self.load_unwise_images()
         self.get_galex_image()
-        self.plotallcutouts()
+        #self.plotallcutouts()
     def get_halpha_cutouts(self):
         self.r,self.header = fits.getdata(self.r_name,header=True)
         self.ha = fits.getdata(self.rootname+'-Ha.fits')
@@ -259,6 +267,7 @@ class cutouts():
         self.galid = self.header['ID']
         
     def download_legacy(self):
+
         # get legacy grz color and fits
         self.legacy_imsize = self.xsize_arcsec/LEGACY_PIXSCALE
         print('requested legacy imsize = ',self.legacy_imsize)
@@ -298,8 +307,11 @@ class cutouts():
             elif f.find('w4-img') > -1:
                 self.w4,self.w4_header = fits.getdata(f,header=True)
     def get_galex_image(self):
+        # download galex image if necessary (large FOV)
+        # then get cutout
         t = self.rootname.split('-')
-        self.nuv_image_name = 'galex/'+self.galid+'-'+t[1]+'-nuv.fits'
+        imsize_arcsec = "%i"%(self.xsize_arcsec)
+        self.nuv_image_name = 'galex/'+self.galid+'-'+t[1]+'-nuv-'+imsize_arcsec+'.fits'
         if os.path.exists(self.nuv_image_name):
             self.nuv_image = fits.getdata(self.nuv_image_name)
         else:
@@ -308,8 +320,7 @@ class cutouts():
             self.nuv_image = cutout.data
     def plotcutouts(self,plotsingle=True):
         if plotsingle:
-            figu
-            re_size=(10,4)
+            figure_size=(10,4)
             plt.figure(figsize=figure_size)
             plt.clf()
             plt.subplots_adjust(hspace=0,wspace=0)
@@ -367,6 +378,36 @@ class cutouts():
         plt.text(-1.3,3.8,self.rootname,transform=plt.gca().transAxes,fontsize=14,horizontalalignment='center')    
         plt.savefig(self.rootname+'-all-cutouts.png')
         plt.savefig(self.rootname+'-all-cutouts.pdf')        
+
+    def plotsfrcutouts(self,plotsingle=True):
+        nrow = 1
+        ncol = 4
+
+        #Continuum subtracted image
+        
+
+        if plotsingle:
+            figure_size=(12,4)
+            plt.figure(figsize=figure_size)
+            plt.clf()
+            plt.subplots_adjust(left=.05,right=.95,bottom=.05,top=.9,hspace=.2,wspace=0)
+        for i in range(nrow*ncol):
+            
+            plt.subplot(nrow,ncol,i+1)
+            if i == 0:
+                self.plot_legacy_jpg()
+            elif i == 1:
+                self.plot_galex_nuv()
+            elif i == 2:
+                self.plot_cs()
+            elif (i == 3):
+                wband = i+1
+                self.plot_unwise(band=wband)
+            plt.gca().set_yticks(())
+            plt.gca().set_xticks(())            
+        plt.text(-1.,-.1,self.rootname,transform=plt.gca().transAxes,fontsize=14,horizontalalignment='center')    
+        plt.savefig(self.rootname+'-sfr-cutouts.png')
+        plt.savefig(self.rootname+'-sfr-cutouts.pdf')        
         
     def plot_legacy_jpg(self):
         # plot jpeg from legacy survey
