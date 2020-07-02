@@ -58,13 +58,17 @@ import numpy as np
 import sys
 from matplotlib import pyplot as plt
 import matplotlib.patches as patches
+
 import astropy.units as u
 import astropy.coordinates as coord
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
+from astropy.stats import sigma_clip
+
 from scipy.optimize import curve_fit
 from astroquery.vizier import Vizier
-
+from photutils import Background2D, MedianBackground
+import itertools
 # function for fitting ZP equation
 # this one forces slope = 1
 zpfunc = lambda x, zp: x + zp
@@ -72,6 +76,10 @@ zpfunc = lambda x, zp: x + zp
 zpfuncwithslope = lambda x, m, zp: m*x + zp
 
 pixelscale = 0.43 # arcsec per pixel
+
+v1=.97
+v2=1.03
+
 
 def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=20,
                     maxsources=10000):
@@ -98,7 +106,23 @@ def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=20,
     return vquery.query_region(field,
                                width=("%fd" % rad_deg),
                                catalog="II/349/ps1")[0]
+def polyfit2d(x, y, z, order=3):
+    # from  https://stackoverflow.com/questions/7997152/python-3d-polynomial-surface-fit-order-dependent
+    ncols = (order + 1)**2
+    G = np.zeros((x.size, ncols))
+    ij = itertools.product(range(order+1), range(order+1))
+    for k, (i,j) in enumerate(ij):
+        G[:,k] = x**i * y**j
+    m, _, _, _ = np.linalg.lstsq(G, z)
+    return m
 
+def polyval2d(x, y, m):
+    order = int(np.sqrt(len(m))) - 1
+    ij = itertools.product(range(order+1), range(order+1))
+    z = np.zeros_like(x)
+    for a, (i,j) in zip(m, ij):
+        z += a * x**i * y**j
+    return z
 
 class getzp():
     def __init__(self, image, instrument='h', filter='r', astromatic_dir = '~/github/HalphaImaging/astromatic/',norm_exptime = True,nsigma = 2., useri = False, naper = 5, mag=0):
@@ -247,12 +271,16 @@ class getzp():
 
         # for WFC on INT, restrict area to central region
         # to avoid top chip and vignetted regions
-        if self.instrument == 'i':
-            self.goodarea_flag = (self.matchedarray1['X_IMAGE'] > self.keepsection[0]) & \
-                (self.matchedarray1['X_IMAGE'] < self.keepsection[1]) & \
-                (self.matchedarray1['Y_IMAGE'] > self.keepsection[2]) & \
-                (self.matchedarray1['Y_IMAGE'] < self.keepsection[3])
-            self.fitflag = self.fitflag & self.goodarea_flag
+        #
+        # skipping for now in place of fitting the residuals
+        # and re-normalizing the image as per suggestion of mischa
+        #
+        #if self.instrument == 'i':
+        #    self.goodarea_flag = (self.matchedarray1['X_IMAGE'] > self.keepsection[0]) & #\
+        #        (self.matchedarray1['X_IMAGE'] < self.keepsection[1]) & \
+        #        (self.matchedarray1['Y_IMAGE'] > self.keepsection[2]) & \
+        #        (self.matchedarray1['Y_IMAGE'] < self.keepsection[3])
+        #    self.fitflag = self.fitflag & self.goodarea_flag
                 
         if self.filter == 'R':
             ###################################
@@ -396,32 +424,42 @@ class getzp():
         ###################################
         ##  show histogram of residuals
         ###################################
-        plt.figure()
+
         yplot = self.matchedarray1['MAG_APER'][:,self.naper][self.fitflag]
         magfit = np.polyval(self.bestc,self.R[self.fitflag])
-        residual_all = magfit - yplot
+        residual_all = 10.**((magfit - yplot)/2.5)        
+
         s = '%.3f +/- %.3f'%(np.mean(residual_all),np.std(residual_all))
-        crap = plt.hist(residual_all,bins=np.linspace(-.1,.1,20))
-        plt.text(0.05,.85,s,horizontalalignment='left',transform=plt.gca().transAxes)
-        plt.savefig('getzp-residual-hist.png')
+        if plotall:
+            plt.figure()            
+            crap = plt.hist(residual_all,bins=np.linspace(.8,1.2,20))
+            plt.text(0.05,.85,s,horizontalalignment='left',transform=plt.gca().transAxes)
+            plt.savefig('getzp-residual-hist.png')
 
         ###################################
         # Show location of residuals
         ###################################
+        '''
+        # this plots locations of all sources, not just the ones that 
+        # are used in the ZPfitting
+        # 
         plt.figure(figsize=(6,4))
         plt.title(self.image)
         yplot2 = self.matchedarray1['MAG_APER'][:,self.naper]
         magfit2 = np.polyval(self.bestc,self.R)
-        residual_all2 = magfit2 - yplot2
+        residual_all2 = 10.**((magfit2 - yplot2)/2.5)
 
-        plt.scatter(self.matchedarray1['X_IMAGE'],self.matchedarray1['Y_IMAGE'],c = (residual_all2),vmin=-.05,vmax=.05,s=15)
-        plt.colorbar()
+        plt.scatter(self.matchedarray1['X_IMAGE'],self.matchedarray1['Y_IMAGE'],c = (residual_all2),vmin=v1,vmax=v2,s=15)
+        cb=plt.colorbar()
+        cb.set_label('f-WFC/f-pan')        
         plt.savefig('getzp-position-residuals-all-fig1.png')
+        '''
         plt.figure(figsize=(6,4))
         plt.title(self.image)
 
-        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=-.05,vmax=.05,s=15)
-        plt.colorbar()
+        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
+        cb=plt.colorbar()
+        cb.set_label('f-WFC/f-pan')
         plt.savefig('getzp-position-residuals-fitted-fig1.png')
 
         self.x = x
@@ -451,6 +489,118 @@ class getzp():
         header.set('FLUXZPJY',float(3631))
 
         fits.writeto(self.image, im, header, overwrite=True)
+    def getzp_wfc(self):
+        self.getzp()
+        self.fit_residual_surface(norder=2)
+        self.renorm_wfc()
+        self.rerun_zp_fit()
+        self.fit_residual_surface(norder=2)
+        self.renorm_wfc()
+        self.rerun_zp_fit()
+        plt.figure()
+        plt.hist(self.zim,bins=np.linspace(.9,1.1,40))
+    def fit_residual_surface(self,norder=2,suffix=None):
+        """
+        for INT data, first pass:
+        - create an image of the fit the residuals WRT panstarrs,
+        - use SE to fit the background to the image (or some other polynomial fit?)
+        - normalize the background image
+        - divide this into the science frame
+        - resolve for the photometric zp
+
+        """
+        # get difference between measured and predicted fluxes
+        mag_meas = self.matchedarray1['MAG_APER'][:,self.naper][self.fitflag]
+        mag_pan = np.polyval(self.bestc,self.R[self.fitflag])
+        flux_ratio = 10.**((mag_pan - mag_meas)/2.5)
+        
+        # create an image
+        self.xim = self.matchedarray1['X_IMAGE'][self.fitflag]
+        self.yim = self.matchedarray1['Y_IMAGE'][self.fitflag]        
+
+        self.zim = flux_ratio
+        self.imagedata = fits.getdata(self.image)
+        # fill in where there is no coverage        
+        weight_name = self.image.split('.fits')[0]+'.weight.fits'
+        self.weightdata = fits.getdata(self.image)
+        self.nodata =  self.weightdata == 0
+
+        # center of geometric distortion ~= (3500, 2400)
+        # top chip has y > 4300
+        # blank area starts at x > 4300
+        # end of image at x = 6300, y=6400
+        # so drop some of top left points into top right
+        # 
+        flip_data = (self.xim < (6300-3500)) & (self.yim > 4300)
+
+        # add points from the top left corner into blank corner
+        nrandom = 40
+        fakex = 2*3500 - self.xim[flip_data]
+        fakey = self.yim[flip_data]
+        fakez = self.zim[flip_data]                
+
+        fakey = fakey[fakex < 6300]
+        fakez = fakez[fakex < 6300]                
+        fakex = fakex[fakex < 6300]        
+
+        # combine fake data with original data
+        #self.xim = np.array(self.xim.tolist()+fakex.tolist())
+        #self.yim = np.array(self.yim.tolist()+fakey.tolist())
+        #self.zim = np.array(self.zim.tolist()+fakez.tolist())
+        
+        # clip data
+        clip_flag = sigma_clip(self.zim,sigma=3,maxiters=10,masked=True)
+        
+        # Fit a 2nd order, 2d polynomial
+        m = polyfit2d(self.xim[~clip_flag.mask],self.yim[~clip_flag.mask],self.zim[~clip_flag.mask],order=norder)
+
+        # Evaluate it on a grid...        
+        ny, nx = self.imagedata.shape
+        xx, yy = np.meshgrid(np.linspace(self.xim.min(), self.xim.max(), nx), 
+                         np.linspace(self.yim.min(), self.yim.max(), ny))
+        self.zz = polyval2d(xx, yy, m)
+
+        # Plot
+        plt.figure()
+        plt.imshow(self.zz,extent=(self.xim.min(), self.yim.max(), self.xim.max(), self.yim.min()),vmin=v1,vmax=v2)
+        plt.scatter(self.xim[~clip_flag.mask], self.yim[~clip_flag.mask], c=self.zim[~clip_flag.mask],vmin=v1,vmax=v2,s=15)
+        cb=plt.colorbar()
+        cb.set_label('f-WFC/f-pan')
+        plt.title(self.image+': n poly = '+str(norder))
+        plt.show()
+        
+        if suffix is None:
+            plotname=self.image+'-imsurfit-'+str(norder)+'-'
+        else:
+            plotname=self.image+'-imsurfit-'+str(norder)+'-'+suffix
+        plt.savefig(plotname+'.png')
+        plt.savefig(plotname+'.pdf')
+        
+    def renorm_wfc(self):
+        # normalize surface fit
+        self.zz_norm = self.zz/np.median(self.zz)
+        # not sure we want to normalize this, actually
+        self.zz_norm = self.zz
+        
+        # divide image by surface fit
+        self.imagedata,header = fits.getdata(self.image,header=True)
+        self.imagedata_norm = self.imagedata/self.zz_norm
+        # save flattened image
+        self.renorm_image = 'f'+self.image
+        fits.writeto(self.renorm_image,self.imagedata_norm,header=header,overwrite=True)
+    def rerun_zp_fit(self):
+        # change image name to flattened image
+        self.image = self.renorm_image
+        # rerun getzp, but don't download panstarrs again
+        self.runse()
+        print('STATUS: matching se cat to panstarrs')       
+        self.match_coords()
+        print('STATUS: fitting zeropoint')        
+        self.fitzp()
+        print('STATUS: udating header')        
+        self.update_header()
+        # check to make sure the systematic residuals have been removed
+        self.fit_residual_surface(suffix='round2')
 if __name__ == '__main__':
 
 
@@ -470,7 +620,10 @@ if __name__ == '__main__':
     args.nexptime = bool(args.nexptime)
     args.naper = int(args.naper)
     zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
-    zp.getzp()
+    if args.instrument == 'i':
+        zp.getzp_wfc()
+    else:
+        zp.getzp()
     print('ZP = {:.3f} +/- {:.3f}'.format(-1*zp.zp,zp.zperr))
 
 

@@ -20,6 +20,9 @@ import glob
 ######################################################
 
 data_dir = os.getenv('HOME')+'/research/HalphaGroups/Becky-sSFR-concentration/'
+if os.getenv('HOME').find('/home/') > -1:
+    data_dir = os.getenv('HOME')+'/research/Virgo/Becky-sSFR-concentration/'
+print('data_dir = ',data_dir)
 class table_tools():
     def read_tables(self):
         # read in virgo r
@@ -276,7 +279,7 @@ def plotfilaments():
     ax3 = fig.add_subplot(nrow,ncol,12)
 
 
-    ffiles = glob.glob('/Users/rfinn/research/VirgoFilaments/Halpha/results/2017/v17p*rfinn*.fits')
+    ffiles = glob.glob('/home/rfinn/research/Virgo/student-data-gui/v*.fits')
     for p in ffiles:
         print(p)
         fil = filament(p)
