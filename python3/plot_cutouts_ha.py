@@ -1,5 +1,25 @@
 #!/usr/bin/env python
 
+"""
+GOAL:
+* will download images from legacy server, unwise, and galex
+* plot cutouts together
+
+INPUT:
+image name of r-band cutout
+
+OUTPUT:
+can create different version of cutouts - halpha, sfr indicators, and all
+
+USAGE:
+* Images will get saved to the current directory, so run this from individual cutout directories.
+* run this after the halpha cutouts have been made
+* see main below
+
+
+"""
+
+
 import sys
 import wget
 import tarfile
@@ -49,7 +69,7 @@ def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',bands='grz',ma
     * jpeg_name
     """
     imsize = int(imsize)    
-    rootname = 'cutouts/'+str(galid)+'-legacy-'+str(imsize)
+    rootname = str(galid)+'-legacy-'+str(imsize)
     jpeg_name = rootname+'.jpg'
     fits_name = rootname+'-'+bands+'.fits'
 
@@ -113,7 +133,7 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
 
     # check if images already exist
 
-    image_names = glob.glob('cutouts/'+galid+'-unwise*img-m.fits')
+    image_names = glob.glob(galid+'-unwise*img-m.fits')
     if len(image_names) > 3:
         print('unwise images already downloaded')
         if len(image_names) > 4*len(bands):
@@ -140,7 +160,7 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
     tartemp.extractall()
     for fname in wnames:
         t = fname.split('-')
-        rename = 'cutouts/'+str(galid)+'-'+t[0]+'-'+t[1]+'-'+t[2]+'-'+t[3]+'-'+t[4]
+        rename = str(galid)+'-'+t[0]+'-'+t[1]+'-'+t[2]+'-'+t[3]+'-'+t[4]
         print('rename = ',rename)
         if os.path.exists(rename): # this should only occur if multiple images are returned from wise
             os.remove(rename)
@@ -249,6 +269,12 @@ class cutouts():
         self.load_unwise_images()
         self.get_galex_image()
         #self.plotallcutouts()
+    def runha(self):
+        self.get_halpha_cutouts()
+        self.get_image_size()
+        self.get_RADEC()
+        self.get_galid()
+        self.plotcutouts()
     def get_halpha_cutouts(self):
         self.r,self.header = fits.getdata(self.r_name,header=True)
         self.ha = fits.getdata(self.rootname+'-Ha.fits')
@@ -480,5 +506,5 @@ if __name__ == '__main__':
         print('try again')
         sys.exit()
     c = cutouts(args.r)
-    c.runall()
+    #c.runall()
     #c.plotcutouts()
