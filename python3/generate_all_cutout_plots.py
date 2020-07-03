@@ -22,6 +22,6 @@ for d in dirlist:
         imlist = glob.glob(d+'*-r.fits')
     if len(imlist) == 0:
         continue
-    for im in inlist:
+    for im in imlist:
         os.system('python '+homedir+'/github/HalphaImaging/python3/plot_cutouts_ha.py --r '+im+' --plotall')
     os.chdir('..')
