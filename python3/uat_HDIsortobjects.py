@@ -31,6 +31,7 @@ from astropy.io import fits
 parser = argparse.ArgumentParser(description ='group objects by filter and target for combining with swarp')
 parser.add_argument('--filestring', dest = 'filestring', default = 'h', help = 'string to use to get input files (default = "h" which grabs all files "h*o00.fits")')
 parser.add_argument('--siena', dest = 'siena', default = False, action='store_true', help = 'set if running on siena data')
+parser.add_argument('--int', dest = 'INT', default = False, action='store_true', help = 'set if running on INT WFC data')
 
 args = parser.parse_args()
 
@@ -45,6 +46,9 @@ filestring = args.filestring+'*o00.fits'
 if args.siena:
     print('running on siena data')
     filestring = args.filestring+'*.fits'
+elif args.INT:
+    print('running on INT data')
+    filestring = args.filestring+'*FC.fits'
 try:
     os.system('gethead '+filestring+' FILTER, OBJECT, EXPTIME > junkfile2')
     infile=open('junkfile2','r')
