@@ -499,6 +499,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description ='This program subtracts scaled R-band image from Halpha.\n \nTo subtract mosaics:\n~/github/HalphaImaging/uat_subtract_continuum.py --r A1367-h02_R.coadd.fits --ha A1367-h02_ha12.coadd.fits --scale 0.0445 --mosaic \n\nTo subtract cutouts:\n~/github/HalphaImaging/uat_subtract_continuum.py --cluster A1367 --scale 0.044 --id 113364', formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('--r', dest = 'r', default = None, help = 'R-band image.  This is all you need to provide if images are named: blah_R.fits, blah_CS.fits, blah_Ha.fits')
     parser.add_argument('--ha', dest = 'ha', default = None, help = 'Halpha image.  Use this if you are subtracting mosaic images rather than cutouts.')
+    parser.add_argument('--plotall', dest = 'plotall', default = False, action='store_true', help = 'set this to download images and generate all three plots (Ha, all images, sfr indicators)')    
     args = parser.parse_args()
 
     if args.r is None:
@@ -506,7 +507,8 @@ if __name__ == '__main__':
         print('try again')
         sys.exit()
     c = cutouts(args.r)
-    c.runall()
-    c.plotcutouts()
-    c.plotallcutouts()
-    c.plotsfrcutouts()    
+    if args.plotall:
+        c.runall()
+        c.plotcutouts()
+        c.plotallcutouts()
+        c.plotsfrcutouts()    
