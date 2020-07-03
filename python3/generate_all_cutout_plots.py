@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+"""
+run in the cutouts directory
+
+it will go into each subdir and run the script to generate cutouts!
+
+"""
 import glob
 import os
 
