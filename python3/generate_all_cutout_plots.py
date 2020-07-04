@@ -24,4 +24,6 @@ for d in dirlist:
         continue
     for im in imlist:
         os.system('python '+homedir+'/github/HalphaImaging/python3/plot_cutouts_ha.py --r '+im+' --plotall')
+        
+        
     os.chdir('..')

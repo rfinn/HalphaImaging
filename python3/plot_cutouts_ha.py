@@ -51,7 +51,7 @@ vmax = 50.
 UNWISE_PIXSCALE = 2.75
 LEGACY_PIXSCALE = 1
 
-def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',bands='grz',makeplots=False):
+def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',bands='grz',makeplots=False,subfolder=None):
     """
     Download legacy image for a particular ra, dec
     
@@ -68,8 +68,11 @@ def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',bands='grz',ma
     * fits_name
     * jpeg_name
     """
-    imsize = int(imsize)    
-    rootname = str(galid)+'-legacy-'+str(imsize)
+    imsize = int(imsize)
+    if subfolder is not None:
+        rootname = subfolder+'/'+str(galid)+'-legacy-'+str(imsize)
+    else:
+        rootname = str(galid)+'-legacy-'+str(imsize)        
     jpeg_name = rootname+'.jpg'
     fits_name = rootname+'-'+bands+'.fits'
 
@@ -117,7 +120,7 @@ def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',bands='grz',ma
     return fits_name, jpeg_name
 
 
-def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234',makeplots=False):
+def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234',makeplots=False,subfolder=None):
     """
     Download unwise image for a particular ra, dec
     
@@ -132,8 +135,10 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
     """
 
     # check if images already exist
-
-    image_names = glob.glob(galid+'-unwise*img-m.fits')
+    if subfolder is not None:
+        image_names = glob.glob(subfolder+'/'+galid+'-unwise*img-m.fits')
+    else:
+        image_names = glob.glob(galid+'-unwise*img-m.fits')
     if len(image_names) > 3:
         print('unwise images already downloaded')
         if len(image_names) > 4*len(bands):
@@ -160,7 +165,10 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
     tartemp.extractall()
     for fname in wnames:
         t = fname.split('-')
-        rename = str(galid)+'-'+t[0]+'-'+t[1]+'-'+t[2]+'-'+t[3]+'-'+t[4]
+        if subfolder is not None:
+            rename = subfolder+'/'+str(galid)+'-'+t[0]+'-'+t[1]+'-'+t[2]+'-'+t[3]+'-'+t[4]
+        else:
+            rename = str(galid)+'-'+t[0]+'-'+t[1]+'-'+t[2]+'-'+t[3]+'-'+t[4]
         print('rename = ',rename)
         if os.path.exists(rename): # this should only occur if multiple images are returned from wise
             os.remove(rename)
@@ -177,8 +185,8 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
         norm = simple_norm(im, stretch='asinh',percent=99)
         plt.imshow(im, norm=norm)
         plt.show()
-    print(image_names)
-    print(multiframe)
+    #print(image_names)
+    #print(multiframe)
     return image_names,multiframe
 
 def get_galex_image(ra,dec,imsize):
@@ -253,10 +261,14 @@ class cutouts():
             split_string = '_r.fits'
         self.rootname = self.r_name.split(split_string)[0]
         # check to make sure cutouts directory exists
-        if not os.path.exists('cutouts'):
-            os.mkdir('cutouts')
         if not os.path.exists('galex'):
             os.mkdir('galex')
+        if not os.path.exists('legacy'):
+            os.mkdir('legacy')
+        if not os.path.exists('unwise'):
+            os.mkdir('unwise')
+
+            
             
     def runall(self):
         self.get_halpha_cutouts()
@@ -297,9 +309,9 @@ class cutouts():
         # get legacy grz color and fits
         self.legacy_imsize = self.xsize_arcsec/LEGACY_PIXSCALE
         print('requested legacy imsize = ',self.legacy_imsize)
-        self.legacy_filename_g,self.legacy_jpegname = get_legacy_images(self.ra,self.dec,galid=self.galid,imsize=self.legacy_imsize,bands='g')
-        self.legacy_filename_r,self.legacy_jpegname = get_legacy_images(self.ra,self.dec,galid=self.galid,imsize=self.legacy_imsize,bands='r')
-        self.legacy_filename_z,self.legacy_jpegname = get_legacy_images(self.ra,self.dec,galid=self.galid,imsize=self.legacy_imsize,bands='z')                
+        self.legacy_filename_g,self.legacy_jpegname = get_legacy_images(self.ra,self.dec,galid=self.galid,imsize=self.legacy_imsize,bands='g',subfolder='legacy')
+        self.legacy_filename_r,self.legacy_jpegname = get_legacy_images(self.ra,self.dec,galid=self.galid,imsize=self.legacy_imsize,bands='r',subfolder='legacy')
+        self.legacy_filename_z,self.legacy_jpegname = get_legacy_images(self.ra,self.dec,galid=self.galid,imsize=self.legacy_imsize,bands='z',subfolder='legacy')
         
     def load_legacy_images(self):
         self.legacy_g = fits.getdata(self.legacy_filename_g)
@@ -318,8 +330,8 @@ class cutouts():
         self.wise_imsize = self.xsize_arcsec/UNWISE_PIXSCALE
         print('wise image size = ',self.wise_imsize)
         self.wise_filenames,self.wise_multiframe_flag = \
-            get_unwise_image(self.ra,self.dec,galid=self.galid,pixscale='2.75',imsize=self.wise_imsize,bands=self.wise_band)
-        
+            get_unwise_image(self.ra,self.dec,galid=self.galid,pixscale='2.75',imsize=self.wise_imsize,bands=self.wise_band,subfolder='unwise')
+            
     def load_unwise_images(self):
         if self.wise_multiframe_flag:
             print('WARNING: galaxy falls on multiple unwise images')
@@ -496,9 +508,9 @@ class cutouts():
         plt.title(r'$GALEX \ NUV$')
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description ='This program subtracts scaled R-band image from Halpha.\n \nTo subtract mosaics:\n~/github/HalphaImaging/uat_subtract_continuum.py --r A1367-h02_R.coadd.fits --ha A1367-h02_ha12.coadd.fits --scale 0.0445 --mosaic \n\nTo subtract cutouts:\n~/github/HalphaImaging/uat_subtract_continuum.py --cluster A1367 --scale 0.044 --id 113364', formatter_class=RawDescriptionHelpFormatter)
-    parser.add_argument('--r', dest = 'r', default = None, help = 'R-band image.  This is all you need to provide if images are named: blah_R.fits, blah_CS.fits, blah_Ha.fits')
-    parser.add_argument('--ha', dest = 'ha', default = None, help = 'Halpha image.  Use this if you are subtracting mosaic images rather than cutouts.')
+    parser = argparse.ArgumentParser(description ='This program will create a plot of halpha image.  will also download images from galex, legacy survey, and unwise.', formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument('--r', dest = 'r', default = None, help = 'R-band cutout image.  This is all you need to provide if images are named: blah_R.fits, blah_CS.fits, blah_Ha.fits')
+    parser.add_argument('--ha', dest = 'ha', default = None, help = 'Halpha image.  ')
     parser.add_argument('--plotall', dest = 'plotall', default = False, action='store_true', help = 'set this to download images and generate all three plots (Ha, all images, sfr indicators)')    
     args = parser.parse_args()
 
