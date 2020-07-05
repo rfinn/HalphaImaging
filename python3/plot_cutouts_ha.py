@@ -518,6 +518,12 @@ class cutouts():
         #plt.gca().set_yticks(())
         display_image(self.cs)
         plt.title(r'$H\alpha$',fontsize=14)
+    def plot_mask(self):
+        #v1,v2=scoreatpercentile(self.cs,[vmin,vmax])
+        #plt.imshow(self.cs,origin='lower',cmap='gray_r',vmin=v1,vmax=v2)
+        #plt.gca().set_yticks(())
+        display_image(self.mask)
+        plt.title(r'$H\alpha$',fontsize=14)
         
     def plot_galex_nuv(self):
         display_image(self.nuv_image)
