@@ -291,6 +291,7 @@ class cutouts():
         self.r,self.header = fits.getdata(self.r_name,header=True)
         self.ha = fits.getdata(self.rootname+'-Ha.fits')
         self.cs = fits.getdata(self.rootname+'-CS.fits')
+        self.mask = fits.getdata(self.rootname+'-R-mask.fits')        
     def get_image_size(self):
         # get image size in pixels and arcsec
         self.xsize_pix,self.ysize_pix = self.r.shape
@@ -371,6 +372,21 @@ class cutouts():
         plt.show(block=False)        
         plt.savefig(self.rootname+'-cutouts.png')
         plt.savefig(self.rootname+'-cutouts.pdf')
+    def plotmask(self,plotsingle=True):
+        if plotsingle:
+            figure_size=(10,4)
+            plt.figure(figsize=figure_size)
+            plt.clf()
+            plt.subplots_adjust(hspace=0,wspace=0)
+        plt.subplot(1,3,1)
+        self.plot_r()
+        plt.subplot(1,3,2)
+        self.plot_cs()
+        plt.subplot(1,3,3)
+        self.plot_mask()
+        plt.show(block=False)        
+        plt.savefig(self.rootname+'-mask.png')
+        plt.savefig(self.rootname+'-mask.pdf')
         
     def plotallcutouts(self,plotsingle=True):
         nrow = 3
@@ -524,3 +540,4 @@ if __name__ == '__main__':
         c.plotcutouts()
         c.plotallcutouts()
         c.plotsfrcutouts()    
+        c.plotmask()
