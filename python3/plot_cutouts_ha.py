@@ -6,7 +6,9 @@ GOAL:
 * plot cutouts together
 
 INPUT:
-image name of r-band cutout
+* image name of r-band cutout
+* trying to change this to RA, DEC, size and ID
+
 
 OUTPUT:
 can create different version of cutouts - halpha, sfr indicators, and all
@@ -16,6 +18,9 @@ USAGE:
 * run this after the halpha cutouts have been made
 * see main below
 
+UPDATES ON 7/7/2020:
+* trying to adapt this to take an RA, DEC and size instead of the r-band cutout
+  - goal is to get cutouts for ALL VF galaxies
 
 """
 
@@ -50,6 +55,7 @@ vmax = 50.
 
 UNWISE_PIXSCALE = 2.75
 LEGACY_PIXSCALE = 1
+
 
 def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',bands='grz',makeplots=False,subfolder=None):
     """
@@ -208,7 +214,7 @@ def get_galex_image(ra,dec,imsize):
     # https://astroquery.readthedocs.io/en/latest/mast/mast.html
 
     # get data products in region near ra,dec
-    obs_table = Observations.query_region("%12.8f %12.8f"%(c.ra,c.dec),radius=.1*u.arcmin)
+    obs_table = Observations.query_region("%12.8f %12.8f"%(ra,dec),radius=.1*u.arcmin)
     # create a flag to select galex data
     galexFlag = obs_table['obs_collection'] == 'GALEX'
 
@@ -243,23 +249,45 @@ def get_galex_image(ra,dec,imsize):
 
     return cutout
     
-def display_image(image,percent=99.5):
-    norm = simple_norm(image, stretch='asinh',percent=percent)
+def display_image(image,percent=99.5,lowrange=False):
+    if lowrange:
+        norm = simple_norm(image, stretch='linear',percent=percent)
+    else:
+        norm = simple_norm(image, stretch='asinh',percent=percent)
+        
     plt.imshow(image, norm=norm,cmap='gray_r')
 
 class cutouts():
-    def __init__(self, rimage):
-        self.r_name = rimage
-        self.wcs = WCS(self.r_name)
+    def __init__(self, rimage,ra=None,dec=None,size=None,galid=None):
+        '''
+        arguments:
+        - rimage - rband cutout image; position and image size will be taken from this
+        - ra - alternatively, user can provide ra, dec, size, and rootname
+        - dec - dec of center of galaxy or center of cutout
+        - size - size of cutout in arcsec
+        - galid - prefix to use with all the cutouts; should be VFIDXXXX-nedname-
+        '''
+        if ra is not None:
+            self.ra = ra
+            self.dec = dec
+            self.xsize_arcsec = size
+            self.ysize_arcsec = size            
+            self.galid = galid
+            self.rootname = galid
+            self.use_position_flag = True
+        else:
+            self.use_position_flag = False
+            self.r_name = rimage
+            self.wcs = WCS(self.r_name)
 
-        if self.r_name.find('_R') > -1:
-            split_string = '_R.fits'
+            if self.r_name.find('_R') > -1:
+                split_string = '_R.fits'
 
-        if self.r_name.find('-R') > -1:
-            split_string = '-R.fits'
-        elif self.r_name.find('-r') > -1:
-            split_string = '_r.fits'
-        self.rootname = self.r_name.split(split_string)[0]
+            if self.r_name.find('-R') > -1:
+                split_string = '-R.fits'
+            elif self.r_name.find('-r') > -1:
+                split_string = '_r.fits'
+            self.rootname = self.r_name.split(split_string)[0]
         # check to make sure cutouts directory exists
         if not os.path.exists('galex'):
             os.mkdir('galex')
@@ -267,14 +295,23 @@ class cutouts():
             os.mkdir('legacy')
         if not os.path.exists('unwise'):
             os.mkdir('unwise')
-
-            
-            
+                        
     def runall(self):
-        self.get_halpha_cutouts()
-        self.get_image_size()
-        self.get_RADEC()
-        self.get_galid()
+        '''
+        get halpha cutout if it exists
+
+        if using r-band image to as reference, get image size, ra, dec, id
+        '''
+        try:
+            self.get_halpha_cutouts()
+            self.halpha_flag = True
+        except:
+            print(self.galid,': did not find halpha cutout')
+            self.halpha_flag = False            
+        if self.use_position_flag == False:
+            self.get_image_size()
+            self.get_RADEC()
+            self.get_galid()
         self.download_legacy()
         self.load_legacy_images()
         self.download_unwise_images()
@@ -311,6 +348,8 @@ class cutouts():
         self.legacy_imsize = self.xsize_arcsec/LEGACY_PIXSCALE
         print('requested legacy imsize = ',self.legacy_imsize)
         self.legacy_filename_g,self.legacy_jpegname = get_legacy_images(self.ra,self.dec,galid=self.galid,imsize=self.legacy_imsize,bands='g',subfolder='legacy')
+        h = fits.getheader(self.legacy_filename_g)
+        self.legacy_pscale = np.abs(h['CD1_1'])*3600
         self.legacy_filename_r,self.legacy_jpegname = get_legacy_images(self.ra,self.dec,galid=self.galid,imsize=self.legacy_imsize,bands='r',subfolder='legacy')
         self.legacy_filename_z,self.legacy_jpegname = get_legacy_images(self.ra,self.dec,galid=self.galid,imsize=self.legacy_imsize,bands='z',subfolder='legacy')
         
@@ -339,20 +378,28 @@ class cutouts():
         for f in self.wise_filenames:
             if f.find('w1-img') > -1:
                 self.w1,self.w1_header = fits.getdata(f,header=True)
+                self.w1_pscale = np.abs(self.w1_header['CD1_1'])*3600
             elif f.find('w2-img') > -1:
                 self.w2,self.w2_header = fits.getdata(f,header=True)
+                self.w2_pscale = np.abs(self.w2_header['CD1_1'])*3600
             elif f.find('w3-img') > -1:
                 self.w3,self.w3_header = fits.getdata(f,header=True)
+                self.w3_pscale = np.abs(self.w3_header['CD1_1'])*3600
             elif f.find('w4-img') > -1:
                 self.w4,self.w4_header = fits.getdata(f,header=True)
+                self.w4_pscale = np.abs(self.w4_header['CD1_1'])*3600
     def get_galex_image(self):
         # download galex image if necessary (large FOV)
         # then get cutout
-        t = self.rootname.split('-')
+        t = self.galid.split('-')
         imsize_arcsec = "%i"%(self.xsize_arcsec)
         self.nuv_image_name = 'galex/'+self.galid+'-'+t[1]+'-nuv-'+imsize_arcsec+'.fits'
         if os.path.exists(self.nuv_image_name):
-            self.nuv_image = fits.getdata(self.nuv_image_name)
+            self.nuv_image,h = fits.getdata(self.nuv_image_name,header=True)
+            try:
+                self.nuv_pscale = np.abs(h['CD1_1'])*3600
+            except:
+                print('WARNING: could not get galex pixelscale')
         else:
             cutout = get_galex_image(self.ra,self.dec,self.xsize_arcsec)
             fits.writeto(self.nuv_image_name, cutout.data, overwrite=True)
@@ -389,6 +436,7 @@ class cutouts():
         plt.savefig(self.rootname+'-mask.pdf')
         
     def plotallcutouts(self,plotsingle=True):
+        '''plot all wavelengths'''
         nrow = 3
         ncol = 4
 
@@ -412,11 +460,20 @@ class cutouts():
                 wband = i-3
                 self.plot_unwise(band=wband)
             elif i == 8:
-                self.plot_ha()
+                try:
+                    self.plot_ha()
+                except:
+                    print('no ha')
             elif i == 9:
-                self.plot_r()
+                try:
+                    self.plot_r()
+                except:
+                    print('no r')
             elif i == 10:
-                self.plot_cs()
+                try:
+                    self.plot_cs()
+                except:
+                    print('no cs halpha')
             elif i == 11:
                 self.plot_galex_nuv()
             #if (i%4 != 0):
@@ -427,11 +484,11 @@ class cutouts():
                 ax.spines['top'].set_color(mycolor) 
                 ax.spines['right'].set_color(mycolor)
                 ax.spines['left'].set_color(mycolor)
-            plt.gca().set_yticks(())
-            plt.gca().set_xticks(())            
-        plt.text(-1.3,3.8,self.rootname,transform=plt.gca().transAxes,fontsize=14,horizontalalignment='center')    
-        plt.savefig(self.rootname+'-all-cutouts.png')
-        plt.savefig(self.rootname+'-all-cutouts.pdf')        
+            #plt.gca().set_yticks(())
+            #plt.gca().set_xticks(())            
+        plt.text(-1.3,3.8,self.galid,transform=plt.gca().transAxes,fontsize=14,horizontalalignment='center')    
+        plt.savefig(self.galid+'-all-cutouts.png')
+        plt.savefig(self.galid+'-all-cutouts.pdf')        
 
     def plotsfrcutouts(self,plotsingle=True):
         nrow = 1
@@ -453,12 +510,16 @@ class cutouts():
             elif i == 1:
                 self.plot_galex_nuv()
             elif i == 2:
-                self.plot_cs()
+                try:
+                    self.plot_cs()
+                except:
+                    print('no cs halpha')
             elif (i == 3):
                 wband = i+1
                 self.plot_unwise(band=wband)
-            plt.gca().set_yticks(())
-            plt.gca().set_xticks(())            
+            if i > 0:
+                plt.gca().set_yticks(())
+            #plt.gca().set_xticks(())            
         plt.text(-1.,-.1,self.rootname,transform=plt.gca().transAxes,fontsize=14,horizontalalignment='center')    
         plt.savefig(self.rootname+'-sfr-cutouts.png')
         plt.savefig(self.rootname+'-sfr-cutouts.pdf')        
@@ -468,6 +529,7 @@ class cutouts():
         t = Image.open(self.legacy_jpegname)        
         plt.imshow(t,origin='lower')
         plt.title(r'$Legacy$')
+        
         pass
     def plot_legacy(self,band=1):
         # plot image from legacy survey
@@ -486,16 +548,16 @@ class cutouts():
         # plot image from legacy survey
         # band refers to W1, W2, W3, W4 (1,2,3,4)
         if band == 1:
-            display_image(self.w1)
+            display_image(self.w1,lowrange=True)
             plt.title(r'$unWISE \ W1$')            
         elif band == 2:
-            display_image(self.w2)
+            display_image(self.w2,lowrange=True)
             plt.title(r'$unWISE \ W2$')            
         elif band == 3:
-            display_image(self.w3)
+            display_image(self.w3,lowrange=True)
             plt.title(r'$unWISE \ W3$')
         elif band == 4:
-            display_image(self.w4)
+            display_image(self.w4,lowrange=True)
             plt.title(r'$unWISE \ W4$')
         pass
     def plot_ha(self):
@@ -516,7 +578,7 @@ class cutouts():
         #v1,v2=scoreatpercentile(self.cs,[vmin,vmax])
         #plt.imshow(self.cs,origin='lower',cmap='gray_r',vmin=v1,vmax=v2)
         #plt.gca().set_yticks(())
-        display_image(self.cs)
+        display_image(self.cs,lowrange=True)
         plt.title(r'$H\alpha$',fontsize=14)
     def plot_mask(self):
         #v1,v2=scoreatpercentile(self.cs,[vmin,vmax])
@@ -529,10 +591,10 @@ class cutouts():
         display_image(self.nuv_image)
         plt.title(r'$GALEX \ NUV$')
 
+        
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description ='This program will create a plot of halpha image.  will also download images from galex, legacy survey, and unwise.', formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('--r', dest = 'r', default = None, help = 'R-band cutout image.  This is all you need to provide if images are named: blah_R.fits, blah_CS.fits, blah_Ha.fits')
-    parser.add_argument('--ha', dest = 'ha', default = None, help = 'Halpha image.  ')
     parser.add_argument('--plotall', dest = 'plotall', default = False, action='store_true', help = 'set this to download images and generate all three plots (Ha, all images, sfr indicators)')    
     args = parser.parse_args()
 

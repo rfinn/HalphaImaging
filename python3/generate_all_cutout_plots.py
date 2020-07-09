@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
 """
-run in the cutouts directory
+GOAL:
+- generate cutouts for images with halpha cutouts
 
-it will go into each subdir and run the script to generate cutouts!
+NOTES:
+- run in the cutouts directory
+
+- it will go into each subdir and run the script to generate cutouts!
 
 """
 import glob
