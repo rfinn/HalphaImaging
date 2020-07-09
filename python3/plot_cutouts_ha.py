@@ -414,6 +414,7 @@ class cutouts():
         self.nuv_image_name = 'galex/'+self.galid+'-'+t[1]+'-nuv-'+imsize_arcsec+'.fits'
         if os.path.exists(self.nuv_image_name):
             self.nuv_image,h = fits.getdata(self.nuv_image_name,header=True)
+            self.nuv_flag = True
             try:
                 self.nuv_pscale = np.abs(h['CD1_1'])*3600
             except:
