@@ -248,7 +248,7 @@ def get_galex_image(ra,dec,imsize):
     try:
         cutout = Cutout2D(nuv,position,(imsize*u.arcsec,imsize*u.arcsec),wcs=nuv_wcs)
     except:
-        print('WARNING: problem getting galex cutout for ',self.prefix)
+        print('WARNING: problem getting galex cutout')
         cutout = None
 
     return cutout
