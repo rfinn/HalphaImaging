@@ -331,9 +331,9 @@ class cutouts():
         self.get_galid()
         self.plotcutouts()
     def find_rcutout(self):
-        imlist = glob.glob(self.prefix+'*-R.fits')
+        imlist = glob.glob(self.galid+'*-R.fits')
         if len(imlist) == 0:
-            imlist = glob.glob(self.prefix+'*-r.fits')
+            imlist = glob.glob(self.galid+'*-r.fits')
         if len(imlist) == 0:
             self.ha_flag = False
             self.r_name = None
