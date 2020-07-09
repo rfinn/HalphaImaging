@@ -25,8 +25,8 @@ vfmain = Table.read(vftabledir+'vf_north_v0_main.fits')
 vfmain_co = vfmain[vfmain['COflag']]
 
 # run plotcutouts_ha for each galaxy
-#for i in range(len(vfmain_co)):
-for i in range(2):    # for testing
+#for i in range(2):    # for testing
+for i in range(len(vfmain_co)):
     if not os.path.exists(vfmain_co['prefix'][i]):
         os.mkdir(vfmain_co['prefix'][i])
     os.chdir(vfmain_co['prefix'][i])
