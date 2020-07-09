@@ -37,5 +37,7 @@ for i in range(len(vfmain_co)):
     c = pc.cutouts('',ra=vfmain_co['RA'][i],dec=vfmain_co['DEC'][i],size=rad,galid=vfmain_co['prefix'][i])
     c.runall()
     c.plotallcutouts()
-    c.plotsfrcutouts()    
+    c.plotsfrcutouts()
+    os.system('cp *.png ../../COfigures/.')
+    os.system('cp *.pdf ../../COfigures/.')    
     os.chdir('..')

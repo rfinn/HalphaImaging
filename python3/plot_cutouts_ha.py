@@ -245,7 +245,11 @@ def get_galex_image(ra,dec,imsize):
 
     nuv_wcs = WCS(nuv_header)
     position = SkyCoord(ra,dec,unit="deg",frame='icrs')
-    cutout = Cutout2D(nuv,position,(imsize*u.arcsec,imsize*u.arcsec),wcs=nuv_wcs)
+    try:
+        cutout = Cutout2D(nuv,position,(imsize*u.arcsec,imsize*u.arcsec),wcs=nuv_wcs)
+    except:
+        print('WARNING: problem getting galex cutout for ',self.prefix)
+        cutout = None
 
     return cutout
     
@@ -275,6 +279,8 @@ class cutouts():
             self.galid = galid
             self.rootname = galid
             self.use_position_flag = True
+            # look for r-band cutout
+            self.find_rcutout()
         else:
             self.use_position_flag = False
             self.r_name = rimage
@@ -324,11 +330,23 @@ class cutouts():
         self.get_RADEC()
         self.get_galid()
         self.plotcutouts()
+    def find_rcutout(self):
+        imlist = glob.glob(d+'*-R.fits')
+        if len(imlist) == 0:
+            imlist = glob.glob(d+'*-r.fits')
+        if len(imlist) == 0:
+            self.ha_flag = False
+            self.r_name = None
+        else:
+            self.ha_flag = True
+            self.r_name = imlist[0]
+        
     def get_halpha_cutouts(self):
-        self.r,self.header = fits.getdata(self.r_name,header=True)
-        self.ha = fits.getdata(self.rootname+'-Ha.fits')
-        self.cs = fits.getdata(self.rootname+'-CS.fits')
-        self.mask = fits.getdata(self.rootname+'-R-mask.fits')        
+        if self.r_name is not None:
+            self.r,self.header = fits.getdata(self.r_name,header=True)
+            self.ha = fits.getdata(self.rootname+'-Ha.fits')
+            self.cs = fits.getdata(self.rootname+'-CS.fits')
+            self.mask = fits.getdata(self.rootname+'-R-mask.fits')        
     def get_image_size(self):
         # get image size in pixels and arcsec
         self.xsize_pix,self.ysize_pix = self.r.shape
@@ -402,8 +420,12 @@ class cutouts():
                 print('WARNING: could not get galex pixelscale')
         else:
             cutout = get_galex_image(self.ra,self.dec,self.xsize_arcsec)
-            fits.writeto(self.nuv_image_name, cutout.data, overwrite=True)
-            self.nuv_image = cutout.data
+            if cutout is not None:
+                fits.writeto(self.nuv_image_name, cutout.data, overwrite=True)
+                self.nuv_image = cutout.data
+                self.nuv_flag = True
+            else:
+                self.nuv_flag = False
     def plotcutouts(self,plotsingle=True):
         if plotsingle:
             figure_size=(10,4)
@@ -475,7 +497,8 @@ class cutouts():
                 except:
                     print('no cs halpha')
             elif i == 11:
-                self.plot_galex_nuv()
+                if self.nuv_flag:
+                    self.plot_galex_nuv()
             #if (i%4 != 0):
             if (i > 7) & (i < 11):
                 ax = plt.gca()
@@ -571,6 +594,7 @@ class cutouts():
         #R
         #v1,v2=scoreatpercentile(self.r,[vmin,vmax])#.5,99        
         #plt.imshow(self.r,cmap='gray_r',vmin=v1,vmax=v2,origin='lower')
+
         display_image(self.r)
         plt.title(r'$R$',fontsize=14)
         
@@ -609,3 +633,4 @@ if __name__ == '__main__':
         c.plotallcutouts()
         c.plotsfrcutouts()    
         c.plotmask()
+        
