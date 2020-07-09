@@ -16,6 +16,7 @@ homedir = os.getenv("HOME")
 os.sys.path.append(homedir+'/github/HalphaImaging/python3/')
 import plot_cutouts_ha as pc
 from astropy.table import Table
+import argparse
 vftabledir = homedir+'/research/Virgo/tables-north/v0/'
 
 
