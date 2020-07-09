@@ -20,7 +20,7 @@ import argparse
 vftabledir = homedir+'/research/Virgo/tables-north/v0/'
 
 
-parser = argparse.ArgumentParser(description ='This program will create a plot of halpha image.  will also download images from galex, legacy survey, and unwise.', formatter_class=RawDescriptionHelpFormatter)
+parser = argparse.ArgumentParser(description ='This program will create a plot of halpha image.  ')
 parser.add_argument('--startindex', dest = 'startindex', default = 0, help = 'startindex, if you do not want to start at zero.  useful for testing.')
 args = parser.parse_args()
 
