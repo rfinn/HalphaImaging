@@ -318,8 +318,12 @@ class cutouts():
             self.get_image_size()
             self.get_RADEC()
             self.get_galid()
-        self.download_legacy()
-        self.load_legacy_images()
+        try:
+            self.download_legacy()
+            self.load_legacy_images()
+            self.legacy_flag = True
+        except urllib.error.HTTPError:
+            self.legacy_flag = False
         self.download_unwise_images()
         self.load_unwise_images()
         self.get_galex_image()
@@ -475,10 +479,12 @@ class cutouts():
             
             plt.subplot(nrow,ncol,i+1)
             if i == 0:
-                self.plot_legacy_jpg()
+                if self.legacy_flag:
+                    self.plot_legacy_jpg()
             elif i < 4:
                 # plot each band of legacy
-                self.plot_legacy(band=i)
+                if self.legacy_flag:
+                    self.plot_legacy(band=i)
             elif (i > 3) & (i < 8):
                 wband = i-3
                 self.plot_unwise(band=wband)
@@ -530,7 +536,8 @@ class cutouts():
             
             plt.subplot(nrow,ncol,i+1)
             if i == 0:
-                self.plot_legacy_jpg()
+                if self.legacy_flag:
+                    self.plot_legacy_jpg()
             elif i == 1:
                 self.plot_galex_nuv()
             elif i == 2:
