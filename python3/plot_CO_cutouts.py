@@ -18,6 +18,11 @@ import plot_cutouts_ha as pc
 from astropy.table import Table
 vftabledir = homedir+'/research/Virgo/tables-north/v0/'
 
+
+parser = argparse.ArgumentParser(description ='This program will create a plot of halpha image.  will also download images from galex, legacy survey, and unwise.', formatter_class=RawDescriptionHelpFormatter)
+parser.add_argument('--startindex', dest = 'startindex', default = 0, help = 'startindex, if you do not want to start at zero.  useful for testing.')
+args = parser.parse_args()
+
 # read in vf main file
 vfmain = Table.read(vftabledir+'vf_north_v0_main.fits')
 
@@ -26,7 +31,7 @@ vfmain_co = vfmain[vfmain['COflag']]
 
 # run plotcutouts_ha for each galaxy
 #for i in range(2):    # for testing
-for i in range(len(vfmain_co)):
+for i in range(int(args.startindex),len(vfmain_co)):
     print('')    
     print('###################################')
     print(i,len(vfmain_co))

@@ -322,7 +322,7 @@ class cutouts():
             self.download_legacy()
             self.load_legacy_images()
             self.legacy_flag = True
-        except urllib.error.HTTPError:
+        except: # urllib.error.HTTPError:
             self.legacy_flag = False
         self.download_unwise_images()
         self.load_unwise_images()
