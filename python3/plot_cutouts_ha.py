@@ -613,7 +613,8 @@ class cutouts():
         plt.title(r'$H\alpha$',fontsize=14)
         
     def plot_galex_nuv(self):
-        display_image(self.nuv_image)
+        if self.nuv_flag:
+            display_image(self.nuv_image)
         plt.title(r'$GALEX \ NUV$')
 
         
