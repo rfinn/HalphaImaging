@@ -43,6 +43,6 @@ for i in range(len(vfmain_co)):
     c.runall()
     c.plotallcutouts()
     c.plotsfrcutouts()
-    os.system('cp *.png ../../COfigures/.')
-    os.system('cp *.pdf ../../COfigures/.')    
+    os.system('cp *cutouts.png ../../COfigures/.')
+    os.system('cp *cutouts.pdf ../../COfigures/.')    
     os.chdir('..')
