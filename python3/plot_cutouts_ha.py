@@ -156,6 +156,8 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
     print('wise image size = ',imsize)
     baseurl = 'http://unwise.me/cutout_fits?version=allwise'
     imurl = baseurl +'&ra=%.5f&dec=%.5f&size=%s&bands=%s'%(ra,dec,imsize,bands)
+    print('downloading unwise images')
+    print(imurl)
     wisetar = wget.download(imurl)
     tartemp = tarfile.open(wisetar,mode='r:gz') #mode='r:gz'
     wnames = tartemp.getnames()
@@ -319,14 +321,17 @@ class cutouts():
             self.get_RADEC()
             self.get_galid()
         try:
+            print('trying to download legacy image')
             self.download_legacy()
             self.load_legacy_images()
             self.legacy_flag = True
         except: # urllib.error.HTTPError:
+            print('could not get legacy image')
             self.legacy_flag = False
+        self.get_galex_image()            
         self.download_unwise_images()
         self.load_unwise_images()
-        self.get_galex_image()
+
         #self.plotallcutouts()
     def runha(self):
         self.get_halpha_cutouts()
@@ -624,6 +629,36 @@ class cutouts():
             display_image(self.nuv_image)
         plt.title(r'$GALEX \ NUV$')
 
+
+    def adap2020(self):
+        '''cutouts to show in ADAP 2020 proposal, shows legacy color, W1-W4 and galex'''
+
+        nrow = 2
+        ncol = 3
+
+        #Continuum subtracted image
+        
+
+        if plotsingle:
+            figure_size=(9,7)
+            plt.figure(figsize=figure_size)
+            plt.clf()
+            plt.subplots_adjust(left=.05,right=.95,bottom=.05,top=.9,hspace=.275,wspace=0)
+        for i in range(nrow*ncol):
+            
+            plt.subplot(nrow,ncol,i+1)
+            if i == 0:
+                if self.legacy_flag:
+                    self.plot_legacy_jpg()
+            elif i == 1:
+                if self.nuv_flag:
+                    self.plot_galex_nuv()
+            else: 
+                wband = i-1
+                self.plot_unwise(band=wband)
+        #plt.text(-1.3,3.8,self.galid,transform=plt.gca().transAxes,fontsize=14,horizontalalignment='center')    
+        plt.savefig(self.galid+'-adap2020-cutouts.png')
+        plt.savefig(self.galid+'-adap2020-cutouts.pdf')        
         
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description ='This program will create a plot of halpha image.  will also download images from galex, legacy survey, and unwise.', formatter_class=RawDescriptionHelpFormatter)
