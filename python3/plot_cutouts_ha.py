@@ -7,8 +7,8 @@ GOAL:
 
 INPUT:
 * image name of r-band cutout
-* trying to change this to RA, DEC, size and ID
-
+-OR-
+* RA, DEC, size and ID
 
 OUTPUT:
 can create different version of cutouts - halpha, sfr indicators, and all
@@ -21,6 +21,13 @@ USAGE:
 UPDATES ON 7/7/2020:
 * trying to adapt this to take an RA, DEC and size instead of the r-band cutout
   - goal is to get cutouts for ALL VF galaxies
+
+STILL TO DO:
+* need to stack unwise images when multiple images are returned
+
+REFERENCES
+* For stacking unWISE images:
+https://reproject.readthedocs.io/en/stable/celestial.html
 
 """
 
@@ -255,13 +262,16 @@ def get_galex_image(ra,dec,imsize):
 
     return cutout
     
-def display_image(image,percent=99.5,lowrange=False):
+def display_image(image,percent=99.9,lowrange=False):
+    lowrange=False
     if lowrange:
         norm = simple_norm(image, stretch='linear',percent=percent)
     else:
         norm = simple_norm(image, stretch='asinh',percent=percent)
-        
+
     plt.imshow(image, norm=norm,cmap='gray_r')
+    #v1,v2=scoreatpercentile(image,[.5,99.5])            
+    #plt.imshow(image, cmap='gray_r',vmin=v1,vmax=v2,origin='lower')    
 
 class cutouts():
     def __init__(self, rimage,ra=None,dec=None,size=None,galid=None):
@@ -328,6 +338,7 @@ class cutouts():
         except: # urllib.error.HTTPError:
             print('could not get legacy image')
             self.legacy_flag = False
+
         self.get_galex_image()            
         self.download_unwise_images()
         self.load_unwise_images()
@@ -563,9 +574,8 @@ class cutouts():
     def plot_legacy_jpg(self):
         # plot jpeg from legacy survey
         t = Image.open(self.legacy_jpegname)        
-        plt.imshow(t,origin='lower')
-        plt.title(r'$Legacy$')
-        
+        plt.imshow(t,origin='upper')
+        plt.title(r'$Legacy$')        
         pass
     def plot_legacy(self,band=1):
         # plot image from legacy survey
@@ -630,32 +640,48 @@ class cutouts():
         plt.title(r'$GALEX \ NUV$')
 
 
-    def adap2020(self):
+    def adap2020(self,plotsingle=True):
         '''cutouts to show in ADAP 2020 proposal, shows legacy color, W1-W4 and galex'''
 
         nrow = 2
         ncol = 3
 
         #Continuum subtracted image
-        
-
+        self.legacy_jpegname = 'legacy/VFID0566-NGC5989-legacy-158.jpg'
+        self.nuv_image_name = 'galex/VFID0566-NGC5989-NGC5989-nuv-158.fits'        
+        self.nuv_image = fits.getdata(self.nuv_image_name)
+        titles = [r'$Legacy \ grz$',r'$GALEX \ NUV$',r'$unWISE \ W1$',r'$unWISE \ W2$',r'$unWISE \ W3$',r'$unWISE \ W4$']        
         if plotsingle:
             figure_size=(9,7)
             plt.figure(figsize=figure_size)
             plt.clf()
-            plt.subplots_adjust(left=.05,right=.95,bottom=.05,top=.9,hspace=.275,wspace=0)
+            plt.subplots_adjust(left=.05,right=.95,bottom=.05,top=.9,hspace=.2,wspace=0)
         for i in range(nrow*ncol):
             
             plt.subplot(nrow,ncol,i+1)
             if i == 0:
-                if self.legacy_flag:
-                    self.plot_legacy_jpg()
+                self.plot_legacy_jpg()
             elif i == 1:
                 if self.nuv_flag:
                     self.plot_galex_nuv()
             else: 
                 wband = i-1
                 self.plot_unwise(band=wband)
+            x1,x2 = plt.xlim()
+            # zoom in by a factor of 2
+            dx = (x2-x1)
+            print('image size in unwise = ',dx/2)
+            xmean = np.mean([x1,x2])
+            xmin = xmean - dx/4
+            xmax = xmean + dx/4
+            if i > 0:
+                plt.axis([xmin,xmax,xmax,xmin])
+            else:
+                plt.axis([xmin,xmax,xmin,xmax])
+            print(x1,x2,xmean,xmin,xmax)
+            plt.title(titles[i],fontsize=24)                        
+            plt.xticks([])
+            plt.yticks([])            
         #plt.text(-1.3,3.8,self.galid,transform=plt.gca().transAxes,fontsize=14,horizontalalignment='center')    
         plt.savefig(self.galid+'-adap2020-cutouts.png')
         plt.savefig(self.galid+'-adap2020-cutouts.pdf')        

@@ -42,9 +42,6 @@ for i in range(int(args.startindex),len(vfmain_co)):
     print(i,len(vfmain_co))
     print('###################################')
     print('')
-    if not os.path.exists(vfmain_co['prefix'][i]):
-        os.mkdir(vfmain_co['prefix'][i])
-    os.chdir(vfmain_co['prefix'][i])
     if vfmain_co['radius_flag'][i]:
         rad = 3*vfmain_co['radius'][i]
     else:
@@ -57,4 +54,4 @@ for i in range(int(args.startindex),len(vfmain_co)):
     c.adap2020()
     #os.system('cp *cutouts.png ../../COfigures/.')
     #os.system('cp *cutouts.pdf ../../COfigures/.')    
-    os.chdir('..')
+
