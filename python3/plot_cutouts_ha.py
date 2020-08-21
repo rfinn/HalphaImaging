@@ -429,9 +429,14 @@ class cutouts():
     def get_galex_image(self):
         # download galex image if necessary (large FOV)
         # then get cutout
-        t = self.galid.split('-')
-        imsize_arcsec = "%i"%(self.xsize_arcsec)
-        self.nuv_image_name = 'galex/'+self.galid+'-'+t[1]+'-nuv-'+imsize_arcsec+'.fits'
+        imsize_arcsec = "%i"%(self.xsize_arcsec)        
+        try:
+            t = self.galid.split('-')
+            self.nuv_image_name = 'galex/'+self.galid+'-'+t[1]+'-nuv-'+imsize_arcsec+'.fits'            
+        except IndexError:
+            self.nuv_image_name = 'galex/'+self.galid+'-nuv-'+imsize_arcsec+'.fits'            
+
+
         if os.path.exists(self.nuv_image_name):
             self.nuv_image,h = fits.getdata(self.nuv_image_name,header=True)
             self.nuv_flag = True
@@ -574,7 +579,7 @@ class cutouts():
     def plot_legacy_jpg(self):
         # plot jpeg from legacy survey
         t = Image.open(self.legacy_jpegname)        
-        plt.imshow(t,origin='upper')
+        plt.imshow(t,origin='lower')
         plt.title(r'$Legacy$')        
         pass
     def plot_legacy(self,band=1):
