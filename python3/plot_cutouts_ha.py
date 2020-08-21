@@ -126,7 +126,7 @@ def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',bands='grz',ma
     if makeplots:
         if jpeg:
             t = Image.open(jpeg_name)
-            plt.imshow(t,origin='lower')
+            plt.imshow(t,origin='upper')
         else:
             norm = simple_norm(t[1],stretch='asinh',percent=99.5)            
             plt.imshow(t[1],origin='upper',cmap='gray_r', norm=norm)
@@ -198,7 +198,7 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
         ##### DISPLAY IMAGE
         im = fits.getdata(rename)
         norm = simple_norm(im, stretch='asinh',percent=99)
-        plt.imshow(im, norm=norm)
+        plt.imshow(im, norm=norm,origin='upper')
         plt.show()
     #print(image_names)
     #print(multiframe)
@@ -269,7 +269,7 @@ def display_image(image,percent=99.9,lowrange=False):
     else:
         norm = simple_norm(image, stretch='asinh',percent=percent)
 
-    plt.imshow(image, norm=norm,cmap='gray_r')
+    plt.imshow(image, norm=norm,cmap='gray_r',origin='lower')
     #v1,v2=scoreatpercentile(image,[.5,99.5])            
     #plt.imshow(image, cmap='gray_r',vmin=v1,vmax=v2,origin='lower')    
 
@@ -579,7 +579,7 @@ class cutouts():
     def plot_legacy_jpg(self):
         # plot jpeg from legacy survey
         t = Image.open(self.legacy_jpegname)        
-        plt.imshow(t,origin='lower')
+        plt.imshow(t,origin='upper')
         plt.title(r'$Legacy$')        
         pass
     def plot_legacy(self,band=1):
