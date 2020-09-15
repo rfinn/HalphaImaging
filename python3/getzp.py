@@ -170,7 +170,10 @@ class getzp():
         elif self.instrument == 'm':
             defaultcat = 'default.sex.HDI'
         header = fits.getheader(self.image)
-        expt = header['EXPTIME']
+        try:
+            expt = header['EXPTIME']
+        except KeyError:
+            expt = 1.
         ADUlimit = 4000000./float(expt)
         print('saturation limit in ADU/s {:.1f}'.format(ADUlimit))
         if args.fwhm is None:
@@ -497,6 +500,11 @@ class getzp():
         self.fit_residual_surface(norder=2)
         self.renorm_wfc()
         self.rerun_zp_fit()
+        if self.filter == 'ha':
+            print("running an additional round of flattening for halpha")
+            self.fit_residual_surface(norder=2)
+            self.renorm_wfc()
+            self.rerun_zp_fit()
         plt.figure()
         plt.hist(self.zim,bins=np.linspace(.9,1.1,40))
     def fit_residual_surface(self,norder=2,suffix=None):
@@ -562,7 +570,7 @@ class getzp():
 
         # Plot
         plt.figure()
-        plt.imshow(self.zz,extent=(self.xim.min(), self.yim.max(), self.xim.max(), self.yim.min()),vmin=v1,vmax=v2)
+        plt.imshow(self.zz,extent=(self.xim.min(), self.yim.max(), self.xim.max(), self.yim.min()),vmin=v1,vmax=v2,origin="lower")
         plt.scatter(self.xim[~clip_flag.mask], self.yim[~clip_flag.mask], c=self.zim[~clip_flag.mask],vmin=v1,vmax=v2,s=15)
         cb=plt.colorbar()
         cb.set_label('f-WFC/f-pan')
@@ -608,7 +616,7 @@ if __name__ == '__main__':
     parser.add_argument('--image', dest = 'image', default = 'test.coadd.fits', help = 'Image for ZP calibration')
     parser.add_argument('--instrument', dest = 'instrument', default = None, help = 'HDI = h, KPNO mosaic = m, INT = i')
     parser.add_argument('--fwhm', dest = 'fwhm', default = None, help = 'image FWHM in arcseconds.  Default is none, then SE assumes 1.5 arcsec')    
-    parser.add_argument('--filter', dest = 'filter', default = 'R', help = 'filter (R or r; use r for Halpha)')
+    parser.add_argument('--filter', dest = 'filter', default = 'R', help = 'filter (R or r; use ha for Halpha)')
     parser.add_argument('--useri',dest = 'useri', default = False, action = 'store_true', help = 'Use r->R transformation as a function of r-i rather than the g-r relation.  g-r is the default.')
     parser.add_argument('--nexptime', dest = 'nexptime', default = True, action = 'store_false', help = "set this flag if the image is in ADU rather than ADU/s.  Swarp produces images in ADU/s.")
     parser.add_argument('--mag', dest = 'mag', default = 0,help = "select SE magnitude to use when solving for ZP.  0=MAG_APER,1=MAG_BEST,2=MAG_PETRO.  Default is MAG_APER ")
@@ -620,6 +628,10 @@ if __name__ == '__main__':
     args.nexptime = bool(args.nexptime)
     args.naper = int(args.naper)
     zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
+    print('value of nexptime = ',args.nexptime)
+    if args.filter == 'ha':
+        v1 = .95
+        v2 = 1.05  
     if args.instrument == 'i':
         zp.getzp_wfc()
     else:

@@ -202,6 +202,10 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
         plt.show()
     #print(image_names)
     #print(multiframe)
+
+    # if multiframe
+    # run swarp to create coadded image
+    
     return image_names,multiframe
 
 def get_galex_image(ra,dec,imsize):
