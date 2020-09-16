@@ -177,23 +177,92 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
     
     wmembers = tartemp.getmembers()
     image_names = []
+    weight_names = []
     tartemp.extractall()
     for fname in wnames:
+        #print(fname)
         t = fname.split('-')
         if subfolder is not None:
             rename = subfolder+'/'+str(galid)+'-'+t[0]+'-'+t[1]+'-'+t[2]+'-'+t[3]+'-'+t[4]
         else:
             rename = str(galid)+'-'+t[0]+'-'+t[1]+'-'+t[2]+'-'+t[3]+'-'+t[4]
-        print('rename = ',rename)
-        if os.path.exists(rename): # this should only occur if multiple images are returned from wise
-            os.remove(rename)
+        #print('rename = ',rename)
+        #print(rename.find('gz'))
+        #if os.path.exists(rename): # this should only occur if multiple images are returned from wise
+        #    os.remove(rename)
         os.rename(fname, rename)
         if rename.find('.gz') > -1:
+            #print('hello????')
             os.system('gunzip '+rename)
-        if fname.find('img') > -1:
+            rename = rename.split('.gz')[0]
+            #print('after gunzip, rename = ',rename)
+        if rename.find('img') > -1:
             image_names.append(rename)
+        if rename.find('std') > -1:
+            # move ivar images to imagename.weight.fits
+            outim = rename.replace('std-m','img-m.std')
+            os.rename(rename,outim)
+            weight_names.append(outim)
     os.remove(wisetar)
+    
+    # if multiframe
+    # run swarp to create coadded image
+    if multiframe:
+        print('running swarp to combine multiple unwise images')
+        #########################################
+        ## COMBINE THE IMAGE FRAMES USING AVERAGE
+        #########################################        
+        # create default.swarp
+        os.system('swarp -d > default.swarp')
+        # run swarp
+        all_images = ' '.join(image_names)
+        output_image = str(galid)+'-'
+        s = 'swarp '+all_images+' -COMBINE_TYPE AVERAGE -WEIGHT_TYPE MAP_RMS -WEIGHT_SUFFIX .std.fits -SUBTRACT_BACK N'
+        #print(s)
+        os.system(s)
 
+        # rename coadd.fits to the output image name
+        outimage = str(galid)+'-unwise-w'+str(bands)+'-coadd.fits'
+        os.rename('coadd.fits',outimage)
+
+        #########################################
+        ## COMBINE THE STD FRAMES USING SUM
+        #########################################
+        noise_images = []
+        '''
+        for f in weight_names:
+            im,h = fits.getdata(f,header=True)
+            # square values
+            im = im**2
+            # save file
+            fits.writeto('sq-'+f,im,header=h,overwrite=True)
+            noise_images.append('sq-'+f)
+        '''
+        #all_images = ' '.join(noise_images)
+
+        # just combine using average and then multiply by sqrt 2
+        all_images = ' '.join(weight_names)
+        output_image = str(galid)+'-'
+        s = 'swarp '+all_images+' -COMBINE_TYPE MEDIAN -WEIGHT_TYPE NONE -SUBTRACT_BACK N'
+        #print(s)
+        os.system(s)
+
+        # now take sqrt of image values
+        #im,h = fits.getdata('coadd.fits',header=True)
+        #im = np.sqrt(2)*im
+        # divide by number of images because we took average of data
+        #im = im/len(all_images)
+
+        weightname = str(galid)+'-unwise-w'+str(bands)+'-coadd.std.fits'  
+        #fits.writeto(weightname,im,header=h,overwrite=True)
+
+
+        # just trying average!
+        os.rename('coadd.fits',weightname)
+        image_names = [outimage]
+        weight_names = [weightname]
+        multiframe=True
+        
     if makeplots:
         ##### DISPLAY IMAGE
         im = fits.getdata(rename)
@@ -203,10 +272,8 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
     #print(image_names)
     #print(multiframe)
 
-    # if multiframe
-    # run swarp to create coadded image
     
-    return image_names,multiframe
+    return image_names,weight_names,multiframe
 
 def get_galex_image(ra,dec,imsize):
     """
