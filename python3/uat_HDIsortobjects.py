@@ -48,7 +48,7 @@ if args.siena:
     filestring = args.filestring+'*.fits'
 elif args.INT:
     print('running on INT data')
-    filestring = args.filestring+'*FC.fits'
+    filestring = args.filestring+'*PA.fits'
 try:
     os.system('gethead '+filestring+' FILTER, OBJECT, EXPTIME > junkfile2')
     infile=open('junkfile2','r')

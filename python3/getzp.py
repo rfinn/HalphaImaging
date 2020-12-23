@@ -66,6 +66,7 @@ from astropy.io import fits
 from astropy.stats import sigma_clip
 
 from scipy.optimize import curve_fit
+from scipy.stats import median_absolute_deviation as MAD2
 from astroquery.vizier import Vizier
 from photutils import Background2D, MedianBackground
 import itertools
@@ -124,10 +125,17 @@ def polyval2d(x, y, m):
         z += a * x**i * y**j
     return z
 
+def fit_circle_func():
+    #fit function centered on 
+    pass
 class getzp():
     def __init__(self, image, instrument='h', filter='r', astromatic_dir = '~/github/HalphaImaging/astromatic/',norm_exptime = True,nsigma = 2., useri = False, naper = 5, mag=0):
 
         self.image = image
+        self.plotprefix = 'plots/'+self.image+'-'
+        # create plot directory if it doesn't already exist
+        if not os.path.exists('plots'):
+            os.mkdir('plots')
         self.astrodir = astromatic_dir
         self.instrument = instrument
         self.filter = filter
@@ -311,7 +319,9 @@ class getzp():
         yfit = np.polyval(polyfit_results,x)
         residual = (yfit - y)
         plt.figure(figsize=(8,8))
-        plt.title(self.image)
+        s = ' (MAD = %.4f)'%(MAD2(residual))
+        plt.title(self.image+s)
+        
         plt.subplot(2,1,1)
         if len(yerr) < len(y): 
             plt.plot(x,y,'bo',label='MAG_AUTO')
@@ -327,17 +337,17 @@ class getzp():
         plt.legend()
         
         plt.subplot(2,1,2)
-        s = 'std = %.4f'%(np.std(residual))
+        s = 'MAD = %.4f'%(MAD2(residual))
         if len(yerr) < len(y):
             plt.plot(x,residual, 'ko',label=s)
             
         else:
-            plt.errorbar(x,residual,yerr=yerr,fmt='None',ecolor='b',label='SE MAG')
+            plt.errorbar(x,residual,yerr=yerr,fmt='None',ecolor='b',label='SE MAG '+s)
         plt.xlabel('Pan-STARRS r',fontsize=16)
         plt.ylabel('YFIT - SE R-band MAG',fontsize=16)
         plt.legend()
         plt.axhline(y=0,color='r')
-        plt.savefig('getzp-fig2.png')
+        plt.savefig(self.plotprefix+'getzp-fig2.png')
 
     def fitzp(self,plotall=False):
         ###################################
@@ -433,11 +443,12 @@ class getzp():
         residual_all = 10.**((magfit - yplot)/2.5)        
 
         s = '%.3f +/- %.3f'%(np.mean(residual_all),np.std(residual_all))
+        print(s)
         if plotall:
             plt.figure()            
             crap = plt.hist(residual_all,bins=np.linspace(.8,1.2,20))
             plt.text(0.05,.85,s,horizontalalignment='left',transform=plt.gca().transAxes)
-            plt.savefig('getzp-residual-hist.png')
+            plt.savefig(self.plotprefix+'getzp-residual-hist.png')
 
         ###################################
         # Show location of residuals
@@ -458,12 +469,15 @@ class getzp():
         plt.savefig('getzp-position-residuals-all-fig1.png')
         '''
         plt.figure(figsize=(6,4))
-        plt.title(self.image)
+        
+        s = ' (mean,std,MAD = {:.4f},{:.4f},{:.4f})'.format(np.mean(residual_all),np.std(residual_all),MAD2(residual_all))
+        #s = str(MAD(residual_all))
+        plt.title(self.image+s)
 
         plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
         cb=plt.colorbar()
         cb.set_label('f-WFC/f-pan')
-        plt.savefig('getzp-position-residuals-fitted-fig1.png')
+        plt.savefig(self.plotprefix+'getzp-position-residuals-fitted-fig1.png')
 
         self.x = x
         self.y = y
@@ -570,19 +584,20 @@ class getzp():
 
         # Plot
         plt.figure()
-        plt.imshow(self.zz,extent=(self.xim.min(), self.yim.max(), self.xim.max(), self.yim.min()),vmin=v1,vmax=v2,origin="lower")
+        plt.imshow(self.zz,origin="lower",extent=(self.xim.min(), self.yim.max(), self.xim.max(), self.yim.min()),vmin=v1,vmax=v2)
         plt.scatter(self.xim[~clip_flag.mask], self.yim[~clip_flag.mask], c=self.zim[~clip_flag.mask],vmin=v1,vmax=v2,s=15)
         cb=plt.colorbar()
         cb.set_label('f-WFC/f-pan')
-        plt.title(self.image+': n poly = '+str(norder))
+        s = ' std (MAD) = %.4f (%.4f)'%(np.std(self.zim[~clip_flag.mask]),MAD2(self.zim[~clip_flag.mask]))
+        plt.title(self.image+': n poly = '+str(norder)+s)
         plt.show()
         
         if suffix is None:
-            plotname=self.image+'-imsurfit-'+str(norder)+'-'
+            plotname='-imsurfit-'+str(norder)+'-'
         else:
-            plotname=self.image+'-imsurfit-'+str(norder)+'-'+suffix
-        plt.savefig(plotname+'.png')
-        plt.savefig(plotname+'.pdf')
+            plotname='-imsurfit-'+str(norder)+'-'+suffix
+        plt.savefig(self.plotprefix+plotname+'.png')
+        plt.savefig(self.plotprefix+plotname+'.pdf')
         
     def renorm_wfc(self):
         # normalize surface fit
