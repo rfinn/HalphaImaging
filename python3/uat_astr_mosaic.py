@@ -129,7 +129,7 @@ if args.swarp:
     else:
         
         print('RUNNING SWARP')
-        if args.m:
+        if args.m: 
             infile = open(args.l,'r')
             outfile = open('masks','w')
             for line in infile:
