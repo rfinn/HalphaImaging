@@ -22,11 +22,11 @@ EXAMPLE:
    To get swarp to create aligned images in multiple bans (e.g. Halpha and R-band), do the following
     uat_astr_mosaic.py --swarp --l A1367-h02_R
 
-    uat_astr_mosaic.py --swarp --l A1367-h02_ha12 --refimage 'A1367-h02_ha12.coadd.fits'
+    uat_astr_mosaic.py --swarp --l A1367-h02_ha12 --refimage 'A1367-h02_R.coadd.fits'
 
-    uat_astr_mosaic.py --swarp --l A1367-h02_R --refimage 'A1367-h02_ha12.coadd.fits'
+    uat_astr_mosaic.py --swarp --l A1367-h02_R --refimage 'A1367-h02_R.coadd.fits'
 
-refimage should be R-band always because visible light more extended obviously than Ha
+
 
 WHAT THIS CODE DOES:
 INPUT/OUPUT:
@@ -99,7 +99,7 @@ if args.s:
         i += 1
         
 if args.scamp:
-    os.system('ls *.cat > scamp_input_cats')
+    os.system('ls '+args.filestring+'*.cat > scamp_input_cats')
     print('RUNNING SCAMP')
     if args.siena:
         os.system('scamp @scamp_input_cats -c default.scamp.siena')
@@ -114,6 +114,8 @@ if args.scamp:
 if args.swarp:
     #HDI data
     pixel_scale = 0.425
+    if args.int:
+        pixel_scale = 0.331
     if args.refimage:
         data,header = fits.getdata(args.refimage,header=True)
         w = WCS(header)
