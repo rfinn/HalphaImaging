@@ -58,6 +58,7 @@ parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromati
 parser.add_argument('--refimage',dest = 'refimage', default = None,  help = 'use a reference image to set center and size of output mosaic')
 parser.add_argument('--m',dest = 'm', default = False, action = 'store_true', help = 'set if running for mosaic data')
 parser.add_argument('--int',dest = 'int', default = False, action = 'store_true', help = 'set if running on INT data')
+parser.add_argument('--noback',dest = 'noback', default = False, action = 'store_true', help = 'set to disable background subtraction in swarp')
 
 args = parser.parse_args()
 
@@ -114,8 +115,16 @@ if args.scamp:
 if args.swarp:
     #HDI data
     pixel_scale = 0.425
+    defaultswarp = 'default.swarp'
     if args.int:
         pixel_scale = 0.331
+        defaultswarp = 'default.swarp.INT'
+    if args.noback:
+        outimage = '.noback.coadd.fits'
+        weightimage = '.noback.coadd.weight.fits'        
+    else:
+        outimage = '.coadd.fits'
+        weightimage = '.coadd.weight.fits'                
     if args.refimage:
         data,header = fits.getdata(args.refimage,header=True)
         w = WCS(header)
@@ -124,8 +133,8 @@ if args.swarp:
         ra,dec = w.wcs_pix2world(image_size[0]/2.,image_size[1]/2.,1)
         center = str(ra)+','+str(dec)
         mosaic_image_size = str(image_size[1])+','+str(image_size[0])
-        print(('output mosaic image size = ',mosaic_image_size))
-        print(('center of mosaic = ',center))
+        #print(('output mosaic image size = ',mosaic_image_size))
+        #print(('center of mosaic = ',center))
     if not(args.l):
         print('No file list provided for swarp')
     else:
@@ -138,15 +147,21 @@ if args.swarp:
                 t=line.split('.fits')
                 outfile.write(t[0]+'_bpm.pl \n')
             outfile.close
-            os.system('swarp @' + args.l + ' -c default.swarp -IMAGEOUT_NAME ' + args.l + '.coadd.fits -WEIGHTOUT_NAME ' + args.l + '.coadd.weight.fits -WEIGHT_TYPE MAP_WEIGHT -WEIGHT_IMAGE @masks')
+            os.system('swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -WEIGHT_TYPE MAP_WEIGHT -WEIGHT_IMAGE @masks')
         else:
             # CENTER_TYPE MANUAL
             #CENTER RA,DEC
             #PIXEL_SCALE 0.425
             if args.refimage:
                 print('using reference image with swarp')
-                os.system('swarp @' + args.l + ' -c default.swarp -IMAGEOUT_NAME ' + args.l + '.coadd.fits -WEIGHTOUT_NAME ' + args.l + '.coadd.weight.fits -CENTER_TYPE MANUAL -CENTER '+center+' -PIXEL_SCALE '+str(pixel_scale)+' -IMAGE_SIZE '+mosaic_image_size)
+                commandstring = 'swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -CENTER_TYPE MANUAL -CENTER '+center+' -PIXEL_SCALE '+str(pixel_scale)+' -IMAGE_SIZE '+mosaic_image_size 
             else:
-                os.system('swarp @' + args.l + ' -c default.swarp -IMAGEOUT_NAME ' + args.l + '.coadd.fits -WEIGHTOUT_NAME ' + args.l + '.coadd.weight.fits ')
+                commandstring='swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage
+            if args.noback:
+                commandstring = commandstring+' -SUBTRACT_BACK N'
+            print('running the following command:')
+            print(commandstring)
+            os.system(commandstring)
+
         print('DONE')
 
