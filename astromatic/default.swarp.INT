@@ -47,7 +47,7 @@ RESAMPLING_TYPE        LANCZOS3        # NEAREST,BILINEAR,LANCZOS2,LANCZOS3
                                        # LANCZOS4 (1 per axis) or FLAGS
 OVERSAMPLING           0               # Oversampling in each dimension
                                        # (0 = automatic)
-INTERPOLATE            N               # Interpolate bad input pixels (Y/N)?
+INTERPOLATE            Y               # Interpolate bad input pixels (Y/N)?
                                        # (all or for each image)
  
 FSCALASTRO_TYPE        FIXED           # NONE,FIXED, or VARIABLE
@@ -67,7 +67,7 @@ BACK_TYPE              AUTO            # AUTO or MANUAL
                                        # (all or for each image)
 BACK_DEFAULT           0.0             # Default background value in MANUAL
                                        # (all or for each image)
-BACK_SIZE              512             # Background mesh size (pixels)
+BACK_SIZE              1024             # Background mesh size (pixels)
                                        # (all or for each image)
 BACK_FILTERSIZE        3               # Background map filter range (meshes)
                                        # (all or for each image)
