@@ -173,7 +173,7 @@ class getzp():
         if self.instrument == 'h':
             defaultcat = 'default.sex.HDI'
         elif self.instrument == 'i':
-            defaultcat = 'default.sex.HDI'
+            defaultcat = 'default.sex.INT'
             self.keepsection=[1000,5000,0,4000]
         elif self.instrument == 'm':
             defaultcat = 'default.sex.HDI'
