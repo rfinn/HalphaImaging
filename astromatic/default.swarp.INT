@@ -19,11 +19,11 @@ WEIGHT_IMAGE                           # Weightmap filename if suffix not used
 #------------------------------- Co-addition ----------------------------------
  
 COMBINE                Y               # Combine resampled images (Y/N)?
-COMBINE_TYPE           WEIGHTED          # MEDIAN,AVERAGE,MIN,MAX,WEIGHTED,CLIPPED
+COMBINE_TYPE           CLIPPED          # MEDIAN,AVERAGE,MIN,MAX,WEIGHTED,CLIPPED
                                        # CHI-OLD,CHI-MODE,CHI-MEAN,SUM,
                                        # WEIGHTED_WEIGHT,MEDIAN_WEIGHT,
                                        # AND,NAND,OR or NOR
- 
+CLIP_SIGMA             3.0
 #-------------------------------- Astrometry ----------------------------------
  
 CELESTIAL_TYPE         NATIVE          # NATIVE, PIXEL, EQUATORIAL,
@@ -67,7 +67,7 @@ BACK_TYPE              AUTO            # AUTO or MANUAL
                                        # (all or for each image)
 BACK_DEFAULT           0.0             # Default background value in MANUAL
                                        # (all or for each image)
-BACK_SIZE              2048             # Background mesh size (pixels)
+BACK_SIZE              512             # Background mesh size (pixels)
                                        # (all or for each image)
 BACK_FILTERSIZE        3               # Background map filter range (meshes)
                                        # (all or for each image)
