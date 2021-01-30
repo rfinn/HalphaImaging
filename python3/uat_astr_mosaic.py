@@ -95,7 +95,7 @@ if args.s:
             print('HEY! PISCES!!!!!')
         else:
             os.system('sex ' + f + ' -c default.sex.HDI -CATALOG_NAME ' + froot + '.cat')
-        os.rename('check.fits', froot + 'check.fits')
+        #os.rename('check.fits', froot + 'check.fits')
             
         i += 1
         

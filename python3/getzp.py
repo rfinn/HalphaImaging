@@ -58,7 +58,8 @@ import numpy as np
 import sys
 from matplotlib import pyplot as plt
 import matplotlib.patches as patches
-
+import matplotlib
+matplotlib.use("Qt5agg")
 import astropy.units as u
 import astropy.coordinates as coord
 from astropy.coordinates import SkyCoord
@@ -508,9 +509,6 @@ class getzp():
         fits.writeto(self.image, im, header, overwrite=True)
     def getzp_wfc(self):
         self.getzp()
-        self.fit_residual_surface(norder=2)
-        self.renorm_wfc()
-        self.rerun_zp_fit()
         self.fit_residual_surface(norder=2)
         self.renorm_wfc()
         self.rerun_zp_fit()
