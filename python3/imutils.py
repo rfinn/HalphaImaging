@@ -15,13 +15,14 @@ from astropy.stats import sigma_clipped_stats
 import ccdproc
 from photutils import make_source_mask
 from astropy.io.fits import Header
+import numpy as np
 
 def subtract_median_sky(data):
     ''' subtract median sky from image data '''
     mask = make_source_mask(data,nsigma=3,npixels=5,dilate_size=10)
     mean,median,std = sigma_clipped_stats(data,sigma=3.0,mask=mask)
     data -= median
-    return data
+    return data,median
     
 def make_ccdmask(flat1,flat2=None):
     ''' make bad pixel mask from flat image.  use ratio of flats if flat2 is given '''
@@ -59,8 +60,12 @@ def convert_headfile_header(filename):
     f.close()
     # construct new header
     for i in range(len(keys)):
-        newheader.set(keys[i],value=values[i],comment=comments[i])
-
+        try:
+            newheader.set(keys[i],value=values[i],comment=comments[i])
+        except ValueError:
+            # getting error ValueError: Floating point inf values are not allowed in FITS headers.
+            print('WARNING: did not like header entry: ',keys[i],values[i])
+            continue
     return newheader
                             
             
