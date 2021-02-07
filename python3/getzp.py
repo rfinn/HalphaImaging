@@ -59,7 +59,7 @@ import sys
 from matplotlib import pyplot as plt
 import matplotlib.patches as patches
 import matplotlib
-matplotlib.use("Qt5agg")
+matplotlib.use("Tkagg")
 import astropy.units as u
 import astropy.coordinates as coord
 from astropy.coordinates import SkyCoord
@@ -133,7 +133,8 @@ class getzp():
     def __init__(self, image, instrument='h', filter='r', astromatic_dir = '~/github/HalphaImaging/astromatic/',norm_exptime = True,nsigma = 2., useri = False, naper = 5, mag=0):
 
         self.image = image
-        self.plotprefix = 'plots/'+self.image+'-'
+
+        self.plotprefix = self.image.split('.coadd')[0]+'-'
         # create plot directory if it doesn't already exist
         if not os.path.exists('plots'):
             os.mkdir('plots')
@@ -145,8 +146,11 @@ class getzp():
             im, header = fits.getdata(self.image,header=True)
             exptime = header['EXPTIME']
             norm_im = im/float(exptime)
+            header.set('ORIGEXPT',value=exptime,comment='ORIGINAL EXPTIME BEFORE NORM')
+            header.set('EXPTIME',value=1,comment="getzp set exptime=1")
             fits.writeto('n'+self.image, norm_im, header, overwrite=True)
             self.image = 'n'+self.image
+            self.plotprefix = 'n'+self.plotprefix
         print('output image = ',self.image)
         self.nsigma = nsigma
         self.useri = useri
@@ -348,7 +352,7 @@ class getzp():
         plt.ylabel('YFIT - SE R-band MAG',fontsize=16)
         plt.legend()
         plt.axhline(y=0,color='r')
-        plt.savefig(self.plotprefix+'getzp-fig2.png')
+        plt.savefig('plots/'+self.plotprefix+'-se-pan-flux.png')
 
     def fitzp(self,plotall=False):
         ###################################
@@ -449,7 +453,7 @@ class getzp():
             plt.figure()            
             crap = plt.hist(residual_all,bins=np.linspace(.8,1.2,20))
             plt.text(0.05,.85,s,horizontalalignment='left',transform=plt.gca().transAxes)
-            plt.savefig(self.plotprefix+'getzp-residual-hist.png')
+            plt.savefig('plots/'+self.plotprefix+'getzp-residual-hist.png')
 
         ###################################
         # Show location of residuals
@@ -478,7 +482,7 @@ class getzp():
         plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
         cb=plt.colorbar()
         cb.set_label('f-WFC/f-pan')
-        plt.savefig(self.plotprefix+'getzp-position-residuals-fitted-fig1.png')
+        plt.savefig('plots/'+self.plotprefix+'getzp-xyresidual-fitted.png')
 
         self.x = x
         self.y = y
@@ -510,13 +514,24 @@ class getzp():
     def getzp_wfc(self):
         self.getzp()
         self.fit_residual_surface(norder=2)
+        # this creates 'f'+imagename
         self.renorm_wfc()
         self.rerun_zp_fit()
+
         if self.filter == 'ha':
             print("running an additional round of flattening for halpha")
             self.fit_residual_surface(norder=2)
             self.renorm_wfc()
+            # this creates 'ff'+imagename
             self.rerun_zp_fit()
+        # clean up
+        if self.image.find('f') > -1:
+            rootname = self.image.strip('f')
+            if rootname.startswith('nWFC'):
+                os.remove(rootname)
+            if self.image.find('ff') > -1:
+                os.remove('f'+rootname)
+                
         plt.figure()
         plt.hist(self.zim,bins=np.linspace(.9,1.1,40))
     def fit_residual_surface(self,norder=2,suffix=None):
@@ -588,14 +603,14 @@ class getzp():
         cb.set_label('f-WFC/f-pan')
         s = ' std (MAD) = %.4f (%.4f)'%(np.std(self.zim[~clip_flag.mask]),MAD2(self.zim[~clip_flag.mask]))
         plt.title(self.image+': n poly = '+str(norder)+s)
-        plt.show()
+        #plt.show()
         
         if suffix is None:
             plotname='-imsurfit-'+str(norder)+'-'
         else:
             plotname='-imsurfit-'+str(norder)+'-'+suffix
-        plt.savefig(self.plotprefix+plotname+'.png')
-        plt.savefig(self.plotprefix+plotname+'.pdf')
+        plt.savefig('plots/'+self.plotprefix+plotname+'.png')
+        plt.savefig('plots/'+self.plotprefix+plotname+'.pdf')
         
     def renorm_wfc(self):
         # normalize surface fit
@@ -612,6 +627,7 @@ class getzp():
     def rerun_zp_fit(self):
         # change image name to flattened image
         self.image = self.renorm_image
+        self.plotprefix = 'f'+self.plotprefix
         # rerun getzp, but don't download panstarrs again
         self.runse()
         print('STATUS: matching se cat to panstarrs')       
