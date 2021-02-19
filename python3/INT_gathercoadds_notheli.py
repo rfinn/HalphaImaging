@@ -26,7 +26,7 @@ import argparse
 import subprocess
 
 parser = argparse.ArgumentParser(description ='Run sextractor, scamp, and swarp to determine WCS solution and make mosaics')
-parser.add_argument('--outdir',dest = 'outdir', default ='/home/rfinn/data/reduced/virgo-coadds-feb2019-int/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
+parser.add_argument('--outdir',dest = 'outdir', default ='/home/rfinn/data/reduced/virgo-coadds-feb2019-int/', help = 'output directory for coadds. Default is /home/rfinn/data/reduced/virgo-coadds/feb2019-int/')
 
 args = parser.parse_args()
 
@@ -36,7 +36,7 @@ output_dir_coadds = args.outdir
 telescope = 'INT'
 # get list of current directory
 flist1 = os.listdir()
-
+print(flist1)
 working_dir = os.getcwd()
 # overwrite output files if they exist
 overwrite = True
