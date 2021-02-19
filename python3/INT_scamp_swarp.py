@@ -38,6 +38,10 @@ overwrite = True
 flist1.sort()
 runscamp=False
 runswarp=True
+
+#flist1 = ['pointing022','pointing026']
+# setting this to false just b/c I am redoing mosaics for these two pointings
+submedian=False
 for subdir in flist1: # loop through list
     if os.path.isdir(subdir) & (subdir.find('pointing') > -1):# & (subdir.find('-') > -1):
         print('##########################################')
@@ -67,7 +71,8 @@ for subdir in flist1: # loop through list
             # move short exposure times
             os.system('python ~/github/HalphaImaging/python3/move_short_exposures.py --filestring WFC')        
             # subtract median
-            os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring WFC')
+            if submedian:
+                os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring WFC')
 
             # gather files
             os.system('ls WFC.r*PA.fits > '+subdir+'_r')

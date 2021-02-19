@@ -21,9 +21,18 @@ import shutil
 from astropy.io import fits
 import glob
 
+
+import argparse
+import subprocess
+
+parser = argparse.ArgumentParser(description ='Run sextractor, scamp, and swarp to determine WCS solution and make mosaics')
+parser.add_argument('--outdir',dest = 'outdir', default ='/home/rfinn/data/reduced/virgo-coadds-feb2019-int/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
+
+args = parser.parse_args()
+
 homedir = os.getenv("HOME")
 # define directory for all coadds
-output_dir_coadds = homedir+'/data/reduced/virgo-coadds-feb2019-int/'
+output_dir_coadds = args.outdir
 telescope = 'INT'
 # get list of current directory
 flist1 = os.listdir()
@@ -31,6 +40,7 @@ working_dir = os.getcwd()
 # overwrite output files if they exist
 overwrite = True
 flist1.sort()
+flist1 = ['pointing022','pointing026']
 workingdir = os.getcwd()
 for subdir in flist1:
     if os.path.isdir(subdir) & (subdir.find('pointing')>-1 ):# & (subdir.find('-') > -1):

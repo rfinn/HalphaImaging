@@ -54,7 +54,7 @@ from astropy.coordinates import SkyCoord
 from astropy.visualization import simple_norm
 from astropy import units as u
 from astropy.nddata import Cutout2D
-
+from astropy.stats import sigma_clip
 from astroquery.mast import Observations
 
 vmin = .5
@@ -333,12 +333,16 @@ def get_galex_image(ra,dec,imsize):
 
     return cutout
     
-def display_image(image,percent=99.9,lowrange=False):
+def display_image(image,percent=99.9,lowrange=False,mask=None,sigclip=True):
     lowrange=False
-    if lowrange:
-        norm = simple_norm(image, stretch='linear',percent=percent)
+    if sigclip:
+        clipped_data = sigma_clip(image,sigma_lower=5,sigma_upper=5)#,grow=10)
     else:
-        norm = simple_norm(image, stretch='asinh',percent=percent)
+        clipped_data = image
+    if lowrange:
+        norm = simple_norm(clipped_data, stretch='linear',percent=percent)
+    else:
+        norm = simple_norm(clipped_data, stretch='asinh',percent=percent)
 
     plt.imshow(image, norm=norm,cmap='gray_r',origin='lower')
     #v1,v2=scoreatpercentile(image,[.5,99.5])            
@@ -437,7 +441,10 @@ class cutouts():
             self.r,self.header = fits.getdata(self.r_name,header=True)
             self.ha = fits.getdata(self.rootname+'-Ha.fits')
             self.cs = fits.getdata(self.rootname+'-CS.fits')
-            self.mask = fits.getdata(self.rootname+'-R-mask.fits')        
+            try:
+                self.mask = fits.getdata(self.rootname+'-R-mask.fits')
+            except:
+                print('WARNING: could not open mask ',self.rootname+'-R-mask.fits')
     def get_image_size(self):
         # get image size in pixels and arcsec
         self.xsize_pix,self.ysize_pix = self.r.shape
@@ -535,9 +542,10 @@ class cutouts():
         self.plot_r()
         plt.subplot(1,3,3)
         self.plot_cs()
-        plt.show(block=False)        
-        plt.savefig(self.rootname+'-cutouts.png')
-        plt.savefig(self.rootname+'-cutouts.pdf')
+        #plt.show(block=False)
+        if plotsingle:
+            plt.savefig(self.rootname+'-cutouts.png')
+            plt.savefig(self.rootname+'-cutouts.pdf')
     def plotmask(self,plotsingle=True):
         if plotsingle:
             figure_size=(10,4)
@@ -695,13 +703,14 @@ class cutouts():
         #plt.imshow(self.r,cmap='gray_r',vmin=v1,vmax=v2,origin='lower')
 
         display_image(self.r)
-        plt.title(r'$R$',fontsize=14)
+        pointing = self.header['object'].replace('ointing','').replace('-','')
+        plt.title(r'$R$'+' ('+str(pointing)+')',fontsize=14)
         
     def plot_cs(self):
         #v1,v2=scoreatpercentile(self.cs,[vmin,vmax])
         #plt.imshow(self.cs,origin='lower',cmap='gray_r',vmin=v1,vmax=v2)
         #plt.gca().set_yticks(())
-        display_image(self.cs,lowrange=True)
+        display_image(self.cs,lowrange=False,percent=99.9,sigclip=False)
         plt.title(r'$H\alpha$',fontsize=14)
     def plot_mask(self):
         #v1,v2=scoreatpercentile(self.cs,[vmin,vmax])
@@ -773,10 +782,13 @@ if __name__ == '__main__':
         print('try again')
         sys.exit()
     c = cutouts(args.r)
+    
     if args.plotall:
         c.runall()
         c.plotcutouts()
         c.plotallcutouts()
         c.plotsfrcutouts()    
         c.plotmask()
-        
+    else:
+        c.get_halpha_cutouts()
+        c.plotcutouts()

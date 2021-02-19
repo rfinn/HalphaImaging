@@ -18,7 +18,7 @@ homedir = os.getenv('HOME')
 sys.path.append(homedir+'/github/HalphaImaging/python3/')
 
 dirlist = glob.glob('VF*')
-
+workingdir = os.getcwd()
 for d in dirlist:
     os.chdir(d)
     imlist = glob.glob(d+'*-R.fits')
@@ -27,7 +27,10 @@ for d in dirlist:
     if len(imlist) == 0:
         continue
     for im in imlist:
-        os.system('python '+homedir+'/github/HalphaImaging/python3/plot_cutouts_ha.py --r '+im+' --plotall')
+        # run this on the virgo vms to generate all cutouts
+        #os.system('python '+homedir+'/github/HalphaImaging/python3/plot_cutouts_ha.py --r '+im+' --plotall')
+        # run this to generate halpha cutouts only
+        os.system('python '+homedir+'/github/HalphaImaging/python3/plot_cutouts_ha.py --r '+im)
         
         
-    os.chdir('..')
+    os.chdir(workingdir)

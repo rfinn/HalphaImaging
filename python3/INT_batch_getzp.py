@@ -5,7 +5,7 @@ GOAL:
 - go into each subdirectory and run getzp on coadded images
 - delete any intermediate images to save space
 
-Run this from, e.g. /home/rfinn/data/reduced/scratch-int-feb2019
+Run this from, e.g. /home/rfinn/data/reduced/scratch-int-feb2019/attemp2
 - this directory has a subdirectory for each pointing
 
 
@@ -26,6 +26,7 @@ working_dir = os.getcwd()
 overwrite = True
 flist1.sort()
 #print(flist1)
+flist1 = ['pointing022','pointing026']
 for subdir in flist1: # loop through list
     #if os.path.isdir(subdir) & (subdir.startswith('pointing')) & (subdir.find('-') > -1):
     if os.path.isdir(subdir) & (subdir.find('pointing') > -1):

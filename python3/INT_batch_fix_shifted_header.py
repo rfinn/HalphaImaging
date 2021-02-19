@@ -58,7 +58,7 @@ for rimage in flist1: # loop through list
             haimage = c
             print('matching ha image: ',haimage)
     if haimage is not None:
-        command_string = 'python ~/github/HalphaImaging/python3/INT_align_images.py --image1 {} --image2 {} --weight2 {}'.format(haimage,rimage,rweightimage)
+        command_string = 'python ~/github/HalphaImaging/python3/INT_fix_shifted_header.py --image1 {} --image2 {} --weight2 {}'.format(haimage,rimage,rweightimage)
         # check to see if shifted r-band image exists.  if 
         try:
             print('running : ',command_string)
@@ -69,7 +69,7 @@ for rimage in flist1: # loop through list
             print('##########################################')
 
     # just running on one directory for testing purposes
-    break
+    #break
 
 
 
