@@ -26,7 +26,7 @@ working_dir = os.getcwd()
 overwrite = True
 flist1.sort()
 #print(flist1)
-flist1 = ['pointing022','pointing026']
+#flist1 = ['pointing022','pointing026']
 for subdir in flist1: # loop through list
     #if os.path.isdir(subdir) & (subdir.startswith('pointing')) & (subdir.find('-') > -1):
     if os.path.isdir(subdir) & (subdir.find('pointing') > -1):

@@ -36,13 +36,14 @@ output_dir_coadds = args.outdir
 telescope = 'INT'
 # get list of current directory
 flist1 = os.listdir()
-print(flist1)
+
 working_dir = os.getcwd()
 # overwrite output files if they exist
 overwrite = True
 flist1.sort()
 #flist1 = ['pointing022','pointing026']
 workingdir = os.getcwd()
+print(flist1)
 for subdir in flist1:
     if os.path.isdir(subdir) & (subdir.find('pointing')>-1 ):# & (subdir.find('-') > -1):
         os.chdir(subdir)
