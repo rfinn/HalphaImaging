@@ -21,11 +21,20 @@ matplotlib.use("Qt5agg")
 homedir = os.getenv("HOME")
 telescope = 'INT'
 working_dir = os.getcwd()
-coadd_image_directory = homedir+'/data/reduced/virgo-coadds-feb2019-int/'
+
 # overwrite output files if they exist
 overwrite = True
 
-#print(flist1)
+import argparse
+
+
+parser = argparse.ArgumentParser(description ='Run sextractor, scamp, and swarp to determine WCS solution and make mosaics')
+parser.add_argument('--coaddir',dest = 'coadddir', default ='/home/rfinn/data/reduced/virgo-coadds-feb2019-int/', help = 'directory for coadds. Default is /home/rfinn/data/reduced/virgo-coadds/feb2019-int/')
+
+args = parser.parse_args()
+
+coadd_image_directory = args.coaddir
+
 
 
 

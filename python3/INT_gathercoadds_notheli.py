@@ -70,6 +70,7 @@ for subdir in flist1:
             print('checking for ',imfile)
             fstring=filter
             if not os.path.exists(imfile):
+                # for the nelvy data, I did two cycles of flattening for halpha by mistake...
                 imfile = 'ffn{}_{}.noback.coadd.fits'.format(long_pointing,filesuffix[i])
                 print('checking for ',imfile)
 
