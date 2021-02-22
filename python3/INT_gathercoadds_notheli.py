@@ -53,7 +53,7 @@ for subdir in flist1:
         # redoing for when both filters are in the same directory
         long_pointing = subdir
         pointing = long_pointing.replace('ointing','')
-
+        
 
         ## GRAB THE COADDS IN THIS DIRECTORY
                 
@@ -65,13 +65,13 @@ for subdir in flist1:
         filters = ['r','Halpha','Ha6657']
         for i,filter in enumerate(filters):
             if i == 0:
-                imfile = 'fn'+long_pointing+'_r.noback.coadd.fits'
+                imfile = 'fn'+long_pointing+'_r*.noback.coadd.fits'
                 fstring='r'
             elif i == 1:
-                imfile = 'ffn'+long_pointing+'_Halpha.noback.coadd.fits'
+                imfile = 'ffn'+long_pointing+'_Halpha*.noback.coadd.fits'
                 fstring='Halpha'
             elif i == 2:
-                imfile = 'ffn'+long_pointing+'_Ha6657.noback.coadd.fits'
+                imfile = 'ffn'+long_pointing+'_Ha6657*.noback.coadd.fits'
                 fstring='Ha6657'
             if not os.path.exists(imfile):
                 continue
