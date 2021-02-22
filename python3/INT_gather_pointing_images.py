@@ -43,12 +43,12 @@ for p in upointings:
             os.system('mv {}/* {}/.'.format(hadir,p))
             for s in subdirs:
                 subdirpath = '{}-{}/{}'.format(p,h,s)
-                if os.path.exists(p+'-Halpha/'+s):
-                    command = 'mv {}-Halpha/{}/* {}/{}/.'.format(p,s,p,s)
+                if os.path.exists(subdirpath):
+                    command = 'mv {}/* {}/{}/.'.format(subdirpath,p,s)
                     print(command)
                     os.system(command)
                 os.system('rmdir '+subdirpath)
-            os.system('rmdir '+p+'-'+h)
+            os.system('rmdir {}'.format(hadir))
 
 
 
