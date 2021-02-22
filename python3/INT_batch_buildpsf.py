@@ -62,7 +62,7 @@ for i,f in enumerate(filters):
         # adding saturation limit for normalized images
         # I estimated this from the r-band image for p001
         # this is in counts/sec
-        command_string = 'python ~/github/halphagui/testing/buildpsf.py --image {} --saturate {} --int'.format(fimage,saturate_level[i])
+        command_string = 'python ~/github/halphagui/buildpsf.py --image {} --saturate {} --int'.format(fimage,saturate_level[i])
         try:
             print('running : ',command_string)
             os.system(command_string)
