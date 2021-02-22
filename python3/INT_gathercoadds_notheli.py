@@ -63,13 +63,18 @@ for subdir in flist1:
         # this is directory structure setup by theli
         # when I processed them myself, the coadds are in the main directory
         filters = ['r','Halpha','Ha6657','r','Halpha','Ha6657']
-        filesuffix = ['r','Halpha','Ha6657','r_r','Halpha_Halpha','Ha6657_Ha6657']    
+        filesuffix = ['r','Halpha','Ha6657','r_r','Halpha_Halpha','Ha6657_Ha6657']
+
         for i,filter in enumerate(filters):
             imfile = 'fn{}_{}.noback.coadd.fits'.format(long_pointing,filesuffix[i])
             print('checking for ',imfile)
             fstring=filter
             if not os.path.exists(imfile):
-                continue
+                imfile = 'ffn{}_{}.noback.coadd.fits'.format(long_pointing,filesuffix[i])
+                print('checking for ',imfile)
+
+                if not os.path.exists(imfile):
+                    continue
             weight_file = imfile.strip('ffn').split('.fits')[0]+'.weight.fits'
 
             # grab date from one of the r-band files
