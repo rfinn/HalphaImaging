@@ -46,6 +46,7 @@ workingdir = os.getcwd()
 print(flist1)
 for subdir in flist1:
     if os.path.isdir(subdir) & (subdir.find('pointing')>-1 ):# & (subdir.find('-') > -1):
+        print("I'm in "+subdir+"!!!")
         os.chdir(subdir)
         # store pointing and filter
         #long_pointing,filter = subdir.split('-')
