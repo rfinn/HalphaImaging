@@ -48,8 +48,10 @@ for subdir in flist1:
         filesuffix = ['-r_r','-Halpha_Halpha','-Ha6657_Ha6657']
         newsuffix = ['_r','_Halpha','_Ha6657']
         for i,fsuffix in enumerate(filesuffix):
-            files = glob.glob('{}/*{}*.fits'.format(subdir,fsuffix))
-            print(len(files))
+            globstring = '{}/*{}*.fits'.format(subdir,fsuffix)
+            print(globstring)
+            files = glob.glob(globstring)
+            print(files)
             for f in files:
                 outname = f.replace(fsuffix,newsuffix[i])
                 print('renaming ',f,'->',outname)
