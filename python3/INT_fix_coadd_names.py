@@ -24,7 +24,6 @@ import subprocess
 
 homedir = os.getenv("HOME")
 # define directory for all coadds
-output_dir_coadds = args.outdir
 telescope = 'INT'
 # get list of current directory
 flist1 = os.listdir()
