@@ -66,6 +66,7 @@ for subdir in flist1:
         filesuffix = ['r','Halpha','Ha6657','r_r','Halpha_Halpha','Ha6657_Ha6657']    
         for i,filter in enumerate(filters):
             imfile = 'fn{}_{}.noback.coadd.fits'.format(long_pointing,filesuffix[i])
+            print('checking for ',imfile)
             fstring=filter
             if not os.path.exists(imfile):
                 continue
