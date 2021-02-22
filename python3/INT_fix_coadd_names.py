@@ -36,7 +36,7 @@ workingdir = os.getcwd()
 for subdir in flist1:
     if os.path.isdir(subdir) & (subdir.find('pointing')>-1 ):# & (subdir.find('-') > -1):
         print("I'm in "+subdir+"!!!")
-        os.chdir(subdir)
+
         # store pointing and filter
         #long_pointing,filter = subdir.split('-')
         # redoing for when both filters are in the same directory
@@ -44,15 +44,16 @@ for subdir in flist1:
         pointing = long_pointing.replace('ointing','')
         
 
-        ## GRAB THE COADDS IN THIS DIRECTORY
-                
 
         filesuffix = ['-r_r','-Halpha_Halpha','-Ha6657_Ha6657']
         newsuffix = ['_r','_Halpha','_Ha6657']
         for i,fsuffix in enumerate(filesuffix):
-            files = glob.glob('*{}*.fits'.format(fsuffix))
+            files = glob.glob('{}/*{}*.fits'.format(subdir,fsuffix))
+            print(len(files))
             for f in files:
                 outname = f.replace(fsuffix,newsuffix[i])
+                print('renaming ',f,'->',outname)
                 os.rename(f,outname)
+    #os.chdir(workingdir)
 
 
