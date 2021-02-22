@@ -62,17 +62,11 @@ for subdir in flist1:
 
         # this is directory structure setup by theli
         # when I processed them myself, the coadds are in the main directory
-        filters = ['r','Halpha','Ha6657']
+        filters = ['r','Halpha','Ha6657','r','Halpha','Ha6657']
+        filesuffix = ['r','Halpha','Ha6657','r_r','Halpha_Halpha','Ha6657_Ha6657']    
         for i,filter in enumerate(filters):
-            if i == 0:
-                imfile = 'fn'+long_pointing+'_r*.noback.coadd.fits'
-                fstring='r'
-            elif i == 1:
-                imfile = 'ffn'+long_pointing+'_Halpha*.noback.coadd.fits'
-                fstring='Halpha'
-            elif i == 2:
-                imfile = 'ffn'+long_pointing+'_Ha6657*.noback.coadd.fits'
-                fstring='Ha6657'
+            imfile = 'fn{}_{}.noback.coadd.fits'.format(long_pointing,filesuffix[i])
+            fstring=filter
             if not os.path.exists(imfile):
                 continue
             weight_file = imfile.strip('ffn').split('.fits')[0]+'.weight.fits'
