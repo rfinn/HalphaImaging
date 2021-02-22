@@ -40,7 +40,7 @@ for p in upointings:
     for h in hafilters:
         hadir = p+'-'+h
         if os.path.exists(hadir):
-            os.system('mv {}/* {}/.'.format(hadir,p)
+            os.system('mv {}/* {}/.'.format(hadir,p))
             for s in subdirs:
                 subdirpath = '{}-{}/{}'.format(p,h,s)
                 if os.path.exists(p+'-Halpha/'+s):
