@@ -28,6 +28,8 @@ for f in flist1:
 # pointings will now have two listing for each filter b/c of r and Halpha
 upointings = set(pointings) # unique pointings
 
+subdirs = ['plots','shortexposure']
+hafilters = ['Halpha','Ha6657']
 for p in upointings:
     print(p)
     if not(os.path.exists(p)):
@@ -37,10 +39,15 @@ for p in upointings:
         os.system('rmdir '+p+'-r')
     if os.path.exists(p+'-Halpha'):
         os.system('mv '+p+'-Halpha/* '+p+'/.')
-        os.system('rmdir '+p+'-Halpha')
-    if os.path.exists(p+'-Ha6657'):
-        os.system('mv '+p+'-Ha6657/* '+p+'/.')
-        os.system('rmdir '+p+'-Ha6657')
+        for s in subdirs:
+            for h in hafilters:
+                subdirpath = '{}-{}/{}'.format(p,h,s)
+                if os.path.exists(p+'-Halpha/'+s):
+                    command = 'mv {}-Halpha/{}/* {}/{}/.'.format(p,s,p,s)
+                    print(command)
+                    os.system(command)
+                os.system('rmdir '+subdirpath)
+            os.system('rmdir '+p+'-'+h)
 
 
 
