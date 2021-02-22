@@ -37,10 +37,11 @@ for p in upointings:
     if os.path.exists(p+'-r'):
         os.system('mv '+p+'-r/* '+p+'/.')
         os.system('rmdir '+p+'-r')
-    if os.path.exists(p+'-Halpha'):
-        os.system('mv '+p+'-Halpha/* '+p+'/.')
-        for s in subdirs:
-            for h in hafilters:
+    for h in hafilters:
+        hadir = p+'-'+h
+        if os.path.exists(hadir):
+            os.system('mv {}/* {}/.'.format(hadir,p)
+            for s in subdirs:
                 subdirpath = '{}-{}/{}'.format(p,h,s)
                 if os.path.exists(p+'-Halpha/'+s):
                     command = 'mv {}-Halpha/{}/* {}/{}/.'.format(p,s,p,s)
