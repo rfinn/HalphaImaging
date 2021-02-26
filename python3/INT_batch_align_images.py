@@ -49,9 +49,16 @@ for rimage in flist1: # loop through list
 
     # grab other coadds
     rootname = rimage.split('-r')[0]
+    # last entry is the pointing name - match on this
+    # because sometimes the Halpha coordinates are slightly different
+    # or the UT date changed between Halpha and r images
+    pointing = rootname.split('-')[-1]
     rweightimage = rootname+'-r.weight.fits'
-    coadds = glob.glob(rootname+'*.fits')
-    #print(coadds)
+    coadds = glob.glob('VF*'+pointing+'*.fits')
+    print('rootname = ',rootname)
+    print(coadds)
+
+    # fin
     haimage = None
     for c in coadds:
         if (c.find('-Ha') > -1) & (c.find('weight') < 0):
@@ -69,7 +76,7 @@ for rimage in flist1: # loop through list
             print('##########################################')
 
     # just running on one directory for testing purposes
-    break
+    #break
 
 
 
