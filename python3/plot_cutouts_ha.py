@@ -146,7 +146,7 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
       - native is 0.262 for legacy; 
       - 2.75 for wise
     """
-
+    downloadwise = True
     # check if images already exist
     if subfolder is not None:
         image_names = glob.glob(subfolder+'/'+galid+'-unwise*img-m.fits')
@@ -154,114 +154,141 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
         image_names = glob.glob(galid+'-unwise*img-m.fits')
     if len(image_names) > 3:
         print('unwise images already downloaded')
-        if len(image_names) > 4*len(bands):
+        print(image_names)
+        # should be only one *-img-m.fits image per band
+        if len(image_names) > len(bands):
             multiframe=True
         else:
             multiframe = False
-        return image_names,multiframe
-    imsize = int(imsize)
-    print('wise image size = ',imsize)
-    baseurl = 'http://unwise.me/cutout_fits?version=allwise'
-    imurl = baseurl +'&ra=%.5f&dec=%.5f&size=%s&bands=%s'%(ra,dec,imsize,bands)
-    print('downloading unwise images')
-    print(imurl)
-    wisetar = wget.download(imurl)
-    tartemp = tarfile.open(wisetar,mode='r:gz') #mode='r:gz'
-    wnames = tartemp.getnames()
-
-    print(wnames)
-    # check for multiple pointings - means galaxy is split between images
-    multiframe = False
-    if len(wnames) > 4*len(bands):
-        multiframe = True
-    
-    wmembers = tartemp.getmembers()
-    image_names = []
-    weight_names = []
-    tartemp.extractall()
-    for fname in wnames:
-        #print(fname)
-        t = fname.split('-')
-        if subfolder is not None:
-            rename = subfolder+'/'+str(galid)+'-'+t[0]+'-'+t[1]+'-'+t[2]+'-'+t[3]+'-'+t[4]
+        weight_names = glob.glob(galid+'-unwise*std*.fits')
+        if not multiframe:
+            return image_names,weight_names,multiframe
         else:
-            rename = str(galid)+'-'+t[0]+'-'+t[1]+'-'+t[2]+'-'+t[3]+'-'+t[4]
-        #print('rename = ',rename)
-        #print(rename.find('gz'))
-        #if os.path.exists(rename): # this should only occur if multiple images are returned from wise
-        #    os.remove(rename)
-        os.rename(fname, rename)
-        if rename.find('.gz') > -1:
-            #print('hello????')
-            os.system('gunzip '+rename)
-            rename = rename.split('.gz')[0]
-            #print('after gunzip, rename = ',rename)
-        if rename.find('img') > -1:
-            image_names.append(rename)
-        if rename.find('std') > -1:
-            # move ivar images to imagename.weight.fits
-            outim = rename.replace('std-m','img-m.std')
-            os.rename(rename,outim)
-            weight_names.append(outim)
-    os.remove(wisetar)
+            print('going to try new stacking for wise multiframe')
+            downloadwise = False
+    if downloadwise:
+        imsize = int(imsize)
+        print('wise image size = ',imsize)
+        baseurl = 'http://unwise.me/cutout_fits?version=allwise'
+        imurl = baseurl +'&ra=%.5f&dec=%.5f&size=%s&bands=%s'%(ra,dec,imsize,bands)
+        print('downloading unwise images')
+        print(imurl)
+        wisetar = wget.download(imurl)
+        tartemp = tarfile.open(wisetar,mode='r:gz') #mode='r:gz'
+        wnames = tartemp.getnames()
+
+        print(wnames)
+        # check for multiple pointings - means galaxy is split between images
+        multiframe = False
+        if len(wnames) > 4*len(bands):
+            multiframe = True
+    
+        wmembers = tartemp.getmembers()
+        image_names = []
+        weight_names = []
+        tartemp.extractall()
+        for fname in wnames:
+            #print(fname)
+            t = fname.split('-')
+            if subfolder is not None:
+                rename = subfolder+'/'+str(galid)+'-'+t[0]+'-'+t[1]+'-'+t[2]+'-'+t[3]+'-'+t[4]
+            else:
+                rename = str(galid)+'-'+t[0]+'-'+t[1]+'-'+t[2]+'-'+t[3]+'-'+t[4]
+            #print('rename = ',rename)
+            #print(rename.find('gz'))
+            #if os.path.exists(rename): # this should only occur if multiple images are returned from wise
+            #    os.remove(rename)
+            os.rename(fname, rename)
+            if rename.find('.gz') > -1:
+                #print('hello????')
+                os.system('gunzip '+rename)
+                rename = rename.split('.gz')[0]
+                #print('after gunzip, rename = ',rename)
+            if rename.find('img') > -1:
+                image_names.append(rename)
+            if rename.find('std') > -1:
+                # move ivar images to imagename.weight.fits
+                outim = rename.replace('std-m','img-m.std')
+                os.rename(rename,outim)
+                weight_names.append(outim)
+        os.remove(wisetar)
     
     # if multiframe
     # run swarp to create coadded image
     if multiframe:
-        print('running swarp to combine multiple unwise images')
-        #########################################
-        ## COMBINE THE IMAGE FRAMES USING AVERAGE
-        #########################################        
-        # create default.swarp
-        os.system('swarp -d > default.swarp')
-        # run swarp
-        all_images = ' '.join(image_names)
-        output_image = str(galid)+'-'
-        s = 'swarp '+all_images+' -COMBINE_TYPE AVERAGE -WEIGHT_TYPE MAP_RMS -WEIGHT_SUFFIX .std.fits -SUBTRACT_BACK N'
-        #print(s)
-        os.system(s)
-
-        # rename coadd.fits to the output image name
-        outimage = str(galid)+'-unwise-w'+str(bands)+'-coadd.fits'
-        os.rename('coadd.fits',outimage)
-
-        #########################################
-        ## COMBINE THE STD FRAMES USING SUM
-        #########################################
-        noise_images = []
-        '''
-        for f in weight_names:
-            im,h = fits.getdata(f,header=True)
-            # square values
-            im = im**2
-            # save file
-            fits.writeto('sq-'+f,im,header=h,overwrite=True)
-            noise_images.append('sq-'+f)
-        '''
-        #all_images = ' '.join(noise_images)
-
-        # just combine using average and then multiply by sqrt 2
-        all_images = ' '.join(weight_names)
-        output_image = str(galid)+'-'
-        s = 'swarp '+all_images+' -COMBINE_TYPE MEDIAN -WEIGHT_TYPE NONE -SUBTRACT_BACK N'
-        #print(s)
-        os.system(s)
-
-        # now take sqrt of image values
-        #im,h = fits.getdata('coadd.fits',header=True)
-        #im = np.sqrt(2)*im
-        # divide by number of images because we took average of data
-        #im = im/len(all_images)
-
-        weightname = str(galid)+'-unwise-w'+str(bands)+'-coadd.std.fits'  
-        #fits.writeto(weightname,im,header=h,overwrite=True)
+        image_names=[]
+        weight_names=[]
+        for b in bands:
+            print('running swarp to combine multiple unwise images in band ',b)
+            #########################################
+            ## COMBINE THE IMAGE FRAMES USING AVERAGE
+            #########################################        
+            # create default.swarp
+            os.system('swarp -d > default.swarp')
+            # run swarp
+            matchstring = "*w{}-img-m.fits".format(b)            
+            if subfolder is not None:
+                allfiles = glob.glob(subfolder+'/'+galid+matchstring)
 
 
-        # just trying average!
-        os.rename('coadd.fits',weightname)
-        image_names = [outimage]
-        weight_names = [weightname]
-        multiframe=True
+                
+            else:
+                allfiles = glob.glob(galid+matchstring)
+
+            all_images = " ".join(allfiles)
+            output_image = str(galid)+'-'
+            s = 'swarp '+all_images+' -COMBINE_TYPE AVERAGE -WEIGHT_SUFFIX .std.fits -SUBTRACT_BACK N'
+            print(s)
+            os.system(s)
+
+            # rename coadd.fits to the output image name
+            outimage = str(galid)+'-unwise-w'+str(b)+'-coadd.fits'
+            if subfolder is not None:
+                os.rename('coadd.fits',os.path.join(subfolder,outimage))
+                image_names.append(os.path.join(subfolder,outimage))                
+            else:
+                os.rename('coadd.fits',outimage)
+                image_names.append(outimage)
+
+            
+            os.rename('coadd.fits','unwise/'+outimage)
+
+            #########################################
+            ## COMBINE THE STD FRAMES USING SUM
+            #########################################
+            # just combine using average and then multiply by sqrt 2
+            matchstring = "*w{}-img-m.std.fits".format(b)
+            
+            if subfolder is not None:
+                allfiles = glob.glob(subfolder+'/'+galid+matchstring)
+            else:
+                allfiles = glob.glob(galid+matchstring)
+            #print('allfiles with std images = ',allfiles)
+            all_images = " ".join(allfiles)
+            
+            output_image = str(galid)+'-'
+            s = 'swarp '+all_images+' -COMBINE_TYPE MEDIAN -WEIGHT_TYPE NONE -SUBTRACT_BACK N'
+            #print(s)
+            os.system(s)
+
+            # now take sqrt of image values
+            #im,h = fits.getdata('coadd.fits',header=True)
+            #im = np.sqrt(2)*im
+            # divide by number of images because we took average of data
+            #im = im/len(all_images)
+            
+            weightname = str(galid)+'-unwise-w'+str(b)+'-coadd.std.fits'  
+            #fits.writeto(weightname,im,header=h,overwrite=True)
+
+
+            # just trying average!
+            if subfolder is not None:
+                os.rename('coadd.fits',os.path.join(subfolder,weightname))
+                weight_names.append(os.path.join(subfolder,weightname))
+            else:
+                os.rename('coadd.fits',weightname)
+                weight_names.append(weightname)
+            
         
     if makeplots:
         ##### DISPLAY IMAGE
@@ -272,7 +299,7 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
     #print(image_names)
     #print(multiframe)
 
-    
+
     return image_names,weight_names,multiframe
 
 def get_galex_image(ra,dec,imsize):
@@ -317,7 +344,7 @@ def get_galex_image(ra,dec,imsize):
     # look for the image before calling this function
     #
     # but I should also look for the image, because if I change the image
-    # size of the cutotu, I don't need to download the big FOV
+    # size of the cutout, I don't need to download the big FOV
     
     nuv,nuv_header = fits.getdata(nuv_path,header=True)
 
@@ -482,31 +509,56 @@ class cutouts():
         OUTPUT: Name of file to retrieve from
 
         '''
+
         self.wise_band = band
         self.wise_imsize = self.xsize_arcsec/UNWISE_PIXSCALE
         print('wise image size = ',self.wise_imsize)
-        self.wise_filenames,self.wise_multiframe_flag = \
-            get_unwise_image(self.ra,self.dec,galid=self.galid,pixscale='2.75',imsize=self.wise_imsize,bands=self.wise_band,subfolder='unwise')
+        # check for coadds in unwise folder.  if they are there, then use these
+        outimage = str(self.galid)+'-unwise-w*-coadd.fits'
+        coadds = glob.glob('unwise/'+outimage)
+        if len(coadds) > 0:
+            print('found unwise coadds')
+            self.wise_filenames = [os.path.basename(f) for f in coadds]
+            stdimage = str(self.galid)+'-unwise-w*-coadd.std.fits'
+            t = glob.glob('unwise/'+stdimage)
+            self.wise_weightimages = [os.path.basename(f) for f in t]
+            self.wise_multiframe_flag = True
+        else:
+            self.wise_filenames,self.wise_weightimages,self.wise_multiframe_flag = \
+                get_unwise_image(self.ra,self.dec,galid=self.galid,pixscale='2.75',imsize=self.wise_imsize,bands=self.wise_band,subfolder='unwise')
             
     def load_unwise_images(self):
+        print('current directory = ',os.getcwd())                
         if self.wise_multiframe_flag:
             print('WARNING: galaxy falls on multiple unwise images')
+        print(self.wise_filenames)
         for f in self.wise_filenames:
-            if f.find('w1-img') > -1:
+            #f = os.path.join('unwise',f)
+
+            # this is a kludge to get around issue that without multiframe
+            # the file has the path prepended
+            # but with multiframe, it doesn't
+            #
+            # but then when don't I just update filename in get_unwise_image???
+            if not os.path.exists(f):
+                f = 'unwise/'+f
+            print('wise filename :',f)            
+            if f.find('w1') > -1:
                 self.w1,self.w1_header = fits.getdata(f,header=True)
                 self.w1_pscale = np.abs(self.w1_header['CD1_1'])*3600
-            elif f.find('w2-img') > -1:
+            elif f.find('w2') > -1:
                 self.w2,self.w2_header = fits.getdata(f,header=True)
                 self.w2_pscale = np.abs(self.w2_header['CD1_1'])*3600
-            elif f.find('w3-img') > -1:
+            elif f.find('w3') > -1:
                 self.w3,self.w3_header = fits.getdata(f,header=True)
                 self.w3_pscale = np.abs(self.w3_header['CD1_1'])*3600
-            elif f.find('w4-img') > -1:
+            elif f.find('w4') > -1:
                 self.w4,self.w4_header = fits.getdata(f,header=True)
                 self.w4_pscale = np.abs(self.w4_header['CD1_1'])*3600
     def get_galex_image(self):
         # download galex image if necessary (large FOV)
         # then get cutout
+
         imsize_arcsec = "%i"%(self.xsize_arcsec)        
         try:
             t = self.galid.split('-')
@@ -678,16 +730,16 @@ class cutouts():
         # plot image from legacy survey
         # band refers to W1, W2, W3, W4 (1,2,3,4)
         if band == 1:
-            display_image(self.w1,lowrange=True)
+            display_image(self.w1,lowrange=False)
             plt.title(r'$unWISE \ W1$')            
         elif band == 2:
-            display_image(self.w2,lowrange=True)
+            display_image(self.w2,lowrange=False)
             plt.title(r'$unWISE \ W2$')            
         elif band == 3:
-            display_image(self.w3,lowrange=True)
+            display_image(self.w3,lowrange=False)
             plt.title(r'$unWISE \ W3$')
         elif band == 4:
-            display_image(self.w4,lowrange=True)
+            display_image(self.w4,lowrange=False)
             plt.title(r'$unWISE \ W4$')
         pass
     def plot_ha(self):
