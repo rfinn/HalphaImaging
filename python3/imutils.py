@@ -19,7 +19,7 @@ import numpy as np
 
 def subtract_median_sky(data):
     ''' subtract median sky from image data '''
-    mask = make_source_mask(data,nsigma=3,npixels=5,dilate_size=10)
+    mask = make_source_mask(data,nsigma=3,npixels=5,dilate_size=5)
     masked_data = np.ma.array(data,mask=mask)
     #clipped_array = sigma_clip(masked_data,cenfunc=np.ma.mean)
 
