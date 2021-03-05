@@ -40,15 +40,16 @@ from astropy.io import fits
 def subtract_median(files,overwrite=False):
     print('subtracting median from images')
     for fname in files:
-        hdu = fits.open(fname)
-
-
-        # background subtraction
+        print(fname)
         if os.path.exists("m"+fname) and not overwrite:
             print("m"+fname,' already exists.  moving to next file')
             continue
+        
+        hdu = fits.open(fname)
+
+        # background subtraction
         hdu[0].data,median = imutils.subtract_median_sky(hdu[0].data)
-        hdu.header.set('MEDSUB',value=median,comment='median subtraction')
+        hdu[0].header.set('MEDSUB',value=median,comment='median subtraction')
         if overwrite:
             hdu.writeto(fname,overwrite=True)
         else:
