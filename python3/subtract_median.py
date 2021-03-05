@@ -35,14 +35,16 @@ import ccdproc as ccdp
 ### SUBTRACT MEDIAN FROM IMAGE
 ##########################################################
 
-def subtract_median(ic,overwrite=False):
+def subtract_median(files,overwrite=False):
     print('subtracting median from images')
-    for hdu, fname in ic.hdus(return_fname=True):
+    for fname in files:
+        hdu = fits.open(fname)
+
 
         # background subtraction
         if os.path.exists("m"+fname) and not overwrite:
             print("m"+fname,' already exists.  moving to next file')
-
+            continue
         hdu.data,median = imutils.subtract_median_sky(hdu.data)
         hdu.header.set('MEDSUB',value=median,comment='median subtraction')
         if overwrite:
@@ -64,5 +66,5 @@ if __name__ == '__main__':
     #else:
     #    keys = ['naxis1', 'naxis2', 'imagetyp', 'filter', 'exptime','instrmnt']
 
-    ic = ccdp.ImageFileCollection(os.getcwd(),  glob_include=args.filestring+'*.fits',glob_exclude='*coadd*.fits')
-    subtract_median(ic,overwrite=args.overwrite)
+    files = glob.glob(args.filestring+'*.fits')
+    subtract_median(files,overwrite=args.overwrite)
