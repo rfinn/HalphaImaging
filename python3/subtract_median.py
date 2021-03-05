@@ -40,7 +40,10 @@ from astropy.io import fits
 def subtract_median(files,overwrite=False):
     print('subtracting median from images')
     for fname in files:
-        print(fname)
+        if not overwrite:
+            print("{} -> m{}".format(fname,fname))
+        else:
+            print("{} -> {}".format(fname,fname))
         if os.path.exists("m"+fname) and not overwrite:
             print("m"+fname,' already exists.  moving to next file')
             continue
@@ -70,4 +73,5 @@ if __name__ == '__main__':
     #    keys = ['naxis1', 'naxis2', 'imagetyp', 'filter', 'exptime','instrmnt']
 
     files = glob.glob(args.filestring+'*.fits')
+    files = files.sort()
     subtract_median(files,overwrite=args.overwrite)
