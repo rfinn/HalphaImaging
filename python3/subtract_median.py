@@ -37,7 +37,8 @@ import ccdproc as ccdp
 
 def subtract_median(ic,overwrite=False):
     print('subtracting median from images')
-    for hdu, fname in ic.hdus(return_fname=True):    
+    for hdu, fname in ic.hdus(return_fname=True):
+        print(fname)
         # background subtraction
         hdu.data,median = imutils.subtract_median_sky(hdu.data)
         hdu.header.set('MEDSUB',value=median,comment='median subtraction')
