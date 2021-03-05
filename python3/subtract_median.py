@@ -73,5 +73,6 @@ if __name__ == '__main__':
     #    keys = ['naxis1', 'naxis2', 'imagetyp', 'filter', 'exptime','instrmnt']
 
     files = glob.glob(args.filestring+'*.fits')
-    files = files.sort()
+    files.sort()
+    print(files)
     subtract_median(files,overwrite=args.overwrite)
