@@ -143,7 +143,7 @@ if args.swarp:
             multiha = False
             halist = fnames[0]
         # get name of R-band coadd
-        rcoadd_image = f+'.coadd.fits'
+        rcoadd_image = f+'.noback.coadd.fits'
         # run swarp on r images
         print('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f)
         os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --noback')
