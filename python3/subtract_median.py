@@ -52,7 +52,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description ='Subtract the median from images, after masking out objects and growing mask.')
 
     parser.add_argument('--filestring', dest = 'filestring', default = 'WFC', help = 'filestring to match. default is WFC')
-    parser.add_argument('--overwrite', action = store_true, default = False, help = 'overwrite file?  the default is false, so that a new file with m prefix is created.')    
+    parser.add_argument('--overwrite', action = 'store_true', default = False, help = 'overwrite file?  the default is false, so that a new file with m prefix is created.')    
     args = parser.parse_args()
 
     #if args.hdi:
