@@ -47,7 +47,7 @@ def subtract_median(files,overwrite=False):
         if os.path.exists("m"+fname) and not overwrite:
             print("m"+fname,' already exists.  moving to next file')
             continue
-        hdu.data,median = imutils.subtract_median_sky(hdu.data)
+        hdu[0].data,median = imutils.subtract_median_sky(hdu[0].data)
         hdu.header.set('MEDSUB',value=median,comment='median subtraction')
         if overwrite:
             hdu.writeto(fname,overwrite=True)
