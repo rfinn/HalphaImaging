@@ -107,7 +107,7 @@ if args.scamp:
 
 if args.submed:
     # subtract median from images before running swarp
-    os.system('python '+gitpath+'subtract_median.py --filestring h --overwrite')
+    os.system('python '+gitpath+'subtract_median.py --filestring h ')
 
     # sort objects by field
     os.system('python '+gitpath+'uat_HDIsortobjects.py --filestring mh')

@@ -38,15 +38,17 @@ import ccdproc as ccdp
 def subtract_median(ic,overwrite=False):
     print('subtracting median from images')
     for hdu, fname in ic.hdus(return_fname=True):
-        print(fname)
+        print("m"+fname,' already exists.  moving to next file')
         # background subtraction
+        if os.path.exists("m"+fname) and not overwrite:
+            print(
         hdu.data,median = imutils.subtract_median_sky(hdu.data)
         hdu.header.set('MEDSUB',value=median,comment='median subtraction')
         if overwrite:
             hdu.writeto(fname,overwrite=True)
         else:
             hdu.writeto("m"+fname,overwrite=True)
-        
+        hdu.close()
 if __name__ == '__main__':
     import argparse
 
