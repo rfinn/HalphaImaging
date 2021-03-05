@@ -39,6 +39,7 @@ parser.add_argument('--flatwdome', dest='flatwdome', default=False,action='store
 parser.add_argument('--fixheader', dest='fixheader', default=False,action='store_true', help='fix headeer to get files ready for scamp.')
 parser.add_argument('--se', dest='se', default=False,action='store_true', help='run sextractor.  best to do this on all files from an observing run at once.')
 parser.add_argument('--scamp', dest='scamp', default=False,action='store_true', help='run scamp, and group files.  best to do this on all files from an observing run at once.')
+parser.add_argument('--submed', dest='submed', default=False,action='store_true', help='run subtract_median to remove the background before running swarp.')
 parser.add_argument('--swarp', dest='swarp', default=False,action='store_true', help='run swarp to make coadded images.')
 parser.add_argument('--filelist', dest='filelist', default='swarp_input', help='list of image sets to run swarp on.  the file should contain the list of all Rband groups, for example: ls pointing*_R > swarp_input.  This will look for the corresponding list of halpha images.')
 parser.add_argument('--zp', dest='zp', default=False,action='store_true', help='run getzp.py on all *coadd.fits images')
@@ -103,6 +104,14 @@ if args.scamp:
 
     # sort objects by field
     os.system('python '+gitpath+'uat_HDIsortobjects.py --filestring h')
+
+if args.submed:
+    # subtract median from images before running swarp
+    os.system('python '+gitpath+'subtract_median.py --filestring h ')
+
+    # sort objects by field
+    os.system('python '+gitpath+'uat_HDIsortobjects.py --filestring mh')
+
 
 # run swarp?
 #os.system('python '+gitpath+'uat_HDIsortobjects.py --filestring h')

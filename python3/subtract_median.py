@@ -35,23 +35,30 @@ import ccdproc as ccdp
 ### SUBTRACT MEDIAN FROM IMAGE
 ##########################################################
 
-def subtract_median(ic):
+def subtract_median(ic,overwrite=False):
     print('subtracting median from images')
     for hdu, fname in ic.hdus(return_fname=True):    
         # background subtraction
         hdu.data,median = imutils.subtract_median_sky(hdu.data)
         hdu.header.set('MEDSUB',value=median,comment='median subtraction')
-        hdu.writeto(fname,overwrite=True)
+        if overwrite:
+            hdu.writeto(fname,overwrite=True)
+        else:
+            hdu.writeto("m"+fname,overwrite=True)
         
 if __name__ == '__main__':
     import argparse
 
-    parser = argparse.ArgumentParser(description ='Run gui for analyzing Halpha images')
+    parser = argparse.ArgumentParser(description ='Subtract the median from images, after masking out objects and growing mask.')
 
     parser.add_argument('--filestring', dest = 'filestring', default = 'WFC', help = 'filestring to match. default is WFC')
+    parser.add_argument('--overwrite', action = store_true, default = False, help = 'overwrite file?  the default is false, so that a new file with m prefix is created.')    
     args = parser.parse_args()
 
-    keys = ['naxis1', 'naxis2', 'imagetyp', 'filter', 'exptime','instrmnt']
+    #if args.hdi:
+    #    keys = ['naxis1', 'naxis2', 'imagetyp', 'filter', 'exptime','instrmnt']
+    #else:
+    #    keys = ['naxis1', 'naxis2', 'imagetyp', 'filter', 'exptime','instrmnt']
 
-    ic = ccdp.ImageFileCollection(os.getcwd(), keywords=keys, glob_include=args.filestring+'*.fits',glob_exclude='*coadd*.fits')
-    subtract_median(ic)
+    ic = ccdp.ImageFileCollection(os.getcwd(),  glob_include=args.filestring+'*.fits',glob_exclude='*coadd*.fits')
+    subtract_median(ic,overwrite=args.overwrite)
