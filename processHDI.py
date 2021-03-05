@@ -146,18 +146,18 @@ if args.swarp:
         rcoadd_image = f+'.coadd.fits'
         # run swarp on r images
         print('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f)
-        os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f)
+        os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --noback')
         
 
         if multiha:
             for h in fnames:
                 # run swarp on halpha, with r as reference image
-                os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+h+' --refimage '+rcoadd_image)
+                os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+h+' --refimage '+rcoadd_image+' --noback')
         else:
             # run swarp on r, with r as reference image
-            os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+halist+' --refimage '+rcoadd_image)
+            os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+halist+' --refimage '+rcoadd_image+' --noback')
         # run swarp on r, with r as reference image
-        os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image)
+        os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image+' --noback')
         #break
         
     infile.close()
