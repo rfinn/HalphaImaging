@@ -28,6 +28,7 @@ print(homedir)
 sys.path.append('/home/rfinn/github/HalphaImaging/python3/')
 import imutils
 import ccdproc as ccdp
+import glob
 
 
 
