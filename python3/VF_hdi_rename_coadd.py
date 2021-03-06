@@ -28,7 +28,7 @@ from astropy.time import Time
 parser = argparse.ArgumentParser(description ='Rename HDI coadds to VF format.  EX: VF-2017-05-23-HDI-p012-R-coadd.fits')
 
 
-parser.add_argument('--filestring', dest='filestring', default='pointing', help='list of image sets to run swarp on.  the file should contain the list of all Rband groups, for example: ls pointing*_R > swarp_input.  This will look for the corresponding list of halpha images.')
+parser.add_argument('--filestring', dest='filestring', default='pointing', help='filestring that points to files to rename.  glob will pull filestring*.fits')
 parser.add_argument('--test', dest='test', default=False, action='store_true', help='set this to print out new filenames but not actually rename the files')
 
 args = parser.parse_args()
