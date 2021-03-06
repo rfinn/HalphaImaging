@@ -37,6 +37,8 @@ parser.add_argument('--zap', dest='zap', default=False,action='store_true', help
 parser.add_argument('--groupflat', dest='groupflat', default=False,action='store_true', help='group files by filter and create normalized flats')
 parser.add_argument('--flatwdome', dest='flatwdome', default=False,action='store_true', help='flatten images with dome flats')
 parser.add_argument('--fixheader', dest='fixheader', default=False,action='store_true', help='fix headeer to get files ready for scamp.')
+parser.add_argument('--filestring', dest = 'filestring', default = 'h', help = 'string to use to get input files (default = "h", which grabs all of the files "h*o00.fits")')
+
 parser.add_argument('--se', dest='se', default=False,action='store_true', help='run sextractor.  best to do this on all files from an observing run at once.')
 parser.add_argument('--scamp', dest='scamp', default=False,action='store_true', help='run scamp, and group files.  best to do this on all files from an observing run at once.')
 parser.add_argument('--submed', dest='submed', default=False,action='store_true', help='run subtract_median to remove the background before running swarp.')
@@ -97,20 +99,20 @@ if fixheader:
 # images taken on different nights. :)
 if args.se:
     # run sextractor to create object lists
-    os.system('python '+gitpath+'uat_astr_mosaic.py --s --filestring h')
+    os.system('python '+gitpath+'uat_astr_mosaic.py --s --filestring '+args.filestring)
 if args.scamp:
     # run scamp to solve for astrometry
-    os.system('python '+gitpath+'uat_astr_mosaic.py --scamp --filestring h')
+    os.system('python '+gitpath+'uat_astr_mosaic.py --scamp --filestring '+args.filestring)
 
     # sort objects by field
-    os.system('python '+gitpath+'uat_HDIsortobjects.py --filestring h')
+    os.system('python '+gitpath+'uat_HDIsortobjects.py --filestring '+args.filestring)
 
 if args.submed:
     # subtract median from images before running swarp
-    os.system('python '+gitpath+'subtract_median.py --filestring h ')
+    os.system('python '+gitpath+'subtract_median.py --filestring '+args.filestring)
 
     # sort objects by field
-    os.system('python '+gitpath+'uat_HDIsortobjects.py --filestring mh')
+    os.system('python '+gitpath+'uat_HDIsortobjects.py --filestring '+args.filestring)
 
 
 # run swarp?
