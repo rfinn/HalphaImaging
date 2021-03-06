@@ -56,10 +56,13 @@ for f in flist:
     # try to identify format
     if len(o.split()) > -11:
         split_string=' '
+        print('object names contain ',split_string)        
     elif len(o.split('-')) > -1:
         split_string='-'
+        print('object names contain ',split_string)
     elif len(o.split('_')) > -1:
         split_string='_'
+        print('object names contain ',split_string)        
     
              
              
