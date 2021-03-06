@@ -52,12 +52,22 @@ for f in flist:
     
     # read in object
     o = header['OBJECT'] # should split into "pointing" and "10" for example
+    # try to identify format
+    if len(o.split()) > -11:
+        split_string='\s'
+    elif len(o.split('-')) > -1:
+        split_string='-'
+    elif len(o.split('_')) > -1:
+        split_string='_'
+    
+             
+             
     if (o.find('lm') > -1)| (o.find('LM') > -1):
         # low-mass pointing
-        pointing = "lmp{:03d}".format(int(o.split()[1]))
+        prefix = "lmp"
     else:
-        pointing = "p{:03d}".format(int(o.split()[1]))
-    
+        prefix = "p"
+    pointing = "{}{:03d}".format(prefix,int(o.split(split_string)[1]))
     # read in filter
     ffilter = header['FILTER']
 
