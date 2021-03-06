@@ -42,7 +42,7 @@ for f in flist:
     # store time 
     t = header['EPOCH']
     # convert to year, month,day
-    t = Time(t)
+    t = Time(t,format='decimalyear')
     dateobs = t.iso.split()[0]
     
     # read in instrument
