@@ -59,7 +59,7 @@ import sys
 from matplotlib import pyplot as plt
 import matplotlib.patches as patches
 import matplotlib
-matplotlib.use("Tkagg")
+#matplotlib.use("Tkagg")
 import astropy.units as u
 import astropy.coordinates as coord
 from astropy.coordinates import SkyCoord
