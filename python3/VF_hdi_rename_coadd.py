@@ -29,6 +29,7 @@ parser = argparse.ArgumentParser(description ='Rename HDI coadds to VF format.  
 
 
 parser.add_argument('--filestring', dest='filestring', default='pointing', help='list of image sets to run swarp on.  the file should contain the list of all Rband groups, for example: ls pointing*_R > swarp_input.  This will look for the corresponding list of halpha images.')
+parser.add_argument('--test', dest='test', default=False, action='store_true', help='set this to print out new filenames but not actually rename the files')
 
 args = parser.parse_args()
 
@@ -83,4 +84,5 @@ for f in flist:
         suffix=noback+'coadd.fits'
     outfile = "VF-{}-{}-{}-{}-{}".format(dateobs,instrument,pointing,ffilter,suffix)
     print('moving ',f,' -> ',outfile)
-    os.rename(f,outfile)
+    if not os.test:
+        os.rename(f,outfile)
