@@ -67,7 +67,7 @@ from astropy.io import fits
 from astropy.stats import sigma_clip
 
 from scipy.optimize import curve_fit
-from scipy.stats import median_abs_deviation as MAD2
+from scipy.stats import median_absolute_deviation as MAD2
 from astroquery.vizier import Vizier
 from photutils import Background2D, MedianBackground
 import itertools
@@ -187,7 +187,7 @@ class getzp():
             expt = header['EXPTIME']
         except KeyError:
             expt = 1.
-        ADUlimit = 4000000./float(expt)
+        ADUlimit = 4000000.#/float(expt)
         print('saturation limit in ADU/s {:.1f}'.format(ADUlimit))
         if args.fwhm is None:
             t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)
@@ -447,7 +447,7 @@ class getzp():
         magfit = np.polyval(self.bestc,self.R[self.fitflag])
         residual_all = 10.**((magfit - yplot)/2.5)        
 
-        s = '%.3f +/- %.3f'%(np.mean(residual_all),np.std(residual_all))
+        s = 'residual (mean,std) = %.3f +/- %.3f'%(np.mean(residual_all),np.std(residual_all))
         print(s)
         if plotall:
             plt.figure()            

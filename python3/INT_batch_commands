@@ -1,0 +1,78 @@
+# going to try to enter these in theli all at once
+# not sure what will happen...
+
+
+./process_split_WFC@INT.sh /home/rfinn/data/INT/20190208/ BIAS
+./process_split_WFC@INT.sh /home/rfinn/data/INT/20190208/ SKYFLAT-r
+./process_split_WFC@INT.sh /home/rfinn/data/INT/20190208/ target-r
+./process_split_WFC@INT.sh /home/rfinn/data/INT/20190208/ SKYFLAT-Halpha
+./process_split_WFC@INT.sh /home/rfinn/data/INT/20190208/ target-Halpha
+
+./process_split_WFC@INT.sh /home/rfinn/data/INT/20190208/ SKYFLAT-Ha6657
+./process_split_WFC@INT.sh /home/rfinn/data/INT/20190208/ target-Ha6657
+
+
+./parallel_manager.sh process_bias_para.sh /home/rfinn/INT/temp/20190208/ BIAS
+./parallel_manager.sh process_flat_para.sh /home/rfinn/INT/temp/20190208 BIAS SKYFLAT-r
+./create_flat_ratio.sh /home/rfinn/INT/20190208 SKYFLAT-r
+./parallel_manager.sh create_norm_para.sh /home/rfinn/INT/20190208 SKYFLAT-r
+./parallel_manager.sh process_science_para.sh /home/rfinn/INT/20190208 BIAS SKYFLAT-r target-r  
+./parallel_manager.sh process_flat_para.sh /home/rfinn/data/INT/20190208/ BIAS SKYFLAT-Halpha
+./create_flat_ratio.sh /home/rfinn/data/INT/20190208/ SKYFLAT-Halpha
+./parallel_manager.sh create_norm_para.sh /home/rfinn/data/INT/20190208/ SKYFLAT-Halpha
+./parallel_manager.sh process_science_para.sh /home/rfinn/data/INT/20190208/ BIAS SKYFLAT-Halpha target-Halpha
+### Ha6657 filter
+./parallel_manager.sh process_flat_para.sh /home/rfinn/data/INT/20190208/ BIAS SKYFLAT-Ha6657
+./create_flat_ratio.sh /home/rfinn/data/INT/20190208/ SKYFLAT-Ha6657
+./parallel_manager.sh create_norm_para.sh /home/rfinn/data/INT/20190208/ SKYFLAT-Ha6657
+./parallel_manager.sh process_science_para.sh /home/rfinn/data/INT/20190208/ BIAS SKYFLAT-Ha6657 target-Ha6657
+
+
+# BACKGROUND
+./parallel_manager.sh process_background_para.sh /home/rfinn/data/INT/20190208/ target-r noskydir
+./parallel_manager.sh process_background_para.sh /home/rfinn/data/INT/20190208/ target-Halpha noskydir
+./parallel_manager.sh process_background_para.sh /home/rfinn/data/INT/20190208/ target-Ha6657 noskydir
+
+
+# WEIGHTS
+./parallel_manager.sh create_global_weights_para.sh /home/rfinn/data/INT/20190208/ SKYFLAT-r_norm target-r
+./transform_ds9_reg.sh /home/rfinn/data/INT/20190208/ target-r
+./parallel_manager.sh create_weights_para.sh /home/rfinn/data/INT/20190208/ target-r OFCB
+./parallel_manager.sh create_global_weights_para.sh /home/rfinn/data/INT/20190208/ SKYFLAT-Halpha_norm target-Halpha
+./transform_ds9_reg.sh /home/rfinn/data/INT/20190208/ target-Halpha
+./parallel_manager.sh create_weights_para.sh /home/rfinn/data/INT/20190208/ target-Halpha OFCB
+./parallel_manager.sh create_global_weights_para.sh /home/rfinn/data/INT/20190208/ SKYFLAT-Ha6657_norm target-Ha6657
+./transform_ds9_reg.sh /home/rfinn/data/INT/20190208/ target-Ha6657
+./parallel_manager.sh create_weights_para.sh /home/rfinn/data/INT/20190208/ target-Ha6657 OFCB
+
+
+
+
+#### FOR EACH POINTING
+./parallel_manager.sh create_astromcats_para.sh /home/rfinn/data/INT/20190208/ pointing140-r OFCB
+./create_scampcats.sh /home/rfinn/data/INT/20190208/ pointing140-r OFCB
+./create_scamp.sh /home/rfinn/data/INT/20190208/ pointing140-r OFCB
+./create_stats_table.sh /home/rfinn/data/INT/20190208/ pointing140-r OFCB headers
+./create_absphotom_coadd.sh /home/rfinn/data/INT/20190208/ pointing140-r
+./parallel_manager.sh create_skysub_para.sh /home/rfinn/data/INT/20190208/ pointing140-r OFCB
+./prepare_coadd_swarp.sh /home/rfinn/data/INT/20190208/ pointing140-r OFCB.sub
+./parallel_manager.sh resample_coadd_swarp_para.sh /home/rfinn/data/INT/20190208/ pointing140-r OFCB.sub
+./perform_coadd_swarp.sh /home/rfinn/data/INT/20190208/ pointing140-r
+./update_coadd_header.sh /home/rfinn/data/INT/20190208/ pointing140-r OFCB
+./parallel_manager.sh create_astromcats_para.sh /home/rfinn/data/INT/20190208/ pointing140-Halpha OFCB
+./create_scampcats.sh /home/rfinn/data/INT/20190208/ pointing140-Halpha OFCB
+./create_scamp.sh /home/rfinn/data/INT/20190208/ pointing140-Halpha OFCB
+./create_stats_table.sh /home/rfinn/data/INT/20190208/ pointing140-Halpha OFCB headers
+./create_absphotom_coadd.sh /home/rfinn/data/INT/20190208/ pointing140-Halpha
+./parallel_manager.sh create_skysub_para.sh /home/rfinn/data/INT/20190208/ pointing140-Halpha OFCB
+./prepare_coadd_swarp.sh /home/rfinn/data/INT/20190208/ pointing140-Halpha OFCB.sub
+./parallel_manager.sh resample_coadd_swarp_para.sh /home/rfinn/data/INT/20190208/ pointing140-Halpha OFCB.sub
+./perform_coadd_swarp.sh /home/rfinn/data/INT/20190208/ pointing140-Halpha
+./update_coadd_header.sh /home/rfinn/data/INT/20190208/ pointing140-Halpha OFCB
+
+### Then need to restart theli and do coaddition of Halpha
+### don't know how to adjust the filter flag or where that is set
+./prepare_coadd_swarp.sh /home/rfinn/data/INT/20190208/ pointing140-Halpha OFCB.sub
+./parallel_manager.sh resample_coadd_swarp_para.sh /home/rfinn/data/INT/20190208/ pointing140-Halpha OFCB.sub
+./perform_coadd_swarp.sh /home/rfinn/data/INT/20190208/ pointing140-Halpha
+./update_coadd_header.sh /home/rfinn/data/INT/20190208/ pointing140-Halpha OFCB
