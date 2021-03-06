@@ -54,16 +54,16 @@ for f in flist:
     # read in object
     o = header['OBJECT'] # should split into "pointing" and "10" for example
     # try to identify format
-    print(o,len(o))
+    #print(o,len(o))
     if len(o.split()) > 1:
         split_string=' '
-        print('object names contain ',split_string)        
+        #print('object names contain ',split_string)        
     elif len(o.split('-')) > 1:
         split_string='-'
-        print('object names contain ',split_string)
+        #print('object names contain ',split_string)
     elif len(o.split('_')) > 1:
         split_string='_'
-        print('object names contain ',split_string)        
+        #print('object names contain ',split_string)        
     
              
              
