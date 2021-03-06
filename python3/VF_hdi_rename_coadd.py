@@ -55,13 +55,13 @@ for f in flist:
     o = header['OBJECT'] # should split into "pointing" and "10" for example
     # try to identify format
     print(o,len(o))
-    if len(o.split()) > -1:
+    if len(o.split()) > 1:
         split_string=' '
         print('object names contain ',split_string)        
-    elif len(o.split('-')) > -1:
+    elif len(o.split('-')) > 1:
         split_string='-'
         print('object names contain ',split_string)
-    elif len(o.split('_')) > -1:
+    elif len(o.split('_')) > 1:
         split_string='_'
         print('object names contain ',split_string)        
     
