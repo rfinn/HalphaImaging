@@ -61,11 +61,16 @@ for f in flist:
     # read in filter
     ffilter = header['FILTER']
 
+    # no back
+    if f.find('noback') > -1:
+        noback='-noback-'
+    else:
+        noback=''
     # check to see if this is a weight image
     if f.find('weight') > -1:
-        suffix='coadd.weight.fits'
+        suffix=noback+'coadd.weight.fits'
     else:
-        suffix='coadd.fits'
+        suffix=noback+'coadd.fits'
     outfile = "VF-{}-{}-{}-{}-{}".format(dateobs,instrument,pointing,ffilter,suffix)
     print('moving ',f,' -> ',outfile)
     #os.rename(f,outfile)
