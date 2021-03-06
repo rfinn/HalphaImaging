@@ -168,9 +168,15 @@ if args.zp:
     for f in filelist:
         if f.find('_h') > -1:
             photfilter = 'r'
+        elif f.find('-h') > -1:
+            photfilter = 'r'
         elif f.find('_r') > -1:
             photfilter = 'r'
+        elif f.find('-r') > -1:
+            photfilter = 'r'
         elif f.find('_R') > -1:
+            photfilter = 'R'
+        elif f.find('-R') > -1:
             photfilter = 'R'
         os.system('python '+gitpath+'getzp.py --image '+f+' --filter '+photfilter+' --instrument h')
         #break
