@@ -63,7 +63,7 @@ for f in flist:
 
     # no back
     if f.find('noback') > -1:
-        noback='-noback-'
+        noback='noback-'
     else:
         noback=''
     # check to see if this is a weight image
