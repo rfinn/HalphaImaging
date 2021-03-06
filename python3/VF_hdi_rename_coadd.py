@@ -51,7 +51,7 @@ for f in flist:
     instrument = i.upper()
     
     # read in object
-    o = header['OBJECT'].split() # should split into "pointing" and "10" for example
+    o = header['OBJECT'] # should split into "pointing" and "10" for example
     if (o.find('lm') > -1)| (o.find('LM') > -1):
         # low-mass pointing
         pointing = "lmp{:03d}".format(float(o.split()[1]))
