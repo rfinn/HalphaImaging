@@ -134,7 +134,7 @@ class getzp():
 
         self.image = image
 
-        self.plotprefix = self.image.split('.coadd')[0]+'-'
+        self.plotprefix = self.image.split('coadd')[0].replace('.','-').replace('noback',"")
         # create plot directory if it doesn't already exist
         if not os.path.exists('plots'):
             os.mkdir('plots')
@@ -324,8 +324,8 @@ class getzp():
         yfit = np.polyval(polyfit_results,x)
         residual = (yfit - y)
         plt.figure(figsize=(8,8))
-        s = ' (MAD = %.4f)'%(MAD2(residual))
-        plt.title(self.image+s)
+        s = ' (MAD = %.2f)'%(MAD2(residual))
+        plt.title(self.plotprefix+s)
         
         plt.subplot(2,1,1)
         if len(yerr) < len(y): 
@@ -365,7 +365,7 @@ class getzp():
 
         if plotall:
             plt.figure(figsize=(6,4))
-            plt.title(self.image)
+            plt.title(self.plotprefix)
             plt.plot(self.pan['rmag'][flag],self.matchedarray1['MAG_AUTO'][flag],'bo')
             plt.errorbar(self.pan['rmag'][flag],self.matchedarray1['MAG_AUTO'][flag],xerr= self.pan['e_rmag'][flag],yerr=self.matchedarray1['MAGERR_AUTO'][flag],fmt='none')
             plt.plot(self.pan['rmag'][flag],self.matchedarray1['MAG_BEST'][flag],'ro',label='MAG_BEST')
@@ -475,9 +475,9 @@ class getzp():
         '''
         plt.figure(figsize=(6,4))
         
-        s = ' (mean,std,MAD = {:.4f},{:.4f},{:.4f})'.format(np.mean(residual_all),np.std(residual_all),MAD2(residual_all))
+        s = ' (mean,std,MAD = {:.2f},{:.2f},{:.2f})'.format(np.mean(residual_all),np.std(residual_all),MAD2(residual_all))
         #s = str(MAD(residual_all))
-        plt.title(self.image+s)
+        plt.title(self.plotprefix+s)
 
         plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
         cb=plt.colorbar()
@@ -602,7 +602,7 @@ class getzp():
         cb=plt.colorbar()
         cb.set_label('f-WFC/f-pan')
         s = ' std (MAD) = %.4f (%.4f)'%(np.std(self.zim[~clip_flag.mask]),MAD2(self.zim[~clip_flag.mask]))
-        plt.title(self.image+': n poly = '+str(norder)+s)
+        plt.title(self.plotprefix+': n poly = '+str(norder)+s)
         #plt.show()
         
         if suffix is None:
