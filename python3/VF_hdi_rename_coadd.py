@@ -55,7 +55,7 @@ for f in flist:
     o = header['OBJECT'] # should split into "pointing" and "10" for example
     # try to identify format
     if len(o.split()) > -11:
-        split_string='\s'
+        split_string=' '
     elif len(o.split('-')) > -1:
         split_string='-'
     elif len(o.split('_')) > -1:
