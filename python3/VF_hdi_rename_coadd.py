@@ -56,7 +56,7 @@ for f in flist:
         # low-mass pointing
         pointing = "lmp{:03d}".format(int(o.split()[1]))
     else:
-        pointing = "lmp{:03d}".format(int(o.split()[1]))
+        pointing = "p{:03d}".format(int(o.split()[1]))
     
     # read in filter
     ffilter = header['FILTER']
