@@ -84,5 +84,5 @@ for f in flist:
         suffix=noback+'coadd.fits'
     outfile = "VF-{}-{}-{}-{}-{}".format(dateobs,instrument,pointing,ffilter,suffix)
     print('moving ',f,' -> ',outfile)
-    if not os.test:
+    if not args.test:
         os.rename(f,outfile)
