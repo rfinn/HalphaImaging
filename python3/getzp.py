@@ -67,7 +67,7 @@ from astropy.io import fits
 from astropy.stats import sigma_clip
 
 from scipy.optimize import curve_fit
-from scipy.stats import median_absolute_deviation as MAD2
+from scipy.stats import median_abs_deviation as MAD2
 from astroquery.vizier import Vizier
 from photutils import Background2D, MedianBackground
 import itertools
