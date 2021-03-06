@@ -54,9 +54,9 @@ for f in flist:
     o = header['OBJECT'] # should split into "pointing" and "10" for example
     if (o.find('lm') > -1)| (o.find('LM') > -1):
         # low-mass pointing
-        pointing = "lmp{:03d}".format(float(o.split()[1]))
+        pointing = "lmp{:03d}".format(int(o.split()[1]))
     else:
-        pointing = "lmp{:03d}".format(float(o.split()[1]))
+        pointing = "lmp{:03d}".format(int(o.split()[1]))
     
     # read in filter
     ffilter = header['FILTER']
