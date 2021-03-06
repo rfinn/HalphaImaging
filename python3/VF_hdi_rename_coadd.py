@@ -52,15 +52,20 @@ for f in flist:
     
     # read in object
     o = header['OBJECT'].split() # should split into "pointing" and "10" for example
-    if o.find('lm') | o.find('LM'):
+    if (o.find('lm') > -1)| (o.find('LM') > -1):
         # low-mass pointing
         pointing = "lmp{:03d}".format(float(o.split()[1]))
     else:
         pointing = "lmp{:03d}".format(float(o.split()[1]))
     
     # read in filter
-    filter = header['FILTER']    
+    ffilter = header['FILTER']
 
-    outfile = "VF-{}-{}-{}-{}-coadd.fits".format(dateobs,instrument,pointing,filter)
+    # check to see if this is a weight image
+    if f.find('weight') > -1:
+        suffix='coadd.weight.fits'
+    else:
+        suffix='coadd.fits'
+    outfile = "VF-{}-{}-{}-{}-{}".format(dateobs,instrument,pointing,ffilter,suffix)
     print('moving ',f,' -> ',outfile)
     #os.rename(f,outfile)
