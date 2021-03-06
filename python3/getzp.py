@@ -352,7 +352,7 @@ class getzp():
         plt.ylabel('YFIT - SE R-band MAG',fontsize=16)
         plt.legend()
         plt.axhline(y=0,color='r')
-        plt.savefig('plots/'+self.plotprefix+'-se-pan-flux.png')
+        plt.savefig('plots/'+self.plotprefix.replace('.fits','')+'-se-pan-flux.png')
 
     def fitzp(self,plotall=False):
         ###################################
@@ -453,7 +453,7 @@ class getzp():
             plt.figure()            
             crap = plt.hist(residual_all,bins=np.linspace(.8,1.2,20))
             plt.text(0.05,.85,s,horizontalalignment='left',transform=plt.gca().transAxes)
-            plt.savefig('plots/'+self.plotprefix+'getzp-residual-hist.png')
+            plt.savefig('plots/'+self.plotprefix.replace(".fits","")+'getzp-residual-hist.png')
 
         ###################################
         # Show location of residuals
@@ -482,7 +482,7 @@ class getzp():
         plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
         cb=plt.colorbar()
         cb.set_label('f-WFC/f-pan')
-        plt.savefig('plots/'+self.plotprefix+'getzp-xyresidual-fitted.png')
+        plt.savefig('plots/'+self.plotprefix.replace(".fits","")+'getzp-xyresidual-fitted.png')
 
         self.x = x
         self.y = y
@@ -609,8 +609,8 @@ class getzp():
             plotname='-imsurfit-'+str(norder)+'-'
         else:
             plotname='-imsurfit-'+str(norder)+'-'+suffix
-        plt.savefig('plots/'+self.plotprefix+plotname+'.png')
-        plt.savefig('plots/'+self.plotprefix+plotname+'.pdf')
+        plt.savefig('plots/'+self.plotprefix.replace(".fits","")+plotname+'.png')
+        plt.savefig('plots/'+self.plotprefix.replace(".fits","")+plotname+'.pdf')
         
     def renorm_wfc(self):
         # normalize surface fit
