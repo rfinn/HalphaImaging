@@ -135,7 +135,7 @@ if args.swarp:
             sys.exit()
         # get set of halpha images
         print('rootname = ',rootname)
-        fnames = glob.glob(rootname+'_h*')
+        fnames = glob.glob(rootname+'_h*coadd.fits')
         print('halpha file = ',fnames)
         if len(fnames) > 1:
             print('got more than one Halpha image - crazy!')
@@ -180,5 +180,5 @@ if args.zp:
             photfilter = 'R'
         elif f.find('-R') > -1:
             photfilter = 'R'
-        os.system('python '+gitpath+'getzp.py --image '+f+' --filter '+photfilter+' --instrument h --nexptime')
+        os.system('python '+gitpath+'getzp.py --image '+f+' --filter '+photfilter+' --instrument h ')
         #break
