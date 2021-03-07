@@ -134,7 +134,7 @@ class getzp():
 
         self.image = image
 
-        self.plotprefix = self.image.split('coadd')[0].replace('.','-').replace('noback',"")
+        self.plotprefix = self.image.split('coadd')[0].replace('.','-').replace('-noback',"")
         # create plot directory if it doesn't already exist
         if not os.path.exists('plots'):
             os.mkdir('plots')
@@ -352,7 +352,7 @@ class getzp():
         plt.ylabel('YFIT - SE R-band MAG',fontsize=16)
         plt.legend()
         plt.axhline(y=0,color='r')
-        plt.savefig('plots/'+self.plotprefix.replace('.fits','')+'-se-pan-flux.png')
+        plt.savefig('plots/'+self.plotprefix.replace('.fits','')+'se-pan-flux.png')
 
     def fitzp(self,plotall=False):
         ###################################
