@@ -64,33 +64,40 @@ UNWISE_PIXSCALE = 2.75
 LEGACY_PIXSCALE = 1
 
 
-def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',bands='grz',makeplots=False,subfolder=None):
+def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',band='g',makeplots=False,subfolder=None):
     """
     Download legacy image for a particular ra, dec
     
     Inputs:
     * ra
     * dec
-    * galid = galaxy id (e.g. VFID0001)
+    * galid = galaxy id (e.g. VFID0001); used for naming the image files
     * imsize = size of cutout in pixels
-    * pixscale = pixel scale of cutout in arcsec
-      - native is 0.262 for legacy; 
-      - 2.75 for wise
-
+    * band = filter for the fits images that will be returned.  e.g. 'g' or 'r' or 'z'. 
+    * pixscale = pixel scale of cutout in arcsec; native is 0.262 for legacy
+    * makeplots = boolean, generate plot of image
+    * subfolder = default is None; you can specify a name of a subfolder to 
+                  save the data in, e.g., subfolder='legacy-images'
     Returns:
-    * fits_name
-    * jpeg_name
+    * fits_name = fits image name
+    * jpeg_name = jpeg image name
     """
     imsize = int(imsize)
+
+    # make output image names
     if subfolder is not None:
+        # check if subfolder exists. if not, make it.
+        if not os.path.exists(subfolder):
+            os.mkdir(subfolder)
         rootname = subfolder+'/'+str(galid)+'-legacy-'+str(imsize)
     else:
         rootname = str(galid)+'-legacy-'+str(imsize)        
     jpeg_name = rootname+'.jpg'
-    fits_name = rootname+'-'+bands+'.fits'
+    fits_name = rootname+'-'+band+'.fits'
 
 
     print('legacy imsize = ',imsize)
+    
     # check if images already exist
     # if not download images
     if not(os.path.exists(jpeg_name)):
@@ -101,7 +108,7 @@ def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',bands='grz',ma
         print('previously downloaded ',jpeg_name)
     if not(os.path.exists(fits_name)):
         print('retrieving ',fits_name)
-        url='http://legacysurvey.org/viewer/cutout.fits?ra='+str(ra)+'&dec='+str(dec)+'&layer=dr8&size='+str(imsize)+'&pixscale='+str(pixscale)+'&bands='+bands
+        url='http://legacysurvey.org/viewer/cutout.fits?ra='+str(ra)+'&dec='+str(dec)+'&layer=dr8&size='+str(imsize)+'&pixscale='+str(pixscale)+'&bands='+band
         urlretrieve(url, fits_name)
     else:
         print('previously downloaded ',fits_name)
@@ -116,13 +123,12 @@ def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',bands='grz',ma
         url='http://legacysurvey.org/viewer/cutout.fits?ra='+str(ra1)+'&dec='+str(dec1)+'&layer=dr8&size='+str(image_size)+'&pixscale=1.00'
         print(url)
         return None
-    
-    # write out r-band image
-    # nevermind - John M figured out how to use MEF with WCS
-    #fits.writeto('r-test.fits',t[1],header=h,overwrite=True)
+
+    # this will trigger if the image is outside the legacy footprint
     if np.mean(t[1]) == 0:
         return None
 
+    # plot the images
     if makeplots:
         if jpeg:
             t = Image.open(jpeg_name)
@@ -130,6 +136,8 @@ def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',bands='grz',ma
         else:
             norm = simple_norm(t[1],stretch='asinh',percent=99.5)            
             plt.imshow(t[1],origin='upper',cmap='gray_r', norm=norm)
+
+    # return the name of the fits images and jpeg image
     return fits_name, jpeg_name
 
 

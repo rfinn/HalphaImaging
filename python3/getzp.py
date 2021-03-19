@@ -167,6 +167,31 @@ class getzp():
         self.fitzp()
         print('STATUS: udating header')        
         self.update_header()
+        self.fit_residual_surface(norder=2,suffix=None)
+    def getzp_wfc(self):
+        self.getzp()
+        #self.fit_residual_surface(norder=2)
+        # this creates 'f'+imagename
+        self.renorm_wfc()
+        self.rerun_zp_fit()
+
+        if self.filter == 'ha':
+            print("running an additional round of flattening for halpha")
+            self.fit_residual_surface(norder=2)
+            self.renorm_wfc()
+            # this creates 'ff'+imagename
+            self.rerun_zp_fit()
+        # clean up
+        if self.image.find('f') > -1:
+            rootname = self.image.strip('f')
+            if rootname.startswith('nWFC'):
+                os.remove(rootname)
+            if self.image.find('ff') > -1:
+                os.remove('f'+rootname)
+                
+        plt.figure()
+        plt.hist(self.zim,bins=np.linspace(.9,1.1,40))
+        
     def runse(self):
         #####
         # Run Source Extractor on image to measure magnitudes
@@ -511,29 +536,6 @@ class getzp():
         header.set('FLUXZPJY',float(3631))
 
         fits.writeto(self.image, im, header, overwrite=True)
-    def getzp_wfc(self):
-        self.getzp()
-        self.fit_residual_surface(norder=2)
-        # this creates 'f'+imagename
-        self.renorm_wfc()
-        self.rerun_zp_fit()
-
-        if self.filter == 'ha':
-            print("running an additional round of flattening for halpha")
-            self.fit_residual_surface(norder=2)
-            self.renorm_wfc()
-            # this creates 'ff'+imagename
-            self.rerun_zp_fit()
-        # clean up
-        if self.image.find('f') > -1:
-            rootname = self.image.strip('f')
-            if rootname.startswith('nWFC'):
-                os.remove(rootname)
-            if self.image.find('ff') > -1:
-                os.remove('f'+rootname)
-                
-        plt.figure()
-        plt.hist(self.zim,bins=np.linspace(.9,1.1,40))
     def fit_residual_surface(self,norder=2,suffix=None):
         """
         for INT data, first pass:
@@ -606,7 +608,7 @@ class getzp():
         #plt.show()
         
         if suffix is None:
-            plotname='-imsurfit-'+str(norder)+'-'
+            plotname='-imsurfit-'+str(norder)
         else:
             plotname='-imsurfit-'+str(norder)+'-'+suffix
         plt.savefig('plots/'+self.plotprefix.replace(".fits","")+plotname+'.png')
