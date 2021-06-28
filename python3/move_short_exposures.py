@@ -33,7 +33,7 @@ import ccdproc as ccdp
 ##########################################################
 ### GET RID OF SHORT EXPOSURES
 ##########################################################
-def move_short_exposures(ic,exptime=20):
+def move_short_exposures(ic,exptime=20.):
     # get rid of 15 sec r-band exposure, b/c can't figure out how to do the weighting!!!
     if not os.path.exists('shortexposure'):
         os.mkdir('shortexposure')
@@ -55,4 +55,4 @@ if __name__ == '__main__':
     keys = ['naxis1', 'naxis2', 'imagetyp', 'filter', 'exptime','instrmnt']
 
     ic = ccdp.ImageFileCollection(os.getcwd(), keywords=keys, glob_include=args.filestring+'*.fits',glob_exclude='*coadd*.fits')
-    move_short_exposures(ic,exptime = args.exptime)
+    move_short_exposures(ic,exptime = float(args.exptime))
