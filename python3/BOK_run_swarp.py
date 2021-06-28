@@ -97,7 +97,7 @@ if __name__ == '__main__':
     parser.add_argument('--filestring', dest = 'filestring', default = 'ksb', help = 'filestring to match. default is ksb')
     args = parser.parse_args()
 
-    keys = ['naxis1', 'naxis2', 'imagetyp', 'filter', 'exptime','instrmnt','magzero1']
+    keys = ['naxis1', 'naxis2', 'imagetyp', 'filter', 'exptime','instrmnt','magzero1','object']
     # get list of images (images only)
     ic = ccdp.ImageFileCollection(os.getcwd(), keywords=keys, glob_include=args.filestring+'*ooi*.fits',glob_exclude='*coadd*.fits')
     
