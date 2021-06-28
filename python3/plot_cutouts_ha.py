@@ -259,7 +259,7 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
                 image_names.append(outimage)
 
             
-            os.rename('coadd.fits','unwise/'+outimage)
+            #os.rename('coadd.fits','unwise/'+outimage)
 
             #########################################
             ## COMBINE THE STD FRAMES USING SUM
@@ -393,6 +393,7 @@ class cutouts():
         - size - size of cutout in arcsec
         - galid - prefix to use with all the cutouts; should be VFIDXXXX-nedname-
         '''
+        self.galid = galid
         if ra is not None:
             self.ra = ra
             self.dec = dec
@@ -414,6 +415,8 @@ class cutouts():
             if self.r_name.find('-R') > -1:
                 split_string = '-R.fits'
             elif self.r_name.find('-r') > -1:
+                split_string = '-r.fits'
+            elif self.r_name.find('_r') > -1:
                 split_string = '_r.fits'
             self.rootname = self.r_name.split(split_string)[0]
         # check to make sure cutouts directory exists
@@ -440,6 +443,8 @@ class cutouts():
             self.get_image_size()
             self.get_RADEC()
             self.get_galid()
+
+
         try:
             print('trying to download legacy image')
             self.download_legacy()
@@ -483,7 +488,10 @@ class cutouts():
     def get_image_size(self):
         # get image size in pixels and arcsec
         self.xsize_pix,self.ysize_pix = self.r.shape
-        self.pscale = np.abs(float(self.header['CD1_1']))
+        try:
+            self.pscale = np.abs(float(self.header['PIXSCAL1']))/3600
+        except KeyError:
+            self.pscale = np.abs(float(self.header['CD1_1']))
         self.xsize_arcsec = self.xsize_pix*self.pscale*3600
         self.ysize_arcsec = self.ysize_pix*self.pscale*3600    
     def get_RADEC(self):
@@ -491,18 +499,21 @@ class cutouts():
         ycenter = self.ysize_pix/2
         self.ra,self.dec = self.wcs.wcs_pix2world(xcenter,ycenter,1)
     def get_galid(self):
-        self.galid = self.header['ID']
+        try:
+            self.galid = self.header['ID']
+        except:
+            self.galid = self.galid
         
     def download_legacy(self):
 
         # get legacy grz color and fits
         self.legacy_imsize = self.xsize_arcsec/LEGACY_PIXSCALE
         print('requested legacy imsize = ',self.legacy_imsize)
-        self.legacy_filename_g,self.legacy_jpegname = get_legacy_images(self.ra,self.dec,galid=self.galid,imsize=self.legacy_imsize,bands='g',subfolder='legacy')
+        self.legacy_filename_g,self.legacy_jpegname = get_legacy_images(self.ra,self.dec,galid=self.galid,imsize=self.legacy_imsize,band='g',subfolder='legacy')
         h = fits.getheader(self.legacy_filename_g)
         self.legacy_pscale = np.abs(h['CD1_1'])*3600
-        self.legacy_filename_r,self.legacy_jpegname = get_legacy_images(self.ra,self.dec,galid=self.galid,imsize=self.legacy_imsize,bands='r',subfolder='legacy')
-        self.legacy_filename_z,self.legacy_jpegname = get_legacy_images(self.ra,self.dec,galid=self.galid,imsize=self.legacy_imsize,bands='z',subfolder='legacy')
+        self.legacy_filename_r,self.legacy_jpegname = get_legacy_images(self.ra,self.dec,galid=self.galid,imsize=self.legacy_imsize,band='r',subfolder='legacy')
+        self.legacy_filename_z,self.legacy_jpegname = get_legacy_images(self.ra,self.dec,galid=self.galid,imsize=self.legacy_imsize,band='z',subfolder='legacy')
         
     def load_legacy_images(self):
         self.legacy_g = fits.getdata(self.legacy_filename_g)
@@ -834,7 +845,8 @@ class cutouts():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description ='This program will create a plot of halpha image.  will also download images from galex, legacy survey, and unwise.', formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument('--r', dest = 'r', default = None, help = 'R-band cutout image.  This is all you need to provide if images are named: blah_R.fits, blah_CS.fits, blah_Ha.fits')
-    parser.add_argument('--plotall', dest = 'plotall', default = False, action='store_true', help = 'set this to download images and generate all three plots (Ha, all images, sfr indicators)')    
+    parser.add_argument('--plotall', dest = 'plotall', default = False, action='store_true', help = 'set this to download images and generate all three plots (Ha, all images, sfr indicators)')
+    #parser.add_argument('--plotall', dest = 'plotall', default = False, action='store_true', help = 'set this to download images and generate all three plots (Ha, all images, sfr indicators)')        
     args = parser.parse_args()
 
     if args.r is None:

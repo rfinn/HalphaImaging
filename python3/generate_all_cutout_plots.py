@@ -18,6 +18,7 @@ homedir = os.getenv('HOME')
 sys.path.append(homedir+'/github/HalphaImaging/python3/')
 
 dirlist = glob.glob('VFID*')
+dirlist.sort()
 workingdir = os.getcwd()
 for d in dirlist:
     if os.path.isdir(d):
@@ -35,6 +36,6 @@ for d in dirlist:
             os.system('python '+homedir+'/github/HalphaImaging/python3/plot_cutouts_ha.py --r '+im+' --plotall')
             # run this to generate halpha cutouts only
             #os.system('python '+homedir+'/github/HalphaImaging/python3/plot_cutouts_ha.py --r '+im)
-        
+    #break
         
     os.chdir(workingdir)
