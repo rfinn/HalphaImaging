@@ -7,7 +7,22 @@ ORGANIZING DATA
 
 * moving short exposure time images to subdirectory junk
 
+%run ~/github/HalphaImaging/python3/move_short_exposures.py --filestring ksb --exptime 31
 
+###########
+
+checking object names
+
+gethead object exptime RA DEC *ooi*.fits > header_info
+
+fixed a few issues
+
+############
+
+data from 04/15 is pretty crappy
+- photometric zps are sometimes 2-3 mags lower
+- VFID2911 has data from 04/16, so moving the 04/15 data to junk
+- going to keep the others, but the depth is def not good
 
 '''
 
@@ -42,6 +57,12 @@ def combine_masks(weight_image,dq_image):
     weight_hdu.writeto('combined_weight.fits',overwrite=True)
 
 def run_swarp(image_list, weight_list):
+    # run swarp to mosaic r-band
+
+    # run swarp to mosaic halpha
+    
+    # alight r and halpha imaging
+
     pass
 
 
@@ -68,28 +89,33 @@ runswarp=True
 
 
 rawdir = os.getcwd()
-# get list of images (images only)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description ='stack the 90prime images after noao pipeline')
+        
+    parser.add_argument('--filestring', dest = 'filestring', default = 'ksb', help = 'filestring to match. default is ksb')
+    args = parser.parse_args()
+
+    keys = ['naxis1', 'naxis2', 'imagetyp', 'filter', 'exptime','instrmnt','magzero1']
+    # get list of images (images only)
+    ic = ccdp.ImageFileCollection(os.getcwd(), keywords=keys, glob_include=args.filestring+'*ooi*.fits',glob_exclude='*coadd*.fits')
+    
+
+    # sort images by location and filter
+    # alternatively could use object name,
+    # but not all are correct, so need to fix names
+
+    
+    
+    # create file list with r-band images
+    # create a file list with r-band weight images
 
 
-# sort images by location and filter
-# alternatively could use object name,
-# but not all are correct, so need to fix names
+    # create file list with halpha images
+    # create a file list with halpha weight images
 
 
-# create file list with r-band images
-# create a file list with r-band weight images
-
-
-# create file list with halpha images
-# create a file list with halpha weight images
-
-
-# run swarp to mosaic r-band
-
-# run swarp to mosaic halpha
-
-# alight r and halpha imaging
-
-#keys = ['OBJECT', 'RA', 'DEC', 'FILTER', 'EXPTIME']
-#ic = ccdp.ImageFileCollection(rawdir, keywords=keys, glob_include='*.fit*', glob_exclude='*test*.fit')
+    
+    #keys = ['OBJECT', 'RA', 'DEC', 'FILTER', 'EXPTIME']
+    #ic = ccdp.ImageFileCollection(rawdir, keywords=keys, glob_include='*.fit*', glob_exclude='*test*.fit')
 
