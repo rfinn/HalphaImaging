@@ -152,6 +152,7 @@ if __name__ == '__main__':
     for t in targets:
         if t.ends_with('_r'):
             primary_targets.append(t)
+    print('list of targets: \n',primary_targets)
 
     if args.combinemasks:
         # combine masks
