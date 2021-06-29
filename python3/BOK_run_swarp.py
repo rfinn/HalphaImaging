@@ -129,10 +129,6 @@ if __name__ == '__main__':
     parser.add_argument('--combinemasks', dest = 'combinemasks', default = False, action='store_true',help = 'set this to combine weight image and bad pixel mask.')        
     args = parser.parse_args()
 
-    if args.submedian:
-        # subtract median
-        os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring),'ooi')
-
         
     os.system('gethead object exptime FILTER RA DEC '+args.filstring+'*ooi*.fits > header_info')
     t = Table.read('header_info',data_start=0,delimiter=' ',format='ascii',guess=False,fast_reader=False,names=['FILENAME','OBJECT','EXPTIME','FILTER','RA','DEC'])
@@ -155,6 +151,11 @@ if __name__ == '__main__':
             primary_targets.append(t)
     print('list of targets: \n',primary_targets)
 
+    if args.submedian:
+        # subtract median
+        os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi')
+
+    
     if args.combinemasks:
         # combine masks
         # this combines weight image and bad pixel masks
