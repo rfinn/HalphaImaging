@@ -130,7 +130,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
         
-    os.system('gethead object exptime FILTER RA DEC '+args.filstring+'*ooi*.fits > header_info')
+    os.system('gethead object exptime FILTER RA DEC '+args.filestring+'*ooi*.fits > header_info')
     t = Table.read('header_info',data_start=0,delimiter=' ',format='ascii',guess=False,fast_reader=False,names=['FILENAME','OBJECT','EXPTIME','FILTER','RA','DEC'])
 
     
