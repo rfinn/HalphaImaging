@@ -27,9 +27,11 @@ data from 04/15 is pretty crappy
 '''
 
 import os
-from astropy.io import fits
+
 import argparse
 
+from astropy.table import Table
+from astropy.io import fits
 
 
 def combine_masks(weight_image,dq_image):
