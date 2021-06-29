@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
     matchstring = args.filestring+'*.fits'
     if args.filestring2 is not None:
-        matchstring = args.filestring+'*'+args.filestring2+'*.fits'
+        matchstring = args.filestring+'*'+args.filestring2
     files = glob.glob(matchstring)
     files.sort()
     #print(files)
