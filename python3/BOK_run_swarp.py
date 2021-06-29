@@ -66,8 +66,12 @@ def combine_all_masks(filelist):
             weight_image = f.replace('ooi','oow')
             dq_image = f.replace('ooi','ood')
             combine_masks(weight_image,dq_image)
-            os.rename('combined_weight.fits',combined_mask)
-def run_swarp(image_list, weight_list,refimage=None):
+            # prepend the m to match the name of the median subtracted image
+            if os.path.exists('m'+f):
+                os.rename('combined_weight.fits','m'+combined_mask)
+            else:
+                os.rename('combined_weight.fits',combined_mask)
+def run_swarp(image_list,refimage=None):
     sstring = 'swarp @{} --WEIGHT_IMAGE {} --WEIGHT_SUFFIX .combweight.fits --COMBINE_TYPE WEIGHTED '.format(image_list,weight_list)
     if refimage is not None:
         # copying this from uat_astr_mosaic.py
@@ -80,14 +84,19 @@ def run_swarp(image_list, weight_list,refimage=None):
         center = str(ra)+','+str(dec)
         mosaic_image_size = str(image_size[1])+','+str(image_size[0])
         
-        sstring += '--refimage {} '.format(refimage)
+        sstring += ' --refimage {} '.format(refimage)
         
         commandstring = 'swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -CENTER_TYPE MANUAL -CENTER '+center+' -PIXEL_SCALE '+str(pixel_scale)+' -IMAGE_SIZE '+mosaic_image_size         
 
         
     os.system(sstring)
     
+def run_swarp_all(image_list):
+    # run swarp on r-band mosaic
 
+    # run swarp on Halpha, using r-band mosaic as ref image
+
+    # run swarp on r-band, using r-band mosaic as ref image
 
 def count_lines(fname):
     with open(fname) as f:
@@ -97,6 +106,7 @@ def count_lines(fname):
         return i+1
     except UnboundLocalError:
         return 0
+
 
 def write_filelists(targets,header_table):
     for t in targets:
@@ -112,10 +122,17 @@ if __name__ == '__main__':
     telescope = 'BOK'
     
     parser = argparse.ArgumentParser(description ='stack the 90prime images after noao pipeline')
-        
     parser.add_argument('--filestring', dest = 'filestring', default = 'ksb', help = 'filestring to match. default is ksb')
+        
+    parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true',help = 'set this to subtract the median from images.')
+    parser.add_argument('--combinemasks', dest = 'combinemasks', default = False, action='store_true',help = 'set this to combine weight image and bad pixel mask.')        
     args = parser.parse_args()
 
+    if args.submedian:
+        # subtract median
+        os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring),'ooi')
+
+        
     os.system('gethead object exptime FILTER RA DEC '+args.filstring+'*ooi*.fits > header_info')
     t = Table.read('header_info',data_start=0,delimiter=' ',format='ascii',guess=False,fast_reader=False,names=['FILENAME','OBJECT','EXPTIME','FILTER','RA','DEC'])
 
@@ -130,16 +147,20 @@ if __name__ == '__main__':
     targets = sort(list(set(t['OBJECT'])))
     write_filelists(targets,t)
 
-    # combine masks
-    # this combines weight image and bad pixel masks
-    combine_all_masks(t['FILENAME'])
-    
     # get list of r-band objects only
     primary_targets = []
     for t in targets:
         if t.ends_with('_r'):
             primary_targets.append(t)
 
+    if args.combinemasks:
+        # combine masks
+        # this combines weight image and bad pixel masks
+        combine_all_masks(t['FILENAME'])
+    
+
+    # subtract median from sky
+    
     # run swarp
 
     # run swarp to mosaic r-band
