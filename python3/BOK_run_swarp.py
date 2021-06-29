@@ -119,7 +119,7 @@ def write_filelists(targets,header_table,medsub=False):
         filenames = header_table['OBJECT'] == t
         for f in filenames:
             if medsub:
-                outfile.write('{} \n'.format('m'+f))
+                outfile.write('m{} \n'.format(f))
             else:
                 outfile.write('{} \n'.format(f))
             combined_mask = f.replace('.fits','.combweight.fits')
