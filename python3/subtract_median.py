@@ -63,7 +63,7 @@ def subtract_median(files,overwrite=False,MEF=False):
 
         # read in image 
         hdu = fits.open(fname,memmap=False)
-
+ 
         if MEF:
             # if MEF flag is set, assume primary header is extension 0
             # loop over additional extenstions and subtract median
