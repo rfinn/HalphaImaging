@@ -26,7 +26,6 @@ data from 04/15 is pretty crappy
 
 '''
 
-import ccdproc as ccdp
 import os
 from astropy.io import fits
 import argparse
@@ -57,14 +56,25 @@ def combine_masks(weight_image,dq_image):
         weight_hdu[i].data = weight_hdu[i].data + 1000*dq_hdu[i].data
     weight_hdu.writeto('combined_weight.fits',overwrite=True)
 
-def run_swarp(image_list, weight_list):
-    # run swarp to mosaic r-band
+def combine_all_masks(filelist):
+    for f in filelist:
 
-    # run swarp to mosaic halpha
+        combined_mask = f.replace('.fits','.combweight.fits')
+        if os.path.exists(combined_mask):
+            continue
+        else:
+            weight_image = f.replace('ooi','oow')
+            dq_image = f.replace('ooi','ood')
+            combine_masks(weight_image,dq_image)
+            os.rename('combined_weight.fits',combined_mask)
+def run_swarp(image_list, weight_list,refimage=None):
+    sstring = 'swarp @{} --WEIGHT_IMAGE {} --WEIGHT_SUFFIX .combweight.fits --COMBINE_TYPE WEIGHTED '.format(image_list,weight_list)
+    if refimage is not None:
+        sstring += '--refimage {} '.format(refimage)
+    else:
+        
+    os.system(sstring)
     
-    # alight r and halpha imaging
-
-    pass
 
 
 def count_lines(fname):
@@ -76,6 +86,13 @@ def count_lines(fname):
     except UnboundLocalError:
         return 0
 
+def write_filelists(targets,header_table):
+    for t in targets:
+        outfile = open(t,'w')
+        filenames = header_table['OBJECT'] == t
+        for f in filenames:
+            outfile.write('{} \n'.format(f))
+        outfile.close
 
 homedir = os.getenv("HOME")
 telescope = 'INT'
@@ -97,26 +114,33 @@ if __name__ == '__main__':
     parser.add_argument('--filestring', dest = 'filestring', default = 'ksb', help = 'filestring to match. default is ksb')
     args = parser.parse_args()
 
-    keys = ['naxis1', 'naxis2', 'imagetyp', 'filter', 'exptime','instrmnt','magzero1','object']
-    # get list of images (images only)
-    ic = ccdp.ImageFileCollection(os.getcwd(), keywords=keys, glob_include=args.filestring+'*ooi*.fits',glob_exclude='*coadd*.fits')
+    os.system('gethead object exptime FILTER RA DEC '+args.filstring+'*ooi*.fits > header_info')
+    t = Table.read('header_info',data_start=0,delimiter=' ',format='ascii',guess=False,fast_reader=False,names=['FILENAME','OBJECT','EXPTIME','FILTER','RA','DEC'])
+
     
 
     # sort images by location and filter
     # alternatively could use object name,
     # but not all are correct, so need to fix names
-
+    targets = sort(list(set(t['OBJECT'])))
     
     
-    # create file list with r-band images
-    # create a file list with r-band weight images
+    write_filelists(targets,t)
 
+    # combine masks
+    combine_all_masks(t['FILENAME'])
+    # get list of r-band objects only
+    primary_targets = []
+    for t in targets:
+        if t.ends_with('_r'):
+            primary_targets.append(t)
 
-    # create file list with halpha images
-    # create a file list with halpha weight images
+    # run swarp
 
+    # run swarp to mosaic r-band
 
+    # run swarp to mosaic halpha
     
-    #keys = ['OBJECT', 'RA', 'DEC', 'FILTER', 'EXPTIME']
-    #ic = ccdp.ImageFileCollection(rawdir, keywords=keys, glob_include='*.fit*', glob_exclude='*test*.fit')
+    # alight r and halpha imaging
+    
 
