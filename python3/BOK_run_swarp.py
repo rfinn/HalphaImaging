@@ -151,7 +151,7 @@ if __name__ == '__main__':
     # get list of r-band objects only
     primary_targets = []
     for t in targets:
-        if t.ends_with('_r'):
+        if t.endswith('_r'):
             primary_targets.append(t)
     print('{} primary targets'.format(len(primary_targets)))
     print(primary_targets)
