@@ -143,7 +143,7 @@ if __name__ == '__main__':
 
     # get a list of all the unique objects
     # this is like, e.g. VFID2911_r or VFID2911_Ha4
-    targets = sort(list(set(t['OBJECT'])))
+    targets = list(set(t['OBJECT'])).sort()
     write_filelists(targets,t)
 
     # get list of r-band objects only
