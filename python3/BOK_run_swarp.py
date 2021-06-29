@@ -145,7 +145,7 @@ if __name__ == '__main__':
     # this is like, e.g. VFID2911_r or VFID2911_Ha4
     targets = list(set(t['OBJECT']))
     targets.sort()
-    print(targets)
+    #print(targets)
     write_filelists(targets,t)
 
     # get list of r-band objects only
