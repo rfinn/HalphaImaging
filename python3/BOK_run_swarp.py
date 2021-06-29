@@ -154,7 +154,7 @@ if __name__ == '__main__':
 
     if args.submedian:
         # subtract median
-        os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi')
+        os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi'))
 
     
     if args.combinemasks:
