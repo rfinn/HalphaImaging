@@ -104,4 +104,4 @@ if __name__ == '__main__':
     files = glob.glob(matchstring)
     files.sort()
     #print(files)
-    subtract_median(files,overwrite=args.overwrite)
+    subtract_median(files,overwrite=args.overwrite,MEF=args.mef)
