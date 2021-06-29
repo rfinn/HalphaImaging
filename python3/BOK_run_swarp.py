@@ -97,6 +97,7 @@ def run_swarp_all(image_list):
     # run swarp on Halpha, using r-band mosaic as ref image
 
     # run swarp on r-band, using r-band mosaic as ref image
+    pass
 
 def count_lines(fname):
     with open(fname) as f:
