@@ -116,7 +116,7 @@ def write_filelists(targets,header_table,medsub=False):
     for t in targets:
         outfile = open(t,'w')
         weightfile = open(t+'_weights','w')
-        filenames = header_table['OBJECT'] == t
+        filenames = header_table['FILENAME'][header_table['OBJECT'] == t]
         for f in filenames:
             if medsub:
                 outfile.write('m{} \n'.format(f))
