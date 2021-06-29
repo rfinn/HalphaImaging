@@ -32,7 +32,8 @@ import argparse
 
 from astropy.table import Table
 from astropy.io import fits
-
+from astropy.wcs import WCS
+from astropy.time import Time
 
 def combine_masks(weight_image,dq_image):
     '''
@@ -75,26 +76,47 @@ def combine_all_masks(filelist):
             # prepend the m to match the name of the median subtracted image
             os.rename('combined_weight.fits',combined_mask)
 def run_swarp(image_list,refimage=None):
-    sstring = 'swarp @{} --WEIGHT_IMAGE {} --WEIGHT_SUFFIX .combweight.fits --COMBINE_TYPE WEIGHTED '.format(image_list,weight_list)
+    '''
+
+    RETURNS:
+    * name of output image from swarp
+    '''
+    vfid,filter = image_list.split('_')
+    weight_list = image_list+'_weights'
+
+    # get date of observation from the first image in the list
+    images = open(image_list,'r').readline()
+    dateobs = images.split('_')[1]
+    dateobs = '20'+dateobs
+    
+    output_image = 'VF-{}-BOK-{}-{}.fits'.format(dateobs,vfid,filter)
+    # start building swarp command
+    commandstring = 'swarp @{} -WEIGHT_IMAGE @{} -COMBINE_TYPE WEIGHTED -IMAGEOUT_NAME {}'.format(image_list,weight_list,output_image)
     if refimage is not None:
         # copying this from uat_astr_mosaic.py
         # still need to fix this.
-        data,header = fits.getdata(args.refimage,header=True)
+        data,header = fits.getdata(refimage,header=True)
         w = WCS(header)
         image_size = data.shape
 
-        ra,dec = w.wcs_pix2world(image_size[0]/2.,image_size[1]/2.,1)
+        ra,dec = w.wcs_pix2world(int(image_size[0]/2.),int(image_size[1]/2.),1)
         center = str(ra)+','+str(dec)
         mosaic_image_size = str(image_size[1])+','+str(image_size[0])
         
-        sstring += ' --refimage {} '.format(refimage)
-        
-        commandstring = 'swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -CENTER_TYPE MANUAL -CENTER '+center+' -PIXEL_SCALE '+str(pixel_scale)+' -IMAGE_SIZE '+mosaic_image_size         
+        commandstring = commandstring + ' -CENTER_TYPE MANUAL -CENTER {} -PIXEL_SCALE {} -IMAGE_SIZE {} '.format(center,pixel_scale,mosaic_image_size)
 
         
-    os.system(sstring)
+    os.system(commandstring)
+    return output_image
     
 def run_swarp_all(image_list):
+    '''
+    INPUT:
+    * image_list : list containing r-band images, like VFID0422_r
+
+    PROCEDURE:
+    * run swarp on r-band image, then run on Halpha using r as reference, then rerun on r using r as reference
+    '''
     # run swarp on r-band mosaic
 
     # run swarp on Halpha, using r-band mosaic as ref image

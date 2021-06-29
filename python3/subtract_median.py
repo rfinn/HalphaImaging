@@ -70,13 +70,17 @@ def subtract_median(files,overwrite=False,MEF=False):
             nextensions = len(hdu)
             for i in range(1,nextensions):
                 hdu[i].data,median = imutils.subtract_median_sky(hdu[i].data)
-                hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
-                
+                if median is not np.nan:
+                    hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
+                else:
+                    print('problem subtracting median from image {}, extension {}'.format(fname,i))
+                    continue
             pass
         else:
             # background subtraction
             hdu[0].data,median = imutils.subtract_median_sky(hdu[0].data)
-            hdu[0].header.set('MEDSUB',value=median,comment='median subtraction')
+            if median is not np.nan:
+                hdu[0].header.set('MEDSUB',value=median,comment='median subtraction')
         if overwrite:
             hdu.writeto(fname,overwrite=True)
         else:
