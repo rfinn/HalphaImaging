@@ -115,12 +115,15 @@ def count_lines(fname):
 def write_filelists(targets,header_table,medsub=False):
     for t in targets:
         outfile = open(t,'w')
+        weightfile = open(t+'_weights','w')
         filenames = header_table['OBJECT'] == t
         for f in filenames:
             if medsub:
                 outfile.write('{} \n'.format('m'+f))
             else:
                 outfile.write('{} \n'.format(f))
+            combined_mask = f.replace('.fits','.combweight.fits')
+            weightfile.write('{} \n'.format(combined_mask))
         outfile.close
 
 
@@ -132,7 +135,8 @@ if __name__ == '__main__':
     parser.add_argument('--filestring', dest = 'filestring', default = 'ksb', help = 'filestring to match. default is ksb')
         
     parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true',help = 'set this to subtract the median from images.')
-    parser.add_argument('--combinemasks', dest = 'combinemasks', default = False, action='store_true',help = 'set this to combine weight image and bad pixel mask.')        
+    parser.add_argument('--combinemasks', dest = 'combinemasks', default = False, action='store_true',help = 'set this to combine weight image and bad pixel mask.')
+    parser.add_argument('--sortfiles', dest = 'sortfiles', default = False, action='store_true',help = 'write image and weights to files')            
     args = parser.parse_args()
 
         
@@ -158,6 +162,8 @@ if __name__ == '__main__':
     print('{} primary targets'.format(len(primary_targets)))
     print(primary_targets)
 
+    
+    # subtract median from sky
     if args.submedian:
         # subtract median
         os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_r_v1.fits'))
@@ -171,9 +177,10 @@ if __name__ == '__main__':
     
     #print(targets)
     # need to update to write median-subtracted images to filelist instead of ksb files
-    #write_filelists(targets,filetable,medsub=True)
+    if args.sortfiles:
+        write_filelists(targets,filetable,medsub=True)
 
-    # subtract median from sky
+
     
     # run swarp
 
