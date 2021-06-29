@@ -114,9 +114,14 @@ def count_lines(fname):
 
 def write_filelists(targets,header_table,medsub=False):
     for t in targets:
+        # open file to store the list of science images
         outfile = open(t,'w')
+        # open file to store the list of weight images
         weightfile = open(t+'_weights','w')
+        # keep the filenames that match the current target name
         filenames = header_table['FILENAME'][header_table['OBJECT'] == t]
+        # loop over the filenames and write each science and
+        # weight image to the corresponding list
         for f in filenames:
             if medsub:
                 outfile.write('m{} \n'.format(f))
@@ -124,7 +129,8 @@ def write_filelists(targets,header_table,medsub=False):
                 outfile.write('{} \n'.format(f))
             combined_mask = f.replace('.fits','.combweight.fits')
             weightfile.write('{} \n'.format(combined_mask))
-        outfile.close
+        outfile.close()
+        weightfile.close()
 
 
 
