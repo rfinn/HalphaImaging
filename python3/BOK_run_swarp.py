@@ -64,6 +64,9 @@ def combine_all_masks(filelist):
         combined_mask = f.replace('.fits','.combweight.fits')
         #combined_mask = 'm'+combined_mask
         if os.path.exists(combined_mask):
+            print('output image already exists: ',combined_mask)
+            print('proceeding to next image')
+            print()
             continue
         else:
             weight_image = f.replace('ooi','oow')
@@ -167,7 +170,7 @@ if __name__ == '__main__':
     
     #print(targets)
     # need to update to write median-subtracted images to filelist instead of ksb files
-    write_filelists(targets,filetable,medsub=True)
+    #write_filelists(targets,filetable,medsub=True)
 
     # subtract median from sky
     
