@@ -29,7 +29,7 @@ import imutils
 import ccdproc as ccdp
 import glob
 from astropy.io import fits
-
+import numpy as np
 
 
 ##########################################################
