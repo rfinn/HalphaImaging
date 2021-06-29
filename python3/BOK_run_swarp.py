@@ -111,12 +111,15 @@ def count_lines(fname):
         return 0
 
 
-def write_filelists(targets,header_table):
+def write_filelists(targets,header_table,medsub=False):
     for t in targets:
         outfile = open(t,'w')
         filenames = header_table['OBJECT'] == t
         for f in filenames:
-            outfile.write('{} \n'.format(f))
+            if medsub:
+                outfile.write('{} \n'.format('m'+f))
+            else:
+                outfile.write('{} \n'.format(f))
         outfile.close
 
 
@@ -145,8 +148,6 @@ if __name__ == '__main__':
     # this is like, e.g. VFID2911_r or VFID2911_Ha4
     targets = list(set(t['OBJECT']))
     targets.sort()
-    #print(targets)
-    write_filelists(targets,t)
 
     # get list of r-band objects only
     primary_targets = []
@@ -166,6 +167,9 @@ if __name__ == '__main__':
         # this combines weight image and bad pixel masks
         combine_all_masks(t['FILENAME'])
     
+    #print(targets)
+    # need to update to write median-subtracted images to filelist instead of ksb files
+    write_filelists(targets,t,medsub=True)
 
     # subtract median from sky
     
