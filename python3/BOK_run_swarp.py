@@ -70,8 +70,20 @@ def combine_all_masks(filelist):
 def run_swarp(image_list, weight_list,refimage=None):
     sstring = 'swarp @{} --WEIGHT_IMAGE {} --WEIGHT_SUFFIX .combweight.fits --COMBINE_TYPE WEIGHTED '.format(image_list,weight_list)
     if refimage is not None:
+        # copying this from uat_astr_mosaic.py
+        # still need to fix this.
+        data,header = fits.getdata(args.refimage,header=True)
+        w = WCS(header)
+        image_size = data.shape
+
+        ra,dec = w.wcs_pix2world(image_size[0]/2.,image_size[1]/2.,1)
+        center = str(ra)+','+str(dec)
+        mosaic_image_size = str(image_size[1])+','+str(image_size[0])
+        
         sstring += '--refimage {} '.format(refimage)
-    else:
+        
+        commandstring = 'swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -CENTER_TYPE MANUAL -CENTER '+center+' -PIXEL_SCALE '+str(pixel_scale)+' -IMAGE_SIZE '+mosaic_image_size         
+
         
     os.system(sstring)
     
@@ -94,21 +106,11 @@ def write_filelists(targets,header_table):
             outfile.write('{} \n'.format(f))
         outfile.close
 
-homedir = os.getenv("HOME")
-telescope = 'INT'
-# get list of current directory
-flist1 = os.listdir()
-working_dir = os.getcwd()
-# overwrite output files if they exist
-overwrite = True
-flist1.sort()
-runscamp=False
-runswarp=True
 
-
-rawdir = os.getcwd()
 
 if __name__ == '__main__':
+    telescope = 'BOK'
+    
     parser = argparse.ArgumentParser(description ='stack the 90prime images after noao pipeline')
         
     parser.add_argument('--filestring', dest = 'filestring', default = 'ksb', help = 'filestring to match. default is ksb')
@@ -122,13 +124,16 @@ if __name__ == '__main__':
     # sort images by location and filter
     # alternatively could use object name,
     # but not all are correct, so need to fix names
+
+    # get a list of all the unique objects
+    # this is like, e.g. VFID2911_r or VFID2911_Ha4
     targets = sort(list(set(t['OBJECT'])))
-    
-    
     write_filelists(targets,t)
 
     # combine masks
+    # this combines weight image and bad pixel masks
     combine_all_masks(t['FILENAME'])
+    
     # get list of r-band objects only
     primary_targets = []
     for t in targets:
