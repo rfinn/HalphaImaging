@@ -62,6 +62,7 @@ def combine_all_masks(filelist):
     for f in filelist:
 
         combined_mask = f.replace('.fits','.combweight.fits')
+        #combined_mask = 'm'+combined_mask
         if os.path.exists(combined_mask):
             continue
         else:
@@ -69,10 +70,7 @@ def combine_all_masks(filelist):
             dq_image = f.replace('ooi','ood')
             combine_masks(weight_image,dq_image)
             # prepend the m to match the name of the median subtracted image
-            if os.path.exists('m'+f):
-                os.rename('combined_weight.fits','m'+combined_mask)
-            else:
-                os.rename('combined_weight.fits',combined_mask)
+            os.rename('combined_weight.fits',combined_mask)
 def run_swarp(image_list,refimage=None):
     sstring = 'swarp @{} --WEIGHT_IMAGE {} --WEIGHT_SUFFIX .combweight.fits --COMBINE_TYPE WEIGHTED '.format(image_list,weight_list)
     if refimage is not None:
