@@ -136,7 +136,7 @@ if __name__ == '__main__':
 
         
     os.system('gethead object exptime FILTER RA DEC '+args.filestring+'*ooi*.fits > header_info')
-    t = Table.read('header_info',data_start=0,delimiter=' ',format='ascii',guess=False,fast_reader=False,names=['FILENAME','OBJECT','EXPTIME','FILTER','RA','DEC'])
+    filetable = Table.read('header_info',data_start=0,delimiter=' ',format='ascii',guess=False,fast_reader=False,names=['FILENAME','OBJECT','EXPTIME','FILTER','RA','DEC'])
 
     
 
@@ -146,7 +146,7 @@ if __name__ == '__main__':
 
     # get a list of all the unique objects
     # this is like, e.g. VFID2911_r or VFID2911_Ha4
-    targets = list(set(t['OBJECT']))
+    targets = list(set(filetable['OBJECT']))
     targets.sort()
 
     # get list of r-band objects only
@@ -165,11 +165,11 @@ if __name__ == '__main__':
     if args.combinemasks:
         # combine masks
         # this combines weight image and bad pixel masks
-        combine_all_masks(t['FILENAME'])
+        combine_all_masks(filetable['FILENAME'])
     
     #print(targets)
     # need to update to write median-subtracted images to filelist instead of ksb files
-    write_filelists(targets,t,medsub=True)
+    write_filelists(targets,filetable,medsub=True)
 
     # subtract median from sky
     
