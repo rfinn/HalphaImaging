@@ -106,6 +106,10 @@ def run_swarp(image_list,refimage=None):
     output_weight_image = 'VF-{}-BOK-{}-{}.weight.fits'.format(dateobs,vfid,filter)    
     # start building swarp command
     commandstring = 'swarp @{} -WEIGHT_IMAGE @{} -COMBINE_TYPE WEIGHTED -IMAGEOUT_NAME {} -WEIGHTOUT_NAME {} '.format(image_list,weight_list,output_image,output_weight_image)
+    commandstring += '-COPY_KEYWORDS OBJECT,FILTER,TELESCOP,INSTRUME,GAIN,EPOCH,DATE-OBS,MJD-OBS,AIRMASS,MAGZERO,MAGSIG,SEEING,SEEINGP,SKYADU,SKYMAG,SKYNOISE '
+    # background subtractions
+    commandstring += '-SUBTRACT_BACK N -WRITE_FILEINFO Y -INTERPOLATE Y'
+    
     if refimage is not None:
         # copying this from uat_astr_mosaic.py
         # still need to fix this.
@@ -119,9 +123,6 @@ def run_swarp(image_list,refimage=None):
         
         commandstring = commandstring + ' -CENTER_TYPE MANUAL -CENTER {} -PIXEL_SCALE {} -IMAGE_SIZE {} '.format(center,pixel_scale,mosaic_image_size)
 
-        commandstring += '-COPY_KEYWORDS OBJECT,FILTER,TELESCOP,INSTRUME,GAIN,EPOCH,DATE-OBS,MJD-OBS,AIRMASS,MAGZERO,MAGSIG '
-        # background subtractions
-        commandstring += '-SUBTRACT_BACK N -WRITE_FILEINFO Y -INTERPOLATE Y'
 
         
     os.system(commandstring)
