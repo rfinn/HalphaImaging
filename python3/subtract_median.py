@@ -72,17 +72,24 @@ def subtract_median(files,overwrite=False,MEF=False):
             for i in range(1,nextensions):
                 try:
                     hdu[i].data,median = imutils.subtract_median_sky(hdu[i].data)
-                except TypeError:
+                
+                    if median is not np.nan:
+                        hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
+            
+                    else:
+                        print('problem subtracting median from image {}, extension {}'.format(fname,i))
+                        continue
+                except :
                     mmean, mmed,mstd = stats.sigma_clipped_stats(hdu[i].data,sigma=3,iters=5)
                     if mmed is not np.nan:
                         hdu[i].data -= mmed
                         median = mmed
-                if median is not np.nan:
-                    hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
+                        hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
             
-                else:
-                    print('problem subtracting median from image {}, extension {}'.format(fname,i))
-                    continue
+                    else:
+                        print('problem subtracting median from image {}, extension {}'.format(fname,i))
+                        continue
+                
             pass
         else:
             # background subtraction
