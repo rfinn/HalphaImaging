@@ -29,6 +29,7 @@ import imutils
 import ccdproc as ccdp
 import glob
 from astropy.io import fits
+from astropy import stats
 import numpy as np
 
 
@@ -69,9 +70,16 @@ def subtract_median(files,overwrite=False,MEF=False):
             # loop over additional extenstions and subtract median
             nextensions = len(hdu)
             for i in range(1,nextensions):
-                hdu[i].data,median = imutils.subtract_median_sky(hdu[i].data)
+                try:
+                    hdu[i].data,median = imutils.subtract_median_sky(hdu[i].data)
+                except TypeError:
+                    mmean, mmed,mstd = stats.sigma_clipped_stats(hdu[i].data,sigma=3,iters=5)
+                    if mmed is not np.nan:
+                        hdu[i].data -= mmed
+                        median = mmed
                 if median is not np.nan:
                     hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
+            
                 else:
                     print('problem subtracting median from image {}, extension {}'.format(fname,i))
                     continue

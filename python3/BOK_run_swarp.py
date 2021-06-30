@@ -114,7 +114,7 @@ def run_swarp(image_list,refimage=None):
     os.system(commandstring)
     return output_image
     
-def run_swarp_all(image_list):
+def run_swarp_all(target):
     '''
     INPUT:
     * image_list : list containing r-band images, like VFID0422_r
@@ -123,10 +123,14 @@ def run_swarp_all(image_list):
     * run swarp on r-band image, then run on Halpha using r as reference, then rerun on r using r as reference
     '''
     # run swarp on r-band mosaic
-
+    rfilelist = '{}_r'.format(target)
+    rband_coadd = run_swarp(rfilelist)
+    
     # run swarp on Halpha, using r-band mosaic as ref image
-
+    hafilelist = '{}_Ha4'.format(target)
+    ha_coadd = run_swarp(hafilelist,refimage=rband_coadd)
     # run swarp on r-band, using r-band mosaic as ref image
+    temp = run_swarp(rfilelist,refimage=rband_coadd)    
     pass
 
 def count_lines(fname):
@@ -169,7 +173,8 @@ if __name__ == '__main__':
         
     parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true',help = 'set this to subtract the median from images.')
     parser.add_argument('--combinemasks', dest = 'combinemasks', default = False, action='store_true',help = 'set this to combine weight image and bad pixel mask.')
-    parser.add_argument('--sortfiles', dest = 'sortfiles', default = False, action='store_true',help = 'write image and weights to files')            
+    parser.add_argument('--sortfiles', dest = 'sortfiles', default = False, action='store_true',help = 'write image and weights to files')
+    parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true',help = 'run swarp to create coadded images')                
     args = parser.parse_args()
 
         
@@ -214,13 +219,9 @@ if __name__ == '__main__':
         write_filelists(targets,filetable,medsub=True)
 
 
-    
-    # run swarp
+    if args.swarp:
+        for target in primary_targets:
+            run_swarp_all(target)
 
-    # run swarp to mosaic r-band
-
-    # run swarp to mosaic halpha
-    
-    # alight r and halpha imaging
     
 
