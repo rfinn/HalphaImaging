@@ -216,7 +216,8 @@ if __name__ == '__main__':
     parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true',help = 'set this to subtract the median from images.')
     parser.add_argument('--combinemasks', dest = 'combinemasks', default = False, action='store_true',help = 'set this to combine weight image and bad pixel mask.')
     parser.add_argument('--sortfiles', dest = 'sortfiles', default = False, action='store_true',help = 'write image and weights to files')
-    parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true',help = 'run swarp to create coadded images')                
+    parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true',help = 'run swarp to create coadded images')
+    parser.add_argument('--getzp', dest = 'getzp', default = False, action='store_true',help = 'run getzp to determine photometric zp of r and Halpha images')                    
     args = parser.parse_args()
 
         
@@ -266,6 +267,17 @@ if __name__ == '__main__':
             run_swarp_all_filters(target)
             # for debugging purposes
             #break
+    if args.getzp:
+        rfiles = glob.glob('VF*r.fits')
+        for rf in rfiles:
+            getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument h --filter r --nexptime'.format(rf)
+            os.system(getzpstring)
+        rfiles = glob.glob('VF*Ha.fits')
+        for rf in rfiles:
+            getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument h --filter ha --nexptime'.format(rf)
+            os.system(getzpstring)
+        
 
-    
+            
+            
 
