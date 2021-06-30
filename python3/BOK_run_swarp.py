@@ -136,7 +136,7 @@ def update_header(image,refimage):
     * image - coadded image to add header keywords too
     * refimage - image to get header keywords from
     '''
-    header_fields = ['OBJECT','FILTER','TELESCOP','INSTRUME','GAIN1','DATE-OBS','AIRMASS','MAGZERO','MAGSIG','SEEING']# List of FITS keywords to propagate
+    header_fields = ['OBJECT','FILTER','TELESCOP','INSTRUME','GAIN1','DATE-OBS','AIRMASS','MAGZERO','MAGZSIG','SEEING']# List of FITS keywords to propagate
 
     idata,iheader = fits.getdata(image,header=True)
 
