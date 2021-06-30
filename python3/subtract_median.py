@@ -71,8 +71,8 @@ def subtract_median(files,overwrite=False,MEF=False):
             nextensions = len(hdu)
             for i in range(1,nextensions):
                 d,median = imutils.subtract_median_sky(hdu[i].data.copy())
-                hdu[i].data = d
-                print('median for hdu {} = {}'.format(i,median))
+
+                #print('median for hdu {} = {}'.format(i,median))
                 #print('check if median is nan: {}'.format(median == np.nan))
                 #print('check if median == nan: {}'.format(median == nan))
                 if (str(median) == 'nan'):                    
@@ -85,6 +85,7 @@ def subtract_median(files,overwrite=False,MEF=False):
                         hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
                 
                 else:
+                    hdu[i].data = d
                     hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
             
             
