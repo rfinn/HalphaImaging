@@ -78,6 +78,7 @@ def subtract_median(files,overwrite=False,MEF=False):
                 if (str(median) == 'nan'):                    
                     print('using alternate median for hdu ',i)
                     mmean, mmed,mstd = stats.sigma_clipped_stats(hdu[i].data,sigma=3)
+                    print('alternate estimate of median = {:.2f}'.format(mmed))
                     if mmed is not np.nan:
                         hdu[i].data -= mmed
                         median = mmed
