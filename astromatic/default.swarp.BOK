@@ -4,12 +4,8 @@
 #----------------------------------- Output -----------------------------------
 IMAGEOUT_NAME          coadd.fits      # Output filename
 WEIGHTOUT_NAME       coadd.weight.fits # Output weight-map filename
-HEADEROUT_NAME                         # Out. header filename (overrides suffix)
- 
-HEADER_NAME                            # Header filename if suffix not used
 HEADER_ONLY            N               # Only a header as an output file (Y/N)?
 HEADER_SUFFIX          .head           # Filename extension for additional headers
-TILE_COMPRESS          N               # Write tile compressed output image (Y/N)?
  
 #------------------------------- Input Weights --------------------------------
  
@@ -24,7 +20,7 @@ WEIGHT_THRESH                         # Bad pixel weight-threshold
 #------------------------------- Co-addition ----------------------------------
  
 COMBINE                Y               # Combine resampled images (Y/N)?
-COMBINE_TYPE           MEDIAN          # MEDIAN,AVERAGE,MIN,MAX,WEIGHTED,CLIPPED
+COMBINE_TYPE           CLIPPED          # MEDIAN,AVERAGE,MIN,MAX,WEIGHTED,CLIPPED
                                        # CHI-OLD,CHI-MODE,CHI-MEAN,SUM,
                                        # WEIGHTED_WEIGHT,MEDIAN_WEIGHT,
                                        # AND,NAND,OR or NOR
