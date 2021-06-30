@@ -131,11 +131,11 @@ def run_swarp_all_filters(target):
     * run swarp on r-band image, then run on Halpha using r as reference, then rerun on r using r as reference
     '''
     # run swarp on r-band mosaic
-    rfilelist = '{}_r'.format(target)
+    rfilelist = target
     rband_coadd = run_swarp(rfilelist)
     
     # run swarp on Halpha, using r-band mosaic as ref image
-    hafilelist = '{}_Ha4'.format(target)
+    hafilelist = target.replace('_r','_Ha4')
     ha_coadd = run_swarp(hafilelist,refimage=rband_coadd)
     # run swarp on r-band, using r-band mosaic as ref image
     temp = run_swarp(rfilelist,refimage=rband_coadd)    
