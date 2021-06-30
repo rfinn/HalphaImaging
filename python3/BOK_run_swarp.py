@@ -236,6 +236,8 @@ if __name__ == '__main__':
     if args.swarp:
         for target in primary_targets:
             run_swarp_all_filters(target)
+            # for debugging purposes
+            break
 
     
 
