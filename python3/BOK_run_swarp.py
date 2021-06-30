@@ -125,6 +125,27 @@ def run_swarp(image_list,refimage=None):
     print('Running scamp with the following command:\n',commandstring)
     os.system(commandstring)
     return output_image
+
+def update_header(image,refimage):
+    '''
+    GOAL:
+    scamp is not passing the header keywords through to the coadded image,
+    so the goal of this routine is to add the keywords manually...
+
+    INPUT:
+    * image - coadded image to add header keywords too
+    * refimage - image to get header keywords from
+    '''
+    header_fields = ['OBJECT','FILTER','TELESCOP','INSTRUME','GAIN1','DATE-OBS','AIRMASS','MAGZERO','MAGSIG','SEEING']# List of FITS keywords to propagate
+
+    idata,iheader = fits.getdata(image,header=True)
+
+    rheader = fits.getheader(refimage)
+
+    for f in header_fields:
+        iheader.set(f,rheader[f])
+    fits.writeto(image,idata,header=iheader,overwrite=True)
+
     
 def run_swarp_all_filters(target):
     '''
@@ -141,8 +162,17 @@ def run_swarp_all_filters(target):
     # run swarp on Halpha, using r-band mosaic as ref image
     hafilelist = target.replace('_r','_Ha4')
     ha_coadd = run_swarp(hafilelist,refimage=rband_coadd)
+    
     # run swarp on r-band, using r-band mosaic as ref image
-    temp = run_swarp(rfilelist,refimage=rband_coadd)    
+    rband_coadd = run_swarp(rfilelist,refimage=rband_coadd)
+
+    # update headers
+    refimage = open(rfilelist).readline().rstrip()
+    update_header(rband_coadd,refimage)
+
+    refimage = open(hafilelist).readline().rstrip()
+    update_header(ha_coadd,refimage)
+    
     pass
 
 def count_lines(fname):
