@@ -105,8 +105,7 @@ def run_swarp(image_list,refimage=None):
     output_image = 'VF-{}-BOK-{}-{}.fits'.format(dateobs,vfid,filter)
     output_weight_image = 'VF-{}-BOK-{}-{}.weight.fits'.format(dateobs,vfid,filter)    
     # start building swarp command
-    commandstring = 'swarp @{} -WEIGHT_IMAGE @{} -IMAGEOUT_NAME {} -WEIGHTOUT_NAME {} '.format(image_list,weight_list,output_image,output_weight_image)
-    commandstring += ' -c default.swarp.BOK '
+    commandstring = 'swarp @{} -WEIGHT_IMAGE @{} -c default.swarp.BOK -IMAGEOUT_NAME {} -WEIGHTOUT_NAME {} '.format(image_list,weight_list,output_image,output_weight_image)
     
     if refimage is not None:
         # copying this from uat_astr_mosaic.py
