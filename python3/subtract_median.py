@@ -80,6 +80,7 @@ def subtract_median(files,overwrite=False,MEF=False):
                         print('problem subtracting median from image {}, extension {}'.format(fname,i))
                         continue
                 except :
+                    print('using alternate median for hdu ',i)
                     mmean, mmed,mstd = stats.sigma_clipped_stats(hdu[i].data,sigma=3,iters=5)
                     if mmed is not np.nan:
                         hdu[i].data -= mmed
