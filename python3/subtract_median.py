@@ -70,32 +70,22 @@ def subtract_median(files,overwrite=False,MEF=False):
             # loop over additional extenstions and subtract median
             nextensions = len(hdu)
             for i in range(1,nextensions):
-                try:
-                    d,median = imutils.subtract_median_sky(hdu[i].data.copy())
-                    hdu[i].data = d
-                    print('median for hdu {} = {}'.format(i,median))
-                    print('check if median is nan: {}'.format(median == np.nan))
-                    #print('check if median == nan: {}'.format(median == nan))
-                    print('check if median == nan: {}'.format(str(median) == 'nan'))                    
-                
-                    if median is not np.nan:
-                        hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
-            
-                    else:
-                        print('problem subtracting median from image {}, extension {}'.format(fname,i))
-                        continue
-                except :
+                d,median = imutils.subtract_median_sky(hdu[i].data.copy())
+                hdu[i].data = d
+                print('median for hdu {} = {}'.format(i,median))
+                #print('check if median is nan: {}'.format(median == np.nan))
+                #print('check if median == nan: {}'.format(median == nan))
+                if str(median) == 'nan'):                    
                     print('using alternate median for hdu ',i)
                     mmean, mmed,mstd = stats.sigma_clipped_stats(hdu[i].data,sigma=3,iters=5)
                     if mmed is not np.nan:
                         hdu[i].data -= mmed
                         median = mmed
                         hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
-            
-                    else:
-                        print('problem subtracting median from image {}, extension {}'.format(fname,i))
-                        continue
                 
+                else:
+                    hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
+            
             
         else:
             # background subtraction
