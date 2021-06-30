@@ -73,6 +73,7 @@ def subtract_median(files,overwrite=False,MEF=False):
                 try:
                     d,median = imutils.subtract_median_sky(hdu[i].data.copy())
                     hdu[i].data = d
+                    print('median for hdu {} = {}'.format(i,median))
                 
                     if median is not np.nan:
                         hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
