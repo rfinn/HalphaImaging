@@ -103,20 +103,25 @@ def run_swarp(image_list,refimage=None):
     dateobs = '20'+dateobs
     
     output_image = 'VF-{}-BOK-{}-{}.fits'.format(dateobs,vfid,filter)
+    output_weight_image = 'VF-{}-BOK-{}-{}.weight.fits'.format(dateobs,vfid,filter)    
     # start building swarp command
-    commandstring = 'swarp @{} -WEIGHT_IMAGE @{} -COMBINE_TYPE WEIGHTED -IMAGEOUT_NAME {}'.format(image_list,weight_list,output_image)
+    commandstring = 'swarp @{} -WEIGHT_IMAGE @{} -COMBINE_TYPE CLIPPED -IMAGEOUT_NAME {} -WEIGHTOUT_NAME {} '.format(image_list,weight_list,output_image,output_weight_image)
     if refimage is not None:
         # copying this from uat_astr_mosaic.py
         # still need to fix this.
         data,header = fits.getdata(refimage,header=True)
         w = WCS(header)
         image_size = data.shape
-
+        pixel_scale = 0.453 # pixel scale for 90prime
         ra,dec = w.wcs_pix2world(int(image_size[0]/2.),int(image_size[1]/2.),1)
         center = str(ra)+','+str(dec)
         mosaic_image_size = str(image_size[1])+','+str(image_size[0])
         
         commandstring = commandstring + ' -CENTER_TYPE MANUAL -CENTER {} -PIXEL_SCALE {} -IMAGE_SIZE {} '.format(center,pixel_scale,mosaic_image_size)
+
+        commandstring += '-COPY_KEYWORDS OBJECT,FILTER,TELESCOP,INSTRUME,GAIN,EPOCH,DATE-OBS,MJD-OBS,AIRMASS,MAGZERO,MAGSIG '
+        # background subtractions
+        commandstring += '-SUBTRACK_BACK N -WRITE_FILEINFO Y'
 
         
     os.system(commandstring)
