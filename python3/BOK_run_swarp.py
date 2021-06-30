@@ -93,6 +93,7 @@ def run_swarp(image_list,refimage=None):
     RETURNS:
     * name of output image from swarp
     '''
+    print(image_list)
     vfid,filter = image_list.split('_')
     weight_list = image_list+'_weights'
 
