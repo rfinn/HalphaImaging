@@ -24,6 +24,11 @@ data from 04/15 is pretty crappy
 - VFID2911 has data from 04/16, so moving the 04/15 data to junk
 - going to keep the others, but the depth is def not good
 
+
+#########
+
+problem running median subtract on  ksb_210315_104538_ooi_r_v1.fits - moving this file to temp, and continuing
+
 '''
 
 import os
@@ -195,7 +200,7 @@ if __name__ == '__main__':
     if args.submedian:
         # subtract median
         os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_r_v1.fits'))
-        os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_Ha+4nm_v1.fits'))        
+        #os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_Ha+4nm_v1.fits'))        
 
     
     if args.combinemasks:
