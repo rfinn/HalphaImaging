@@ -71,7 +71,8 @@ def subtract_median(files,overwrite=False,MEF=False):
             nextensions = len(hdu)
             for i in range(1,nextensions):
                 try:
-                    hdu[i].data,median = imutils.subtract_median_sky(hdu[i].data)
+                    d,median = imutils.subtract_median_sky(hdu[i].data.copy())
+                    hdu[i].data = d
                 
                     if median is not np.nan:
                         hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
