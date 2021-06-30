@@ -27,7 +27,14 @@ data from 04/15 is pretty crappy
 
 #########
 
-problem running median subtract on  ksb_210315_104538_ooi_r_v1.fits - moving this file to temp, and continuing
+problem running median subtract on  ksb_210315_104538_ooi_r_v1.fits - moving this file to temp, and continuing.
+
+updated subtract_median_sky to calculate median using astropy.stats.sigma_clipped_stats when the first attempt
+returns a median that is == nan.
+
+added file and median-subtracted file back into main directory
+
+#####################
 
 '''
 
@@ -114,7 +121,7 @@ def run_swarp(image_list,refimage=None):
     os.system(commandstring)
     return output_image
     
-def run_swarp_all(target):
+def run_swarp_all_filters(target):
     '''
     INPUT:
     * image_list : list containing r-band images, like VFID0422_r
@@ -221,7 +228,7 @@ if __name__ == '__main__':
 
     if args.swarp:
         for target in primary_targets:
-            run_swarp_all(target)
+            run_swarp_all_filters(target)
 
     
 
