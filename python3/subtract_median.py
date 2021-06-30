@@ -74,7 +74,9 @@ def subtract_median(files,overwrite=False,MEF=False):
                     d,median = imutils.subtract_median_sky(hdu[i].data.copy())
                     hdu[i].data = d
                     print('median for hdu {} = {}'.format(i,median))
-                    print('check if median is nan: {}'.format(median == np.nan))                    
+                    print('check if median is nan: {}'.format(median == np.nan))
+                    #print('check if median == nan: {}'.format(median == nan))
+                    print('check if median == nan: {}'.format(str(median) == 'nan'))                    
                 
                     if median is not np.nan:
                         hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
@@ -94,7 +96,7 @@ def subtract_median(files,overwrite=False,MEF=False):
                         print('problem subtracting median from image {}, extension {}'.format(fname,i))
                         continue
                 
-            pass
+            
         else:
             # background subtraction
             hdu[0].data,median = imutils.subtract_median_sky(hdu[0].data)
