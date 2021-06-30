@@ -121,7 +121,7 @@ def run_swarp(image_list,refimage=None):
 
         commandstring += '-COPY_KEYWORDS OBJECT,FILTER,TELESCOP,INSTRUME,GAIN,EPOCH,DATE-OBS,MJD-OBS,AIRMASS,MAGZERO,MAGSIG '
         # background subtractions
-        commandstring += '-SUBTRACK_BACK N -WRITE_FILEINFO Y'
+        commandstring += '-SUBTRACT_BACK N -WRITE_FILEINFO Y'
 
         
     os.system(commandstring)
