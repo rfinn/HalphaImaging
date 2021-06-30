@@ -101,12 +101,12 @@ def run_swarp(image_list,refimage=None):
     images = open(image_list,'r').readline()
     dateobs = images.split('_')[1]
     dateobs = '20'+dateobs
-    
+    os.system('cp ~/github/HalphaImaging/astromatic/default.swarp.BOK .')
     output_image = 'VF-{}-BOK-{}-{}.fits'.format(dateobs,vfid,filter)
     output_weight_image = 'VF-{}-BOK-{}-{}.weight.fits'.format(dateobs,vfid,filter)    
     # start building swarp command
     commandstring = 'swarp @{} -WEIGHT_IMAGE @{} -COMBINE_TYPE WEIGHTED -IMAGEOUT_NAME {} -WEIGHTOUT_NAME {} '.format(image_list,weight_list,output_image,output_weight_image)
-    commandstring += '-COPY_KEYWORDS OBJECT,FILTER,TELESCOP,INSTRUME,GAIN,EPOCH,DATE-OBS,MJD-OBS,AIRMASS,MAGZERO,MAGSIG,SEEING,SEEINGP,SKYADU,SKYMAG,SKYNOISE '
+    commandstring += ' -c default.swarp.BOK '
     # background subtractions
     commandstring += '-SUBTRACT_BACK N -WRITE_FILEINFO Y -INTERPOLATE Y'
     
