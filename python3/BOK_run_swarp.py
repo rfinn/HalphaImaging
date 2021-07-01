@@ -39,13 +39,15 @@ added file and median-subtracted file back into main directory
 '''
 
 import os
-
+import glob
 import argparse
 
 from astropy.table import Table
 from astropy.io import fits
 from astropy.wcs import WCS
 from astropy.time import Time
+
+
 
 def combine_masks(weight_image,dq_image):
     '''
