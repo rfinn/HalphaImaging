@@ -29,7 +29,8 @@ import imutils
 import ccdproc as ccdp
 import glob
 from astropy.io import fits
-
+from astropy import stats
+import numpy as np
 
 
 ##########################################################
@@ -69,14 +70,30 @@ def subtract_median(files,overwrite=False,MEF=False):
             # loop over additional extenstions and subtract median
             nextensions = len(hdu)
             for i in range(1,nextensions):
-                hdu[i].data,median = imutils.subtract_median_sky(hdu[i].data)
-                hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
+                d,median = imutils.subtract_median_sky(hdu[i].data.copy())
+
+                #print('median for hdu {} = {}'.format(i,median))
+                #print('check if median is nan: {}'.format(median == np.nan))
+                #print('check if median == nan: {}'.format(median == nan))
+                if (str(median) == 'nan'):                    
+                    print('using alternate median for hdu ',i)
+                    mmean, mmed,mstd = stats.sigma_clipped_stats(hdu[i].data,sigma=3)
+                    print('alternate estimate of median = {:.2f}'.format(mmed))
+                    if mmed is not np.nan:
+                        hdu[i].data -= mmed
+                        median = mmed
+                        hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
                 
-            pass
+                else:
+                    hdu[i].data = d
+                    hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
+            
+            
         else:
             # background subtraction
             hdu[0].data,median = imutils.subtract_median_sky(hdu[0].data)
-            hdu[0].header.set('MEDSUB',value=median,comment='median subtraction')
+            if median is not np.nan:
+                hdu[0].header.set('MEDSUB',value=median,comment='median subtraction')
         if overwrite:
             hdu.writeto(fname,overwrite=True)
         else:

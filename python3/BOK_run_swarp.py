@@ -24,14 +24,29 @@ data from 04/15 is pretty crappy
 - VFID2911 has data from 04/16, so moving the 04/15 data to junk
 - going to keep the others, but the depth is def not good
 
+
+#########
+
+problem running median subtract on  ksb_210315_104538_ooi_r_v1.fits - moving this file to temp, and continuing.
+
+updated subtract_median_sky to calculate median using astropy.stats.sigma_clipped_stats when the first attempt
+returns a median that is == nan.
+
+added file and median-subtracted file back into main directory
+
+#####################
+
 '''
 
 import os
-
+import glob
 import argparse
 
 from astropy.table import Table
 from astropy.io import fits
+from astropy.wcs import WCS
+from astropy.time import Time
+
 
 
 def combine_masks(weight_image,dq_image):
@@ -75,31 +90,91 @@ def combine_all_masks(filelist):
             # prepend the m to match the name of the median subtracted image
             os.rename('combined_weight.fits',combined_mask)
 def run_swarp(image_list,refimage=None):
-    sstring = 'swarp @{} --WEIGHT_IMAGE {} --WEIGHT_SUFFIX .combweight.fits --COMBINE_TYPE WEIGHTED '.format(image_list,weight_list)
+    '''
+
+    RETURNS:
+    * name of output image from swarp
+    '''
+    print(image_list)
+    vfid,filter = image_list.split('_')
+    weight_list = image_list+'_weights'
+
+    # get date of observation from the first image in the list
+    images = open(image_list,'r').readline()
+    dateobs = images.split('_')[1]
+    dateobs = '20'+dateobs
+    os.system('cp ~/github/HalphaImaging/astromatic/default.swarp.BOK .')
+    output_image = 'VF-{}-BOK-{}-{}.fits'.format(dateobs,vfid,filter)
+    output_weight_image = 'VF-{}-BOK-{}-{}.weight.fits'.format(dateobs,vfid,filter)    
+    # start building swarp command
+    commandstring = 'swarp @{} -WEIGHT_IMAGE @{} -c default.swarp.BOK -IMAGEOUT_NAME {} -WEIGHTOUT_NAME {} '.format(image_list,weight_list,output_image,output_weight_image)
+    
     if refimage is not None:
         # copying this from uat_astr_mosaic.py
         # still need to fix this.
-        data,header = fits.getdata(args.refimage,header=True)
+        data,header = fits.getdata(refimage,header=True)
         w = WCS(header)
         image_size = data.shape
-
-        ra,dec = w.wcs_pix2world(image_size[0]/2.,image_size[1]/2.,1)
+        pixel_scale = 0.453 # pixel scale for 90prime
+        ra,dec = w.wcs_pix2world(int(image_size[0]/2.),int(image_size[1]/2.),1)
         center = str(ra)+','+str(dec)
         mosaic_image_size = str(image_size[1])+','+str(image_size[0])
         
-        sstring += ' --refimage {} '.format(refimage)
-        
-        commandstring = 'swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -CENTER_TYPE MANUAL -CENTER '+center+' -PIXEL_SCALE '+str(pixel_scale)+' -IMAGE_SIZE '+mosaic_image_size         
+        commandstring = commandstring + ' -CENTER_TYPE MANUAL -CENTER {} -PIXEL_SCALE {} -IMAGE_SIZE {} '.format(center,pixel_scale,mosaic_image_size)
 
-        
-    os.system(sstring)
+
+    print('')
+    print('Running scamp with the following command:\n',commandstring)
+    os.system(commandstring)
+    return output_image
+
+def update_header(image,refimage):
+    '''
+    GOAL:
+    scamp is not passing the header keywords through to the coadded image,
+    so the goal of this routine is to add the keywords manually...
+
+    INPUT:
+    * image - coadded image to add header keywords too
+    * refimage - image to get header keywords from
+    '''
+    header_fields = ['OBJECT','EXPTIME','FILTER','TELESCOP','INSTRUME','GAIN1','DATE-OBS','AIRMASS','MAGZERO','MAGZSIG','SEEING']# List of FITS keywords to propagate
+
+    idata,iheader = fits.getdata(image,header=True)
+
+    rheader = fits.getheader(refimage)
+
+    for f in header_fields:
+        iheader.set(f,rheader[f])
+    fits.writeto(image,idata,header=iheader,overwrite=True)
+
     
-def run_swarp_all(image_list):
+def run_swarp_all_filters(target):
+    '''
+    INPUT:
+    * image_list : list containing r-band images, like VFID0422_r
+
+    PROCEDURE:
+    * run swarp on r-band image, then run on Halpha using r as reference, then rerun on r using r as reference
+    '''
     # run swarp on r-band mosaic
-
+    rfilelist = target
+    rband_coadd = run_swarp(rfilelist)
+    
     # run swarp on Halpha, using r-band mosaic as ref image
-
+    hafilelist = target.replace('_r','_Ha4')
+    ha_coadd = run_swarp(hafilelist,refimage=rband_coadd)
+    
     # run swarp on r-band, using r-band mosaic as ref image
+    rband_coadd = run_swarp(rfilelist,refimage=rband_coadd)
+
+    # update headers
+    refimage = open(rfilelist).readline().rstrip()
+    update_header(rband_coadd,refimage)
+
+    refimage = open(hafilelist).readline().rstrip()
+    update_header(ha_coadd,refimage)
+    
     pass
 
 def count_lines(fname):
@@ -114,14 +189,23 @@ def count_lines(fname):
 
 def write_filelists(targets,header_table,medsub=False):
     for t in targets:
+        # open file to store the list of science images
         outfile = open(t,'w')
-        filenames = header_table['OBJECT'] == t
+        # open file to store the list of weight images
+        weightfile = open(t+'_weights','w')
+        # keep the filenames that match the current target name
+        filenames = header_table['FILENAME'][header_table['OBJECT'] == t]
+        # loop over the filenames and write each science and
+        # weight image to the corresponding list
         for f in filenames:
             if medsub:
-                outfile.write('{} \n'.format('m'+f))
+                outfile.write('m{} \n'.format(f))
             else:
                 outfile.write('{} \n'.format(f))
-        outfile.close
+            combined_mask = f.replace('.fits','.combweight.fits')
+            weightfile.write('{} \n'.format(combined_mask))
+        outfile.close()
+        weightfile.close()
 
 
 
@@ -132,11 +216,14 @@ if __name__ == '__main__':
     parser.add_argument('--filestring', dest = 'filestring', default = 'ksb', help = 'filestring to match. default is ksb')
         
     parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true',help = 'set this to subtract the median from images.')
-    parser.add_argument('--combinemasks', dest = 'combinemasks', default = False, action='store_true',help = 'set this to combine weight image and bad pixel mask.')        
+    parser.add_argument('--combinemasks', dest = 'combinemasks', default = False, action='store_true',help = 'set this to combine weight image and bad pixel mask.')
+    parser.add_argument('--sortfiles', dest = 'sortfiles', default = False, action='store_true',help = 'write image and weights to files')
+    parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true',help = 'run swarp to create coadded images')
+    parser.add_argument('--getzp', dest = 'getzp', default = False, action='store_true',help = 'run getzp to determine photometric zp of r and Halpha images')                    
     args = parser.parse_args()
 
         
-    os.system('gethead object exptime FILTER RA DEC '+args.filestring+'*ooi*v1.fits > header_info')
+    os.system('gethead -a object exptime FILTER RA DEC '+args.filestring+'*ooi*v1.fits > header_info')
     filetable = Table.read('header_info',data_start=0,delimiter=' ',format='ascii',guess=False,fast_reader=False,names=['FILENAME','OBJECT','EXPTIME','FILTER','RA','DEC'])
 
     
@@ -158,10 +245,12 @@ if __name__ == '__main__':
     print('{} primary targets'.format(len(primary_targets)))
     print(primary_targets)
 
+    
+    # subtract median from sky
     if args.submedian:
         # subtract median
         os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_r_v1.fits'))
-        os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_Ha+4nm_v1.fits'))        
+        #os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_Ha+4nm_v1.fits'))        
 
     
     if args.combinemasks:
@@ -171,16 +260,26 @@ if __name__ == '__main__':
     
     #print(targets)
     # need to update to write median-subtracted images to filelist instead of ksb files
-    #write_filelists(targets,filetable,medsub=True)
+    if args.sortfiles:
+        write_filelists(targets,filetable,medsub=True)
 
-    # subtract median from sky
-    
-    # run swarp
 
-    # run swarp to mosaic r-band
+    if args.swarp:
+        for target in primary_targets:
+            run_swarp_all_filters(target)
+            # for debugging purposes
+            #break
+    if args.getzp:
+        rfiles = glob.glob('VF*r.fits')
+        for rf in rfiles:
+            getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument h --filter r --nexptime'.format(rf)
+            os.system(getzpstring)
+        rfiles = glob.glob('VF*Ha.fits')
+        for rf in rfiles:
+            getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument h --filter ha --nexptime'.format(rf)
+            os.system(getzpstring)
+        
 
-    # run swarp to mosaic halpha
-    
-    # alight r and halpha imaging
-    
+            
+            
 
