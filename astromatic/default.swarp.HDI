@@ -15,7 +15,7 @@ WEIGHT_TYPE            NONE            # BACKGROUND,MAP_RMS,MAP_VARIANCE
 WEIGHT_SUFFIX          .weight.fits    # Suffix to use for weight-maps
 WEIGHT_IMAGE                           # Weightmap filename if suffix not used
                                        # (all or for each weight-map)
- 
+
 #------------------------------- Co-addition ----------------------------------
  
 COMBINE                Y               # Combine resampled images (Y/N)?
@@ -23,7 +23,7 @@ COMBINE_TYPE           CLIPPED          # MEDIAN,AVERAGE,MIN,MAX,WEIGHTED,CLIPPE
                                        # CHI-OLD,CHI-MODE,CHI-MEAN,SUM,
                                        # WEIGHTED_WEIGHT,MEDIAN_WEIGHT,
                                        # AND,NAND,OR or NOR
- 
+CLIP_SIGMA             3.0 
 #-------------------------------- Astrometry ----------------------------------
  
 CELESTIAL_TYPE         NATIVE          # NATIVE, PIXEL, EQUATORIAL,
@@ -60,7 +60,7 @@ GAIN_DEFAULT           0.0             # Default gain if no FITS keyword found
  
 #--------------------------- Background subtraction ---------------------------
  
-SUBTRACT_BACK          Y               # Subtraction sky background (Y/N)?
+SUBTRACT_BACK          N               # Subtraction sky background (Y/N)?
                                        # (all or for each image)
  
 BACK_TYPE              AUTO            # AUTO or MANUAL
