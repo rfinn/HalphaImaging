@@ -157,14 +157,19 @@ class getzp():
         self.naper = naper
         self.mag = mag
     def getzp(self):
+        print('')
         print('STATUS: running se')        
         self.runse()
+        print('')        
         print('STATUS: getting panstarrs')
-        self.get_panstarrs() 
+        self.get_panstarrs()
+        print('')        
         print('STATUS: matching se cat to panstarrs')       
         self.match_coords()
+        print('')        
         print('STATUS: fitting zeropoint')        
         self.fitzp()
+        print('')        
         print('STATUS: udating header')        
         self.update_header()
         self.fit_residual_surface(norder=2,suffix=None)
