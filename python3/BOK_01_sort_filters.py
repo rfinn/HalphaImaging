@@ -2,7 +2,7 @@
 
 '''
 GOAL:
-- sort Bok 90Prime data according to target and filter
+- sort Bok 90Prime data according to image type and filter
 - this sets up the files as needed for theli
 
 
@@ -17,7 +17,9 @@ for flats, create a directory for each filter called FLAT-HALPHA.  Move flat to 
 for science frames, sort them by filter into, e.g. target-r or target-Halpha
 - these will get sorted by object once bias subtraction and flatfielding is done.
 
-After basic calibration, we can sort science objects, make directory for each unique set of OBJECT-FILTER.  move files to appropriate directory.  But theli actually does this part...
+After basic calibration, we can sort science objects, 
+make directory for each unique set of OBJECT-FILTER.  
+move files to appropriate directory.  But theli actually does this part...
 
 '''
 #import ccdproc
