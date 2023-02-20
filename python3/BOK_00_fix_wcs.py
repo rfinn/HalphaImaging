@@ -44,6 +44,14 @@ import numpy as np
 from astropy.coordinates import Angle
 from astropy.io import fits
 from astropy import units as u
+import argparse
+
+# use argparse to get the file prefix
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--filestring', default='ut', help='Prefix of image files.  The default is ut.  All images with ut*.fits will be operated on.')
+parser.add_argument('--nooverwrite', action='store_true', default=False, help='Default behavior is to overwrite existing files.  Set this to save output as w+input_filename.')
+args = parser.parse_args()
 
 RA_offsets = np.array([0.1536,0.1543,0.4118,0.4127,\
                        0.1500,0.1513,0.4066,0.4089,\
@@ -79,7 +87,7 @@ field_values = ['T',-32,\
                 'RA---TAN','DEC--TAN','deg','deg']
 
 # get list of images
-filenames = glob.glob('ut*.fits')
+filenames = glob.glob(args.prefix+'*.fits')
 
 # loop over images
 for f in filenames:
@@ -121,4 +129,7 @@ for f in filenames:
             hdu[i].header[field] = field_values[k]
     # write image
     print(f"updating WCS header info for {f} ({RA},{DEC})")
-    hdu.writeto(f,overwrite=True)
+    if args.nooverwrite:
+        hdu.writeto('w'+f,overwrite=True)
+    else:
+        hdu.writeto(f,overwrite=True)
