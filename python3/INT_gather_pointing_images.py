@@ -22,7 +22,7 @@ flist1.sort()
 # get list of pointings - cut off filter from dir name
 pointings = []
 for f in flist1:
-    if (f.find('pointing') > -1) & (f.find('-') > -1):
+    if( (f.find('pointing') > -1) | (f.find('target') > -1)) & (f.find('-') > -1):
         pointings.append(f.split('-')[0])
 
 # pointings will now have two listing for each filter b/c of r and Halpha

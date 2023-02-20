@@ -25,6 +25,10 @@ working_dir = os.getcwd()
 # overwrite output files if they exist
 overwrite = True
 flist1.sort()
+
+subdir_rootname = 'target'
+subdir_rootname = 'pointing'
+
 #print(flist1)
 #flist1 = ['pointing022','pointing026']
 for subdir in flist1: # loop through list

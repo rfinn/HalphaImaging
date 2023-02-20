@@ -71,17 +71,16 @@ from scipy.stats import median_absolute_deviation as MAD2
 from astroquery.vizier import Vizier
 from photutils import Background2D, MedianBackground
 import itertools
+
+
 # function for fitting ZP equation
 # this one forces slope = 1
 zpfunc = lambda x, zp: x + zp
+
 # this function allows the slope to vary
 zpfuncwithslope = lambda x, m, zp: m*x + zp
 
-pixelscale = 0.43 # arcsec per pixel
-
-v1=.97
-v2=1.03
-
+pixelscale = {'HDI':0.43, 'INT':0.331} 
 
 def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=20,
                     maxsources=10000):
@@ -97,6 +96,8 @@ def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=20,
     :param maxmag: upper limit G magnitude (optional)
     :param maxsources: maximum number of sources
     :return: astropy.table object
+
+    https://vizier.cds.unistra.fr/viz-bin/VizieR-2
     """
     pan_columns =['objID', 'RAJ2000', 'DEJ2000','e_RAJ2000', 'e_DEJ2000', 'f_objID', 'Qual','gmag', 'e_gmag','rmag', 'e_rmag','imag', 'e_imag','zmag', 'e_zmag','ymag', 'e_ymag']
     #print(pan_columns)
@@ -130,19 +131,28 @@ def fit_circle_func():
     #fit function centered on 
     pass
 class getzp():
-    def __init__(self, image, instrument='h', filter='r', astromatic_dir = '~/github/HalphaImaging/astromatic/',norm_exptime = True,nsigma = 2., useri = False, naper = 5, mag=0):
+    def __init__(self, args):
+        
+        self.image = args.image
 
-        self.image = image
-
-        self.plotprefix = self.image.split('coadd')[0].replace('.','-').replace('-noback',"")
+        # TODO - get plot name from image header OBJECT
+        header = fits.getheader(self.image)
+        #self.plotprefix = self.image.split('coadd')[0].replace('.','-').replace('-noback',"")
+        self.plotprefix = header['OBJECT']
         # create plot directory if it doesn't already exist
         if not os.path.exists('plots'):
             os.mkdir('plots')
-        self.astrodir = astromatic_dir
-        self.instrument = instrument
-        self.filter = filter
+        self.astrodir = args.d
+        self.instrument = args.instrument
+        if self.instrument == 'h':
+            self.pixelscale = pixelscale['HDI']
+        elif self.instrument == 'i':
+            self.pixelscale = pixelscale['INT']
+        self.filter = args.filter
+
+
         # if image is in ADU rather than ADU/s, divide image by exptime before running sextractor
-        if not(norm_exptime):
+        if args.normbyexptime:
             im, header = fits.getdata(self.image,header=True)
             exptime = header['EXPTIME']
             norm_im = im/float(exptime)
@@ -151,11 +161,15 @@ class getzp():
             fits.writeto('n'+self.image, norm_im, header, overwrite=True)
             self.image = 'n'+self.image
             self.plotprefix = 'n'+self.plotprefix
-        print('output image = ',self.image)
-        self.nsigma = nsigma
-        self.useri = useri
-        self.naper = naper
-        self.mag = mag
+
+            
+        print('output image = ', self.image)
+        self.nsigma = float(args.nsigma)
+        self.useri = args.useri
+        self.naper = int(args.naper)
+        self.mag = int(args.mag)
+        self.flatten = int(args.flatten)
+        
     def getzp(self):
         print('')
         print('STATUS: running se')        
@@ -168,7 +182,7 @@ class getzp():
         self.match_coords()
         print('')        
         print('STATUS: fitting zeropoint')        
-        self.fitzp()
+        self.fitzp(plotall=True)
         print('')        
         print('STATUS: udating header')        
         self.update_header()
@@ -177,30 +191,35 @@ class getzp():
         self.getzp()
         #self.fit_residual_surface(norder=2)
         # this creates 'f'+imagename
-        self.renorm_wfc()
-        self.rerun_zp_fit()
-
-        if self.filter == 'ha':
-            print("running an additional round of flattening for halpha")
-            self.fit_residual_surface(norder=2)
+        if self.flatten > 0:
             self.renorm_wfc()
-            # this creates 'ff'+imagename
             self.rerun_zp_fit()
+
+            if self.flatten == 2:
+                print("running an additional round of flattening for halpha")
+                self.fit_residual_surface(norder=2)
+                self.renorm_wfc()
+                # this creates 'ff'+imagename
+                self.rerun_zp_fit()
         # clean up
-        if self.image.find('f') > -1:
-            rootname = self.image.strip('f')
-            if rootname.startswith('nWFC'):
-                os.remove(rootname)
-            if self.image.find('ff') > -1:
-                os.remove('f'+rootname)
+        # leaving the extra images for now b/c not sure if flattening is need for 2022 INT data
+        # TODO - reapply clean up after situation is resolved with flattening 2022 data
+        #if self.image.find('f') > -1:
+        #    rootname = self.image.strip('f')
+        #    if rootname.startswith('nWFC'):
+        #        os.remove(rootname)
+        #    if self.image.find('ff') > -1:
+        #        os.remove('f'+rootname)
                 
         plt.figure()
         plt.hist(self.zim,bins=np.linspace(.9,1.1,40))
+        plt.axvline(x=1,color='k')
+        plt.xlabel('Flux/Flux_predicted of fitted sources')
         
     def runse(self):
-        #####
-        # Run Source Extractor on image to measure magnitudes
-        ####
+        """
+        Run Source Extractor on image to measure magnitudes
+        """
 
         os.system('cp ' +self.astrodir + '/default.* .')
         t = self.image.split('.fits')
@@ -217,7 +236,12 @@ class getzp():
             expt = header['EXPTIME']
         except KeyError:
             expt = 1.
-        ADUlimit = 4000000.#/float(expt)
+        ADUlimit = 40000.
+        if self.instrument == 'i':
+            if (self.filter == 'r'):
+                ADUlimit = 400000./60#/float(expt)
+            elif self.filter == 'ha':
+                ADUlimit = 40000./180.
         print('saturation limit in ADU/s {:.1f}'.format(ADUlimit))
         if args.fwhm is None:
             t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)
@@ -240,7 +264,7 @@ class getzp():
             self.secat0 = self.secat
             # get median fwhm of image
             # for some images, this comes back as zero, and I don't know why
-            fwhm = np.median(self.secat['FWHM_IMAGE'])*pixelscale
+            fwhm = np.median(self.secat['FWHM_IMAGE'])*self.pixelscale
             
             
             t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)+' -SEEING_FWHM '+str(fwhm)
@@ -307,13 +331,13 @@ class getzp():
         self.matchedarray1=np.zeros(len(pancoords),dtype=self.secat.dtype)
         self.matchedarray1[self.matchflag] = self.secat[index[self.matchflag]]
 
-        ###################################
+        ###################################################################
         # remove any objects that are saturated, have FLAGS set, galaxies,
         # must have 14 < r < 17 according to Pan-STARRS
-        ###################################
+        ###################################################################
 
 
-        self.fitflag = self.matchflag  & (self.pan['rmag'] > 9.) & (self.matchedarray1['FLAGS'] <  5) & (self.pan['Qual'] < 64)  & (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.pan['rmag'] < 15.5) #& (self.matchedarray1['MAG_AUTO'] > -11.)
+        self.fitflag = self.matchflag  & (self.pan['rmag'] > 14.) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.matchedarray1['CLASS_STAR'] > 0.95) & (self.pan['rmag'] < 17) #& (self.matchedarray1['MAG_AUTO'] > -11.)
 
         # for WFC on INT, restrict area to central region
         # to avoid top chip and vignetted regions
@@ -349,6 +373,7 @@ class getzp():
 
         else:
             self.R = self.pan['rmag']
+            
     def plot_fitresults(self, x, y, yerr=None, polyfit_results = [0,0]):
         # plot best-fit results
         yfit = np.polyval(polyfit_results,x)
@@ -483,6 +508,7 @@ class getzp():
             plt.figure()            
             crap = plt.hist(residual_all,bins=np.linspace(.8,1.2,20))
             plt.text(0.05,.85,s,horizontalalignment='left',transform=plt.gca().transAxes)
+            plt.xlabel('Residuals')
             plt.savefig('plots/'+self.plotprefix.replace(".fits","")+'getzp-residual-hist.png')
 
         ###################################
@@ -539,8 +565,8 @@ class getzp():
             
         header.set('PHOTSYS','AB')
         header.set('FLUXZPJY',float(3631))
-
         fits.writeto(self.image, im, header, overwrite=True)
+        
     def fit_residual_surface(self,norder=2,suffix=None):
         """
         for INT data, first pass:
@@ -654,20 +680,24 @@ if __name__ == '__main__':
     parser.add_argument('--fwhm', dest = 'fwhm', default = None, help = 'image FWHM in arcseconds.  Default is none, then SE assumes 1.5 arcsec')    
     parser.add_argument('--filter', dest = 'filter', default = 'R', help = 'filter (R or r; use ha for Halpha)')
     parser.add_argument('--useri',dest = 'useri', default = False, action = 'store_true', help = 'Use r->R transformation as a function of r-i rather than the g-r relation.  g-r is the default.')
-    parser.add_argument('--nexptime', dest = 'nexptime', default = True, action = 'store_false', help = "set this flag if the image is in ADU rather than ADU/s.  Swarp produces images in ADU/s.")
-    parser.add_argument('--mag', dest = 'mag', default = 0,help = "select SE magnitude to use when solving for ZP.  0=MAG_APER,1=MAG_BEST,2=MAG_PETRO.  Default is MAG_APER ")
+    parser.add_argument('--normbyexptime', dest = 'normbyexptime', default = False, action = 'store_true', help = "set this flag if the image is in ADU rather than ADU/s, and the program will then normalize by the exposure time.  Note: swarp produces images in ADU/s, so this is usually not necessary if using coadds from swarp.")
+    parser.add_argument('--mag', dest = 'mag', default = 0,help = "select SE magnitude to use when solving for ZP.  0=MAG_APER,1=MAG_BEST,2=MAG_PETRO.  Default is MAG_APER ",choices=['0','1','2'])
     parser.add_argument('--naper', dest = 'naper', default = 5,help = "select fixed aperture magnitude.  0=10pix,1=12pix,2=15pix,3=20pix,4=25pix,5=30pix.  Default is 5 (30 pixel diameter)")
     parser.add_argument('--nsigma', dest = 'nsigma', default = 2., help = 'number of std to use in iterative rejection of ZP fitting.  default is 2.')
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
     parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
+    parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT data from 2022 does not seem to show it either.',choices=['0','1','2'])    
+    
     args = parser.parse_args()
-    args.nexptime = bool(args.nexptime)
-    args.naper = int(args.naper)
-    zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
-    print('value of nexptime = ',args.nexptime)
+    #zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
+    zp = getzp(args)
     if args.filter == 'ha':
-        v1 = .95
-        v2 = 1.05  
+        v1 = .9
+        v2 = 1.1
+    else:
+        v1=.95
+        v2=1.05
+
     if args.instrument == 'i':
         zp.getzp_wfc()
     else:

@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 '''
+
+WARNING: NEVER GOT THIS TO WORK 
+
 GOAL:
 - Call theli scripts from the command line
 

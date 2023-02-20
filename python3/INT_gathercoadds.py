@@ -20,8 +20,10 @@ from astropy.io import fits
 
 homedir = os.getenv("HOME")
 # define directory for all coadds
-output_dir_coadds = homedir+'/data/virgo-coadds/'
+output_dir_coadds = homedir+'/data/reduced/virgo-coadds/'
 telescope = 'INT'
+
+
 # get list of current directory
 flist1 = os.listdir()
 working_dir = os.getcwd()

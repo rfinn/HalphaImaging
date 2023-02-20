@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 
 '''
+OVERVIEW:
+- this gathers the individual exposures into a common directory
+- I probably made this so that I could run scamp/swarp on all files at once
+- for 2022 data, I am using theli through coaddition and photometric calibration, 
+for each pointing (target) separately
 
 PROCEDURE:
-* get list of current file
-
-* run this from the base data directory, like ~/data/INT
-  - this have subfolders arranged by date
-* program will look in each subfolder, and then in each directory that has a "pointing" in the name
-* it then looks in YYYYMMDD/pointingXXX-r/coadd-r for the coadd.fits file
-* it will copy that to the output_dir_coadds directory specified below
-* coadds will be renamed by RA, DEC, telescope, pointing, and filter
+- run from directory that contains subdir for each pointing/target and filter
 
 '''
 

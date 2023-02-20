@@ -2,7 +2,7 @@
 
 '''
 GOAL:
-- sort INT WFC data according to target and filter
+- sort Bok 90Prime data according to target and filter
 -
 
 RELEVANT HEADER KEYWORDS:
@@ -40,9 +40,12 @@ After basic calibration, we can sort science objects, make directory for each un
 from ccdproc import ImageFileCollection
 import os
 
+# updating 2022 to make this usable for BOK scripts, rather than making a separate
+
 ic = ImageFileCollection(os.getcwd(),keywords='*',glob_include='r*.fit*')
 
 # get list of filter, imagetype, and object names
+
 
 filters = ic.values('wffband')
 #print(filters)
@@ -65,6 +68,13 @@ for i,d in enumerate(filefilterlist):
     if d.find('Sky background') > -1:
         print('found it')
         filefilterlist[i] = filefilterlist[i].replace("Sky background", "SKYFLAT")
+    # make a case for dome flats, which have the object='Flat field'
+    if d.find('Flat field') > -1:
+        #print('found it')
+        filefilterlist[i] = filefilterlist[i].replace("Flat field", "FLAT")
+    if d.find('Flatfield') > -1:
+        #print('found it')
+        filefilterlist[i] = filefilterlist[i].replace("Flatfield", "FLAT")
 
 # make directory for BIAS
 # make directory for each flat/filter combination
