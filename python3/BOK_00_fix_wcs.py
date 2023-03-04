@@ -127,6 +127,9 @@ for f in filenames:
         for k,field in enumerate(other_fields):
             #print(field,field_values[k])
             hdu[i].header[field] = field_values[k]
+    # add comment to primary header to note that wcs is corrected
+    hdu[0].header.set('
+    
     # write image
     print(f"updating WCS header info for {f} ({RA},{DEC})")
     if args.nooverwrite:

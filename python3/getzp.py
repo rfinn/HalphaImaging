@@ -80,7 +80,7 @@ zpfunc = lambda x, zp: x + zp
 # this function allows the slope to vary
 zpfuncwithslope = lambda x, m, zp: m*x + zp
 
-pixelscale = {'HDI':0.43, 'INT':0.331} 
+pixelscale = {'HDI':0.43, 'INT':0.331, 'BOK':0.45252} 
 
 def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=20,
                     maxsources=10000):
@@ -148,6 +148,8 @@ class getzp():
             self.pixelscale = pixelscale['HDI']
         elif self.instrument == 'i':
             self.pixelscale = pixelscale['INT']
+        elif self.instrument == 'b':
+            self.pixelscale = pixelscale['BOK']            
         self.filter = args.filter
 
 
@@ -169,7 +171,7 @@ class getzp():
         self.naper = int(args.naper)
         self.mag = int(args.mag)
         self.flatten = int(args.flatten)
-        
+        self.norder = int(args.norder)
     def getzp(self):
         print('')
         print('STATUS: running se')        
@@ -186,7 +188,18 @@ class getzp():
         print('')        
         print('STATUS: udating header')        
         self.update_header()
-        self.fit_residual_surface(norder=2,suffix=None)
+        self.fit_residual_surface(norder=self.norder,suffix=None)
+        if self.flatten > 0:
+            self.renorm_wfc()
+            self.rerun_zp_fit()
+
+            if self.flatten == 2:
+                print("running a second round of flattening")
+                self.fit_residual_surface(norder=self.norder)
+                self.renorm_wfc()
+                # this creates 'ff'+imagename
+                self.rerun_zp_fit()
+        
     def getzp_wfc(self):
         self.getzp()
         #self.fit_residual_surface(norder=2)
@@ -197,7 +210,7 @@ class getzp():
 
             if self.flatten == 2:
                 print("running an additional round of flattening for halpha")
-                self.fit_residual_surface(norder=2)
+                self.fit_residual_surface(norder=self.norder)
                 self.renorm_wfc()
                 # this creates 'ff'+imagename
                 self.rerun_zp_fit()
@@ -230,6 +243,8 @@ class getzp():
             defaultcat = 'default.sex.INT'
             self.keepsection=[1000,5000,0,4000]
         elif self.instrument == 'm':
+            defaultcat = 'default.sex.HDI'
+        elif self.instrument == 'b':
             defaultcat = 'default.sex.HDI'
         header = fits.getheader(self.image)
         try:
@@ -537,7 +552,7 @@ class getzp():
 
         plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
         cb=plt.colorbar()
-        cb.set_label('f-WFC/f-pan')
+        cb.set_label('f-meas/f-pan')
         plt.savefig('plots/'+self.plotprefix.replace(".fits","")+'getzp-xyresidual-fitted.png')
 
         self.x = x
@@ -591,8 +606,12 @@ class getzp():
         # fill in where there is no coverage        
         weight_name = self.image.split('.fits')[0]+'.weight.fits'
         self.weightdata = fits.getdata(self.image)
+        # this is not used
         self.nodata =  self.weightdata == 0
 
+        ##########################################################
+        # This is some fine tuning for INT data, but not actually using this?
+        #
         # center of geometric distortion ~= (3500, 2400)
         # top chip has y > 4300
         # blank area starts at x > 4300
@@ -602,6 +621,7 @@ class getzp():
         flip_data = (self.xim < (6300-3500)) & (self.yim > 4300)
 
         # add points from the top left corner into blank corner
+        # looks like I'm not actually using this though
         nrandom = 40
         fakex = 2*3500 - self.xim[flip_data]
         fakey = self.yim[flip_data]
@@ -615,6 +635,7 @@ class getzp():
         #self.xim = np.array(self.xim.tolist()+fakex.tolist())
         #self.yim = np.array(self.yim.tolist()+fakey.tolist())
         #self.zim = np.array(self.zim.tolist()+fakez.tolist())
+        ##########################################################
         
         # clip data
         clip_flag = sigma_clip(self.zim,sigma=3,maxiters=10,masked=True)
@@ -630,10 +651,10 @@ class getzp():
 
         # Plot
         plt.figure()
-        plt.imshow(self.zz,origin="lower",extent=(self.xim.min(), self.yim.max(), self.xim.max(), self.yim.min()),vmin=v1,vmax=v2)
+        plt.imshow(self.zz,extent=(self.xim.min(), self.yim.max(), self.xim.max(), self.yim.min()),vmin=v1,vmax=v2)
         plt.scatter(self.xim[~clip_flag.mask], self.yim[~clip_flag.mask], c=self.zim[~clip_flag.mask],vmin=v1,vmax=v2,s=15)
         cb=plt.colorbar()
-        cb.set_label('f-WFC/f-pan')
+        cb.set_label('f-meas/f-pan')
         s = ' std (MAD) = %.4f (%.4f)'%(np.std(self.zim[~clip_flag.mask]),MAD2(self.zim[~clip_flag.mask]))
         plt.title(self.plotprefix+': n poly = '+str(norder)+s)
         #plt.show()
@@ -670,13 +691,13 @@ class getzp():
         print('STATUS: udating header')        
         self.update_header()
         # check to make sure the systematic residuals have been removed
-        self.fit_residual_surface(suffix='round2')
+        self.fit_residual_surface(suffix='round2',norder=self.norder)
 if __name__ == '__main__':
 
 
     parser = argparse.ArgumentParser(description ='Run sextractor, get Pan-STARRS catalog, and then computer photometric ZP\n \n from within ipython: \n %run ~/github/Virgo/programs/getzp.py --image pointing031-r.coadd.fits --instrument i \n \n The y intercept is -1*ZP. \n \n x and y data can be accessed at zp.x and zp.y in case you want to make additional plots.', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--image', dest = 'image', default = 'test.coadd.fits', help = 'Image for ZP calibration')
-    parser.add_argument('--instrument', dest = 'instrument', default = None, help = 'HDI = h, KPNO mosaic = m, INT = i')
+    parser.add_argument('--instrument', dest = 'instrument', default = None, help = 'HDI = h, KPNO mosaic = m, INT = i, BOK 90Prime = b')
     parser.add_argument('--fwhm', dest = 'fwhm', default = None, help = 'image FWHM in arcseconds.  Default is none, then SE assumes 1.5 arcsec')    
     parser.add_argument('--filter', dest = 'filter', default = 'R', help = 'filter (R or r; use ha for Halpha)')
     parser.add_argument('--useri',dest = 'useri', default = False, action = 'store_true', help = 'Use r->R transformation as a function of r-i rather than the g-r relation.  g-r is the default.')
@@ -687,6 +708,7 @@ if __name__ == '__main__':
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
     parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
     parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT data from 2022 does not seem to show it either.',choices=['0','1','2'])    
+    parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2'])    
     
     args = parser.parse_args()
     #zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
