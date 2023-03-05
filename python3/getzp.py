@@ -65,6 +65,7 @@ import astropy.coordinates as coord
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.stats import sigma_clip
+from astropy.table import Table
 
 from scipy.optimize import curve_fit
 from scipy.stats import median_absolute_deviation as MAD2
@@ -138,10 +139,15 @@ class getzp():
         # TODO - get plot name from image header OBJECT
         header = fits.getheader(self.image)
         #self.plotprefix = self.image.split('coadd')[0].replace('.','-').replace('-noback',"")
-        self.plotprefix = header['OBJECT']
+        try:
+            self.plotprefix = header['OBJECT']
+        except KeyError:
+            self.plotprefix = self.image.split('.fits')[0]
+            
         # create plot directory if it doesn't already exist
         if not os.path.exists('plots'):
             os.mkdir('plots')
+        self.verbose = args.verbose
         self.astrodir = args.d
         self.instrument = args.instrument
         if self.instrument == 'h':
@@ -164,32 +170,40 @@ class getzp():
             self.image = 'n'+self.image
             self.plotprefix = 'n'+self.plotprefix
 
-            
-        print('output image = ', self.image)
+        if self.verbose:
+            print('output image = ', self.image)
         self.nsigma = float(args.nsigma)
         self.useri = args.useri
         self.naper = int(args.naper)
         self.mag = int(args.mag)
         self.flatten = int(args.flatten)
         self.norder = int(args.norder)
+        self.fwhm = args.fwhm
     def getzp(self):
-        print('')
-        print('STATUS: running se')        
+        plt.close('all')
+        if self.verbose:
+            print('')
+            print('STATUS: running se')        
         self.runse()
-        print('')        
-        print('STATUS: getting panstarrs')
+        if self.verbose:
+            print('')        
+            print('STATUS: getting panstarrs')
         self.get_panstarrs()
-        print('')        
-        print('STATUS: matching se cat to panstarrs')       
+        if self.verbose:
+            print('')        
+            print('STATUS: matching se cat to panstarrs')       
         self.match_coords()
-        print('')        
-        print('STATUS: fitting zeropoint')        
+        if self.verbose:
+            print('')        
+            print('STATUS: fitting zeropoint')        
         self.fitzp(plotall=True)
-        print('')        
-        print('STATUS: udating header')        
+        if self.verbose:
+            print('')        
+            print('STATUS: udating header')        
         self.update_header()
-        self.fit_residual_surface(norder=self.norder,suffix=None)
+
         if self.flatten > 0:
+            self.fit_residual_surface(norder=self.norder,suffix=None)
             self.renorm_wfc()
             self.rerun_zp_fit()
 
@@ -257,12 +271,13 @@ class getzp():
                 ADUlimit = 400000./60#/float(expt)
             elif self.filter == 'ha':
                 ADUlimit = 40000./180.
-        print('saturation limit in ADU/s {:.1f}'.format(ADUlimit))
-        if args.fwhm is None:
+        #print('saturation limit in ADU/s {:.1f}'.format(ADUlimit))
+        if self.fwhm is None:
             t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)
             #t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '
-            print('running SE first time to get estimate of FWHM')
-            print(t)
+            if self.verbose:
+                print('running SE first time to get estimate of FWHM')
+                print(t)
             os.system(t)
 
             # clean up SE files
@@ -273,7 +288,8 @@ class getzp():
             ###################################
             # Read in Source Extractor catalog
             ###################################
-            print('reading in SE catalog from first pass')
+            if self.verbose:
+                print('reading in SE catalog from first pass')
             secat_filename = froot+'.cat'
             self.secat = fits.getdata(secat_filename,2)
             self.secat0 = self.secat
@@ -285,11 +301,13 @@ class getzp():
             t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)+' -SEEING_FWHM '+str(fwhm)
             if float(fwhm) == 0:
                 print('WARNING: measured FWHM is zero!')
-            print('running SE again with new FWHM to get better estimate of CLASS_STAR')
+            if self.verbose:
+                print('running SE again with new FWHM to get better estimate of CLASS_STAR')
         else:
-            t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)+' -SEEING_FWHM '+args.fwhm
-            print(t)
-            print('running SE w/user input for FWHM to get better estimate of CLASS_STAR')            
+            t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)+' -SEEING_FWHM '+self.fwhm
+            if self.verbose:
+                print(t)
+                print('running SE w/user input for FWHM to get better estimate of CLASS_STAR')            
         #############################################################
         # rerun Source Extractor catalog with updated SEEING_FWHM
         #############################################################
@@ -326,8 +344,14 @@ class getzp():
         ###################################
         # get Pan-STARRS catalog over the same region
         ###################################
-
+        ptab_name = self.image.split('.fits')[0]+'_pan_tab.csv'
+        #if os.path.exists(ptab_name):
+        #    print('panstarrs table already downloaded')
+        #    self.pan = Table.read(ptab_name)
+        #else:
         self.pan = panstarrs_query(self.centerRA, self.centerDEC, self.radius)
+        ptab = Table(self.pan)
+        ptab.write(ptab_name,format='csv')
     def match_coords(self):
         ###################################
         # match Pan-STARRS1 data to Source Extractor sources
@@ -350,10 +374,11 @@ class getzp():
         # remove any objects that are saturated, have FLAGS set, galaxies,
         # must have 14 < r < 17 according to Pan-STARRS
         ###################################################################
-
-
+        if self.verbose:
+            print(f'\t matched {np.sum(self.matchflag)} objects')
         self.fitflag = self.matchflag  & (self.pan['rmag'] > 14.) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.matchedarray1['CLASS_STAR'] > 0.95) & (self.pan['rmag'] < 17) #& (self.matchedarray1['MAG_AUTO'] > -11.)
-
+        if self.verbose:
+            print(f'\t number that pass fit {np.sum(self.fitflag)}')
         # for WFC on INT, restrict area to central region
         # to avoid top chip and vignetted regions
         #
@@ -423,7 +448,7 @@ class getzp():
         plt.legend()
         plt.axhline(y=0,color='r')
         plt.savefig('plots/'+self.plotprefix.replace('.fits','')+'se-pan-flux.png')
-
+        plt.close()
     def fitzp(self,plotall=False):
         ###################################
         # Solve for the zeropoint
@@ -466,15 +491,18 @@ class getzp():
         # fixed radii apertures: [:,0] = 3 pix, [:,1] = 5 pix, [:,2] = 7 pixels
 
         if self.mag == 0: # this is the default magnitude
-            print('Using Aperture Magnitudes')
+            if self.verbose:
+                print('Using Aperture Magnitudes')
             y = self.matchedarray1['MAG_APER'][:,self.naper][flag]
             yerr = self.matchedarray1['MAGERR_APER'][:,self.naper][flag]
         elif self.mag == 1:
-            print('Using MAG_BEST')
+            if self.verbose:
+                print('Using MAG_BEST')
             y = self.matchedarray1['MAG_BEST'][flag]
             yerr = self.matchedarray1['MAGERR_BEST'][flag]
         elif self.mag == 2:
-            print('Using MAG_PETRO')
+            if self.verbose:
+                print('Using MAG_PETRO')
             y = self.matchedarray1['MAG_PETRO'][flag]
             yerr = self.matchedarray1['MAGERR_PETRO'][flag]
         while delta > 1.e-3:
@@ -482,7 +510,8 @@ class getzp():
             t = curve_fit(zpfunc,x,y,sigma = yerr)
             # convert to format expected from polyfit
             c = np.array([1.,t[0][0]])
-            print('number of points retained = ',sum(flag))
+            if self.verbose:
+                print('number of points retained = ',np.sum(flag))
             yfit = np.polyval(c,x)
             residual = (yfit - y)
 
@@ -491,13 +520,14 @@ class getzp():
 
     
             # check for convergence
-            print('new ZP = {:.3f}, previous ZP = {:.3f}'.format(self.bestc[1],c[1]))
+            if self.verbose:
+                print('new ZP = {:.3f}, previous ZP = {:.3f}'.format(self.bestc[1],c[1]))
             delta = abs(self.bestc[1] - c[1])
             self.bestc = c
             MAD = 1.48*np.median(abs(residual - np.median(residual)))
             flag =  (abs(residual - np.median(residual)) < self.nsigma*MAD)
             if sum(flag) < 2:
-                print('WARNING: ONLY ONE DATA POINT LEFT')
+                print(f'WARNING: ONLY ONE DATA POINT LEFT FOR {self.image}')
                 self.x = x
                 self.y = y
                 self.residual = residual
@@ -518,7 +548,8 @@ class getzp():
         residual_all = 10.**((magfit - yplot)/2.5)        
 
         s = 'residual (mean,std) = %.3f +/- %.3f'%(np.mean(residual_all),np.std(residual_all))
-        print(s)
+        if self.verbose:
+            print(s)
         if plotall:
             plt.figure()            
             crap = plt.hist(residual_all,bins=np.linspace(.8,1.2,20))
@@ -564,7 +595,7 @@ class getzp():
         self.plot_fitresults(x,y,yerr=yerr,polyfit_results = self.bestc)
                 
     def update_header(self):
-        print('working on this')
+        #print('working on this')
         # add best-fit ZP to image header
         im, header = fits.getdata(self.image,header=True)
 
@@ -684,35 +715,40 @@ class getzp():
         self.plotprefix = 'f'+self.plotprefix
         # rerun getzp, but don't download panstarrs again
         self.runse()
-        print('STATUS: matching se cat to panstarrs')       
+        if self.verbose:
+            print('STATUS: matching se cat to panstarrs')       
         self.match_coords()
-        print('STATUS: fitting zeropoint')        
+        if self.verbose:
+            print('STATUS: fitting zeropoint')        
         self.fitzp()
-        print('STATUS: udating header')        
+        if self.verbose:
+            print('STATUS: udating header')        
         self.update_header()
         # check to make sure the systematic residuals have been removed
         self.fit_residual_surface(suffix='round2',norder=self.norder)
-if __name__ == '__main__':
 
 
+def main(raw_args=None):
     parser = argparse.ArgumentParser(description ='Run sextractor, get Pan-STARRS catalog, and then computer photometric ZP\n \n from within ipython: \n %run ~/github/Virgo/programs/getzp.py --image pointing031-r.coadd.fits --instrument i \n \n The y intercept is -1*ZP. \n \n x and y data can be accessed at zp.x and zp.y in case you want to make additional plots.', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--image', dest = 'image', default = 'test.coadd.fits', help = 'Image for ZP calibration')
     parser.add_argument('--instrument', dest = 'instrument', default = None, help = 'HDI = h, KPNO mosaic = m, INT = i, BOK 90Prime = b')
+    parser.add_argument('--catalog', dest = 'catalog', default = None, help = 'photometric catalog to use for bootrapping photometry')    
     parser.add_argument('--fwhm', dest = 'fwhm', default = None, help = 'image FWHM in arcseconds.  Default is none, then SE assumes 1.5 arcsec')    
     parser.add_argument('--filter', dest = 'filter', default = 'R', help = 'filter (R or r; use ha for Halpha)')
     parser.add_argument('--useri',dest = 'useri', default = False, action = 'store_true', help = 'Use r->R transformation as a function of r-i rather than the g-r relation.  g-r is the default.')
     parser.add_argument('--normbyexptime', dest = 'normbyexptime', default = False, action = 'store_true', help = "set this flag if the image is in ADU rather than ADU/s, and the program will then normalize by the exposure time.  Note: swarp produces images in ADU/s, so this is usually not necessary if using coadds from swarp.")
     parser.add_argument('--mag', dest = 'mag', default = 0,help = "select SE magnitude to use when solving for ZP.  0=MAG_APER,1=MAG_BEST,2=MAG_PETRO.  Default is MAG_APER ",choices=['0','1','2'])
     parser.add_argument('--naper', dest = 'naper', default = 5,help = "select fixed aperture magnitude.  0=10pix,1=12pix,2=15pix,3=20pix,4=25pix,5=30pix.  Default is 5 (30 pixel diameter)")
-    parser.add_argument('--nsigma', dest = 'nsigma', default = 2., help = 'number of std to use in iterative rejection of ZP fitting.  default is 2.')
+    parser.add_argument('--nsigma', dest = 'nsigma', default = 3.5, help = 'number of std to use in iterative rejection of ZP fitting.  default is 3.5')
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
     parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
     parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT data from 2022 does not seem to show it either.',choices=['0','1','2'])    
     parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2'])    
-    
-    args = parser.parse_args()
+    parser.add_argument('--verbose',dest = 'verbose', default = False, action = 'store_true',help = 'print extra debug/status statements')    
+    args = parser.parse_args(raw_args)
     #zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
     zp = getzp(args)
+    global v1, v2
     if args.filter == 'ha':
         v1 = .9
         v2 = 1.1
@@ -720,11 +756,10 @@ if __name__ == '__main__':
         v1=.95
         v2=1.05
 
-    if args.instrument == 'i':
-        zp.getzp_wfc()
-    else:
-        zp.getzp()
-    print('ZP = {:.3f} +/- {:.3f}'.format(-1*zp.zp,zp.zperr))
+    zp.getzp()
+    print('ZP = {:.3f} +/- {:.3f}, {}'.format(-1*zp.zp,zp.zperr,zp.image))
+    return zp,-1*zp.zp,zp.zperr
 
 
-
+if __name__ == '__main__':
+    main()
