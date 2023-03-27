@@ -17,15 +17,23 @@ from photutils import make_source_mask
 from astropy.io.fits import Header
 import numpy as np
 
-def subtract_median_sky(data):
+def subtract_median_sky(data,getstd=False,getmedian=True,subtract=True):
     ''' subtract median sky from image data '''
     mask = make_source_mask(data,nsigma=3,npixels=5,dilate_size=5)
     masked_data = np.ma.array(data,mask=mask)
     #clipped_array = sigma_clip(masked_data,cenfunc=np.ma.mean)
 
     mean,median,std = sigma_clipped_stats(masked_data,sigma=3.0,cenfunc=np.ma.mean)
-    data -= median
-    return data,median
+    if subtract:
+        data -= median
+    if getstd:
+        return data,median,std
+    
+    elif getmedian:
+        return data,median
+    
+    else:
+        return data
     
 def make_ccdmask(flat1,flat2=None):
     ''' make bad pixel mask from flat image.  use ratio of flats if flat2 is given '''

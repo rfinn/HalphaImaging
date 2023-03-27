@@ -86,8 +86,21 @@ field_values = ['T',-32,\
                 1008,1024,\
                 'RA---TAN','DEC--TAN','deg','deg']
 
+
+# From Zou+2017 https://iopscience.iop.org/article/10.3847/1538-3881/aa72d9
+#Table 2 
+#Gain and Readout Noise for Each CCD
+#CCD	CCD #1				CCD #2				CCD #3				CCD #4				
+#HDU	1	2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	
+#Gain	1.495	1.620	1.524	1.519	1.546	1.656	1.608	1.590	1.399	1.503	1.425	1.553	1.505	1.535	1.521	1.584	
+#Noise	7.353	7.288	7.313	6.597	9.299	9.509	9.302	8.006	10.122	8.897	9.474	9.019	9.527	7.940	6.903	7.716	
+gain = np.array([1.495,	1.620,	1.524,	1.519,\
+                 1.546,	1.656,	1.608,	1.590,\
+                 1.399,	1.503,	1.425,	1.553,\
+                 1.505,	1.535,	1.521, 1.584])	
+
 # get list of images
-filenames = glob.glob(args.prefix+'*.fits')
+filenames = glob.glob(args.filestring+'*.fits')
 
 # loop over images
 for f in filenames:
@@ -127,9 +140,12 @@ for f in filenames:
         for k,field in enumerate(other_fields):
             #print(field,field_values[k])
             hdu[i].header[field] = field_values[k]
+        # update the GAIN in each image
+        hdu[i].header.set('GAIN',gain[i-1],'GAIN in e/ADU Zou 2017')
+
     # add comment to primary header to note that wcs is corrected
-    hdu[0].header.set('
-    
+    hdu[0].header.set('fixWCS',1,'rough fix to 90prime WCS')
+
     # write image
     print(f"updating WCS header info for {f} ({RA},{DEC})")
     if args.nooverwrite:
