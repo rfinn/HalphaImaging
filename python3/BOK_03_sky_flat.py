@@ -51,6 +51,13 @@ usemp = True
 
 filter = sys.argv[1]
 amp = int(sys.argv[2])
+
+# for testing wrapper script
+print(f"running sky flat for filter {filter} and amp {amp}")
+#sys.exit()
+
+
+
 medsky_results = []
 def collect_results_medsky(result):
 
@@ -61,7 +68,7 @@ def collect_results_medsky(result):
 def inv_median(a):
     return 1/np.ma.median(a)
 
-def get_masked_image(filename):
+def get_masked_image(filename,returnval=False):
     hdu = fits.open(filename)
     mask = make_source_mask(hdu[0].data,nsigma=3,npixels=5,dilate_size=20)
     masked_data = np.ma.array(hdu[0].data,mask=mask)
@@ -74,7 +81,8 @@ def get_masked_image(filename):
     masked_images.append(CCDData(hdu[0].data,unit=u.electron,mask=mask))
 
     hdu.close()
-
+    if returnval:
+        return median
 def get_bright_star_flag(filelist):
     staronimage = np.zeros(len(filelist),'bool')
     brightstar = Table.read('/home/rfinn/research/legacy/gaia-mask-dr9-bright-Virgo-g-lt-8.fits')
@@ -88,10 +96,11 @@ def get_bright_star_flag(filelist):
             staronimage[i] = True
     return staronimage
 
-if not os.path.exists('SKYFLAT'):
-    os.mkdir('SKYFLAT')
+if not os.path.exists(f'SKYFLAT-{filter}'):
+    os.mkdir(f'SKYFLAT-{filter}')
+    
 
-# get list of flattene images from each subdir
+# get list of flattened images from each subdir
 
 subfolders = [f.path for f in os.scandir(os.getcwd()) if f.is_dir()]
 
@@ -115,6 +124,12 @@ for a in amps:
     for f in filelist:
         if f'_{a}PA.fits' in f:
             a1.append(f)
+    # sort filenames
+    a1.sort()
+    # set up array to save the median sky levels in
+    median_sky = np.zeros(len(a1))
+
+    # track time to get bright stars
     t_0 = timeit.default_timer()
     print("#################################")
     print(f"working on amp {a}")
@@ -125,7 +140,7 @@ for a in amps:
     print(f"\tremoving {np.sum(bright_star_flag)} images due to bright stars")
     print()
     # remove images with bright stars
-    a1 = list(np.array(a1)[~bright_star_flag])
+
     t_1 = timeit.default_timer()
     print(f"\telapsed time: {round((t_1-t_0),3)} sec")
     
@@ -134,19 +149,31 @@ for a in amps:
     # scale by median
     # method = median
     print("\tgetting object masks")
-    if usemp:
-        medsky_pool = mp.Pool(mp.cpu_count())
-        myresults = [medsky_pool.apply_async(get_masked_image(im),callback=collect_results_medsky) for im in a1]
+    #if usemp:
+    #    medsky_pool = mp.Pool(mp.cpu_count())
+    #    myresults = [medsky_pool.apply_async(get_masked_image(im),callback=collect_results_medsky) for im in a1]
     
-        medsky_pool.close()
-        medsky_pool.join()
-    else:
-        for im in a1:
-            get_masked_image(im)
+    #    medsky_pool.close()
+    #    medsky_pool.join()
+    #else:
+    for i,im in enumerate(a1):
+        if not bright_star_flag[i]:
+            med = get_masked_image(im,returnval=True)
+            median_sky[i] = med
 
+    # write out median sky levels
+
+    medvalues = open(f'SKYFLAT-{filter}/medvalue-{a}.dat','w')
+    for m in median_sky:
+        medvalues.write(f"{m:.4f}\n")
+    medvalues.close()
+    
     t_2 = timeit.default_timer()
     print(f"\telapsed time: {round((t_2-t_1),3)} sec")
 
+    # remove the images with bright stars in them
+    a1 = list(np.array(a1)[~bright_star_flag])
+    
     print("\tcombining masked images")    
     skyflat = ccdp.combine(masked_images,
                            method='median', scale=1/np.array(this_median),
@@ -165,13 +192,9 @@ for a in amps:
     all_med.append(np.median(np.array(this_median)))
 
 
-    skyflat.write(f'SKYFLAT/skyflat{a:02d}.fits',overwrite=True)
-    skyfiles.append(f'SKYFLAT/skyflat{a:02d}.fits')
+    skyflat.write(f'SKYFLAT-{filter}/skyflat{a:02d}.fits',overwrite=True)
+    skyfiles.append(f'SKYFLAT-{filter}/skyflat{a:02d}.fits')
 
-    medvalues = open(f'SKYFLAT/medvalue-{a}.dat','w')
-    for m in all_med:
-        medvalues.write(f"{m:.3f}\n")
-    medvalues.close()
     t_4 = timeit.default_timer()
     print(f"\ttime for this amp: {round((t_3-t_0),3)} sec")
     
@@ -188,6 +211,6 @@ for i,f in enumerate(all_skyflats):
     hdu[0].data = hdu[0].data*norm_factor[i]
     hdu[0].header.set('skyflat', True)    
     hdu[0].header.set('scale', norm_factor[i])
-    hdu.writeto(f'SKYFLAT/skyflat{i+1:02d}.fits',overwrite=True)
+    hdu.writeto(f'SKYFLAT-{filter}/skyflat{i+1:02d}.fits',overwrite=True)
 
 '''
