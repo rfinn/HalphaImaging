@@ -179,6 +179,17 @@ class getzp():
         self.flatten = int(args.flatten)
         self.norder = int(args.norder)
         self.fwhm = args.fwhm
+
+
+        global v1, v2
+        if self.filter == 'ha':
+            v1 = .9
+            v2 = 1.1
+        else:
+            v1=.95
+            v2=1.05
+
+        
     def getzp(self):
         plt.close('all')
         if self.verbose:
@@ -546,13 +557,13 @@ class getzp():
         yplot = self.matchedarray1['MAG_APER'][:,self.naper][self.fitflag]
         magfit = np.polyval(self.bestc,self.R[self.fitflag])
         residual_all = 10.**((magfit - yplot)/2.5)        
-
+        self.residual_all = residual_all
         s = 'residual (mean,std) = %.3f +/- %.3f'%(np.mean(residual_all),np.std(residual_all))
         if self.verbose:
             print(s)
         if plotall:
             plt.figure()            
-            crap = plt.hist(residual_all,bins=np.linspace(.8,1.2,20))
+            crap = plt.hist(residual_all,bins=np.linspace(.8,1.8,20))
             plt.text(0.05,.85,s,horizontalalignment='left',transform=plt.gca().transAxes)
             plt.xlabel('Residuals')
             plt.savefig('plots/'+self.plotprefix.replace(".fits","")+'getzp-residual-hist.png')
@@ -580,7 +591,8 @@ class getzp():
         s = ' (mean,std,MAD = {:.2f},{:.2f},{:.2f})'.format(np.mean(residual_all),np.std(residual_all),MAD2(residual_all))
         #s = str(MAD(residual_all))
         plt.title(self.plotprefix+s)
-
+        self.residual_allx = self.matchedarray1['X_IMAGE'][self.fitflag]
+        self.residual_ally = self.matchedarray1['Y_IMAGE'][self.fitflag]
         plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
         cb=plt.colorbar()
         cb.set_label('f-meas/f-pan')
@@ -748,14 +760,6 @@ def main(raw_args=None):
     args = parser.parse_args(raw_args)
     #zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
     zp = getzp(args)
-    global v1, v2
-    if args.filter == 'ha':
-        v1 = .9
-        v2 = 1.1
-    else:
-        v1=.95
-        v2=1.05
-
     zp.getzp()
     print('ZP = {:.3f} +/- {:.3f}, {}'.format(-1*zp.zp,zp.zperr,zp.image))
     return zp,-1*zp.zp,zp.zperr
