@@ -247,11 +247,11 @@ if __name__ == '__main__':
 
     
     # subtract median from sky
+
     if args.submedian:
         # subtract median
         os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_r_v1.fits'))
-        #os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_Ha+4nm_v1.fits'))        
-
+        #os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_Ha+4nm_v1.fits'))
     
     if args.combinemasks:
         # combine masks
@@ -261,7 +261,7 @@ if __name__ == '__main__':
     #print(targets)
     # need to update to write median-subtracted images to filelist instead of ksb files
     if args.sortfiles:
-        write_filelists(targets,filetable,medsub=True)
+        write_filelists(targets,filetable,medsub=args.submedian)
 
 
     if args.swarp:
@@ -271,9 +271,10 @@ if __name__ == '__main__':
             #break
     if args.getzp:
         rfiles = glob.glob('VF*r.fits')
-        #for rf in rfiles:
-        #    getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument h --filter r --nexptime'.format(rf)
-        #    os.system(getzpstring)
+        for rf in rfiles:
+            getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument h --filter r --nexptime'.format(rf)
+            os.system(getzpstring)
+        
         rfiles = glob.glob('VF*Ha4.fits')
         for rf in rfiles:
             getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument h --filter ha --normbyexptime'.format(rf)

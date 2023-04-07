@@ -362,7 +362,7 @@ class getzp():
         #else:
         self.pan = panstarrs_query(self.centerRA, self.centerDEC, self.radius)
         ptab = Table(self.pan)
-        ptab.write(ptab_name,format='csv')
+        ptab.write(ptab_name,format='csv',overwrite=True)
     def match_coords(self):
         ###################################
         # match Pan-STARRS1 data to Source Extractor sources
