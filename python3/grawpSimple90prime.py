@@ -40,6 +40,6 @@ for line in infile:
     #print(stdout.decode())
     #print(stderr.decode())
     i += 1
-    if i > 3:
-        break
+    #if i > 3:
+    #    break
 

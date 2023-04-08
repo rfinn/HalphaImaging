@@ -81,6 +81,7 @@ else:
 # run getzp on each ccd
 hdu = fits.open('m'+image_name) # read in median-subtracted image
 ihdu = fits.open(ivar_name) # read in median-subtracted image
+image_name_base = image_name.replace('.fits','')
 allresid = []
 allresid1d =  []
 allresidx = []
@@ -92,9 +93,9 @@ print("")
 #print(f"RA = {hdu[0].header['CRVAL1']:.6f}
 for h in range(1,len(hdu)):
     hdu[h].header.set('EXPTIME',hdu[0].header['EXPTIME'])
-    hdu[h].writeto(f'{image_name}-temp{h}.fits',overwrite=True)
+    hdu[h].writeto(f'{image_name_base}-temp{h}.fits',overwrite=True)
     medsubimage = 'm'+image_name
-    myargs = args(f'{image_name}-temp{h}.fits','i',image_filter,nexptime=True)
+    myargs = args(f'{image_name_base}-temp{h}.fits','i',image_filter,nexptime=True)
     print(f'running getzp on ccd {h}')
     zp = getzp.getzp(myargs)
 
@@ -156,7 +157,7 @@ shutil.copy(dq_name,'zm'+dq_name)
 
 # clean up temp files
 for i in range(1,5):
-    os.remove(f'{image_name}-temp{h}.fits')
-    os.remove(f'n{image_name}-temp{h}.fits')    
-    os.remove(f'n{image_name}-temp{h}.cat')
-    os.remove(f'n{image_name}-temp{h}_pan_tab.csv')    
+    os.remove(f'{image_name_base}-temp{h}.fits')
+    os.remove(f'n{image_name_base}-temp{h}.fits')    
+    os.remove(f'n{image_name_base}-temp{h}.cat')
+    os.remove(f'n{image_name_base}-temp{h}_pan_tab.csv')    
