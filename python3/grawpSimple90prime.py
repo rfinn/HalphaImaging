@@ -29,6 +29,7 @@ HOME = os.getenv("HOME")
 program= f"{HOME}/github/HalphaImaging/python3/BOK_pipeline_fixampoffsets.py"
 input_file = "all_ksb_images"
 infile = open(input_file,'r')
+i = 0
 for line in infile:
     image = line.rstrip()
     
@@ -38,4 +39,5 @@ for line in infile:
     stdout, stderr = process.communicate()
     print(stdout.decode())
     print(stderr.decode())
+    i += 1
     break

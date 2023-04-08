@@ -92,9 +92,9 @@ print("")
 #print(f"RA = {hdu[0].header['CRVAL1']:.6f}
 for h in range(1,len(hdu)):
     hdu[h].header.set('EXPTIME',hdu[0].header['EXPTIME'])
-    hdu[h].writeto(f'temp{h}.fits',overwrite=True)
+    hdu[h].writeto(f'{image_name}-temp{h}.fits',overwrite=True)
     medsubimage = 'm'+image_name
-    myargs = args(f'temp{h}.fits','i',image_filter,nexptime=True)
+    myargs = args(f'{image_name}-temp{h}.fits','i',image_filter,nexptime=True)
     print(f'running getzp on ccd {h}')
     zp = getzp.getzp(myargs)
 
@@ -153,3 +153,9 @@ ihdu.writeto('zm'+ivar_name,overwrite=True)
 
 
 shutil.copy(dq_name,'zm'+dq_name)
+
+# clean up temp files
+for i in range(1,5):
+    os.remove(f'{image_name}-temp{h}.fits')
+    os.remove(f'{image_name}-temp{h}.cat')
+    os.remove(f'{image_name}-temp{h}_pan_tab.csv')    
