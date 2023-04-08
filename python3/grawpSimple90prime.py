@@ -41,9 +41,9 @@ for line in infile:
         #print(stdout.decode())
         #print(stderr.decode())
         i += 1
-        if i > 20:
+        #if i > 20:
             # submit 20 at a time
-            break
-        #if i%20 == 0:
-        #    time.sleep(60)
+        #    break
+        if i%30 == 0:
+            time.sleep(90)
 
