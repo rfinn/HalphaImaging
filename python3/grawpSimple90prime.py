@@ -35,9 +35,9 @@ for line in infile:
     
     cmds = ['python3', program,image]
     print(f"Submitting job to process {input_file}")
-    process = subprocess.Popen(cmds, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    print(stdout.decode())
-    print(stderr.decode())
+    process = subprocess.Popen(cmds)#, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    #stdout, stderr = process.communicate()
+    #print(stdout.decode())
+    #print(stderr.decode())
     i += 1
 
