@@ -22,7 +22,7 @@ import os
 import subprocess
 import sys
 import glob
-
+import time
 HOME = os.getenv("HOME")
 
 
@@ -32,14 +32,18 @@ infile = open(input_file,'r')
 i = 0
 for line in infile:
     image = line.rstrip()
-    
-    cmds = ['python3', program,image]
-    print(f"Submitting job to process {input_file}")
-    process = subprocess.Popen(cmds)#, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    #stdout, stderr = process.communicate()
-    #print(stdout.decode())
-    #print(stderr.decode())
-    i += 1
-    #if i > 3:
-    #    break
+    outimage = 'zm'+image
+    if not os.path.exists(outimage):
+        cmds = ['python3', program,image]
+        print(f"Submitting job to process {input_file}")
+        process = subprocess.Popen(cmds)#, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        #stdout, stderr = process.communicate()
+        #print(stdout.decode())
+        #print(stderr.decode())
+        i += 1
+        if i > 20:
+            # submit 20 at a time
+            break
+        #if i%20 == 0:
+        #    time.sleep(60)
 
