@@ -44,7 +44,7 @@ for line in infile:
         #print(stdout.decode())
         #print(stderr.decode())
         i += 1
-        if i > 20:
+        if i > 25:
             # submit 38 at a time, leave 10 processors free
             break
         #if i%30 == 0:
