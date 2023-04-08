@@ -155,4 +155,3 @@ if args.testsample:
     
 write_output(script_id, input_file, narray=nfiles, submit=args.submit)
 
-os.chdir(cwd)
