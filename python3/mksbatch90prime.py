@@ -60,6 +60,7 @@ def write_output(script_id, input_file, narray=1000, data_dir=None, wavelength=N
     #output += "printenv"
     #output += "yes Y | pip3 uninstall typing-extensions\n"
     output += "pip3 install typing-extensions==4.0.1\n"
+    output += "pip3 install ccdproc\n"    
     output += "pip3 list |grep typing \n"    
     output += "module load gnu9\n"
     output += "\n"
