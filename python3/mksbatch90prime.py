@@ -54,7 +54,8 @@ def write_output(script_id, input_file, narray=1000, data_dir=None, wavelength=N
     output += "\n"
     output += "# Load any environmental modules needed\n"
     output += "module load Python3\n"
-    output += "module load gnu9\n"    
+    output += "module load gnu9\n"
+    output += "module load openblas\n"        
     # print version of typing-extensions
     #output += "pip3 list |grep typing"
     #output += "echo"
@@ -64,7 +65,8 @@ def write_output(script_id, input_file, narray=1000, data_dir=None, wavelength=N
     output += "pip3 list |grep typing \n"
     
     output += "pip3 install ccdproc\n"
-    output += "pip3 install astroquery\n"        
+    output += "pip3 install astroquery\n"
+    output += "pip3 install urllib3==1.24.2\n"            
     output += "\n"
     output += "# perform calculation\n"
     output += "#\n"
