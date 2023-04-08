@@ -26,7 +26,7 @@ import glob
 HOME = os.getenv("HOME")
 
 
-program= "{HOME}/github/HalphaImaging/python3/BOK_pipeline_fixampoffsets.py"
+program= f"{HOME}/github/HalphaImaging/python3/BOK_pipeline_fixampoffsets.py"
 input_file = "all_ksb_images"
 infile = open(input_file,'r')
 for line in infile:
