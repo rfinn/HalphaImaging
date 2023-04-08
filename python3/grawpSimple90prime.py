@@ -33,7 +33,10 @@ i = 0
 for line in infile:
     image = line.rstrip()
     outimage = 'zm'+image
-    if not os.path.exists(outimage):
+    if os.path.exists(outimage):
+        print(f'{outimage} found - moving to next object')
+    else:
+        print(f"processing {image} -> {outimage}")
         cmds = ['python3', program,image]
         print(f"Submitting job to process {input_file}")
         process = subprocess.Popen(cmds)#, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
