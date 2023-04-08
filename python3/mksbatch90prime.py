@@ -71,7 +71,7 @@ def write_output(script_id, input_file, narray=1000, data_dir=None, wavelength=N
         
     output += s
     output += "#\n"
-    output += f"python3 {HOME}/github/HalphaImaging/python3/BOK_pipeline_fixampoffset.py $LINE \n"
+    output += f"python3 {HOME}/github/HalphaImaging/python3/BOK_pipeline_fixampoffsets.py $LINE \n"
 
     outfname = f"JOB_{script_id}.sh"
 
