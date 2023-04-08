@@ -11,7 +11,7 @@ GOAL
 
 USAGE:
 
-python BOK_pipline_fixampoffsets.py image_name image_filter
+python BOK_pipline_fixampoffsets.py image_name 
 
 """
 
@@ -31,7 +31,11 @@ import getzp
 
 image_name = sys.argv[1]
 ivar_name = image_name.replace('ooi','oow')
-image_filter = sys.argv[2]
+
+if image_name.find('r_v1') > -1:
+    image_filter = 'r'
+if image_name.find('Ha+4nm') > -1:
+    image_filter = 'ha'
 dq_name = image_name.replace('ooi','ood')
 
 ### AMPS
@@ -41,7 +45,7 @@ NAXIS2 = 4096
 
 
 class args():
-    """ for replicating argparse input to getzp """
+    """ for replicating argparse input to getzp without using argparse"""
     def __init__(self,image,instrument,filter,nexptime=False):
         self.image = image
         self.instrument = instrument

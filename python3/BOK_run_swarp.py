@@ -276,9 +276,10 @@ if __name__ == '__main__':
             os.system(getzpstring)
         
         rfiles = glob.glob('VF*Ha4.fits')
-        for rf in rfiles:
-            getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument h --filter ha --normbyexptime'.format(rf)
-            os.system(getzpstring)
+        if len(rfiles) > 0:
+            for rf in rfiles:
+                getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument h --filter ha --normbyexptime'.format(rf)
+                os.system(getzpstring)
         
 
             
