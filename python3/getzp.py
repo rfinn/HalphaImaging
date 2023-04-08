@@ -102,8 +102,9 @@ def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=20,
     """
     pan_columns =['objID', 'RAJ2000', 'DEJ2000','e_RAJ2000', 'e_DEJ2000', 'f_objID', 'Qual','gmag', 'e_gmag','rmag', 'e_rmag','imag', 'e_imag','zmag', 'e_zmag','ymag', 'e_ymag']
     #print(pan_columns)
+    
     vquery = Vizier(columns=pan_columns,column_filters={"gmag":("<%f" % maxmag)},row_limit=maxsources)
-
+    print('HEY!!! in panstarrs_query, ra,dec,rad = ',ra_deg,dec_deg,rad_deg)
     field = coord.SkyCoord(ra=ra_deg, dec=dec_deg,
                            unit=(u.deg, u.deg),
                            frame='icrs')

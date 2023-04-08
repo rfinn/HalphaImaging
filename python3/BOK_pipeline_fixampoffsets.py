@@ -88,6 +88,8 @@ allresidy = []
 allzp = []
 ccd_medians = np.zeros(len(hdu)-1)
 firstpass = True
+print("")
+print(f"RA = {hdu[0].header['CRVAL1']:.6f}
 for h in range(1,len(hdu)):
     hdu[h].header.set('EXPTIME',hdu[0].header['EXPTIME'])
     hdu[h].writeto(f'temp{h}.fits',overwrite=True)
