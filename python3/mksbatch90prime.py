@@ -67,14 +67,7 @@ def write_output(script_id, input_file, narray=1000, data_dir=None, wavelength=N
     output += "\n"
     output += "# perform calculation\n"
     output += "#\n"
-    if data_dir is not None:
-        s = f'LINE=$(sed -n "$SLURM_ARRAY_TASK_ID"p {input_file})\n'
-    else:
-        print('please provide a valid data directory')
-        return
-    if wavelength is None:
-        print('please provide a valid wavelength as input to slurm constructor function ')
-        return
+    s = f'LINE=$(sed -n "$SLURM_ARRAY_TASK_ID"p {input_file})\n'
         
     output += s
     output += "#\n"
