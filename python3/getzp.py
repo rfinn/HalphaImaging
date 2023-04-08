@@ -263,7 +263,7 @@ class getzp():
         Run Source Extractor on image to measure magnitudes
         """
 
-        os.system('cp ' +self.astrodir + '/default.* .')
+        os.system('ln -s ' +self.astrodir + '/default.* .')
         t = self.image.split('.fits')
         froot = t[0]
         if self.instrument == 'h':
