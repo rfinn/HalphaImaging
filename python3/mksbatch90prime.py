@@ -63,7 +63,8 @@ def write_output(script_id, input_file, narray=1000, data_dir=None, wavelength=N
     output += "pip3 install typing-extensions==4.0.1\n"
     output += "pip3 list |grep typing \n"
     
-    output += "pip3 install ccdproc\n"    
+    output += "pip3 install ccdproc\n"
+    output += "pip3 install astroquery\n"        
     output += "\n"
     output += "# perform calculation\n"
     output += "#\n"

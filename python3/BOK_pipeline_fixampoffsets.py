@@ -92,7 +92,8 @@ for h in range(1,len(hdu)):
     hdu[h].header.set('EXPTIME',hdu[0].header['EXPTIME'])
     hdu[h].writeto(f'temp{h}.fits',overwrite=True)
     medsubimage = 'm'+image_name
-    myargs = args(f'temp{h}.fits','i',image_filter,nexptime=True)    
+    myargs = args(f'temp{h}.fits','i',image_filter,nexptime=True)
+    print(f'running getzp on ccd {h}')
     zp = getzp.getzp(myargs)
 
     zp.getzp()
