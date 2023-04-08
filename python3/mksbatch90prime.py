@@ -121,21 +121,15 @@ parser.add_argument('--submit',
 args = parser.parse_args()
 
 ###########################################################
-cwd = os.getcwd()
 
-# this is the directory that has a subdirectory for each galaxy
-# the following is the directory that grawp sees (remove rfinn if running on virgo)
-data_dir = "/mnt/qnap_home/rfinn/muchogalfit-output/"
+# run this from the directory with the ksb images
 
 
 # this is the name of the shell script that will be created
-script_id = f"VFIDall-{args.wavelength}"
+script_id = f"VFIDall-ksb"
 
-print('data_dir = ', data_dir)
-print()
 print('script_id = ', script_id) 
 print()
-os.chdir(data_dir)
 
 # this assumes that the data directory has a file called all_ksb_files 
 #
