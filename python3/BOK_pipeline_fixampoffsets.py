@@ -157,5 +157,6 @@ shutil.copy(dq_name,'zm'+dq_name)
 # clean up temp files
 for i in range(1,5):
     os.remove(f'{image_name}-temp{h}.fits')
-    os.remove(f'{image_name}-temp{h}.cat')
-    os.remove(f'{image_name}-temp{h}_pan_tab.csv')    
+    os.remove(f'n{image_name}-temp{h}.fits')    
+    os.remove(f'n{image_name}-temp{h}.cat')
+    os.remove(f'n{image_name}-temp{h}_pan_tab.csv')    
