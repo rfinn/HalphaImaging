@@ -370,16 +370,24 @@ class getzp():
         else:
             # check for catalog from previous run on mosaic
             print(self.image)
+            print()
+            print("looking for panstarrs catalog...")
+            print()
             header = fits.getheader(self.image)
-            objname = header['OBJECT']
+            objname = header['OBJECT'].split('_')[0]
             filter = header['FILTER'].replace('+','').replace('nm','')
             
-            glob_ptab_name = '*'+objname+'-'+filter+'_pan_tab.csv'        
+            glob_ptab_name = '*'+objname+'-'+filter+'_pan_tab.csv'
+            print('\t',glob_ptab_name)
+            print()
             filelist = glob.glob(glob_ptab_name)
+            print(filelist)
             if len(filelist) > 0:
                 ptab_name = filelist[0]
                 self.pan = Table.read(ptab_name)
             else:
+                print()
+                print("no previous panstarrs catalog found :(")
                 self.pan = panstarrs_query(self.centerRA, self.centerDEC, self.radius)
                 ptab = Table(self.pan)
                 ptab.write(ptab_name,format='csv',overwrite=True)
