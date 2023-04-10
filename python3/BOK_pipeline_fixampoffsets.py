@@ -93,6 +93,8 @@ print("")
 #print(f"RA = {hdu[0].header['CRVAL1']:.6f}
 for h in range(1,len(hdu)):
     hdu[h].header.set('EXPTIME',hdu[0].header['EXPTIME'])
+    hdu[h].header.set('OBJECT',hdu[0].header['OBJECT'])
+    hdu[h].header.set('FILTER',hdu[0].header['FILTER'])    
     hdu[h].writeto(f'{image_name_base}-temp{h}.fits',overwrite=True)
     medsubimage = 'm'+image_name
     myargs = args(f'{image_name_base}-temp{h}.fits','i',image_filter,nexptime=True)

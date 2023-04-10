@@ -360,15 +360,17 @@ class getzp():
         # get Pan-STARRS catalog over the same region
         ###################################
         ptab_name = self.image.split('.fits')[0]+'_pan_tab.csv'
-        header = fits.getheader(self.image)
-        objname = header['OBJECT']
-        filter = header['FILTER'].replace('+','').replace('nm','')
 
         if os.path.exists(ptab_name):
             print('panstarrs table already downloaded')
             self.pan = Table.read(ptab_name)
         else:
             # check for catalog from previous run on mosaic
+            print(self.image)
+            header = fits.getheader(self.image)
+            objname = header['OBJECT']
+            filter = header['FILTER'].replace('+','').replace('nm','')
+            
             glob_ptab_name = '*'+objname+'-'+filter+'_pan_tab.csv'        
             filelist = glob.glob(glob_ptab_name)
             if len(filelist) > 0:
