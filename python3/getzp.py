@@ -360,13 +360,24 @@ class getzp():
         # get Pan-STARRS catalog over the same region
         ###################################
         ptab_name = self.image.split('.fits')[0]+'_pan_tab.csv'
+        header = fits.getheader(self.image)
+        objname = header['OBJECT']
+        filter = header['FILTER'].replace('+','').replace('nm','')
+
         if os.path.exists(ptab_name):
             print('panstarrs table already downloaded')
             self.pan = Table.read(ptab_name)
         else:
-            self.pan = panstarrs_query(self.centerRA, self.centerDEC, self.radius)
-            ptab = Table(self.pan)
-            ptab.write(ptab_name,format='csv',overwrite=True)
+            # check for catalog from previous run on mosaic
+            glob_ptab_name = '*'+objname+'-'+filter+'_pan_tab.csv'        
+            filelist = glob.glob(glob_ptab_name)
+            if len(filelist) > 0:
+                ptab_name = filelist[0]
+                self.pan = Table.read(ptab_name)
+            else:
+                self.pan = panstarrs_query(self.centerRA, self.centerDEC, self.radius)
+                ptab = Table(self.pan)
+                ptab.write(ptab_name,format='csv',overwrite=True)
     def match_coords(self):
         ###################################
         # match Pan-STARRS1 data to Source Extractor sources
