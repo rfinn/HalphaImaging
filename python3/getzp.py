@@ -390,9 +390,9 @@ class getzp():
         ###################################
 
 
-        secoords = SkyCoord(ra=self.secat['ALPHA_J2000'].value,dec=self.secat['DELTA_J2000'].value,unit=(u.degree,u.degree),frame='icrs')
-        print(self.pan)
-        pancoords = SkyCoord(ra=self.pan['RAJ2000'].value,dec=self.pan['DEJ2000'].value,unit=(u.degree,u.degree),frame='icrs')
+        secoords = SkyCoord(ra=self.secat['ALPHA_J2000'],dec=self.secat['DELTA_J2000'],unit=(u.degree,u.degree),frame='icrs')
+        #print(self.pan)
+        pancoords = SkyCoord(ra=self.pan['RAJ2000'],dec=self.pan['DEJ2000'],unit=(u.degree,u.degree),frame='icrs')
 
         index,dist2d,dist3d = pancoords.match_to_catalog_sky(secoords)
 
