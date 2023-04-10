@@ -353,20 +353,20 @@ class getzp():
 
         # NOTE - radius is with width of the rectangular
         # search area.  This is not a circular search, as I orginally thought.
-        self.radius = max((maxRA - minRA), (maxDEC - minDEC))
+        self.radius = np.sqrt(2)*max((maxRA - minRA), (maxDEC - minDEC))/2
     def get_panstarrs(self):
 
         ###################################
         # get Pan-STARRS catalog over the same region
         ###################################
         ptab_name = self.image.split('.fits')[0]+'_pan_tab.csv'
-        #if os.path.exists(ptab_name):
-        #    print('panstarrs table already downloaded')
-        #    self.pan = Table.read(ptab_name)
-        #else:
-        self.pan = panstarrs_query(self.centerRA, self.centerDEC, self.radius)
-        ptab = Table(self.pan)
-        ptab.write(ptab_name,format='csv',overwrite=True)
+        if os.path.exists(ptab_name):
+            print('panstarrs table already downloaded')
+            self.pan = Table.read(ptab_name)
+        else:
+            self.pan = panstarrs_query(self.centerRA, self.centerDEC, self.radius)
+            ptab = Table(self.pan)
+            ptab.write(ptab_name,format='csv',overwrite=True)
     def match_coords(self):
         ###################################
         # match Pan-STARRS1 data to Source Extractor sources
@@ -760,7 +760,8 @@ def main(raw_args=None):
     parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
     parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT data from 2022 does not seem to show it either.',choices=['0','1','2'])    
     parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2'])    
-    parser.add_argument('--verbose',dest = 'verbose', default = False, action = 'store_true',help = 'print extra debug/status statements')    
+    parser.add_argument('--verbose',dest = 'verbose', default = False, action = 'store_true',help = 'print extra debug/status statements')
+    parser.add_argument('--getrefcatonly',dest = 'getrefcatonly',default=False,action='store_true',help='download reference PANSTARRS catalog only.  use this before running with slurm')
     args = parser.parse_args(raw_args)
     #zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
     zp = getzp(args)
