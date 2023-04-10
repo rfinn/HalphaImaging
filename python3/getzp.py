@@ -381,10 +381,13 @@ class getzp():
             print('\t',glob_ptab_name)
             print()
             filelist = glob.glob(glob_ptab_name)
-            print(filelist)
+            #print(filelist)
             if len(filelist) > 0:
                 ptab_name = filelist[0]
                 self.pan = Table.read(ptab_name)
+                print()
+                print('Good news - found a prior panstarrs catalog!')
+                print()
             else:
                 print()
                 print("no previous panstarrs catalog found :(")
