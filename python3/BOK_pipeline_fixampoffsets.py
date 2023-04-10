@@ -162,4 +162,4 @@ for i in range(1,5):
     os.remove(f'{image_name_base}-temp{i}.fits')
     os.remove(f'n{image_name_base}-temp{i}.fits')    
     os.remove(f'n{image_name_base}-temp{i}.cat')
-    os.remove(f'n{image_name_base}-temp{i}_pan_tab.csv')    
+    #os.remove(f'n{image_name_base}-temp{i}_pan_tab.csv')    
