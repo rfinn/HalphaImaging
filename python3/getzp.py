@@ -56,6 +56,9 @@ import argparse
 import os
 import numpy as np
 import sys
+import glob
+
+
 from matplotlib import pyplot as plt
 import matplotlib.patches as patches
 import matplotlib
@@ -386,8 +389,10 @@ class getzp():
         # remove any objects that are saturated or non-linear in our r-band image
         ###################################
 
-        pancoords = SkyCoord(self.pan['RAJ2000']*u.degree,self.pan['DEJ2000']*u.degree,frame='icrs')
-        secoords = SkyCoord(self.secat['ALPHA_J2000']*u.degree,self.secat['DELTA_J2000']*u.degree,frame='icrs')
+
+        secoords = SkyCoord(ra=self.secat['ALPHA_J2000'].value,dec=self.secat['DELTA_J2000'].value,unit=(u.degree,u.degree),frame='icrs')
+        print(self.pan)
+        pancoords = SkyCoord(ra=self.pan['RAJ2000'].value,dec=self.pan['DEJ2000'].value,unit=(u.degree,u.degree),frame='icrs')
 
         index,dist2d,dist3d = pancoords.match_to_catalog_sky(secoords)
 
