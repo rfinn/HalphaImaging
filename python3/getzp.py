@@ -373,7 +373,7 @@ class getzp():
         # remove any objects that are saturated or non-linear in our r-band image
         ###################################
 
-        pancoords = SkyCoord(self.pan['RAJ2000'],self.pan['DEJ2000'],frame='icrs')
+        pancoords = SkyCoord(self.pan['RAJ2000']*u.degree,self.pan['DEJ2000']*u.degree,frame='icrs')
         secoords = SkyCoord(self.secat['ALPHA_J2000']*u.degree,self.secat['DELTA_J2000']*u.degree,frame='icrs')
 
         index,dist2d,dist3d = pancoords.match_to_catalog_sky(secoords)
@@ -614,17 +614,18 @@ class getzp():
         #print('working on this')
         # add best-fit ZP to image header
         im, header = fits.getdata(self.image,header=True)
-
+        zperr = np.sqrt(self.zpcovar[0][0])            
         # or convert vega zp to AB
         if self.filter == 'R':
             # conversion from Blanton+2007
             # http://www.astronomy.ohio-state.edu/~martini/usefuldata.html
             header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1]+.21)))
+
             header.set('LAMB(um)',float(.6442))
 
         else:
             header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1])))
-            
+        header.set('PHOTZPER',float('{:.3f}'.format(zperr)))            
         header.set('PHOTSYS','AB')
         header.set('FLUXZPJY',float(3631))
         fits.writeto(self.image, im, header, overwrite=True)
