@@ -160,22 +160,26 @@ def run_swarp_all_filters(target):
     # run swarp on r-band mosaic
     rfilelist = target
     rband_coadd = run_swarp(rfilelist)
-    
-    # run swarp on Halpha, using r-band mosaic as ref image
-    hafilelist = target.replace('_r','_Ha4')
-    ha_coadd = run_swarp(hafilelist,refimage=rband_coadd)
-    
-    # run swarp on r-band, using r-band mosaic as ref image
-    rband_coadd = run_swarp(rfilelist,refimage=rband_coadd)
 
-    # update headers
-    refimage = open(rfilelist).readline().rstrip()
-    update_header(rband_coadd,refimage)
-
-    refimage = open(hafilelist).readline().rstrip()
-    update_header(ha_coadd,refimage)
+    try:
+        # run swarp on Halpha, using r-band mosaic as ref image
+        hafilelist = target.replace('_r','_Ha4')
+        ha_coadd = run_swarp(hafilelist,refimage=rband_coadd)
     
-    pass
+        # run swarp on r-band, using r-band mosaic as ref image
+        rband_coadd = run_swarp(rfilelist,refimage=rband_coadd)
+
+        # update headers
+        refimage = open(rfilelist).readline().rstrip()
+        update_header(rband_coadd,refimage)
+
+        refimage = open(hafilelist).readline().rstrip()
+        update_header(ha_coadd,refimage)
+    except FileNotFoundError:
+        print()
+        print("Warning - couldn't find Halpha images")
+        print()
+        
 
 def count_lines(fname):
     with open(fname) as f:
@@ -272,13 +276,13 @@ if __name__ == '__main__':
     if args.getzp:
         rfiles = glob.glob('VF*r.fits')
         for rf in rfiles:
-            getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument h --filter r --normbyexptime'.format(rf)
+            getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument b --filter r --normbyexptime'.format(rf)
             os.system(getzpstring)
         
         rfiles = glob.glob('VF*Ha4.fits')
         if len(rfiles) > 0:
             for rf in rfiles:
-                getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument h --filter ha --normbyexptime'.format(rf)
+                getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument b --filter ha --normbyexptime'.format(rf)
                 os.system(getzpstring)
         
 

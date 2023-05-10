@@ -68,6 +68,7 @@ import astropy.coordinates as coord
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.stats import sigma_clip
+from astropy.stats import mad_std
 from astropy.table import Table
 
 from scipy.optimize import curve_fit
@@ -138,6 +139,28 @@ def polyval2d(x, y, m):
 def fit_circle_func():
     #fit function centered on 
     pass
+
+class args():
+    """ for replicating argparse input to getzp without using argparse"""
+    def __init__(self,image,instrument,filter,nexptime=False):
+        self.image = image
+        self.instrument = instrument
+        self.filter = filter
+        self.normbyexptime = nexptime
+        self.verbose = False
+        self.nsigma = 3.
+        
+        self.d = os.getenv("HOME")+'/github/HalphaImaging/astromatic/'
+        self.catalog = None
+        self.fwhm = None
+        self.useri = False
+        self.mag = 0
+        self.naper = 5
+        self.fit = False
+        self.flatten = 0
+        self.norder = 2
+        
+
 class getzp():
     def __init__(self, args):
         
@@ -145,6 +168,7 @@ class getzp():
 
         # TODO - get plot name from image header OBJECT
         header = fits.getheader(self.image)
+        self.header = header
         #self.plotprefix = self.image.split('coadd')[0].replace('.','-').replace('-noback',"")
         try:
             self.plotprefix = header['OBJECT']
@@ -201,8 +225,13 @@ class getzp():
         plt.close('all')
         if self.verbose:
             print('')
-            print('STATUS: running se')        
-        self.runse()
+            print('STATUS: running se')
+        secat = self.image.split('.fits')[0]+'.cat'
+        if os.path.exists(secat):
+            print("found SE cat!!!")
+            self.read_se_cat()
+        else:
+            self.runse()
         if self.verbose:
             print('')        
             print('STATUS: getting panstarrs')
@@ -217,7 +246,12 @@ class getzp():
         self.fitzp(plotall=True)
         if self.verbose:
             print('')        
-            print('STATUS: udating header')        
+            print('STATUS: udating header')
+        if self.instrument == 'b':
+            self.check_90prime_ccds()
+            self.runse()
+            self.match_coords()
+            self.fitzp(plotall=True)
         self.update_header()
 
         if self.flatten > 0:
@@ -231,7 +265,7 @@ class getzp():
                 self.renorm_wfc()
                 # this creates 'ff'+imagename
                 self.rerun_zp_fit()
-        
+    
     def getzp_wfc(self):
         self.getzp()
         #self.fit_residual_surface(norder=2)
@@ -266,9 +300,16 @@ class getzp():
         Run Source Extractor on image to measure magnitudes
         """
 
-        os.system('ln -s ' +self.astrodir + '/default.* .')
+        # check for se catalog
+
+        
+
         t = self.image.split('.fits')
         froot = t[0]
+        # check for se catalog
+        secat = froot+'.cat'
+
+        os.system('ln -s ' +self.astrodir + '/default.* .')        
         if self.instrument == 'h':
             defaultcat = 'default.sex.HDI'
         elif self.instrument == 'i':
@@ -303,22 +344,22 @@ class getzp():
             # os.system('rm default.* .')
 
 
-            ###################################
-            # Read in Source Extractor catalog
-            ###################################
-            if self.verbose:
-                print('reading in SE catalog from first pass')
-            secat_filename = froot+'.cat'
-            self.secat = fits.getdata(secat_filename,2)
-            self.secat0 = self.secat
-            # get median fwhm of image
-            # for some images, this comes back as zero, and I don't know why
-            fwhm = np.median(self.secat['FWHM_IMAGE'])*self.pixelscale
+        ###################################
+        # Read in Source Extractor catalog
+        ###################################
+        if self.verbose:
+            print('reading in SE catalog from first pass')
+        secat_filename = froot+'.cat'
+        self.secat = fits.getdata(secat_filename,2)
+        self.secat0 = self.secat
+        # get median fwhm of image
+        # for some images, this comes back as zero, and I don't know why
+        fwhm = np.median(self.secat['FWHM_IMAGE'])*self.pixelscale
             
             
-            t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)+' -SEEING_FWHM '+str(fwhm)
-            if float(fwhm) == 0:
-                print('WARNING: measured FWHM is zero!')
+        t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)+' -SEEING_FWHM '+str(fwhm)
+        if float(fwhm) == 0:
+            print('WARNING: measured FWHM is zero!')
             if self.verbose:
                 print('running SE again with new FWHM to get better estimate of CLASS_STAR')
         else:
@@ -332,10 +373,15 @@ class getzp():
 
         #print(t)
         os.system(t)
+        self.read_se_cat()
+    def read_se_cat(self):
+        
 
         ###################################
         # Read in Source Extractor catalog
         ###################################
+        t = self.image.split('.fits')
+        froot = t[0]
 
         secat_filename = froot+'.cat'
         self.secat = fits.getdata(secat_filename,2)
@@ -416,11 +462,11 @@ class getzp():
 
         ###################################################################
         # remove any objects that are saturated, have FLAGS set, galaxies,
-        # must have 14 < r < 17 according to Pan-STARRS
+        # must have 15 < r < 16.8 for panstarrs mag, based on fitting results
         ###################################################################
         if self.verbose:
             print(f'\t matched {np.sum(self.matchflag)} objects')
-        self.fitflag = self.matchflag  & (self.pan['rmag'] > 14.) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.matchedarray1['CLASS_STAR'] > 0.95) & (self.pan['rmag'] < 17) #& (self.matchedarray1['MAG_AUTO'] > -11.)
+        self.fitflag = self.matchflag  & (self.pan['rmag'] > 14) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.matchedarray1['CLASS_STAR'] > 0.95) & (self.pan['rmag'] < 19) #& (self.matchedarray1['MAG_AUTO'] > -11.)
         if self.verbose:
             print(f'\t number that pass fit {np.sum(self.fitflag)}')
         # for WFC on INT, restrict area to central region
@@ -435,8 +481,26 @@ class getzp():
         #        (self.matchedarray1['Y_IMAGE'] > self.keepsection[2]) & \
         #        (self.matchedarray1['Y_IMAGE'] < self.keepsection[3])
         #    self.fitflag = self.fitflag & self.goodarea_flag
-                
-        if self.filter == 'R':
+        self.color_correct_panstarrs()
+    def color_correct_panstarrs(self):
+        """
+        correcting panstarrs magnitudes into the observed filter systems using conversions from M. Fossati  
+
+        Best fit quadratic Intha - PS1_r = 0.0182*(PS1_g-PS1_r)^2 + -0.2662*(PS1_g-PS1_r) + 0.0774
+
+        Best fit quadratic Ha4 - PS1_r = 0.0016*(PS1_g-PS1_r)^2 + -0.2134*(PS1_g-PS1_r) + 0.0168
+
+        Best fit quadratic KPSr - PS1_r = 0.0084*(PS1_g-PS1_r)^2 + -0.0420*(PS1_g-PS1_r) + 0.0036
+
+        Best fit quadratic KPHr - PS1_r = 0.0170*(PS1_g-PS1_r)^2 + -0.1864*(PS1_g-PS1_r) + 0.0213
+
+        Best fit quadratic INTSr - PS1_r = 0.0023*(PS1_g-PS1_r)^2 + -0.0122*(PS1_g-PS1_r) + 0.0003
+
+
+        """
+        PS1_r = self.pan['rmag']
+        PS1_g = self.pan['gmag']        
+        if self.filter == 'R' and (self.instrument == 'h'): # this should be the only observations through an R filter
             ###################################
             # Calculate Johnson R
             # from http://www.sdss3.org/dr8/algorithms/sdssUBVRITransform.php
@@ -454,8 +518,42 @@ class getzp():
                 self.R = self.pan['rmag'] + (-0.166)*(self.pan['rmag']-self.pan['imag']) - 0.275
             else:
                 self.R = self.pan['rmag'] + (-0.142)*(self.pan['gmag']-self.pan['rmag']) - 0.142
+                
+            #Best fit quadratic KPHr - PS1_r = 0.0170*(PS1_g-PS1_r)^2 + -0.1864*(PS1_g-PS1_r) + 0.0213
+            self.R = PS1_r + 0.0170*(PS1_g-PS1_r)**2 + -0.1864*(PS1_g-PS1_r) + 0.0213
 
+
+        elif self.filter == 'r' and self.instrument == 'i':
+            self.R = self.pan['rmag']
+            #Best fit quadratic INTSr - PS1_r = 0.0023*(PS1_g-PS1_r)^2 + -0.0122*(PS1_g-PS1_r) + 0.0003
+            self.R = PS1_r + 0.0023*(PS1_g-PS1_r)**2 + -0.0122*(PS1_g-PS1_r) + 0.0003            
+        # which filter is the bok telescope using?
+        elif self.filter == 'r' and self.instrument == 'b':
+            self.R = self.pan['rmag']
+            #Best fit quadratic KPSr - PS1_r = 0.0084*(PS1_g-PS1_r)^2 + -0.0420*(PS1_g-PS1_r) + 0.0036
+            self.R = PS1_r + 0.0084*(PS1_g-PS1_r)**2 + -0.0420*(PS1_g-PS1_r) + 0.0036            
+        # this is the kpno r filter
+        elif self.filter == 'r' and self.instrument == 'h':
+            #Best fit quadratic KPSr - PS1_r = 0.0084*(PS1_g-PS1_r)^2 + -0.0420*(PS1_g-PS1_r) + 0.0036
+            self.R = self.pan['rmag']
+            self.R = PS1_r + 0.0084*(PS1_g-PS1_r)**2 + -0.0420*(PS1_g-PS1_r) + 0.0036            
+
+        # halpha filters
+        elif self.filter == 'ha' and self.instrument == 'i':
+            #Best fit quadratic Intha - PS1_r = 0.0182*(PS1_g-PS1_r)^2 + -0.2662*(PS1_g-PS1_r) + 0.0774
+            self.R = PS1_r + 0.0182*(PS1_g-PS1_r)**2 + -0.2662*(PS1_g-PS1_r) + 0.0774
+
+
+            self.R = self.pan['rmag']
+        # bok is using the kpno halpha+4nm filter, so use the same correction for these
+        elif self.filter == 'ha' and ((self.instrument == 'b') | (self.instrument == 'h')) :
+            #Best fit quadratic Ha4 - PS1_r = 0.0016*(PS1_g-PS1_r)^2 + -0.2134*(PS1_g-PS1_r) + 0.0168
+            self.R = self.pan['rmag']
+            self.R = PS1_r + 0.0016*(PS1_g-PS1_r)**2 + -0.2134*(PS1_g-PS1_r) + 0.0168
         else:
+            print("ruh - roh!  did not find the panstarrs color transformation!!!")
+            print("setting instrumental r mag to panstarrs r mag")
+            print()
             self.R = self.pan['rmag']
             
     def plot_fitresults(self, x, y, yerr=None, polyfit_results = [0,0]):
@@ -486,52 +584,47 @@ class getzp():
             plt.plot(x,residual, 'ko',label=s)
             
         else:
-            plt.errorbar(x,residual,yerr=yerr,fmt='None',ecolor='b',label='SE MAG '+s)
+            plt.errorbar(x,residual,yerr=yerr,fmt='o',ecolor='b',label='SE MAG '+s)
         plt.xlabel('Pan-STARRS r',fontsize=16)
         plt.ylabel('YFIT - SE R-band MAG',fontsize=16)
         plt.legend()
         plt.axhline(y=0,color='r')
         plt.savefig('plots/'+self.plotprefix.replace('.fits','')+'se-pan-flux.png')
-        plt.close()
+        #plt.close()
     def fitzp(self,plotall=False):
         ###################################
         # Solve for the zeropoint
         ###################################
 
         # plot Pan-STARRS r mag on x axis, observed R-mag on y axis
-        flag = self.fitflag
-        c = np.polyfit(self.pan['rmag'][flag],self.matchedarray1['MAG_AUTO'][flag],1)
 
         if plotall:
+            flag = self.fitflag
             plt.figure(figsize=(6,4))
             plt.title(self.plotprefix)
-            plt.plot(self.pan['rmag'][flag],self.matchedarray1['MAG_AUTO'][flag],'bo')
-            plt.errorbar(self.pan['rmag'][flag],self.matchedarray1['MAG_AUTO'][flag],xerr= self.pan['e_rmag'][flag],yerr=self.matchedarray1['MAGERR_AUTO'][flag],fmt='none')
-            plt.plot(self.pan['rmag'][flag],self.matchedarray1['MAG_BEST'][flag],'ro',label='MAG_BEST')
-            plt.plot(self.pan['rmag'][flag],self.matchedarray1['MAG_PETRO'][flag],'go',label='MAG_PETRO')
-            plt.plot(self.pan['rmag'][flag],self.matchedarray1['MAG_APER'][:,0][flag],'ko',label='MAG_APER')
+            plt.plot(self.R[flag],self.R[flag]-self.matchedarray1['MAG_AUTO'][flag],'bo')
+            plt.errorbar(self.R[flag],self.R[flag]-self.matchedarray1['MAG_AUTO'][flag],xerr= self.pan['e_rmag'][flag],yerr=self.matchedarray1['MAGERR_AUTO'][flag],fmt='none')
+            plt.plot(self.R[flag],self.R[flag]-self.matchedarray1['MAG_BEST'][flag],'ro',label='MAG_BEST')
+            plt.plot(self.R[flag],self.R[flag]-self.matchedarray1['MAG_PETRO'][flag],'go',label='MAG_PETRO')
+            plt.plot(self.R[flag],self.R[flag]-self.matchedarray1['MAG_APER'][:,self.naper][flag],'ko',label='MAG_APER')
             plt.xlabel('Pan-STARRS r',fontsize=16)
-            plt.ylabel('SE R-band MAG_AUTO',fontsize=16)
-
+            plt.ylabel('PANSTARRS - SE_MAG',fontsize=16)
+            plt.legend()
             xl = np.linspace(14,17,10)
-            yl = np.polyval(c,xl)
-            plt.plot(xl,yl,'k--')
-            #plt.savefig('getzp-fig2.png')
+            yl = 0*xl
+            #yl = np.polyval(c,xl)
+            #plt.plot(xl,yl,'k--')
+            plt.savefig('getzp-fig2.png')
             #plt.plot(xl,1.2*yl,'k:')
-            #print(c)
-    
-        yfit = np.polyval(c,self.pan['rmag'])
+
+        
         residual = np.zeros(len(flag))
         ####################################
         ## had been dividing by yfit, but that doesn't make sense
         ## want residual to be in magnitudes
         ## removing yfit normalization
         ####################################
-        residual[flag] = (yfit[flag] - self.matchedarray1['MAG_AUTO'][flag])#/yfit[flag]
 
-        self.bestc = np.array([0,0],'f')
-        delta = 100.     
-        x = self.R[flag] # expected mag from panstarrs
         # fixed radii apertures: [:,0] = 3 pix, [:,1] = 5 pix, [:,2] = 7 pixels
 
         if self.mag == 0: # this is the default magnitude
@@ -549,6 +642,14 @@ class getzp():
                 print('Using MAG_PETRO')
             y = self.matchedarray1['MAG_PETRO'][flag]
             yerr = self.matchedarray1['MAGERR_PETRO'][flag]
+
+
+        # start fitting procedure
+        flag = self.fitflag
+        self.bestc = np.array([0,0],'f')
+        delta = 100.     
+        x = self.R[flag] # expected mag from panstarrs
+        
         while delta > 1.e-3:
             #c = np.polyfit(x,y,1)
             t = curve_fit(zpfunc,x,y,sigma = yerr)
@@ -568,7 +669,8 @@ class getzp():
                 print('new ZP = {:.3f}, previous ZP = {:.3f}'.format(self.bestc[1],c[1]))
             delta = abs(self.bestc[1] - c[1])
             self.bestc = c
-            MAD = 1.48*np.median(abs(residual - np.median(residual)))
+            MAD = mad_std(residual)#1.48*np.median(abs(residual - np.median(residual)))
+            #clip_flag = sigma_clip(self.zim,sigma=3,maxiters=10,masked=True)            
             flag =  (abs(residual - np.median(residual)) < self.nsigma*MAD)
             if sum(flag) < 2:
                 print(f'WARNING: ONLY ONE DATA POINT LEFT FOR {self.image}')
@@ -600,6 +702,8 @@ class getzp():
             plt.text(0.05,.85,s,horizontalalignment='left',transform=plt.gca().transAxes)
             plt.xlabel('Residuals')
             plt.savefig('plots/'+self.plotprefix.replace(".fits","")+'getzp-residual-hist.png')
+
+
 
         ###################################
         # Show location of residuals
@@ -638,7 +742,37 @@ class getzp():
         self.zperr = np.sqrt(self.zpcovar[0][0])
         self.zp = self.bestc[1]
         self.plot_fitresults(x,y,yerr=yerr,polyfit_results = self.bestc)
+
+    def check_90prime_ccds(self):
+        image_med = np.ma.median(self.residual_all)
+        hdu = fits.open(self.image)                
+        NAXIS1 = self.header['NAXIS1']
+        NAXIS2 = self.header['NAXIS2']
+        quad = 1
+
+        for ix in range(2):
+            xmin = 0 + NAXIS1//2*ix
+            xmax = NAXIS1//2 * (ix +1)
+            
+            for iy in range(2):
+                ymin = 0 + NAXIS2//2*iy
+                ymax = NAXIS2//2 * (iy+1)
+                #print(xmin,xmax,ymin,ymax)
+                flag = (self.residual_allx > xmin) & (self.residual_allx < xmax) &\
+                    (self.residual_ally > ymin) & (self.residual_ally < ymax) 
+                amp_med = np.ma.median(self.residual_all[flag])
                 
+                amp_scale = image_med/amp_med
+                
+                print(f"\tmedian and scale for quadrant {quad} = {amp_med:.3f} {amp_scale:.3f}")
+                # scale the data
+                # scale the image and ivar accordingly            
+                hdu[0].data[ymin:ymax,xmin:xmax] = amp_scale*hdu[0].data[ymin:ymax,xmin:xmax]
+
+                # what is the correct way to scale the weights?  same as image or inverse???
+                # in the weight image, high numbers are good
+                quad += 1
+        hdu.writeto(self.image, overwrite=True)
     def update_header(self):
         #print('working on this')
         # add best-fit ZP to image header

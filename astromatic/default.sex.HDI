@@ -11,7 +11,7 @@ PARAMETERS_NAME  default.param  # name of the file containing catalog contents
  
 #------------------------------- Extraction ----------------------------------
  
-DETECT_TYPE      CCD            # CCD (linear) or PHOTO (with gamma correction)
+DETECT_TYPE      CCD            #CCD (linear) or PHOTO (with gamma correction)
 
 #FLAG_IMAGE       flag.fits      # filename for an input FLAG-image
 DETECT_MINAREA   10              # minimum number of pixels above threshold
