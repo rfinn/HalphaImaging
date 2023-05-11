@@ -104,6 +104,10 @@ def run_swarp(image_list,refimage=None):
     dateobs = images.split('_')[1]
     dateobs = '20'+dateobs
     os.system('cp ~/github/HalphaImaging/astromatic/default.swarp.BOK .')
+    # add RA and DEC - 2023-05-10
+    # didn't actually do this for the 2021 data, but changing now so that this is
+    # implemented for 2022 data
+    
     output_image = 'VF-{}-BOK-{}-{}.fits'.format(dateobs,vfid,filter)
     output_weight_image = 'VF-{}-BOK-{}-{}.weight.fits'.format(dateobs,vfid,filter)    
     # start building swarp command

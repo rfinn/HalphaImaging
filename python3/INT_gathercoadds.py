@@ -85,9 +85,9 @@ for f1 in flist1:
 
                     # create string for output name
                     if float(dec) < 0:
-                        outfile = output_dir_coadds+'VF-{:.4f}-{:.4f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filter)
+                        outfile = output_dir_coadds+'VF-{:07.3f}-{:06.3f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filter)
                     else:
-                        outfile = output_dir_coadds+'VF-{:.4f}+{:.4f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filter)
+                        outfile = output_dir_coadds+'VF-{:07.3f}+{:06.3f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filter)
 
                     # copy imfile to outfile
                     out1 = outfile+'.fits'
