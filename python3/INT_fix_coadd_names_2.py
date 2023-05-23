@@ -23,9 +23,16 @@ python ~/github/HalphaImaging/python3/BOK_fix_coadd_names_2.py
 '''
 
 import os
-import glob
+#import glob
+import shutil
 
-
+copyflag = False
+if not copyflag:
+    # change this for the appropriate input/output filelist
+    outdir = '/media/rfinn/hdata/coadds/virgo-coadds-INT-2019-Feb/'
+    outdir = '/media/rfinn/hdata/coadds/virgo-coadds-INT-2019-Jun/'
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
 
 
 # get list of current directory
@@ -38,6 +45,8 @@ workingdir = os.getcwd()
 for f in flist1:
     if os.path.isdir(f):
         #this will skp over subdirectories, etc
+        continue
+    if not f.find('INT') > -1:
         continue
     print(f)
     if f.find('+') >-1: # this means dec is positive
@@ -56,9 +65,18 @@ for f in flist1:
     else:
         outfile = 'VF-{:07.3f}+{:06.3f}-{:s}-{:s}-{:s}{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filterwsuffix)
 
+    if copyflag:
+        print('renaming ',f,'->',outdir+outfile)
+    else:
+        print('renaming ',f,'->',outfile)
 
-    print('renaming ',f,'->',outfile)
-    os.rename(f,outfile)
+    # comment the following until you are sure that the output names are correct
+
+    if copyflag:
+        shutil.copy(f,os.path.join(outdir,outfile))
+    else:
+        os.rename(f,outfile)
+
     #os.chdir(workingdir)
 
 

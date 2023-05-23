@@ -39,6 +39,8 @@ for f in flist1:
     if os.path.isdir(f):
         #this will skp over subdirectories, etc
         continue
+    if not f.find("BOK") > -1:
+        continue
     print(f)
     if f.find('+') >-1: # this means dec is positive
         t,radec,telescope,dateobs,pointing,filterwsuffix = f.split('-')

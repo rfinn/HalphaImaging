@@ -4,25 +4,20 @@
 
 PROCEDURE:
 
-* rename images that have the filename format
+* rename images to a uniform format
+* files have format
 
-  VF-20210315-BOK-VFID2593-r.fits
+  VF-2017-05-23-HDI-p010-R-noback-coadd.fits
 
-  to a format that includes ra and dec
+  and need to have
+
+  VF-208.704+40.669-BOK-20210417-VFID2068-r.fits 
 
 * get list of current files
 
 USAGE:
 
 * running this from /home/rfinn/data/reduced/virgo-coadds-HDI/
-
-files have format
-
-VF-2017-05-23-HDI-p010-R-noback-coadd.fits
-
-
-and need to have
-
 
 
 '''
@@ -33,7 +28,9 @@ from astropy.io import fits
 import glob
 
 
-
+outdir = '/media/rfinn/hdata/coadds/virgo-coadds-HDI/'
+if not os.path.exists(outdir):
+    os.mkdir(outdir)
 
 homedir = os.getenv("HOME")
 # define directory for all coadds
@@ -54,16 +51,24 @@ for f in flist1:
     ra = float(h['CRVAL1'])
     dec = float(h['CRVAL2'])
 
-    t,dateobs,telescope,pointing,filterwsuffix = f.split('-')
+    t,year,month,day,telescope,pointing,filter, junk1,suffix = f.split('-')
     # create string for output name
+    dateobs = year+month+day
+
+    # remove coadd from suffix
+
+    #print(suffix)
+    #print(suffix.replace('coadd',''))
+    
     if float(dec) < 0:
-        outfile = 'VF-{:07.3f}-{:06.3f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filterwsuffix)
+        outfile = 'VF-{:07.3f}-{:06.3f}-{:s}-{:s}-{:s}-{:s}{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filter, suffix.replace('coadd',''))
     else:
-        outfile = 'VF-{:07.3f}+{:06.3f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filterwsuffix)
+        outfile = 'VF-{:07.3f}+{:06.3f}-{:s}-{:s}-{:s}-{:s}{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filter,suffix.replace('coadd',''))
 
 
-    print('renaming ',f,'->',outfile)
-    os.rename(f,outfile)
-    #os.chdir(workingdir)
+    print('renaming ',f,'->',outdir+outfile)
+    shutil.copy(f,os.path.join(outdir,outfile))
+    #os.rename(f,outfile)
+
 
 

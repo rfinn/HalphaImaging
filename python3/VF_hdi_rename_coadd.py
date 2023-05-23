@@ -76,7 +76,8 @@ for f in flist:
     # read in filter
     ffilter = header['FILTER']
 
-    # no back
+    # no back - does this mean no background,
+    # or no background subtraction???
     if f.find('noback') > -1:
         noback='noback-'
     else:

@@ -140,6 +140,19 @@ def fit_circle_func():
     #fit function centered on 
     pass
 
+def get_filebasename(fname):
+    # determine telescope and filter from filename
+    t = fname.split('-')
+    #print(t)
+    # check to see if declination is negative
+    # if it is, then index of instrument will be off by one
+    if fname[10] == '+':
+        basename = '-'.join(t[0:5])
+    else:
+        basename = '-'.join(t[0:6])
+    return basename
+        
+
 class args():
     """ for replicating argparse input to getzp without using argparse"""
     def __init__(self,image,instrument,filter,nexptime=False):
@@ -166,14 +179,14 @@ class getzp():
         
         self.image = args.image
 
-        # TODO - get plot name from image header OBJECT
         header = fits.getheader(self.image)
         self.header = header
         #self.plotprefix = self.image.split('coadd')[0].replace('.','-').replace('-noback',"")
-        try:
-            self.plotprefix = header['OBJECT']
-        except KeyError:
-            self.plotprefix = self.image.split('.fits')[0]
+        #try:
+        #    self.plotprefix = header['OBJECT']
+        #except KeyError:
+        #    self.plotprefix = self.image.split('.fits')[0]
+        self.plotprefix = self.image.split('.fits')[0]+'-'
             
         # create plot directory if it doesn't already exist
         if not os.path.exists('plots'):
@@ -363,7 +376,7 @@ class getzp():
             if self.verbose:
                 print('running SE again with new FWHM to get better estimate of CLASS_STAR')
         else:
-            t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)+' -SEEING_FWHM '+self.fwhm
+            t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)+' -SEEING_FWHM '+str(self.fwhm)
             if self.verbose:
                 print(t)
                 print('running SE w/user input for FWHM to get better estimate of CLASS_STAR')            
@@ -408,38 +421,44 @@ class getzp():
         ###################################
         # get Pan-STARRS catalog over the same region
         ###################################
-        ptab_name = self.image.split('.fits')[0]+'_pan_tab.csv'
+        # this naming convention uses the same panstarrs catalog
+        # for both the r and halpha images - saves time!
+        ptab_name = get_filebasename(self.image)+'_pan_tab.csv'
 
         if os.path.exists(ptab_name):
             print('panstarrs table already downloaded')
             self.pan = Table.read(ptab_name)
         else:
             # check for catalog from previous run on mosaic
-            print(self.image)
-            print()
-            print("looking for panstarrs catalog...")
-            print()
-            header = fits.getheader(self.image)
-            objname = header['OBJECT'].split('_')[0]
-            filter = header['FILTER'].replace('+','').replace('nm','')
+            # not sure what this does anymore - don't think we want this
+            # commenting out and querying for new catalog
+
             
-            glob_ptab_name = '*'+objname+'-'+filter+'_pan_tab.csv'
-            print('\t',glob_ptab_name)
+            #print(self.image)
+            #print()
+            #print("looking for panstarrs catalog...")
+            #print()
+            #header = fits.getheader(self.image)
+            #objname = header['OBJECT'].split('_')[0]
+            #filter = header['FILTER'].replace('+','').replace('nm','')
+            
+            #glob_ptab_name = '*'+objname+'-'+filter+'_pan_tab.csv'
+            #print('\t',glob_ptab_name)
+            #print()
+            #filelist = glob.glob(glob_ptab_name)
+            ##print(filelist)
+            #if len(filelist) > 0:
+            #    ptab_name = filelist[0]
+            #    self.pan = Table.read(ptab_name)
+            #    print()
+            #    print('Good news - found a prior panstarrs catalog!')
+            #    print()
+            #else:
             print()
-            filelist = glob.glob(glob_ptab_name)
-            #print(filelist)
-            if len(filelist) > 0:
-                ptab_name = filelist[0]
-                self.pan = Table.read(ptab_name)
-                print()
-                print('Good news - found a prior panstarrs catalog!')
-                print()
-            else:
-                print()
-                print("no previous panstarrs catalog found :(")
-                self.pan = panstarrs_query(self.centerRA, self.centerDEC, self.radius)
-                ptab = Table(self.pan)
-                ptab.write(ptab_name,format='csv',overwrite=True)
+            print("no previous panstarrs catalog found :(")
+            self.pan = panstarrs_query(self.centerRA, self.centerDEC, self.radius)
+            ptab = Table(self.pan)
+            ptab.write(ptab_name,format='csv',overwrite=True)
     def match_coords(self):
         ###################################
         # match Pan-STARRS1 data to Source Extractor sources
