@@ -83,6 +83,6 @@ for i,f in enumerate(rfiles):
     os.system(getzpstring)
 
     # uncomment the following for testing
-    #if i > 0:
-    #    break
+    if i > 0:
+        break
         

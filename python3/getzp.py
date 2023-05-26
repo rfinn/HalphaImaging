@@ -428,6 +428,7 @@ class getzp():
         if os.path.exists(ptab_name):
             print('panstarrs table already downloaded')
             self.pan = Table.read(ptab_name)
+            
         else:
             # check for catalog from previous run on mosaic
             # not sure what this does anymore - don't think we want this
@@ -459,6 +460,7 @@ class getzp():
             self.pan = panstarrs_query(self.centerRA, self.centerDEC, self.radius)
             ptab = Table(self.pan)
             ptab.write(ptab_name,format='csv',overwrite=True)
+        self.color_correct_panstarrs()
     def match_coords(self):
         ###################################
         # match Pan-STARRS1 data to Source Extractor sources
@@ -485,7 +487,7 @@ class getzp():
         ###################################################################
         if self.verbose:
             print(f'\t matched {np.sum(self.matchflag)} objects')
-        self.fitflag = self.matchflag  & (self.pan['rmag'] > 14) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.matchedarray1['CLASS_STAR'] > 0.95) & (self.pan['rmag'] < 19) #& (self.matchedarray1['MAG_AUTO'] > -11.)
+        self.fitflag = self.matchflag  & (self.pan['rmag'] > 15) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.matchedarray1['CLASS_STAR'] > 0.95) & (self.pan['rmag'] < 17.5) #& (self.matchedarray1['MAG_AUTO'] > -11.)
         if self.verbose:
             print(f'\t number that pass fit {np.sum(self.fitflag)}')
         # for WFC on INT, restrict area to central region
@@ -500,7 +502,7 @@ class getzp():
         #        (self.matchedarray1['Y_IMAGE'] > self.keepsection[2]) & \
         #        (self.matchedarray1['Y_IMAGE'] < self.keepsection[3])
         #    self.fitflag = self.fitflag & self.goodarea_flag
-        self.color_correct_panstarrs()
+        
     def color_correct_panstarrs(self):
         """
         correcting panstarrs magnitudes into the observed filter systems using conversions from M. Fossati  
@@ -518,14 +520,15 @@ class getzp():
 
         """
         PS1_r = self.pan['rmag']
-        PS1_g = self.pan['gmag']        
+        PS1_g = self.pan['gmag']
+        self.pan_gr_color = self.pan['gmag'] - self.pan['rmag']        
         if self.filter == 'R' and (self.instrument == 'h'): # this should be the only observations through an R filter
+            print("correcting color for R filter at KPNO")            
             ###################################
             # Calculate Johnson R
             # from http://www.sdss3.org/dr8/algorithms/sdssUBVRITransform.php
             ###################################
-            self.R = self.pan['rmag'] + (-0.153)*(self.pan['rmag']-self.pan['imag']) - 0.117
-
+            #self.R = self.pan['rmag'] + (-0.153)*(self.pan['rmag']-self.pan['imag']) - 0.117
             ###################################
             # Other transformations from 
             # https://arxiv.org/pdf/1706.06147.pdf
@@ -533,41 +536,46 @@ class getzp():
             # R - r = C0 + C1 x (g-r)  (-0.142, -0.166)
             ###################################
             #
-            if self.useri:
-                self.R = self.pan['rmag'] + (-0.166)*(self.pan['rmag']-self.pan['imag']) - 0.275
-            else:
-                self.R = self.pan['rmag'] + (-0.142)*(self.pan['gmag']-self.pan['rmag']) - 0.142
-                
+            #if self.useri:
+            #    self.R = self.pan['rmag'] + (-0.166)*(self.pan['rmag']-self.pan['imag']) - 0.275
+            #else:
+            #    self.R = self.pan['rmag'] + (-0.142)*(self.pan['gmag']-self.pan['rmag']) - 0.142
+
+            # from Matteo Fossati
             #Best fit quadratic KPHr - PS1_r = 0.0170*(PS1_g-PS1_r)^2 + -0.1864*(PS1_g-PS1_r) + 0.0213
             self.R = PS1_r + 0.0170*(PS1_g-PS1_r)**2 + -0.1864*(PS1_g-PS1_r) + 0.0213
 
-
         elif self.filter == 'r' and self.instrument == 'i':
-            self.R = self.pan['rmag']
+            print("correcting color for r filter at INT")                        
+            #self.R = self.pan['rmag']
             #Best fit quadratic INTSr - PS1_r = 0.0023*(PS1_g-PS1_r)^2 + -0.0122*(PS1_g-PS1_r) + 0.0003
             self.R = PS1_r + 0.0023*(PS1_g-PS1_r)**2 + -0.0122*(PS1_g-PS1_r) + 0.0003            
         # which filter is the bok telescope using?
         elif self.filter == 'r' and self.instrument == 'b':
-            self.R = self.pan['rmag']
+            print("correcting color for r filter at BOK")                        
+            #self.R = self.pan['rmag']
             #Best fit quadratic KPSr - PS1_r = 0.0084*(PS1_g-PS1_r)^2 + -0.0420*(PS1_g-PS1_r) + 0.0036
             self.R = PS1_r + 0.0084*(PS1_g-PS1_r)**2 + -0.0420*(PS1_g-PS1_r) + 0.0036            
         # this is the kpno r filter
         elif self.filter == 'r' and self.instrument == 'h':
+            print("correcting color for r filter at KPNO")            
             #Best fit quadratic KPSr - PS1_r = 0.0084*(PS1_g-PS1_r)^2 + -0.0420*(PS1_g-PS1_r) + 0.0036
             self.R = self.pan['rmag']
             self.R = PS1_r + 0.0084*(PS1_g-PS1_r)**2 + -0.0420*(PS1_g-PS1_r) + 0.0036            
 
         # halpha filters
         elif self.filter == 'ha' and self.instrument == 'i':
+            print("correcting color for halpha filter at INT")
             #Best fit quadratic Intha - PS1_r = 0.0182*(PS1_g-PS1_r)^2 + -0.2662*(PS1_g-PS1_r) + 0.0774
             self.R = PS1_r + 0.0182*(PS1_g-PS1_r)**2 + -0.2662*(PS1_g-PS1_r) + 0.0774
 
 
-            self.R = self.pan['rmag']
+            #self.R = self.pan['rmag']
         # bok is using the kpno halpha+4nm filter, so use the same correction for these
         elif self.filter == 'ha' and ((self.instrument == 'b') | (self.instrument == 'h')) :
+            print("correcting color for ha filter at KPNO")                        
             #Best fit quadratic Ha4 - PS1_r = 0.0016*(PS1_g-PS1_r)^2 + -0.2134*(PS1_g-PS1_r) + 0.0168
-            self.R = self.pan['rmag']
+            #self.R = self.pan['rmag']
             self.R = PS1_r + 0.0016*(PS1_g-PS1_r)**2 + -0.2134*(PS1_g-PS1_r) + 0.0168
         else:
             print("ruh - roh!  did not find the panstarrs color transformation!!!")
@@ -575,8 +583,9 @@ class getzp():
             print()
             self.R = self.pan['rmag']
             
-    def plot_fitresults(self, x, y, yerr=None, polyfit_results = [0,0]):
+    def plot_fitresults(self, x, y, yerr=None, polyfit_results = [0,0],color=None):
         # plot best-fit results
+        #print(f"inside plot_fitresults, len(x) = {len(x)}, len(color)={len(color)}")
         yfit = np.polyval(polyfit_results,x)
         residual = (yfit - y)
         plt.figure(figsize=(8,8))
@@ -584,13 +593,23 @@ class getzp():
         plt.title(self.plotprefix+s)
         
         plt.subplot(2,1,1)
-        if len(yerr) < len(y): 
-            plt.plot(x,y,'bo',label='MAG_AUTO')
+        if len(yerr) < len(y):
             
+            if color is not None:
+                plt.scatter(x,residual,s=30,label=s,c=color)
+                plt.colorbar(label='g-r')                
+            else:
+                plt.plot(x,residual, 'ko',label=s)
+
+                
         else:
-            plt.errorbar(x,y,yerr=yerr,fmt='bo',ecolor='b',label='SE MAG')
-        plt.xlabel('Pan-STARRS r',fontsize=16)
-        plt.ylabel('SE R-band MAG',fontsize=16)
+            #print(f"inside plot_fitresults, len(x) = {len(x)}, len(color)={len(color)}")            
+            plt.errorbar(x,y,yerr=yerr,fmt='None',ecolor='0.5',label='SE MAG',alpha=.4,zorder=1)
+            if color is not None:
+                plt.scatter(x,y,s=30,label=s,c=color,zorder=10)
+                plt.colorbar(label='g-r')
+        plt.xlabel('Pan-STARRS Corrected',fontsize=16)
+        plt.ylabel('SE MAG',fontsize=16)
         xl = np.linspace(14,17,10)
         yl = np.polyval(polyfit_results,xl)
         s = 'fit: y = %.2f PAN + %.2f'%(polyfit_results[0],polyfit_results[1])
@@ -600,11 +619,18 @@ class getzp():
         plt.subplot(2,1,2)
         s = 'MAD = %.4f'%(MAD2(residual))
         if len(yerr) < len(y):
-            plt.plot(x,residual, 'ko',label=s)
-            
+
+            # color by panstarrs g-r color to check for residual color terms
+            if color is not None:
+                plt.scatter(x,residual,s=30,label=s,c=color)
+            else:
+                plt.plot(x,residual, 'ko',label=s)
         else:
-            plt.errorbar(x,residual,yerr=yerr,fmt='o',ecolor='b',label='SE MAG '+s)
-        plt.xlabel('Pan-STARRS r',fontsize=16)
+            plt.errorbar(x,residual,yerr=yerr,fmt='None',ecolor='0.5',label='SE MAG '+s,alpha=.4,zorder=1)
+            if color is not None:
+                plt.scatter(x,residual,s=30,label=s,c=color,zorder=10)
+                plt.colorbar(label='g-r')
+        plt.xlabel('Pan-STARRS Corrected',fontsize=16)
         plt.ylabel('YFIT - SE R-band MAG',fontsize=16)
         plt.legend()
         plt.axhline(y=0,color='r')
@@ -668,7 +694,8 @@ class getzp():
         self.bestc = np.array([0,0],'f')
         delta = 100.     
         x = self.R[flag] # expected mag from panstarrs
-        
+        color = self.pan_gr_color[flag]
+        #print(f"len(x) = {len(x)}, len(color)= {len(color)}")
         while delta > 1.e-3:
             #c = np.polyfit(x,y,1)
             t = curve_fit(zpfunc,x,y,sigma = yerr)
@@ -680,7 +707,7 @@ class getzp():
             residual = (yfit - y)
 
             if plotall:
-                self.plot_fitresults(x,y,yerr=yerr,polyfit_results = c)
+                self.plot_fitresults(x,y,yerr=yerr,polyfit_results = c,color=color)
 
     
             # check for convergence
@@ -704,6 +731,7 @@ class getzp():
             x = x[flag]
             y = y[flag]
             yerr = yerr[flag]
+            color = color[flag]
         ###################################
         ##  show histogram of residuals
         ###################################
@@ -760,7 +788,7 @@ class getzp():
         self.zpcovar = t[1]
         self.zperr = np.sqrt(self.zpcovar[0][0])
         self.zp = self.bestc[1]
-        self.plot_fitresults(x,y,yerr=yerr,polyfit_results = self.bestc)
+        self.plot_fitresults(x,y,yerr=yerr,polyfit_results = self.bestc,color=color)
 
     def check_90prime_ccds(self):
         image_med = np.ma.median(self.residual_all)
@@ -915,10 +943,14 @@ class getzp():
         # rerun getzp, but don't download panstarrs again
         self.runse()
         if self.verbose:
-            print('STATUS: matching se cat to panstarrs')       
+            print('STATUS: matching se cat to panstarrs')
+            
         self.match_coords()
+        #self.color_correct_panstarrs()        
+
         if self.verbose:
-            print('STATUS: fitting zeropoint')        
+            print('STATUS: fitting zeropoint')
+            
         self.fitzp()
         if self.verbose:
             print('STATUS: udating header')        
@@ -948,6 +980,7 @@ def main(raw_args=None):
     args = parser.parse_args(raw_args)
     #zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
     zp = getzp(args)
+
     zp.getzp()
     print('ZP = {:.3f} +/- {:.3f}, {}'.format(-1*zp.zp,zp.zperr,zp.image))
     return zp,-1*zp.zp,zp.zperr
