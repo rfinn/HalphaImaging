@@ -29,7 +29,7 @@ def processone(image):
     program= f"{HOME}/github/HalphaImaging/python3/BOK_pipeline_fixampoffsets.py"    
     cmd = f"python {program} {image} r"
     os.system(cmd)
-        
+    return 1
     #cmds = ['python3', program,image]
     #print(f"Submitting job to process {input_file}")
     #process = subprocess.Popen(cmds)#, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
