@@ -45,7 +45,7 @@ def processall():
     #print(t)
     # set up multiprocessing pool
     image_pool = mp.Pool(mp.cpu_count())
-    myresults = [image_pool.apply_async(processone,args=(image1),callback=collect_results) for image1 in filelist]
+    myresults = [image_pool.apply_async(processone,args=(im,),callback=collect_results) for im in filelist]
     
     image_pool.close()
     image_pool.join()
