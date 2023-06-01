@@ -41,8 +41,8 @@ def processall():
     filelist = glob.glob('ksb*ooi*.fits')
     filelist.sort()
     print(f'found {len(filelist)} files to process...')
-    t = [image1 for image1 in filelist]
-    print(t)
+    #t = [image1 for image1 in filelist]
+    #print(t)
     # set up multiprocessing pool
     image_pool = mp.Pool(mp.cpu_count())
     myresults = [image_pool.apply_async(processone,args=(image1),callback=collect_results) for image1 in filelist]
@@ -50,6 +50,7 @@ def processall():
     image_pool.close()
     image_pool.join()
     infall_results = [r.get() for r in myresults]
+    return infall_results
 
 if __name__ == '__main__':
-    processall()
+    infall_results = processall()
