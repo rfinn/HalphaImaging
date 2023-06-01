@@ -25,6 +25,8 @@ def processone(image):
     #    print(f'{outimage} found - moving to next object')
     #else:
     #    print(f"processing {image} -> {outimage}")
+    
+    program= f"{HOME}/github/HalphaImaging/python3/BOK_pipeline_fixampoffsets.py"    
     cmd = f"python {program} {image} r"
     os.system(cmd)
         
@@ -35,10 +37,12 @@ def processone(image):
     #print(stdout.decode())
     #print(stderr.decode())
 def processall():
-    program= f"{HOME}/github/HalphaImaging/python3/BOK_pipeline_fixampoffsets.py"
+
     filelist = glob.glob('ksb*ooi*.fits')
     filelist.sort()
     print(f'found {len(filelist)} files to process...')
+
+    # set up multiprocessing pool
     image_pool = mp.Pool(mp.cpu_count())
     myresults = [image_pool.apply_async(processone,args=(image1),callback=collect_results) for image1 in filelist]
     
