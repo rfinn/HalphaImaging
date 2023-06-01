@@ -45,7 +45,7 @@ def processall():
     
     image_pool.close()
     image_pool.join()
-    #infall_results = [r.get() for r in myresults]
+    infall_results = [r.get() for r in myresults]
 
 if __name__ == '__main__':
     processall()
