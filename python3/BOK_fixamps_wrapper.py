@@ -20,19 +20,19 @@ def processone(image):
     
     #image = filelist[i]
     outimage = 'zm'+image
-    if os.path.exists(outimage):
-        print(f'{outimage} found - moving to next object')
-    else:
-        print(f"processing {image} -> {outimage}")
-        cmd = f"python {program} {image} r"
-        os.system(cmd)
+    #if os.path.exists(outimage):
+    #    print(f'{outimage} found - moving to next object')
+    #else:
+    #    print(f"processing {image} -> {outimage}")
+    cmd = f"python {program} {image} r"
+    os.system(cmd)
         
-        #cmds = ['python3', program,image]
-        #print(f"Submitting job to process {input_file}")
-        #process = subprocess.Popen(cmds)#, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        #stdout, stderr = process.communicate()
-        #print(stdout.decode())
-        #print(stderr.decode())
+    #cmds = ['python3', program,image]
+    #print(f"Submitting job to process {input_file}")
+    #process = subprocess.Popen(cmds)#, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    #stdout, stderr = process.communicate()
+    #print(stdout.decode())
+    #print(stderr.decode())
 def processall():
     program= f"{HOME}/github/HalphaImaging/python3/BOK_pipeline_fixampoffsets.py"
     filelist = glob.glob('ksb*ooi*.fits')
