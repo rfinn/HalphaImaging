@@ -35,7 +35,7 @@ def processone(image):
         #print(stderr.decode())
 def processall():
     program= f"{HOME}/github/HalphaImaging/python3/BOK_pipeline_fixampoffsets.py"
-    filelist = glob.glob('ksb*ooi_r_v1.fits')
+    filelist = glob.glob('ksb*ooi*.fits')
     filelist.sort()
     print(f'found {len(filelist)} files to process...')
     
