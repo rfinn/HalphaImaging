@@ -39,9 +39,8 @@ def processall():
     filelist = glob.glob('ksb*ooi*.fits')
     filelist.sort()
     print(f'found {len(filelist)} files to process...')
-    
     image_pool = mp.Pool(mp.cpu_count())
-    myresults = [image_pool.apply_async(processone,args=(image),callback=collect_results) for image in filelist]
+    myresults = [image_pool.apply_async(processone,args=(image1),callback=collect_results) for image1 in filelist]
     
     image_pool.close()
     image_pool.join()
