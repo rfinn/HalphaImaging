@@ -20,7 +20,7 @@ def processone(image):
     
     #image = filelist[i]
     outimage = 'zm'+image
-    print("processing ",image)
+    #print("processing ",image)
     #if os.path.exists(outimage):
     #    print(f'{outimage} found - moving to next object')
     #else:
