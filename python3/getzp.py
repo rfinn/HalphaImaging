@@ -1011,4 +1011,4 @@ if __name__ == '__main__':
 
     zp.getzp()
     print('ZP = {:.3f} +/- {:.3f}, {}'.format(-1*zp.zp,zp.zperr,zp.image))
-    return zp,-1*zp.zp,zp.zperr
+    #return zp,-1*zp.zp,zp.zperr
