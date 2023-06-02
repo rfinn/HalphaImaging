@@ -47,6 +47,7 @@ added file and median-subtracted file back into main directory
 import os
 import glob
 import argparse
+import multiprocessing as mp
 
 from astropy.table import Table
 from astropy.io import fits
