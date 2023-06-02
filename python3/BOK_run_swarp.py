@@ -368,7 +368,7 @@ if __name__ == '__main__':
             #break
         
         swarp_pool = mp.Pool(mp.cpu_count())
-        swresults = [swarp_pool.apply_async(run_swarp_all_filters,args=(target,),callback=swarp_collect_results) for target in primary_targets[:2]
+        swresults = [swarp_pool.apply_async(run_swarp_all_filters,args=(target,),callback=swarp_collect_results) for target in primary_targets[:2]]
     
         swarp_pool.close()
         swarp_pool.join()
