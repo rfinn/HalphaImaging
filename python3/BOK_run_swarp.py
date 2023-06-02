@@ -115,10 +115,10 @@ def combine_masks(imname):
         for i in range(1,5):
             #print('combining image number ',i)
             weight_hdu[i].data = weight_hdu[i].data + 1000*dq_hdu[i].data
-        weight_hdu.writeto('combined_weight.fits',overwrite=True)
+        weight_hdu.writeto(combined_mask,overwrite=True)
         
         # prepend the m to match the name of the median subtracted image
-        os.rename('combined_weight.fits',combined_mask)
+        #os.rename('combined_weight.fits',combined_mask)
     
 
 def combine_all_masks(filelist):
