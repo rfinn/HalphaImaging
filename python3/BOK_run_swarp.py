@@ -151,10 +151,17 @@ def run_swarp(image_list,refimage=None):
     dateobs = images.split('_')[1]
     dateobs = '20'+dateobs
     os.system('cp ~/github/HalphaImaging/astromatic/default.swarp.BOK .')
+
+    ##
     # add RA and DEC - 2023-05-10
     # didn't actually do this for the 2021 data, but changing now so that this is
     # implemented for 2022 data
-    
+    #
+    # 2023-06-02
+    # however, the RA and DEC of the first image is not necessarily going to be
+    # the RA and DEC of the mosaiced image -
+    # maybe this is why I didn't fully implement
+    ##
     output_image = 'VF-{}-BOK-{}-{}.fits'.format(dateobs,vfid,filter)
     output_weight_image = 'VF-{}-BOK-{}-{}.weight.fits'.format(dateobs,vfid,filter)    
     # start building swarp command
@@ -177,8 +184,36 @@ def run_swarp(image_list,refimage=None):
     print('')
     print('Running scamp with the following command:\n',commandstring)
     os.system(commandstring)
-    return output_image
 
+    # get RA and DEC of output image, and then rename output image
+
+
+
+    new_output_image = get_updated_BOK_coadd_name(output_image)
+    print('renaming ',output_image,'->',newname)
+    os.rename(output_image,new_output_image)
+
+    newname = get_updated_BOK_coadd_name(output_weight_image)
+    print('renaming ',output_weight_image,'->',newname)
+    os.rename(output_weight_image,newname)
+    
+    
+    return new_output_image
+
+def get_updated_BOK_coadd_name(imname):
+    f = imname
+    h = fits.getheader(f)
+    ra = float(h['CRVAL1'])
+    dec = float(h['CRVAL2'])
+
+    t,dateobs,telescope,pointing,filterwsuffix = f.split('-')
+    # create string for output name
+
+    if float(dec) < 0:
+        outfile = 'VF-{:07.3f}-{:06.3f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,vfid,filterwsuffix)
+    else:
+        outfile = 'VF-{:07.3f}+{:06.3f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filterwsuffix)
+    return outfile
 def update_header(image,refimage):
     '''
     GOAL:
