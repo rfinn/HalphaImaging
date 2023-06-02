@@ -275,7 +275,7 @@ if __name__ == '__main__':
     if args.swarp:
         for target in primary_targets:
             run_swarp_all_filters(target)
-            # for debugging purposes
+            # break below is for debugging purposes
             #break
     if args.getzp:
         rfiles = glob.glob('VF*r.fits')
@@ -284,6 +284,15 @@ if __name__ == '__main__':
             os.system(getzpstring)
         
         rfiles = glob.glob('VF*Ha4.fits')
+        if len(rfiles) > 0:
+            for rf in rfiles:
+                getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument b --filter ha --normbyexptime'.format(rf)
+                os.system(getzpstring)
+
+        ##
+        # Halpha data from 2022 had Ha+4 nm as filter name
+        ##
+        rfiles = glob.glob('VF*Ha+4.fits')
         if len(rfiles) > 0:
             for rf in rfiles:
                 getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument b --filter ha --normbyexptime'.format(rf)

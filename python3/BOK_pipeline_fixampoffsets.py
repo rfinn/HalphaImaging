@@ -36,6 +36,8 @@ if image_name.find('r_v1') > -1:
     image_filter = 'r'
 if image_name.find('Ha+4nm') > -1:
     image_filter = 'ha'
+if image_name.find('Ha4nm') > -1:
+    image_filter = 'ha'
 dq_name = image_name.replace('ooi','ood')
 
 ### AMPS
