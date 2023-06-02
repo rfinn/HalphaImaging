@@ -190,7 +190,7 @@ def run_swarp(image_list,refimage=None):
 
 
     new_output_image = get_updated_BOK_coadd_name(output_image)
-    print('renaming ',output_image,'->',newname)
+    print('renaming ',output_image,'->',new_output_image)
     os.rename(output_image,new_output_image)
 
     newname = get_updated_BOK_coadd_name(output_weight_image)
