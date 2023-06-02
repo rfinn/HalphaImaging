@@ -97,7 +97,7 @@ for h in range(1,len(hdu)):
     hdu[h].header.set('FILTER',hdu[0].header['FILTER'])    
     hdu[h].writeto(f'{image_name_base}-temp{h}.fits',overwrite=True)
     medsubimage = 'm'+image_name
-    myargs = args(f'{image_name_base}-temp{h}.fits','i',image_filter,nexptime=True)
+    myargs = args(f'{image_name_base}-temp{h}.fits','b',image_filter,nexptime=True)
     print(f'running getzp on ccd {h}')
     zp = getzp.getzp(myargs)
 
