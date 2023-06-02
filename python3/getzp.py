@@ -172,7 +172,7 @@ class args():
         self.fit = False
         self.flatten = 0
         self.norder = 2
-        
+        self.nofixbok = False
 
 class getzp():
     def __init__(self, args):
@@ -261,7 +261,8 @@ class getzp():
             print('')        
             print('STATUS: udating header')
         if self.instrument == 'b':
-            self.check_90prime_ccds()
+            if not args.nofixbok:
+                self.check_90prime_ccds()
             self.runse()
             self.match_coords()
             self.fitzp(plotall=True)
@@ -983,6 +984,7 @@ def main(raw_args=None):
     parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2'])    
     parser.add_argument('--verbose',dest = 'verbose', default = False, action = 'store_true',help = 'print extra debug/status statements')
     parser.add_argument('--getrefcatonly',dest = 'getrefcatonly',default=False,action='store_true',help='download reference PANSTARRS catalog only.  use this before running with slurm')
+    parser.add_argument('--nofixbok',dest = 'fixbok',default=False,action='store_true',help='fix offset b/w bok amps')    
     args = parser.parse_args(raw_args)
     #zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
     zp = getzp(args)
@@ -993,28 +995,4 @@ def main(raw_args=None):
 
 
 if __name__ == '__main__':
-    #main()
-    parser = argparse.ArgumentParser(description ='Run sextractor, get Pan-STARRS catalog, and then computer photometric ZP\n \n from within ipython: \n %run ~/github/Virgo/programs/getzp.py --image pointing031-r.coadd.fits --instrument i \n \n The y intercept is -1*ZP. \n \n x and y data can be accessed at zp.x and zp.y in case you want to make additional plots.', formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument('--image', dest = 'image', default = 'test.coadd.fits', help = 'Image for ZP calibration')
-    parser.add_argument('--instrument', dest = 'instrument', default = None, help = 'HDI = h, KPNO mosaic = m, INT = i, BOK 90Prime = b')
-    parser.add_argument('--catalog', dest = 'catalog', default = None, help = 'photometric catalog to use for bootrapping photometry')    
-    parser.add_argument('--fwhm', dest = 'fwhm', default = None, help = 'image FWHM in arcseconds.  Default is none, then SE assumes 1.5 arcsec')    
-    parser.add_argument('--filter', dest = 'filter', default = 'R', help = 'filter (R or r; use ha for Halpha)')
-    parser.add_argument('--useri',dest = 'useri', default = False, action = 'store_true', help = 'Use r->R transformation as a function of r-i rather than the g-r relation.  g-r is the default.')
-    parser.add_argument('--normbyexptime', dest = 'normbyexptime', default = False, action = 'store_true', help = "set this flag if the image is in ADU rather than ADU/s, and the program will then normalize by the exposure time.  Note: swarp produces images in ADU/s, so this is usually not necessary if using coadds from swarp.")
-    parser.add_argument('--mag', dest = 'mag', default = 0,help = "select SE magnitude to use when solving for ZP.  0=MAG_APER,1=MAG_BEST,2=MAG_PETRO.  Default is MAG_APER ",choices=['0','1','2'])
-    parser.add_argument('--naper', dest = 'naper', default = 5,help = "select fixed aperture magnitude.  0=10pix,1=12pix,2=15pix,3=20pix,4=25pix,5=30pix.  Default is 5 (30 pixel diameter)")
-    parser.add_argument('--nsigma', dest = 'nsigma', default = 3.5, help = 'number of std to use in iterative rejection of ZP fitting.  default is 3.5')
-    parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
-    parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
-    parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT data from 2022 does not seem to show it either.',choices=['0','1','2'])    
-    parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2'])    
-    parser.add_argument('--verbose',dest = 'verbose', default = False, action = 'store_true',help = 'print extra debug/status statements')
-    parser.add_argument('--getrefcatonly',dest = 'getrefcatonly',default=False,action='store_true',help='download reference PANSTARRS catalog only.  use this before running with slurm')
-    args = parser.parse_args()
-    #zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
-    zp = getzp(args)
-
-    zp.getzp()
-    print('ZP = {:.3f} +/- {:.3f}, {}'.format(-1*zp.zp,zp.zperr,zp.image))
-    #return zp,-1*zp.zp,zp.zperr
+    main()
