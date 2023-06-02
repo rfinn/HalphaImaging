@@ -319,7 +319,8 @@ if __name__ == '__main__':
     parser.add_argument('--getzp', dest = 'getzp', default = False, action='store_true',help = 'run getzp to determine photometric zp of r and Halpha images')                    
     args = parser.parse_args()
 
-        
+
+    print('command: gethead -a object exptime FILTER RA DEC '+args.filestring+'*ooi*v1.fits > header_info')
     os.system('gethead -a object exptime FILTER RA DEC '+args.filestring+'*ooi*v1.fits > header_info')
     filetable = Table.read('header_info',data_start=0,delimiter=' ',format='ascii',guess=False,fast_reader=False,names=['FILENAME','OBJECT','EXPTIME','FILTER','RA','DEC'])
 
