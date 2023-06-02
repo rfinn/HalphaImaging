@@ -92,12 +92,31 @@ firstpass = True
 print("")
 #print(f"RA = {hdu[0].header['CRVAL1']:.6f}
 for h in range(1,len(hdu)):
+    ##
+    # this is stepping through each CCD and running getzp separately on it
+    # it then stores the ZP of each image
+    # and will scale the images so that each CCD has the same ZP
+    #
+    # but this doesn't account for the variations in each amplifier, does it?
+    # that is taken care of in the next section.
+    # here we just save the x and y positions and residuals so that amp
+    # adjustment can be made below.
+    ##
     hdu[h].header.set('EXPTIME',hdu[0].header['EXPTIME'])
     hdu[h].header.set('OBJECT',hdu[0].header['OBJECT'])
-    hdu[h].header.set('FILTER',hdu[0].header['FILTER'])    
+    hdu[h].header.set('FILTER',hdu[0].header['FILTER'])
+    ##
+    # write out the individual ccd image to use as input to getzp
+    ##
     hdu[h].writeto(f'{image_name_base}-temp{h}.fits',overwrite=True)
     medsubimage = 'm'+image_name
-    myargs = args(f'{image_name_base}-temp{h}.fits','b',image_filter,nexptime=True)
+
+    ##
+    # set up arguments to pass into getzp
+    # using instrument=i b/c we don't have the full image yet
+    # for getzp to help normalize
+    ##
+    myargs = args(f'{image_name_base}-temp{h}.fits','i',image_filter,nexptime=True)
     print(f'running getzp on ccd {h}')
     zp = getzp.getzp(myargs)
 
@@ -107,18 +126,16 @@ for h in range(1,len(hdu)):
     allresidx.append(zp.residual_allx)
     allresidy.append(zp.residual_ally)
     allzp.append(-1*zp.zp)
+##
 # get global median for all ccds, so that ccds are normed relative to each other
+##
 zp_ref = np.mean(np.array(allzp))
 global_med = np.median(allresid1d)
 print(f"global median for all ccds = {global_med:.3f}")
 for h in range(1,len(hdu)):
-    # calculate offset for each amp
-    #    residual_all = 10.**((magfit - yplot)/2.5)        
-    #    self.residual_all = residual_all
-    #    plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
-
-
+    ##
     # calculate the offset for each amplifier and scale the data accordingly
+    ##
     quad = 0
     print(f"CCD {h}:")
     ccd_med = np.ma.median(allresid[h-1])
@@ -139,12 +156,16 @@ for h in range(1,len(hdu)):
             amp_scale = ccd_med/amp_med * zp_scale
 
             print(f"\tmedian and scale for quadrant {quad} = {amp_med:.3f} {amp_scale:.3f}")
-            # scale the data
-            # scale the image and ivar accordingly            
+            ##
+            # scale the data so that each ccd/amp has the same ZP
+            # scale the image and ivar accordingly
+            ##
             hdu[h].data[ymin:ymax,xmin:xmax] = amp_scale*hdu[h].data[ymin:ymax,xmin:xmax]
 
+            ##
             # what is the correct way to scale the weights?  same as image or inverse???
             # in the weight image, high numbers are good
+            ##
             ihdu[h].data[ymin:ymax,xmin:xmax] = amp_scale*ihdu[h].data[ymin:ymax,xmin:xmax]
             quad += 1
 

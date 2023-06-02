@@ -487,7 +487,7 @@ class getzp():
         ###################################################################
         if self.verbose:
             print(f'\t matched {np.sum(self.matchflag)} objects')
-        self.fitflag = self.matchflag  & (self.pan['rmag'] > 15) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.matchedarray1['CLASS_STAR'] > 0.95) & (self.pan['rmag'] < 17.5) #& (self.matchedarray1['MAG_AUTO'] > -11.)
+        self.fitflag = self.matchflag  & (self.pan['rmag'] > 15) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.pan['rmag'] < 17.5) #& (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.matchedarray1['MAG_AUTO'] > -11.)
         if self.verbose:
             print(f'\t number that pass fit {np.sum(self.fitflag)}')
         # for WFC on INT, restrict area to central region
@@ -502,7 +502,6 @@ class getzp():
         #        (self.matchedarray1['Y_IMAGE'] > self.keepsection[2]) & \
         #        (self.matchedarray1['Y_IMAGE'] < self.keepsection[3])
         #    self.fitflag = self.fitflag & self.goodarea_flag
-        
     def color_correct_panstarrs(self):
         """
         correcting panstarrs magnitudes into the observed filter systems using conversions from M. Fossati  
@@ -582,6 +581,13 @@ class getzp():
             print("setting instrumental r mag to panstarrs r mag")
             print()
             self.R = self.pan['rmag']
+    def plot_se_pan(self):
+        plt.figure()
+        x = self.R[self.matchflag]
+        y = self.matchedarray1['MAG_APER'][:,self.naper][self.matchflag]
+        plt.plot(x,y,'bo')
+        plt.xlabel('Corrected PanSTARRS Magnitude')
+        plt.ylabel('SE Magnitude')
             
     def plot_fitresults(self, x, y, yerr=None, polyfit_results = [0,0],color=None):
         # plot best-fit results
