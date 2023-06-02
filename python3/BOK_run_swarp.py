@@ -36,6 +36,12 @@ added file and median-subtracted file back into main directory
 
 #####################
 
+2023-06-02
+
+* Reducing 2022 data on draco (new server)
+
+* updating code to run in multiprocessing mode to take advantage of server
+
 '''
 
 import os
@@ -48,8 +54,31 @@ from astropy.wcs import WCS
 from astropy.time import Time
 
 
+mcombine_results = []
+def mcombine_collect_results(result):
 
-def combine_masks(weight_image,dq_image):
+    global results
+    mcombine_results.append(result)
+
+swarp_results = []
+def swarp_collect_results(result):
+
+    global results
+    swarp_results.append(result)
+
+getzp_results = []
+def getzp_collect_results(result):
+
+    global results
+    getzp_results.append(result)
+
+getzp_results2 = []
+def getzp_collect_results2(result):
+
+    global results
+    getzp_results2.append(result)
+
+def combine_masks(imname):
     '''
     combine the weight and data quality image
     combined weight = weight_image + 1000*data_quality_image
@@ -63,32 +92,48 @@ def combine_masks(weight_image,dq_image):
     OUTPUT:
     * combined_weight.fits : this is the combined weight image
     
+
+    2023-06-02: updating to use multiprocessing
+
     '''
+
+    combined_mask = imname.replace('.fits','.combweight.fits')
+    #combined_mask = 'm'+combined_mask
+    if os.path.exists(combined_mask):
+        print('output image already exists: ',combined_mask)
+        print('proceeding to next image')
+        print()
+        return
+    else:
+        weight_image = imname.replace('ooi','oow')
+        dq_image = imname.replace('ooi','ood')
+        combine_masks(weight_image,dq_image)
+        # prepend the m to match the name of the median subtracted image
+        os.rename('combined_weight.fits',combined_mask)
+    
     weight_hdu = fits.open(weight_image)
     dq_hdu = fits.open(dq_image)
     
     # loop over the 4 images, extensions 1-4
     for i in range(1,5):
-        print('combining image number ',i)
+        #print('combining image number ',i)
         weight_hdu[i].data = weight_hdu[i].data + 1000*dq_hdu[i].data
     weight_hdu.writeto('combined_weight.fits',overwrite=True)
 
 def combine_all_masks(filelist):
-    for f in filelist:
 
-        combined_mask = f.replace('.fits','.combweight.fits')
-        #combined_mask = 'm'+combined_mask
-        if os.path.exists(combined_mask):
-            print('output image already exists: ',combined_mask)
-            print('proceeding to next image')
-            print()
-            continue
-        else:
-            weight_image = f.replace('ooi','oow')
-            dq_image = f.replace('ooi','ood')
-            combine_masks(weight_image,dq_image)
-            # prepend the m to match the name of the median subtracted image
-            os.rename('combined_weight.fits',combined_mask)
+    ##
+    # implement multiprocessing
+    ##
+
+    mcombine_pool = mp.Pool(mp.cpu_count())
+    myresults = [mcombine_pool.apply_async(combine_masks,args=(im,),callback=mcombine_collect_results) for im in filelist]
+    
+    mcombine_pool.close()
+    mcombine_pool.join()
+    mcombine_results = [r.get() for r in myresults]
+    return mcombine_results
+
 def run_swarp(image_list,refimage=None):
     '''
 
@@ -159,7 +204,10 @@ def run_swarp_all_filters(target):
     * image_list : list containing r-band images, like VFID0422_r
 
     PROCEDURE:
-    * run swarp on r-band image, then run on Halpha using r as reference, then rerun on r using r as reference
+    * run swarp on r-band image, 
+    * then run on Halpha using r as reference, 
+    * then rerun on r using r as reference
+
     '''
     # run swarp on r-band mosaic
     rfilelist = target
@@ -216,6 +264,10 @@ def write_filelists(targets,header_table,medsub=False):
         weightfile.close()
 
 
+def getonezp(imname,filter):
+    getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument b --filter {} --normbyexptime'.format(imname,filter)
+    os.system(getzpstring)
+    
 
 if __name__ == '__main__':
     telescope = 'BOK'
@@ -264,7 +316,7 @@ if __name__ == '__main__':
     if args.combinemasks:
         # combine masks
         # this combines weight image and bad pixel masks
-        combine_all_masks(filetable['FILENAME'])
+        mcombine_results = combine_all_masks(filetable['FILENAME'])
     
     #print(targets)
     # need to update to write median-subtracted images to filelist instead of ksb files
@@ -273,31 +325,36 @@ if __name__ == '__main__':
 
 
     if args.swarp:
-        for target in primary_targets:
-            run_swarp_all_filters(target)
+        #for target in primary_targets:
+        #    run_swarp_all_filters(target)
             # break below is for debugging purposes
             #break
+        
+        swarp_pool = mp.Pool(mp.cpu_count())
+        swresults = [swarp_pool.apply_async(run_swarp_all_filters,args=(target,),callback=swarp_collect_results) for target in primary_targets]
+    
+        swarp_pool.close()
+        swarp_pool.join()
+        swarp_results = [r.get() for r in swresults]
+
+        
     if args.getzp:
         rfiles = glob.glob('VF*r.fits')
-        for rf in rfiles:
-            getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument b --filter r --normbyexptime'.format(rf)
-            os.system(getzpstring)
+        getzp_pool = mp.Pool(mp.cpu_count())
+        zpresults = [getzp_pool.apply_async(getonezp,args=(imname,'r'),callback=getzp_collect_results) for imname in rfiles]
+    
+        getzp_pool.close()
+        getzp_pool.join()
+        getzp_results = [r.get() for r in zpresults]
         
-        rfiles = glob.glob('VF*Ha4.fits')
-        if len(rfiles) > 0:
-            for rf in rfiles:
-                getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument b --filter ha --normbyexptime'.format(rf)
-                os.system(getzpstring)
+        hfiles = glob.glob('VF*Ha4.fits')
+        getzp_pool2 = mp.Pool(mp.cpu_count())
+        zpresults2 = [getzp_pool2.apply_async(getonezp,args=(imname,'ha'),callback=getzp_collect_results2) for imname in hfiles]
+    
+        getzp_pool2.close()
+        getzp_pool2.join()
+        getzp_results = [r.get() for r in zpresults2]
 
-        ##
-        # Halpha data from 2022 had Ha+4 nm as filter name
-        ##
-        rfiles = glob.glob('VF*Ha+4.fits')
-        if len(rfiles) > 0:
-            for rf in rfiles:
-                getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument b --filter ha --normbyexptime'.format(rf)
-                os.system(getzpstring)
-        
 
             
         
