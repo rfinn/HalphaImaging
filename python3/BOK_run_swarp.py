@@ -368,7 +368,7 @@ if __name__ == '__main__':
             #break
         
         swarp_pool = mp.Pool(mp.cpu_count())
-        swresults = [swarp_pool.apply_async(run_swarp_all_filters,args=(target,),callback=swarp_collect_results) for target in primary_targets]
+        swresults = [swarp_pool.apply_async(run_swarp_all_filters,args=(target,),callback=swarp_collect_results) for target in primary_targets[:2]
     
         swarp_pool.close()
         swarp_pool.join()
@@ -384,7 +384,10 @@ if __name__ == '__main__':
         getzp_pool.join()
         getzp_results = [r.get() for r in zpresults]
         
-        hfiles = glob.glob('VF*Ha4.fits')
+        #hfiles = glob.glob('VF*Ha4.fits')
+        ##
+        # 2022 data have Ha4nm
+        hfiles = glob.glob('VF*Ha4nm.fits')
         getzp_pool2 = mp.Pool(mp.cpu_count())
         zpresults2 = [getzp_pool2.apply_async(getonezp,args=(imname,'ha'),callback=getzp_collect_results2) for imname in hfiles]
     
