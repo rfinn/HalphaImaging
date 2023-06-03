@@ -144,12 +144,18 @@ def run_swarp(image_list,refimage=None):
     '''
     print(image_list)
     vfid,filter = image_list.split('_')
+
+    
     weight_list = image_list+'_weights'
 
     # get date of observation from the first image in the list
     images = open(image_list,'r').readline()
     dateobs = images.split('_')[1]
     dateobs = '20'+dateobs
+
+    # remove the nm from Ha4nm
+    filter = filter.replace('nm','')
+    
     os.system('cp ~/github/HalphaImaging/astromatic/default.swarp.BOK .')
 
     ##
@@ -185,20 +191,12 @@ def run_swarp(image_list,refimage=None):
     print('Running scamp with the following command:\n',commandstring)
     os.system(commandstring)
 
-    # get RA and DEC of output image, and then rename output image
 
 
 
-    new_output_image = get_updated_BOK_coadd_name(output_image)
-    print('renaming ',output_image,'->',new_output_image)
-    os.rename(output_image,new_output_image)
 
-    newname = get_updated_BOK_coadd_name(output_weight_image)
-    print('renaming ',output_weight_image,'->',newname)
-    os.rename(output_weight_image,newname)
     
-    
-    return new_output_image
+    return output_image
 
 def get_updated_BOK_coadd_name(imname):
     f = imname
@@ -251,7 +249,7 @@ def run_swarp_all_filters(target):
     '''
     # run swarp on r-band mosaic
     rfilelist = target
-    ### rband_coadd = run_swarp(rfilelist)
+    rband_coadd = run_swarp(rfilelist)
 
     #try:
     # run swarp on Halpha, using r-band mosaic as ref image
@@ -261,24 +259,32 @@ def run_swarp_all_filters(target):
         if not os.path.exists(hafilelist):
             print("Warning - couldn't find Halpha images")
             return
-    ### ha_coadd = run_swarp(hafilelist,refimage=rband_coadd)
+    ha_coadd = run_swarp(hafilelist,refimage=rband_coadd)
     
     # run swarp on r-band, using r-band mosaic as ref image
-
-    # update_header had an error so just want to rerun that part
-    #rband_coadd = run_swarp(rfilelist,refimage=rband_coadd)
+    rband_coadd = run_swarp(rfilelist,refimage=rband_coadd)
 
     # update headers
+    # but how does ref image have a 
+    
     refimage = open(rfilelist).readline().rstrip()
     update_header(rband_coadd,refimage)
     
     refimage = open(hafilelist).readline().rstrip()
     update_header(ha_coadd,refimage)
-    #except FileNotFoundError:
-    #    print()
-    #    print("Warning - couldn't find Halpha images")
-    #    print()
-        
+
+    ##
+    # rename r-band coadd using the updated naming convention
+    # that includes RA and DEC
+    ##
+    new_output_image = get_updated_BOK_coadd_name(ha_coadd)
+    print('renaming ',ha_coadd,'->',new_output_image)
+    os.rename(ha_coadd,new_output_image)
+
+    newname = get_updated_BOK_coadd_name(rband_coadd)
+    print('renaming ',rband_coadd,'->',newname)
+    os.rename(rband_coadd,newname)
+
 
 def count_lines(fname):
     with open(fname) as f:
