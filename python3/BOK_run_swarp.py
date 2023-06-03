@@ -253,6 +253,11 @@ def run_swarp_all_filters(target):
     #try:
     # run swarp on Halpha, using r-band mosaic as ref image
     hafilelist = target.replace('_r','_Ha4')
+    if not os.path.exists(hafilelist):
+        hafilelist = target.replace('_r','_Ha4nm')
+        if not os.path.exists(hafilelist):
+            print("Warning - couldn't find Halpha images")
+            return
     ha_coadd = run_swarp(hafilelist,refimage=rband_coadd)
     
     # run swarp on r-band, using r-band mosaic as ref image
