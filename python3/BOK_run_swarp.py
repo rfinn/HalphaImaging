@@ -250,24 +250,24 @@ def run_swarp_all_filters(target):
     rfilelist = target
     rband_coadd = run_swarp(rfilelist)
 
-    try:
-        # run swarp on Halpha, using r-band mosaic as ref image
-        hafilelist = target.replace('_r','_Ha4')
-        ha_coadd = run_swarp(hafilelist,refimage=rband_coadd)
+    #try:
+    # run swarp on Halpha, using r-band mosaic as ref image
+    hafilelist = target.replace('_r','_Ha4')
+    ha_coadd = run_swarp(hafilelist,refimage=rband_coadd)
     
-        # run swarp on r-band, using r-band mosaic as ref image
-        rband_coadd = run_swarp(rfilelist,refimage=rband_coadd)
+    # run swarp on r-band, using r-band mosaic as ref image
+    rband_coadd = run_swarp(rfilelist,refimage=rband_coadd)
 
-        # update headers
-        refimage = open(rfilelist).readline().rstrip()
-        update_header(rband_coadd,refimage)
-
-        refimage = open(hafilelist).readline().rstrip()
-        update_header(ha_coadd,refimage)
-    except FileNotFoundError:
-        print()
-        print("Warning - couldn't find Halpha images")
-        print()
+    # update headers
+    refimage = open(rfilelist).readline().rstrip()
+    update_header(rband_coadd,refimage)
+    
+    refimage = open(hafilelist).readline().rstrip()
+    update_header(ha_coadd,refimage)
+    #except FileNotFoundError:
+    #    print()
+    #    print("Warning - couldn't find Halpha images")
+    #    print()
         
 
 def count_lines(fname):
@@ -369,7 +369,7 @@ if __name__ == '__main__':
             #break
         
         swarp_pool = mp.Pool(mp.cpu_count())
-        swresults = [swarp_pool.apply_async(run_swarp_all_filters,args=(target,),callback=swarp_collect_results) for target in primary_targets[:2]]
+        swresults = [swarp_pool.apply_async(run_swarp_all_filters,args=(target,),callback=swarp_collect_results) for target in primary_targets[:1]]
     
         swarp_pool.close()
         swarp_pool.join()
