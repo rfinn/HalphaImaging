@@ -106,7 +106,7 @@ def combine_masks(imname):
         print()
         return
     else:
-        print("combinging weights for ",imname)
+        print("combining weights for ",imname)
         weight_image = imname.replace('ooi','oow')
         dq_image = imname.replace('ooi','ood')
         weight_hdu = fits.open(weight_image)
