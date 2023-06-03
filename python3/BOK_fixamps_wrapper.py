@@ -21,10 +21,10 @@ def processone(image):
     #image = filelist[i]
     outimage = 'zm'+image
     #print("processing ",image)
-    #if os.path.exists(outimage):
-    #    print(f'{outimage} found - moving to next object')
-    #else:
-    #    print(f"processing {image} -> {outimage}")
+    if os.path.exists(outimage):
+        print(f'{outimage} found - moving to next object')
+    else:
+        print(f"processing {image} -> {outimage}")
     
     program= f"{HOME}/github/HalphaImaging/python3/BOK_pipeline_fixampoffsets.py"    
     cmd = f"python {program} {image} r"
