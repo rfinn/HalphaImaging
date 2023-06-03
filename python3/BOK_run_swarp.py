@@ -231,7 +231,10 @@ def update_header(image,refimage):
     rheader = fits.getheader(refimage)
 
     for f in header_fields:
-        iheader.set(f,rheader[f])
+        try:
+            iheader.set(f,rheader[f])
+        except KeyError:
+            print(f"WARNING: Keyword {f} not found")
     fits.writeto(image,idata,header=iheader,overwrite=True)
 
     
@@ -248,7 +251,7 @@ def run_swarp_all_filters(target):
     '''
     # run swarp on r-band mosaic
     rfilelist = target
-    rband_coadd = run_swarp(rfilelist)
+    ### rband_coadd = run_swarp(rfilelist)
 
     #try:
     # run swarp on Halpha, using r-band mosaic as ref image
@@ -258,10 +261,12 @@ def run_swarp_all_filters(target):
         if not os.path.exists(hafilelist):
             print("Warning - couldn't find Halpha images")
             return
-    ha_coadd = run_swarp(hafilelist,refimage=rband_coadd)
+    ### ha_coadd = run_swarp(hafilelist,refimage=rband_coadd)
     
     # run swarp on r-band, using r-band mosaic as ref image
-    rband_coadd = run_swarp(rfilelist,refimage=rband_coadd)
+
+    # update_header had an error so just want to rerun that part
+    #rband_coadd = run_swarp(rfilelist,refimage=rband_coadd)
 
     # update headers
     refimage = open(rfilelist).readline().rstrip()
