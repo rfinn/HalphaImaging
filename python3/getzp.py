@@ -90,7 +90,7 @@ zpfuncwithslope = lambda x, m, zp: m*x + zp
 
 pixelscale = {'HDI':0.43, 'INT':0.331, 'BOK':0.45252} 
 
-def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=20,
+def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=19,
                     maxsources=10000):
     """
     FOUND THIS ON THE WEB 
@@ -173,7 +173,7 @@ class args():
         self.flatten = 0
         self.norder = 2
         self.nofixbok = False
-
+        
 class getzp():
     def __init__(self, args):
         
@@ -223,8 +223,8 @@ class getzp():
         self.flatten = int(args.flatten)
         self.norder = int(args.norder)
         self.fwhm = args.fwhm
-        self.fixbok = ~args.nofixbok
-
+        self.fixbok = not(args.nofixbok)
+        self.args = args
         global v1, v2
         if self.filter == 'ha':
             v1 = .9
@@ -249,6 +249,7 @@ class getzp():
             print('')        
             print('STATUS: getting panstarrs')
         self.get_panstarrs()
+        self.plot_se_pan_positions()
         if self.verbose:
             print('')        
             print('STATUS: matching se cat to panstarrs')       
@@ -262,7 +263,7 @@ class getzp():
             print('STATUS: udating header')
         if self.instrument == 'b':
             if self.fixbok:  
-                print("checking 90prime ccds...",args.nofixbok)
+                print("checking 90prime ccds...",self.fixbok)
                 self.check_90prime_ccds()
             self.runse()
             self.match_coords()
@@ -418,6 +419,8 @@ class getzp():
         # NOTE - radius is with width of the rectangular
         # search area.  This is not a circular search, as I orginally thought.
         self.radius = np.sqrt(2)*max((maxRA - minRA), (maxDEC - minDEC))/2
+        # fixing to be compatible with box search geometry
+        self.width = max((maxRA - minRA), (maxDEC - minDEC))
     def get_panstarrs(self):
 
         ###################################
@@ -459,7 +462,7 @@ class getzp():
             #else:
             print()
             print("no previous panstarrs catalog found :(")
-            self.pan = panstarrs_query(self.centerRA, self.centerDEC, self.radius)
+            self.pan = panstarrs_query(self.centerRA, self.centerDEC, self.width)
             ptab = Table(self.pan)
             ptab.write(ptab_name,format='csv',overwrite=True)
         self.color_correct_panstarrs()
@@ -590,7 +593,24 @@ class getzp():
         plt.plot(x,y,'bo')
         plt.xlabel('Corrected PanSTARRS Magnitude')
         plt.ylabel('SE Magnitude')
-            
+
+    def plot_se_pan_positions(self):
+        """plot positions of SE and panstarrs catalogs  """
+        plt.figure(figsize=(10,10))
+        plt.plot(self.pan['RAJ2000'],self.pan['DEJ2000'],'bo',markersize=10,mfc='None',label='PanSTARRS')
+        
+        plt.plot(self.secat['ALPHA_J2000'],self.secat['DELTA_J2000'],'r.',label='SE')
+        plt.legend()
+        plt.gca().invert_xaxis()
+        #print(f"number of matched sources = {np.sum(zp.matchflag)}")
+
+        # add circle
+
+        circle1 = plt.Circle((self.centerRA, self.centerDEC), self.radius, color='c',alpha=.2)
+        plt.gca().add_patch(circle1)
+
+        plt.savefig('plots/'+self.plotprefix.replace('.fits','')+'se-pan-positions.png')        
+        
     def plot_fitresults(self, x, y, yerr=None, polyfit_results = [0,0],color=None):
         # plot best-fit results
         #print(f"inside plot_fitresults, len(x) = {len(x)}, len(color)={len(color)}")
@@ -1002,7 +1022,7 @@ if __name__ == '__main__':
     # many of Halpha images from BOK2022 are failing
     # need to see why
     ##
-    
+
     parser = argparse.ArgumentParser(description ='Run sextractor, get Pan-STARRS catalog, and then computer photometric ZP\n \n from within ipython: \n %run ~/github/Virgo/programs/getzp.py --image pointing031-r.coadd.fits --instrument i \n \n The y intercept is -1*ZP. \n \n x and y data can be accessed at zp.x and zp.y in case you want to make additional plots.', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--image', dest = 'image', default = 'test.coadd.fits', help = 'Image for ZP calibration')
     parser.add_argument('--instrument', dest = 'instrument', default = None, help = 'HDI = h, KPNO mosaic = m, INT = i, BOK 90Prime = b')
@@ -1030,4 +1050,5 @@ if __name__ == '__main__':
     print('ZP = {:.3f} +/- {:.3f}, {}'.format(-1*zp.zp,zp.zperr,zp.image))
     #return zp,-1*zp.zp,zp.zperr
 
+    # replicating main function for testing, so I can access zp in jupyter
     #main()

@@ -42,6 +42,11 @@ added file and median-subtracted file back into main directory
 
 * updating code to run in multiprocessing mode to take advantage of server
 
+2023-06-05
+
+* need to add options to run source extractor and scamp b/c some of pipeline images have bad wcs
+
+
 '''
 
 import os
@@ -67,6 +72,12 @@ def swarp_collect_results(result):
     global results
     swarp_results.append(result)
 
+se_results = []
+def se_collect_results(result):
+
+    global results
+    se_results.append(result)
+    
 getzp_results = []
 def getzp_collect_results(result):
 
@@ -324,7 +335,19 @@ def write_filelists(targets,header_table,medsub=False):
 def getonezp(imname,filter):
     getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument b --filter {} --normbyexptime'.format(imname,filter)
     os.system(getzpstring)
+
+
+def run_one_se(filename):
+    print(('RUNNING SEXTRACTOR ON FILE %i OF %i'%(i,nfiles)))
+    t = filename.split('.fits')
+    froot = t[0]
+    # DONE:TODO - check what needs to be updated in default.sex.INT - checked this an it's all ok
+    os.system('sex ' + filename + ' -c default.sex.INT -CATALOG_NAME ' + froot + '.cat')
     
+
+
+
+
 
 if __name__ == '__main__':
     telescope = 'BOK'
@@ -335,12 +358,14 @@ if __name__ == '__main__':
     parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true',help = 'set this to subtract the median from images.')
     parser.add_argument('--combinemasks', dest = 'combinemasks', default = False, action='store_true',help = 'set this to combine weight image and bad pixel mask.')
     parser.add_argument('--sortfiles', dest = 'sortfiles', default = False, action='store_true',help = 'write image and weights to files')
+    parser.add_argument('--se', dest = 'se', default = False, action='store_true',help = 'run source extractor to create catalogs for scamp')
+    parser.add_argument('--scamp', dest = 'scamp', default = False, action='store_true',help = 'run scamp to solve for WCS')
     parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true',help = 'run swarp to create coadded images')
     parser.add_argument('--getzp', dest = 'getzp', default = False, action='store_true',help = 'run getzp to determine photometric zp of r and Halpha images')                    
     args = parser.parse_args()
 
 
-    print('command: gethead -a object exptime FILTER RA DEC '+args.filestring+'*ooi*v1.fits > header_info')
+    #print('command: gethead -a object exptime FILTER RA DEC '+args.filestring+'*ooi*v1.fits > header_info')
     os.system('gethead -a object exptime FILTER RA DEC '+args.filestring+'*ooi*v1.fits > header_info')
     filetable = Table.read('header_info',data_start=0,delimiter=' ',format='ascii',guess=False,fast_reader=False,names=['FILENAME','OBJECT','EXPTIME','FILTER','RA','DEC'])
 
@@ -370,18 +395,39 @@ if __name__ == '__main__':
         # subtract median
         os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_r_v1.fits'))
         #os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_Ha+4nm_v1.fits'))
-    
+        
     if args.combinemasks:
         # combine masks
         # this combines weight image and bad pixel masks
         mcombine_results = combine_all_masks(filetable['FILENAME'])
+
+ 
+    if args.se:
+        filelist = glob.glob('mksb*v1.fits')
+        filelist.sort()
+        print(f"found {len(filelist)} files to run source extractor on")
+        se_pool = mp.Pool(mp.cpu_count())
+        seresults = [se_pool.apply_async(run_one_se,args=(filename,),callback=swarp_collect_results) for filename in filelist]
     
+        swarp_pool.close()
+        swarp_pool.join()
+        swarp_results = [r.get() for r in swresults]
+       
+
+    if args.scamp:
+
+        os.system('ls '+args.filestring+'*.cat > scamp_input_cats')
+        print('RUNNING SCAMP')
+        # TODO - check to see what needs to be updated in default.scamp.INT
+        os.system('scamp @scamp_input_cats -c default.scamp.INT')
+        pass
+
     #print(targets)
     # need to update to write median-subtracted images to filelist instead of ksb files
     if args.sortfiles:
         write_filelists(targets,filetable,medsub=args.submedian)
 
-
+        
     if args.swarp:
         #for target in primary_targets:
         #    run_swarp_all_filters(target)
