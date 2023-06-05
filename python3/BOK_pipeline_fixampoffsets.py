@@ -65,7 +65,7 @@ class args():
         self.fit = False
         self.flatten = 0
         self.norder = 2
-        
+        self.nofixbok = True
 
 #################################################################
 ### MAIN PROGRAM
@@ -118,7 +118,12 @@ for h in range(1,len(hdu)):
     # using instrument=i b/c we don't have the full image yet
     # for getzp to help normalize
     ##
-    myargs = args(f'{image_name_base}-temp{h}.fits','i',image_filter,nexptime=True)
+
+    # NOTE:
+    # changing instrument from 'i' to 'b' so that color corrections are appropriate
+    # I added a flag in getzp to allow us to skip the function that adjust for amp offsets
+    # in the coadded image, as opposed to the MEF images that we are working with here
+    myargs = args(f'{image_name_base}-temp{h}.fits','b',image_filter,nexptime=True)
     print(f'running getzp on ccd {h}')
     zp = getzp.getzp(myargs)
 

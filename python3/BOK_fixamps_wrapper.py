@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+python ~/github/HalphaImaging/python3/BOK_pipeline_fixampoffsets.py ksb_220424_084501_ooi_Ha4nm_v1.fits
 
 import os
 import subprocess
