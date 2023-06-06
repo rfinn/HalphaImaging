@@ -5,6 +5,9 @@ USAGE:
 
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --se
 
+python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --scamp
+
+
 
 ORGANIZING DATA
 * working in /mnt/qnap_home/rfinn/Halpha/Bok
@@ -203,7 +206,7 @@ def run_swarp(image_list,refimage=None):
 
 
     print('')
-    print('Running scamp with the following command:\n',commandstring)
+    print('Running swarp with the following command:\n',commandstring)
     os.system(commandstring)
 
 
@@ -422,7 +425,7 @@ if __name__ == '__main__':
         os.system('ls '+args.filestring+'*.cat > scamp_input_cats')
         print('RUNNING SCAMP')
         # TODO - check to see what needs to be updated in default.scamp.INT
-        os.system('scamp @scamp_input_cats -c default.scamp.INT')
+        os.system('scamp @scamp_input_cats -c default.scamp.BOK')
         pass
 
     if args.combinemasks:
