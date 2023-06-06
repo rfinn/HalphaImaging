@@ -3,7 +3,9 @@
 '''
 USAGE:
 
-python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring ksb --combinemasks
+# add subtract median, although at this point all files have had the median subtracted...
+
+python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --combinemasks
 
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --se
 
@@ -312,7 +314,7 @@ def run_swarp_all_filters(target):
     print('renaming ',rband_coadd,'->',newname)
     os.rename(rband_coadd,newname)
     # rename the weight file    
-    os.rename(rband_coadd.replace('.fits','.weight.fits'),new_output_image.replace('.fits','.weight.fits'))
+    os.rename(rband_coadd.replace('.fits','.weight.fits'),newname.replace('.fits','.weight.fits'))
 
 def count_lines(fname):
     with open(fname) as f:
