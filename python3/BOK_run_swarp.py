@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
 '''
+USAGE:
+
+python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --se
+
 
 ORGANIZING DATA
 * working in /mnt/qnap_home/rfinn/Halpha/Bok
@@ -338,7 +342,7 @@ def getonezp(imname,filter):
 
 
 def run_one_se(filename):
-    print(('RUNNING SEXTRACTOR ON FILE %i OF %i'%(i,nfiles)))
+    #print(('RUNNING SEXTRACTOR ON FILE %i OF %i'%(i,nfiles)))
     t = filename.split('.fits')
     froot = t[0]
     # DONE:TODO - check what needs to be updated in default.sex.INT - checked this an it's all ok
