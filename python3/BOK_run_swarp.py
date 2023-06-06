@@ -11,9 +11,13 @@ python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --se
 
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --scamp
 
-python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --sortfiles
+python ~/github/HalphaImaging/python3/BOK_run_swarp.py --fixamps
 
-python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --swarp
+python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --sortfiles
+
+python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --swarp
+
+python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --getzp
 
 
 
