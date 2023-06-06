@@ -32,9 +32,10 @@ def processone(image):
         print(f'{outimage} found - moving to next object')
     else:
         print(f"processing {image} -> {outimage}")
-    
-    program= f"{HOME}/github/HalphaImaging/python3/BOK_pipeline_fixampoffsets.py"    
-    cmd = f"python {program} {image} r"
+
+    # updating to use the new program
+    program= f"{HOME}/github/HalphaImaging/python3/BOK_fixampoffsets.py"    
+    cmd = f"python {program} {image}"
     os.system(cmd)
     return 1
     #cmds = ['python3', program,image]
@@ -45,7 +46,8 @@ def processone(image):
     #print(stderr.decode())
 def processall():
 
-    filelist = glob.glob('ksb*ooi*_v1.fits')
+    # changing prefix from ksb to mksb b/c this is run on median-subtracted images
+    filelist = glob.glob('mksb*ooi*_v1.fits')
     filelist.sort()
     print(f'found {len(filelist)} files to process...')
     #t = [image1 for image1 in filelist]
