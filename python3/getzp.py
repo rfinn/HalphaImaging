@@ -335,7 +335,7 @@ class getzp():
         elif self.instrument == 'm':
             defaultcat = 'default.sex.HDI'
         elif self.instrument == 'b':
-            defaultcat = 'default.sex.HDI'
+            defaultcat = 'default.sex.BOK'
         header = fits.getheader(self.image)
         try:
             expt = header['EXPTIME']
