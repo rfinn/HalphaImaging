@@ -399,19 +399,22 @@ if __name__ == '__main__':
         
  
     if args.se:
+        os.system('ln -s ~/github/HalphaImaging/astromatic/default.* .')        
         filelist = glob.glob('mksb*v1.fits')
         filelist.sort()
+        # link the astromatic files
+        
         print(f"found {len(filelist)} files to run source extractor on")
         se_pool = mp.Pool(mp.cpu_count())
-        seresults = [se_pool.apply_async(run_one_se,args=(filename,),callback=swarp_collect_results) for filename in filelist]
+        seresults = [se_pool.apply_async(run_one_se,args=(filename,),callback=se_collect_results) for filename in filelist]
     
-        swarp_pool.close()
-        swarp_pool.join()
-        swarp_results = [r.get() for r in swresults]
+        se_pool.close()
+        se_pool.join()
+        se_results = [r.get() for r in seresults]
        
 
     if args.scamp:
-
+        os.system('ln -s ~/github/HalphaImaging/astromatic/default.* .')        
         os.system('ls '+args.filestring+'*.cat > scamp_input_cats')
         print('RUNNING SCAMP')
         # TODO - check to see what needs to be updated in default.scamp.INT
