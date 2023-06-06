@@ -72,7 +72,7 @@ if image_name.find('Ha+4nm') > -1:
     image_filter = 'ha'
 if image_name.find('Ha4nm') > -1:
     image_filter = 'ha'
-dq_name = image_name.replace('ooi','ood')
+dq_name = image_name.replace('ooi','ood').replace('mksb','ksb')
 
 ### AMPS
 
@@ -108,6 +108,8 @@ allzp = []
 ccd_medians = np.zeros(len(hdu)-1)
 firstpass = True
 print("")
+print(f"found {len(hdu)} hdu extensions")
+print()
 #print(f"RA = {hdu[0].header['CRVAL1']:.6f}
 for h in range(1,len(hdu)):
     ##
