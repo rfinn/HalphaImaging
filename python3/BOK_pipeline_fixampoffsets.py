@@ -26,24 +26,8 @@ sys.path.append(homedir+'/github/HalphaImaging/python3/')
 from astropy.io import fits
 import numpy as np
 
-from subtract_median import subtract_median
+#from subtract_median import subtract_median
 import getzp
-
-image_name = sys.argv[1]
-ivar_name = image_name.replace('ooi','oow')
-
-if image_name.find('r_v1') > -1:
-    image_filter = 'r'
-if image_name.find('Ha+4nm') > -1:
-    image_filter = 'ha'
-if image_name.find('Ha4nm') > -1:
-    image_filter = 'ha'
-dq_name = image_name.replace('ooi','ood')
-
-### AMPS
-
-NAXIS1 = 4032
-NAXIS2 = 4096
 
 
 class args():
@@ -71,17 +55,49 @@ class args():
 ### MAIN PROGRAM
 #################################################################
 
-# subtract sky from each ccd
+
+image_name = sys.argv[1]
+ivar_name = image_name.replace('ooi','oow')
+if not os.path.exists(ivar_name):
+    ivar_name = image_name.replace('ooi','oow').replace('mksb','ksb')
+    if not os.path.exists(ivar_name):
+        print("")
+        print("WARNING: could not access ivar image")
+        print("\t exiting so you can fix this...")
+        print()
+        sys.exit()
+if image_name.find('r_v1') > -1:
+    image_filter = 'r'
+if image_name.find('Ha+4nm') > -1:
+    image_filter = 'ha'
+if image_name.find('Ha4nm') > -1:
+    image_filter = 'ha'
+dq_name = image_name.replace('ooi','ood')
+
+### AMPS
+
+NAXIS1 = 4032
+NAXIS2 = 4096
+
+
 files = [image_name]
-if not os.path.exists('m'+image_name):
-    subtract_median(files,overwrite=False,MEF=True)
-else:
-    print()
-    print(f"Found median-subtracted image for {image_name} - using this.")
-    print()
-    
+
+
+##
+# commenting the following code block
+# median subtraction should be done using BOK_run_swarp.py
+##
+# subtract sky from each ccd
+#if not os.path.exists('m'+image_name):
+#    subtract_median(files,overwrite=False,MEF=True)
+#else:
+#    print()
+#    print(f"Found median-subtracted image for {image_name} - using this.")
+#    print()
+
+
 # run getzp on each ccd
-hdu = fits.open('m'+image_name) # read in median-subtracted image
+hdu = fits.open(image_name) # read in median-subtracted image
 ihdu = fits.open(ivar_name) # read in median-subtracted image
 image_name_base = image_name.replace('.fits','')
 allresid = []
