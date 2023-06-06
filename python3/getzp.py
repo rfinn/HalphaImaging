@@ -335,6 +335,9 @@ class getzp():
         elif self.instrument == 'm':
             defaultcat = 'default.sex.HDI'
         elif self.instrument == 'b':
+            print("hey Rose - ")
+            print("using default.sex.BOK!!!")
+            print()
             defaultcat = 'default.sex.BOK'
         header = fits.getheader(self.image)
         try:
