@@ -7,6 +7,10 @@ python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --se
 
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --scamp
 
+python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --sortfiles
+
+python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --swarp
+
 
 
 ORGANIZING DATA
