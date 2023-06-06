@@ -356,10 +356,11 @@ if __name__ == '__main__':
     parser.add_argument('--filestring', dest = 'filestring', default = 'ksb', help = 'filestring to match. default is ksb')
         
     parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true',help = 'set this to subtract the median from images.')
-    parser.add_argument('--combinemasks', dest = 'combinemasks', default = False, action='store_true',help = 'set this to combine weight image and bad pixel mask.')
-    parser.add_argument('--sortfiles', dest = 'sortfiles', default = False, action='store_true',help = 'write image and weights to files')
     parser.add_argument('--se', dest = 'se', default = False, action='store_true',help = 'run source extractor to create catalogs for scamp')
     parser.add_argument('--scamp', dest = 'scamp', default = False, action='store_true',help = 'run scamp to solve for WCS')
+    parser.add_argument('--fixamps', dest = 'fixamps', default = False, action='store_true',help = 'fix ZP offsets between amplifiers in individual MEF images')    
+    parser.add_argument('--combinemasks', dest = 'combinemasks', default = False, action='store_true',help = 'set this to combine weight image and bad pixel mask.')
+    parser.add_argument('--sortfiles', dest = 'sortfiles', default = False, action='store_true',help = 'write image and weights to files')
     parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true',help = 'run swarp to create coadded images')
     parser.add_argument('--getzp', dest = 'getzp', default = False, action='store_true',help = 'run getzp to determine photometric zp of r and Halpha images')                    
     args = parser.parse_args()
@@ -394,13 +395,8 @@ if __name__ == '__main__':
     if args.submedian:
         # subtract median
         os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_r_v1.fits'))
-        #os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_Ha+4nm_v1.fits'))
+        os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_Ha4nm_v1.fits'))
         
-    if args.combinemasks:
-        # combine masks
-        # this combines weight image and bad pixel masks
-        mcombine_results = combine_all_masks(filetable['FILENAME'])
-
  
     if args.se:
         filelist = glob.glob('mksb*v1.fits')
@@ -420,6 +416,18 @@ if __name__ == '__main__':
         print('RUNNING SCAMP')
         # TODO - check to see what needs to be updated in default.scamp.INT
         os.system('scamp @scamp_input_cats -c default.scamp.INT')
+        pass
+
+    if args.combinemasks:
+        # combine masks
+        # this combines weight image and bad pixel masks
+        mcombine_results = combine_all_masks(filetable['FILENAME'])
+
+    # TODO - add a function to fix ZP offsets in individual images.
+    # like BOK_pipeline_fixampoffsets.py - but no median subtraction
+
+    if args.fixamps:
+        # call BOK_pipeline_fixampoffsets.py
         pass
 
     #print(targets)
