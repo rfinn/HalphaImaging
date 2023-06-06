@@ -185,6 +185,15 @@ ihdu.writeto('zm'+ivar_name,overwrite=True)
 
 shutil.copy(dq_name,'zm'+dq_name)
 
+
+# check to see if header files exist
+# if they do, then copy to have z prefix
+
+scamp_header = 'm'+image_name.replace('.fits','.head')
+if os.path.exists(scamp_header):
+    shutil.copy(scamp_header,'z'+scamp_header)
+
+
 # clean up temp files
 #for i in range(1,5):
 #    os.remove(f'{image_name_base}-temp{i}.fits')
