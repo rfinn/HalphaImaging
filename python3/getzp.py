@@ -52,6 +52,7 @@ query = 'SELECT TOP 10 ra, dec, u,g,r,i,z, flags_r FROM Star WHERE (clean = 1) A
 t = SDSS.query_sql(query, data_release=14)
 '''
 
+
 import argparse
 import os
 import numpy as np

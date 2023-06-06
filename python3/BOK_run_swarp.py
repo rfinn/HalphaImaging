@@ -348,7 +348,9 @@ def write_filelists(targets,header_table,medsub=True):
 
 
 def getonezp(imname,filter):
-    getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument b --filter {} --normbyexptime'.format(imname,filter)
+    #getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument b --filter {} --normbyexptime'.format(imname,filter)
+    # after running se and scamp, don't need to normalize by exptime
+    getzpstring = 'python ~/github/HalphaImaging/python3/getzp.py --image {} --instrument b --filter {} '.format(imname,filter)
     os.system(getzpstring)
 
 
@@ -480,7 +482,8 @@ if __name__ == '__main__':
         #hfiles = glob.glob('VF*Ha4.fits')
         ##
         # 2022 data have Ha4nm
-        hfiles = glob.glob('VF*Ha4nm.fits')
+        hfiles = glob.glob('VF*Ha4.fits')
+
         getzp_pool2 = mp.Pool(mp.cpu_count())
         zpresults2 = [getzp_pool2.apply_async(getonezp,args=(imname,'ha'),callback=getzp_collect_results2) for imname in hfiles]
     
