@@ -3,6 +3,8 @@
 '''
 USAGE:
 
+python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring ksb --combinemasks
+
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --se
 
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --scamp
@@ -322,7 +324,7 @@ def count_lines(fname):
         return 0
 
 
-def write_filelists(targets,header_table,medsub=False):
+def write_filelists(targets,header_table,medsub=True):
     for t in targets:
         # open file to store the list of science images
         outfile = open(t,'w')
@@ -333,11 +335,11 @@ def write_filelists(targets,header_table,medsub=False):
         # loop over the filenames and write each science and
         # weight image to the corresponding list
         for f in filenames:
-            if medsub:
-                outfile.write('m{} \n'.format(f))
-            else:
-                outfile.write('{} \n'.format(f))
-            combined_mask = f.replace('.fits','.combweight.fits')
+            #if medsub:
+            #    outfile.write('m{} \n'.format(f))
+            #else:
+            outfile.write('{} \n'.format(f))
+            combined_mask = f.replace('.fits','.combweight.fits').replace('mksb','ksb')
             weightfile.write('{} \n'.format(combined_mask))
         outfile.close()
         weightfile.close()
