@@ -447,8 +447,18 @@ if __name__ == '__main__':
     # like BOK_pipeline_fixampoffsets.py - but no median subtraction
 
     if args.fixamps:
+        # TODO - flesh this out!!!
         # call BOK_pipeline_fixampoffsets.py
-        pass
+
+        # just calling BOK_fixamps_wrapper.py should work
+        # b/c it will already look for median-subtracted images
+        #
+        #
+        # however, I will need to copy header files
+        # so they are associated with zmksb images
+        # before running swarp - otherwise swarp won't see them
+        #
+        os.system('python ~/github/HalphaImaging/python3/BOK_fixamps_wrapper.py')
 
     #print(targets)
     # need to update to write median-subtracted images to filelist instead of ksb files
