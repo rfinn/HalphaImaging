@@ -11,5 +11,8 @@ mfiles = glob.glob('mksb*ooi*v1.fits')
 mfiles.sort()
 for m in mfiles:
     zfile = 'z'+m
-    if not os.path.exists(zfile):
+    hfile = m.replace('.fits','.head')
+    if not os.path.exists(zfile) and os.path.exists(hfile):
         print(m)
+    elif not os.path.exists(zfile) and not os.path.exists(hfile):
+        print(f"{m} missing {hfile}")
