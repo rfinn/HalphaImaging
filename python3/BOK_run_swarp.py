@@ -437,7 +437,7 @@ if __name__ == '__main__':
     print('{} primary targets'.format(len(primary_targets)))
     print(primary_targets)
 
-    
+
     # subtract median from sky
 
     if args.submedian:
