@@ -55,7 +55,6 @@ def subtract_median(files,overwrite=False,MEF=False):
     for fname in files:
         subtract_median_one(fname,MEF=MEF)
 
-    if mpflag: # use multiprocessing
         
 def subtract_median_one(fname,MEF=True,overwrite=False):
     if not overwrite:
