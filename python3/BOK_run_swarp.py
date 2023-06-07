@@ -5,6 +5,8 @@ USAGE:
 
 # add subtract median, although at this point all files have had the median subtracted...
 
+python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring ksb --submedian
+
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --combinemasks
 
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --se
@@ -78,6 +80,16 @@ from astropy.io import fits
 from astropy.wcs import WCS
 from astropy.time import Time
 
+import sys
+homedir = os.getenv("HOME")
+sys.path.append(homedir+"/github/HalphaImaging/python3/")
+from subtract_median import subtract_median_one
+
+sub_results = []
+def sub_collect_results(result):
+
+    global results
+    sub_results.append(result)
 
 mcombine_results = []
 def mcombine_collect_results(result):
@@ -414,9 +426,23 @@ if __name__ == '__main__':
     # subtract median from sky
 
     if args.submedian:
+
+        matchstring = args.filestring+'*ooi*v1.fits'
+        filelist = glob.glob(matchstring)
+        filelist.sort()
+        print()
+        print("found {len(filelist)} files for median subtraction")
+        print()
+        sub_pool = mp.Pool(mp.cpu_count())
+        subresults = [sub_pool.apply_async(subtract_median_one,args=(filename,),callback=sub_collect_results) for filename in filelist]
+    
+        sub_pool.close()
+        sub_pool.join()
+        sub_results = [r.get() for r in subresults]
+        
         # subtract median
-        os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_r_v1.fits'))
-        os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_Ha4nm_v1.fits'))
+        #os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_r_v1.fits'))
+        #os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_Ha4nm_v1.fits'))
         
  
     if args.se:

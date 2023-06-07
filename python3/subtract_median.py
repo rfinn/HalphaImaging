@@ -53,52 +53,57 @@ def subtract_median(files,overwrite=False,MEF=False):
     '''
     print('subtracting median from images')
     for fname in files:
-        if not overwrite:
-            if os.path.exists("m"+fname) and not overwrite:
-                print("m"+fname,' already exists.  moving to next file')
-                continue
-            else:
-                print("{} -> m{}".format(fname,fname))
-        else:
-            print("{} -> {}".format(fname,fname))
+        subtract_median_one(fname,MEF=MEF)
 
-        # read in image 
-        hdu = fits.open(fname,memmap=False)
+    if mpflag: # use multiprocessing
+        
+def subtract_median_one(fname,MEF=True,overwrite=False):
+    if not overwrite:
+        if os.path.exists("m"+fname) and not overwrite:
+            print("m"+fname,' already exists.  moving to next file')
+            return
+        else:
+            print("{} -> m{}".format(fname,fname))
+    else:
+        print("{} -> {}".format(fname,fname))
+
+    # read in image 
+    hdu = fits.open(fname,memmap=False)
  
-        if MEF:
-            # if MEF flag is set, assume primary header is extension 0
-            # loop over additional extenstions and subtract median
-            nextensions = len(hdu)
-            for i in range(1,nextensions):
-                d,median = imutils.subtract_median_sky(hdu[i].data.copy())
+    if MEF:
+        # if MEF flag is set, assume primary header is extension 0
+        # loop over additional extenstions and subtract median
+        nextensions = len(hdu)
+        for i in range(1,nextensions):
+            d,median = imutils.subtract_median_sky(hdu[i].data.copy())
 
-                #print('median for hdu {} = {}'.format(i,median))
-                #print('check if median is nan: {}'.format(median == np.nan))
-                #print('check if median == nan: {}'.format(median == nan))
-                if (str(median) == 'nan'):                    
-                    print('using alternate median for hdu ',i)
-                    mmean, mmed,mstd = stats.sigma_clipped_stats(hdu[i].data,sigma=3)
-                    print('alternate estimate of median = {:.2f}'.format(mmed))
-                    if mmed is not np.nan:
-                        hdu[i].data -= mmed
-                        median = mmed
-                        hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
-                
-                else:
-                    hdu[i].data = d
+            #print('median for hdu {} = {}'.format(i,median))
+            #print('check if median is nan: {}'.format(median == np.nan))
+            #print('check if median == nan: {}'.format(median == nan))
+            if (str(median) == 'nan'):                    
+                print('using alternate median for hdu ',i)
+                mmean, mmed,mstd = stats.sigma_clipped_stats(hdu[i].data,sigma=3)
+                print('alternate estimate of median = {:.2f}'.format(mmed))
+                if mmed is not np.nan:
+                    hdu[i].data -= mmed
+                    median = mmed
                     hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
+                
+            else:
+                hdu[i].data = d
+                hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
             
             
-        else:
-            # background subtraction
-            hdu[0].data,median = imutils.subtract_median_sky(hdu[0].data)
-            if median is not np.nan:
-                hdu[0].header.set('MEDSUB',value=median,comment='median subtraction')
-        if overwrite:
-            hdu.writeto(fname,overwrite=True)
-        else:
-            hdu.writeto("m"+fname,overwrite=True)
-        hdu.close()
+    else:
+        # background subtraction
+        hdu[0].data,median = imutils.subtract_median_sky(hdu[0].data)
+        if median is not np.nan:
+            hdu[0].header.set('MEDSUB',value=median,comment='median subtraction')
+    if overwrite:
+        hdu.writeto(fname,overwrite=True)
+    else:
+        hdu.writeto("m"+fname,overwrite=True)
+    hdu.close()
 if __name__ == '__main__':
     import argparse
 
