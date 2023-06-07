@@ -133,10 +133,7 @@ def subtract_median(imname,overwrite=False):
 
         hdu[i].data -= skyadu
         hdu[i].header.set('MEDSUB',value=skyadu,comment='median subtraction')
-    if overwrite:
-        hdu.writeto(fname,overwrite=True)
-    else:
-        hdu.writeto("m"+fname,overwrite=True)
+    hdu.writeto("m"+fname,overwrite=True)
     hdu.close()
     
 def combine_masks(imname):
@@ -452,7 +449,7 @@ if __name__ == '__main__':
         print("found {len(filelist)} files for median subtraction")
         print()
         sub_pool = mp.Pool(mp.cpu_count())
-        subresults = [sub_pool.apply_async(subtract_median,args=(filename,),callback=sub_collect_results) for filename in filelist]
+        subresults = [sub_pool.apply_async(subtract_median,args=(filename,),callback=sub_collect_results) for filename in filelist[:1]]
     
         sub_pool.close()
         sub_pool.join()
