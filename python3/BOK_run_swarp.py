@@ -133,7 +133,7 @@ def subtract_median(imname,overwrite=False):
 
         hdu[i].data -= skyadu
         hdu[i].header.set('MEDSUB',value=skyadu,comment='median subtraction')
-    hdu.writeto("m"+fname,overwrite=True)
+    hdu.writeto("m"+imname,overwrite=True)
     hdu.close()
     
 def combine_masks(imname):
