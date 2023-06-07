@@ -7,13 +7,13 @@ USAGE:
 
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring ksb --submedian
 
-python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --combinemasks
+python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring ksb --combinemasks
 
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --se
 
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --scamp
 
-python ~/github/HalphaImaging/python3/BOK_run_swarp.py --fixamps
+python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --fixamps
 
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --sortfiles
 
@@ -83,7 +83,7 @@ from astropy.time import Time
 import sys
 homedir = os.getenv("HOME")
 sys.path.append(homedir+"/github/HalphaImaging/python3/")
-from subtract_median import subtract_median_one
+#from subtract_median import subtract_median_one
 
 sub_results = []
 def sub_collect_results(result):
@@ -121,6 +121,25 @@ def getzp_collect_results2(result):
     global results
     getzp_results2.append(result)
 
+def subtract_median(imname):
+    """subtract median using value in image header from F. Valdes pipeline  """
+
+    hdu = fits.open(imname)
+
+    skyadu = float(hdu[0].header['SKYADU'])
+
+
+    nextensions = len(hdu)
+    for i in range(1,nextensions):
+
+        hdu[i].data -= skyadu
+        hdu[i].header.set('MEDSUB',value=skyadu,comment='median subtraction')
+    if overwrite:
+        hdu.writeto(fname,overwrite=True)
+    else:
+        hdu.writeto("m"+fname,overwrite=True)
+    hdu.close()
+    
 def combine_masks(imname):
     '''
     combine the weight and data quality image
@@ -357,7 +376,7 @@ def write_filelists(targets,header_table,medsub=True):
             #    outfile.write('m{} \n'.format(f))
             #else:
             outfile.write('{} \n'.format(f))
-            combined_mask = f.replace('.fits','.combweight.fits').replace('mksb','ksb')
+            combined_mask = f.replace('.fits','.combweight.fits').replace('zmksb','ksb')
             weightfile.write('{} \n'.format(combined_mask))
         outfile.close()
         weightfile.close()
@@ -434,7 +453,7 @@ if __name__ == '__main__':
         print("found {len(filelist)} files for median subtraction")
         print()
         sub_pool = mp.Pool(mp.cpu_count())
-        subresults = [sub_pool.apply_async(subtract_median_one,args=(filename,),callback=sub_collect_results) for filename in filelist]
+        subresults = [sub_pool.apply_async(subtract_median,args=(filename,),callback=sub_collect_results) for filename in filelist]
     
         sub_pool.close()
         sub_pool.join()
@@ -444,6 +463,10 @@ if __name__ == '__main__':
         #os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_r_v1.fits'))
         #os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_Ha4nm_v1.fits'))
         
+    if args.combinemasks:
+        # combine masks
+        # this combines weight image and bad pixel masks
+        mcombine_results = combine_all_masks(filetable['FILENAME'])
  
     if args.se:
         os.system('ln -s ~/github/HalphaImaging/astromatic/default.* .')        
@@ -468,10 +491,6 @@ if __name__ == '__main__':
         os.system('scamp @scamp_input_cats -c default.scamp.BOK')
         pass
 
-    if args.combinemasks:
-        # combine masks
-        # this combines weight image and bad pixel masks
-        mcombine_results = combine_all_masks(filetable['FILENAME'])
 
     # TODO - add a function to fix ZP offsets in individual images.
     # like BOK_pipeline_fixampoffsets.py - but no median subtraction
