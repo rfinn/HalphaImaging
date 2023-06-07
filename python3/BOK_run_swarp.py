@@ -121,13 +121,12 @@ def getzp_collect_results2(result):
     global results
     getzp_results2.append(result)
 
-def subtract_median(imname):
+def subtract_median(imname,overwrite=False):
     """subtract median using value in image header from F. Valdes pipeline  """
-
+    print(f"{imname} -> m{imname}")
     hdu = fits.open(imname)
 
     skyadu = float(hdu[0].header['SKYADU'])
-
 
     nextensions = len(hdu)
     for i in range(1,nextensions):
