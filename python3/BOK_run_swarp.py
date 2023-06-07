@@ -449,7 +449,7 @@ if __name__ == '__main__':
         print("found {len(filelist)} files for median subtraction")
         print()
         sub_pool = mp.Pool(mp.cpu_count())
-        subresults = [sub_pool.apply_async(subtract_median,args=(filename,),callback=sub_collect_results) for filename in filelist[:1]]
+        subresults = [sub_pool.apply_async(subtract_median,args=(filename,),callback=sub_collect_results) for filename in filelist]
     
         sub_pool.close()
         sub_pool.join()
