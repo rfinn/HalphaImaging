@@ -362,7 +362,7 @@ def write_filelists(targets,header_table,medsub=True):
         # open file to store the list of science images
         outfile = open(t.replace('nm',''),'w')# rename all Ha4nm -> Ha4
         # open file to store the list of weight images
-        weightfile = open(t+'_weights','w')
+        weightfile = open(t.replace('nm','')+'_weights','w')
         # keep the filenames that match the current target name
         filenames = header_table['FILENAME'][header_table['OBJECT'] == t]
         # loop over the filenames and write each science and
