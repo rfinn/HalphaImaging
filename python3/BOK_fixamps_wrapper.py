@@ -37,7 +37,7 @@ def processone(image):
     # updating to use the new program
     program= f"{HOME}/github/HalphaImaging/python3/BOK_fixampoffsets.py"    
     cmd = f"python {program} {image}"
-    #os.system(cmd)
+    os.system(cmd)
     return 1
     #cmds = ['python3', program,image]
     #print(f"Submitting job to process {input_file}")
