@@ -116,9 +116,10 @@ def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=19,
     field = coord.SkyCoord(ra=ra_deg, dec=dec_deg,
                            unit=(u.deg, u.deg),
                            frame='icrs')
-    return vquery.query_region(field,
-                               width=("%fd" % rad_deg),
-                               catalog="II/349/ps1")[0]
+    t = vquery.query_region(field,
+                            width=("%fd" % rad_deg),
+                            catalog="II/349/ps1")
+    return t[0]
 def polyfit2d(x, y, z, order=3):
     # from  https://stackoverflow.com/questions/7997152/python-3d-polynomial-surface-fit-order-dependent
     ncols = (order + 1)**2
