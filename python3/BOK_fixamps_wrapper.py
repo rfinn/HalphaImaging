@@ -30,6 +30,7 @@ def processone(image):
     #print("processing ",image)
     if os.path.exists(outimage):
         print(f'{outimage} found - moving to next object')
+        return
     else:
         print(f"processing {image} -> {outimage}")
 
