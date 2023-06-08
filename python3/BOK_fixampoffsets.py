@@ -241,7 +241,7 @@ if os.path.exists(pcat):
     print("found panstarrs cat")
     ptab = Table.read(pcat)
 else:
-    pan = panstarrs_query(centerRA, centerDEC, width)
+    pan = panstarrs_query(centerRA, centerDEC, width,maxmag=18)
     ptab = Table(pan)
     ptab.write(pcat,format='csv',overwrite=True)
 
