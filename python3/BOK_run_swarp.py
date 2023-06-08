@@ -360,7 +360,7 @@ def count_lines(fname):
 def write_filelists(targets,header_table,medsub=True):
     for t in targets:
         # open file to store the list of science images
-        outfile = open(t,'w')
+        outfile = open(t.replace('nm',''),'w')# rename all Ha4nm -> Ha4
         # open file to store the list of weight images
         weightfile = open(t+'_weights','w')
         # keep the filenames that match the current target name

@@ -151,7 +151,7 @@ def get_offsets(secat,pan,filter,verbose=True,naper=5,nsigma=3):
         #clip_flag = sigma_clip(zim,sigma=3,maxiters=10,masked=True)            
         flag =  (abs(residual - np.median(residual)) < nsigma*MAD)
         if sum(flag) < 2:
-            print(f'WARNING: ONLY ONE DATA POINT LEFT FOR {image}')
+            print('WARNING: ONLY ONE DATA POINT LEFT FOR')
             x = x
             y = y
             residual = residual
