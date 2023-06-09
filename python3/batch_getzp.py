@@ -18,6 +18,7 @@ python ~/github/HalphaImaging/python3/batch_getzp.py
 import glob
 import os
 import sys
+import numpy as np
 import multiprocessing as mp
 
 image_results = []
