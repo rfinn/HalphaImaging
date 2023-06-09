@@ -94,7 +94,7 @@ rfiles.sort()
 
 #for rimage in rimages: # loop through list
 image_pool = mp.Pool(mp.cpu_count())
-myresults = [image_pool.apply_async(getoneratio,args=(im,),callback=collect_results) for im in rfiles]
+myresults = [image_pool.apply_async(runone,args=(im,),callback=collect_results) for im in rfiles]
     
 image_pool.close()
 image_pool.join()
