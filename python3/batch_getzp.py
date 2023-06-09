@@ -28,7 +28,7 @@ def collect_results(result):
 
 
     
-def runone(f):
+def runone(i,f):
     if f.find('weight') > -1:
         return
 
@@ -90,11 +90,11 @@ def runone(f):
 # grab all files in the directory
 rfiles = glob.glob('VF*.fits')
 rfiles.sort()
-
+indices = np.arange(len(rfiles))
 
 #for rimage in rimages: # loop through list
 image_pool = mp.Pool(mp.cpu_count())
-myresults = [image_pool.apply_async(runone,args=(im,),callback=collect_results) for im in rfiles]
+myresults = [image_pool.apply_async(runone,args=(i,rfiles[i]),callback=collect_results) for i in indices]
     
 image_pool.close()
 image_pool.join()
