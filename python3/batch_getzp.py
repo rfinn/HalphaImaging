@@ -18,23 +18,28 @@ python ~/github/HalphaImaging/python3/batch_getzp.py
 import glob
 import os
 import sys
+import multiprocessing as mp
 
-# grab all files in the directory
-rfiles = glob.glob('VF*.fits')
-rfiles.sort()
-for i,f in enumerate(rfiles):
-    # skip weight files
+image_results = []
+def collect_results(result):
+
+    global results
+    image_results.append(result)
+
+
+    
+def runone(f):
     if f.find('weight') > -1:
-        continue
+        return
 
     # skip CS images
     if f.find('CS.fits') > -1:
-        continue
+        return
     # how do we skip the unshifted files?
     # this only seems to apply to INT data (why did I need to shift these, anyway???)
     # so if file has INT and -r
     if ('INT' in f) and ('r.fits' in f):
-        continue
+        return
     
     # determine telescope and filter from filename
     t = f.split('-')
@@ -82,7 +87,17 @@ for i,f in enumerate(rfiles):
     # run getzp
     os.system(getzpstring)
 
-    # uncomment the following for testing
-    if i > 0:
-        break
-        
+# grab all files in the directory
+rfiles = glob.glob('VF*.fits')
+rfiles.sort()
+
+
+#for rimage in rimages: # loop through list
+image_pool = mp.Pool(mp.cpu_count())
+myresults = [image_pool.apply_async(getoneratio,args=(im,),callback=collect_results) for im in rfiles]
+    
+image_pool.close()
+image_pool.join()
+image_results = [r.get() for r in myresults]
+
+
