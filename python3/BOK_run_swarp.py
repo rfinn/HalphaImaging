@@ -5,6 +5,9 @@ USAGE:
 
 # add subtract median, although at this point all files have had the median subtracted...
 
+data are in /data-pool/Halpha/processed/BOK2021-22/
+
+
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring ksb --submedian
 
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring ksb --combinemasks
@@ -18,6 +21,10 @@ python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --fixam
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --sortfiles
 
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --swarp
+
+mv VF*.fits /data-pool/Halpha/coadds/virgo-coadds-BOK-all/.
+
+cd /data-pool/Halpha/coadds/virgo-coadds-BOK-all/
 
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --getzp
 
@@ -416,27 +423,32 @@ if __name__ == '__main__':
 
     #print('command: gethead -a object exptime FILTER RA DEC '+args.filestring+'*ooi*v1.fits > header_info')
     os.system('gethead -a object exptime FILTER RA DEC '+args.filestring+'*ooi*v1.fits > header_info')
-    filetable = Table.read('header_info',data_start=0,delimiter=' ',format='ascii',guess=False,fast_reader=False,names=['FILENAME','OBJECT','EXPTIME','FILTER','RA','DEC'])
+    try:
+        filetable = Table.read('header_info',data_start=0,delimiter=' ',format='ascii',guess=False,fast_reader=False,names=['FILENAME','OBJECT','EXPTIME','FILTER','RA','DEC'])
 
     
 
-    # sort images by location and filter
-    # alternatively could use object name,
-    # but not all are correct, so need to fix names
+        # sort images by location and filter
+        # alternatively could use object name,
+        # but not all are correct, so need to fix names
 
-    # get a list of all the unique objects
-    # this is like, e.g. VFID2911_r or VFID2911_Ha4
-    targets = list(set(filetable['OBJECT']))
-    targets.sort()
+        # get a list of all the unique objects
+        # this is like, e.g. VFID2911_r or VFID2911_Ha4
+        targets = list(set(filetable['OBJECT']))
+        targets.sort()
 
-    # get list of r-band objects only
-    primary_targets = []
-    for t in targets:
-        if t.endswith('_r'):
-            primary_targets.append(t)
-    print('{} primary targets'.format(len(primary_targets)))
-    print(primary_targets)
-
+        # get list of r-band objects only
+        primary_targets = []
+        for t in targets:
+            if t.endswith('_r'):
+                primary_targets.append(t)
+        print('{} primary targets'.format(len(primary_targets)))
+        print(primary_targets)
+    except:
+        print()
+        print("seems like no ksb files - continuing anyway...")
+        print()
+              
 
     # subtract median from sky
 
