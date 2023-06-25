@@ -399,7 +399,7 @@ def write_filelists(targets,header_table,medsub=True):
             #    outfile.write('m{} \n'.format(f))
             #else:
             outfile.write('{} \n'.format(f))
-            combined_mask = f.replace('.fits','.combweight.fits').replace('zmksb','ksb')
+            combined_mask = f.replace('.fits','.weight.fits').replace('zmksb','ksb')
             weightfile.write('{} \n'.format(combined_mask))
         outfile.close()
         weightfile.close()
