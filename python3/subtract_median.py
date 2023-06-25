@@ -13,10 +13,11 @@ OVERVIEW:
 USAGE:
 * to run on a list of image
 
+python ~/github/HalphaImaging/python3/subtract_sky.py --mef --filestring1 ksb --filestring2 r_v1.fits
 
 * to run on one image
 
-python ~/github/HalphaImaging/python3/subtract_sky.py –oneimage ksb_220428_040758_ooi_r_v1.fits
+python ~/github/HalphaImaging/python3/subtract_sky.py --mef –oneimage ksb_220428_040758_ooi_r_v1.fits
 
 REFERENCES:
 https://photutils.readthedocs.io/en/stable/background.html
@@ -26,6 +27,9 @@ https://reproject.readthedocs.io/en/stable/mosaicking.html
 ccdproc wcs projection
 https://ccdproc.readthedocs.io/en/latest/image_combination.html
 '''
+
+
+
 
 #from photutils import make_source_mask
 import os
