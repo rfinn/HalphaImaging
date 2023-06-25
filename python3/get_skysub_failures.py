@@ -17,8 +17,8 @@ for k in kfiles:
     mfile = 'm'+k
     hfile = k.replace('.fits','.head')
     if not os.path.exists(mfile) and os.path.exists(hfile):
-        print(m)
-        os.rename(m,outdir+'/'+m)
+        print(k)
+        os.rename(k,outdir+'/'+k)
     elif not os.path.exists(mfile) and not os.path.exists(hfile):
-        print(f"{m} missing {hfile}")
+        print(f"{k} missing {hfile}")
     
