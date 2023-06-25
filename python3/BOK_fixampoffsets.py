@@ -358,7 +358,7 @@ for h in range(1,len(hdu)):
 
             # add scaling info to the header
             header_key = f"CCD{h}_{quad}"
-            header_value = f"{amp_scale:.3f}"
+            header_value = f"{amp_scale:.4f}"
             hdu[0].header.set(header_key,value=float(header_value),comment="PS1 scaling for amp")
             quad += 1
 
