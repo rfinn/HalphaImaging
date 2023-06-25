@@ -7,8 +7,8 @@ GOAL: print out files that have sky subtraction but fixamps failed.
 import glob
 import os
 
-mfiles = glob.glob('ksb*ooi*v1.fits')
-mfiles.sort()
+kfiles = glob.glob('ksb*ooi*v1.fits')
+kfiles.sort()
 outdir = 'skysub-failures'
 if not os.path.exists(outdir):
     os.mkdir(outdir)
