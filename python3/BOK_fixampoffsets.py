@@ -15,7 +15,7 @@ python ~/github/HalphaImaging/python3/BOK_fixampoffsets.py imagename
 
 OUTPUT:
 * for each input image, an output image named "m"+imagename will be created.
-* the output image is the sky-subtracted image
+
 
 """
 

@@ -173,7 +173,7 @@ def combine_masks(imname):
     * dq_image : data quality image, with nonzero indicating bad pixels
 
     OUTPUT:
-    * image_name.combweight.fits : this is the combined weight image
+    * image_name.weight.fits : this is the combined weight image
     
 
     2023-06-02: updating to use multiprocessing
@@ -465,7 +465,7 @@ if __name__ == '__main__':
             if t.endswith('_r'):
                 primary_targets.append(t)
         print('{} primary targets'.format(len(primary_targets)))
-        print(primary_targets)
+        #print(primary_targets)
     except:
         print()
         print("seems like no ksb files - continuing anyway...")
