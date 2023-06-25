@@ -14,7 +14,7 @@ if not os.path.exists(outdir):
     os.mkdir(outdir)
     
 for k in kfiles:
-    zfile = 'm'+k
+    mfile = 'm'+k
     hfile = k.replace('.fits','.head')
     if not os.path.exists(mfile) and os.path.exists(hfile):
         print(m)
