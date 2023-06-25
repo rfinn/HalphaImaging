@@ -173,14 +173,14 @@ def combine_masks(imname):
     * dq_image : data quality image, with nonzero indicating bad pixels
 
     OUTPUT:
-    * combined_weight.fits : this is the combined weight image
+    * image_name.combweight.fits : this is the combined weight image
     
 
     2023-06-02: updating to use multiprocessing
 
     '''
 
-    combined_mask = imname.replace('.fits','.combweight.fits')
+    combined_mask = imname.replace('.fits','.weight.fits')
     #combined_mask = 'm'+combined_mask
     if os.path.exists(combined_mask):
         print('output image already exists: ',combined_mask)
