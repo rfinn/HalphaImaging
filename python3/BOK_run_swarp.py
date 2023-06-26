@@ -18,15 +18,27 @@ python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --scamp
 
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --fixamps
 
-python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --sortfiles
+* group files by target
 
-python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --swarp
+  python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --sortfiles
 
-mv VF*.fits /data-pool/Halpha/coadds/virgo-coadds-BOK-all/.
+* copy headers to match zmksb image names
 
-cd /data-pool/Halpha/coadds/virgo-coadds-BOK-all/
+  python ~/github/HalphaImaging/python3/BOK_copy_scamp_headers_2z.py
 
-python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --getzp
+* run swarp
+
+  python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --swarp
+
+* copy coadds to the coadd directory
+
+  cp VF*.fits /data-pool/Halpha/coadds/all-virgo-coadds/.
+
+* solve for photometric zp
+
+  cd /data-pool/Halpha/coadds/all-virgo-coadds/
+
+  python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --getzp
 
 
 

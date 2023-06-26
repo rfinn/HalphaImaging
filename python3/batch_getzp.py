@@ -13,6 +13,9 @@ from /media/rfinn/hdata/coadds/all-virgo-coadds
 
 python ~/github/HalphaImaging/python3/batch_getzp.py
 
+To run on a subset of files, give a match string VF*matchstring*.fits:
+
+  python ~/github/HalphaImaging/python3/batch_getzp.py BOK
 
 """
 import glob
@@ -89,7 +92,11 @@ def runone(i,f):
     os.system(getzpstring)
 
 # grab all files in the directory
-rfiles = glob.glob('VF*.fits')
+if len(sys.argv) > 1:
+    matchstring = sys.argv[1]
+    rfiles = glob.glob('VF*'+matchstring+'*.fits')
+else:
+    rfiles = glob.glob('VF*.fits')
 rfiles.sort()
 indices = np.arange(len(rfiles))
 
