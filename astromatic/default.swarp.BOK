@@ -20,7 +20,7 @@ WEIGHT_THRESH                         # Bad pixel weight-threshold
 #------------------------------- Co-addition ----------------------------------
  
 COMBINE                Y               # Combine resampled images (Y/N)?
-COMBINE_TYPE           WEIGHTED          # MEDIAN,AVERAGE,MIN,MAX,WEIGHTED,CLIPPED
+COMBINE_TYPE           CLIPPED          # MEDIAN,AVERAGE,MIN,MAX,WEIGHTED,CLIPPED
                                        # CHI-OLD,CHI-MODE,CHI-MEAN,SUM,
                                        # WEIGHTED_WEIGHT,MEDIAN_WEIGHT,
                                        # AND,NAND,OR or NOR
@@ -94,12 +94,12 @@ COMBINE_BUFSIZE        256             # RAM dedicated to co-addition(MB)
  
 #------------------------------ Miscellaneous ---------------------------------
  
-DELETE_TMPFILES        Y               # Delete temporary resampled FITS files
+DELETE_TMPFILES        N               # Delete temporary resampled FITS files
                                        # (Y/N)?
 #COPY_KEYWORDS          OBJECT,FILTER,TELESCOP,INSTRUME,GAIN1,DATE-OBS,AIRMASS,MAGZERO,MAGSIG,SEEING          # List of FITS keywords to propagate
 COPY_KEYWORDS          OBJECT,FILTER,DATE-OBS,GAIN1          # List of FITS keywords to propagate
                                        # from the input to the output headers
-WRITE_FILEINFO         N               # Write information about each input
+WRITE_FILEINFO         Y               # Write information about each input
                                        # file in the output image header?
 WRITE_XML              Y               # Write XML file (Y/N)?
 XML_NAME               swarp.xml       # Filename for XML output

@@ -1,9 +1,20 @@
 #!/usr/bin/env python
 
 """
+GOAL:
+
 This is a major rewrite of BOK_pipeline_fixampoffsets.py
 
 to make use of .head file - need to run SE in mef mode
+
+USEAGE: 
+
+python ~/github/HalphaImaging/python3/BOK_fixampoffsets.py imagename 
+
+
+
+OUTPUT:
+* for each input image, an output image named "m"+imagename will be created.
 
 
 """
@@ -200,8 +211,13 @@ NAXIS1 = 4032
 NAXIS2 = 4096
 
 
-
+##
+# image name is sent in command line
+##
 imname = sys.argv[1]
+
+
+        
 ivar_name = imname.replace('ooi','oow').replace('mksb','ksb')
 
 if imname.find('r_v1') > -1:
@@ -303,6 +319,7 @@ zp_ref = np.mean(np.array(allzp))
 global_med = np.median(allresid1d)
 print(f"global median for all ccds = {global_med:.3f}")
 
+
 for h in range(1,len(hdu)):
     ##
     # calculate the offset for each amplifier and scale the data accordingly
@@ -338,8 +355,14 @@ for h in range(1,len(hdu)):
             # in the weight image, high numbers are good
             ##
             ihdu[h].data[ymin:ymax,xmin:xmax] = amp_scale*ihdu[h].data[ymin:ymax,xmin:xmax]
+
+            # add scaling info to the header
+            header_key = f"CCD{h}_{quad}"
+            header_value = f"{amp_scale:.4f}"
+            hdu[0].header.set(header_key,value=float(header_value),comment="PS1 scaling for amp")
             quad += 1
 
+# TODO - should really add scaling factors to the image header so I can compare among images
 
 # save sky-subtracted, scaled image
 hdu.writeto('z'+imname,overwrite=True)

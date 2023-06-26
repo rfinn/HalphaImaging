@@ -18,15 +18,27 @@ python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --scamp
 
 python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --fixamps
 
-python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --sortfiles
+* group files by target
 
-python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --swarp
+  python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --sortfiles
 
-mv VF*.fits /data-pool/Halpha/coadds/virgo-coadds-BOK-all/.
+* copy headers to match zmksb image names
 
-cd /data-pool/Halpha/coadds/virgo-coadds-BOK-all/
+  python ~/github/HalphaImaging/python3/BOK_copy_scamp_headers_2z.py
 
-python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --getzp
+* run swarp
+
+  python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --swarp
+
+* copy coadds to the coadd directory
+
+  cp VF*.fits /data-pool/Halpha/coadds/all-virgo-coadds/.
+
+* solve for photometric zp
+
+  cd /data-pool/Halpha/coadds/all-virgo-coadds/
+
+  python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --getzp
 
 
 
@@ -74,6 +86,13 @@ added file and median-subtracted file back into main directory
 
 * need to add options to run source extractor and scamp b/c some of pipeline images have bad wcs
 
+SKY SUBTRACTION
+* By default, the sky value is taken from the image header.
+* in 6 cases, this fails for CCD4, so if you set the second argument to 1
+
+python ~/github/HalphaImaging/python3/BOK_fixampoffsets.py imagename 1
+
+
 
 '''
 
@@ -90,7 +109,7 @@ from astropy.time import Time
 import sys
 homedir = os.getenv("HOME")
 sys.path.append(homedir+"/github/HalphaImaging/python3/")
-#from subtract_median import subtract_median_one
+
 
 sub_results = []
 def sub_collect_results(result):
@@ -128,8 +147,19 @@ def getzp_collect_results2(result):
     global results
     getzp_results2.append(result)
 
+
 def subtract_median(imname,overwrite=False):
-    """subtract median using value in image header from F. Valdes pipeline  """
+    """
+    measure median sky value
+
+    subtract median using 
+
+    need to use this instead of header value because a handfull (6) images have
+    bogus sky values for ccd4
+
+    """
+
+    
     print(f"{imname} -> m{imname}")
     hdu = fits.open(imname)
 
@@ -142,7 +172,7 @@ def subtract_median(imname,overwrite=False):
         hdu[i].header.set('MEDSUB',value=skyadu,comment='median subtraction')
     hdu.writeto("m"+imname,overwrite=True)
     hdu.close()
-    
+
 def combine_masks(imname):
     '''
     combine the weight and data quality image
@@ -155,14 +185,14 @@ def combine_masks(imname):
     * dq_image : data quality image, with nonzero indicating bad pixels
 
     OUTPUT:
-    * combined_weight.fits : this is the combined weight image
+    * image_name.weight.fits : this is the combined weight image
     
 
     2023-06-02: updating to use multiprocessing
 
     '''
 
-    combined_mask = imname.replace('.fits','.combweight.fits')
+    combined_mask = imname.replace('.fits','.weight.fits')
     #combined_mask = 'm'+combined_mask
     if os.path.exists(combined_mask):
         print('output image already exists: ',combined_mask)
@@ -243,7 +273,10 @@ def run_swarp(image_list,refimage=None):
         data,header = fits.getdata(refimage,header=True)
         w = WCS(header)
         image_size = data.shape
-        pixel_scale = 0.453 # pixel scale for 90prime
+        # should get pixel scale automatically from image header
+        # if this is not exactly what is in the ref image, then we will get an offset
+        
+        pixel_scale = 0.4533 # pixel scale for 90prime
         ra,dec = w.wcs_pix2world(int(image_size[0]/2.),int(image_size[1]/2.),1)
         center = str(ra)+','+str(dec)
         mosaic_image_size = str(image_size[1])+','+str(image_size[0])
@@ -337,6 +370,8 @@ def run_swarp_all_filters(target):
     refimage = open(hafilelist).readline().rstrip()
     update_header(ha_coadd,refimage)
 
+    # NOTE - this does not produced aligned images
+    
     ##
     # rename r-band coadd using the updated naming convention
     # that includes RA and DEC
@@ -379,7 +414,7 @@ def write_filelists(targets,header_table,medsub=True):
             #    outfile.write('m{} \n'.format(f))
             #else:
             outfile.write('{} \n'.format(f))
-            combined_mask = f.replace('.fits','.combweight.fits').replace('zmksb','ksb')
+            combined_mask = f.replace('.fits','.weight.fits').replace('zmksb','ksb')
             weightfile.write('{} \n'.format(combined_mask))
         outfile.close()
         weightfile.close()
@@ -417,7 +452,9 @@ if __name__ == '__main__':
     parser.add_argument('--combinemasks', dest = 'combinemasks', default = False, action='store_true',help = 'set this to combine weight image and bad pixel mask.')
     parser.add_argument('--sortfiles', dest = 'sortfiles', default = False, action='store_true',help = 'write image and weights to files')
     parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true',help = 'run swarp to create coadded images')
-    parser.add_argument('--getzp', dest = 'getzp', default = False, action='store_true',help = 'run getzp to determine photometric zp of r and Halpha images')                    
+    parser.add_argument('--getzp', dest = 'getzp', default = False, action='store_true',help = 'run getzp to determine photometric zp of r and Halpha images')
+
+    
     args = parser.parse_args()
 
 
@@ -443,7 +480,7 @@ if __name__ == '__main__':
             if t.endswith('_r'):
                 primary_targets.append(t)
         print('{} primary targets'.format(len(primary_targets)))
-        print(primary_targets)
+        #print(primary_targets)
     except:
         print()
         print("seems like no ksb files - continuing anyway...")
@@ -506,17 +543,6 @@ if __name__ == '__main__':
     # like BOK_pipeline_fixampoffsets.py - but no median subtraction
 
     if args.fixamps:
-        # TODO - flesh this out!!!
-        # call BOK_pipeline_fixampoffsets.py
-
-        # just calling BOK_fixamps_wrapper.py should work
-        # b/c it will already look for median-subtracted images
-        #
-        #
-        # however, I will need to copy header files
-        # so they are associated with zmksb images
-        # before running swarp - otherwise swarp won't see them
-        #
         os.system('python ~/github/HalphaImaging/python3/BOK_fixamps_wrapper.py')
 
     #print(targets)
@@ -526,17 +552,22 @@ if __name__ == '__main__':
 
         
     if args.swarp:
-        #for target in primary_targets:
-        #    run_swarp_all_filters(target)
-            # break below is for debugging purposes
+        for target in primary_targets:
+            run_swarp_all_filters(target)
+            # break below is for debugging purposes to run on one target
             #break
-        
-        swarp_pool = mp.Pool(mp.cpu_count())
-        swresults = [swarp_pool.apply_async(run_swarp_all_filters,args=(target,),callback=swarp_collect_results) for target in primary_targets]
+
+        ##
+        # not running in mp b/c a bunch of coadds got corrupted
+        # swarp is already configured to run as multithreaded
+        ##
+
+        #swarp_pool = mp.Pool(mp.cpu_count())
+        #swresults = [swarp_pool.apply_async(run_swarp_all_filters,args=(target,),callback=swarp_collect_results) for target in primary_targets]
     
-        swarp_pool.close()
-        swarp_pool.join()
-        swarp_results = [r.get() for r in swresults]
+        #swarp_pool.close()
+        #swarp_pool.join()
+        #swarp_results = [r.get() for r in swresults]
 
         
     if args.getzp:

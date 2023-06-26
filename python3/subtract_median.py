@@ -9,6 +9,16 @@ OVERVIEW:
 * designed to complete final stages of coaddition for INT WFC images
 * 
 
+
+USAGE:
+* to run on a list of image
+
+python ~/github/HalphaImaging/python3/subtract_sky.py --mef --filestring1 ksb --filestring2 r_v1.fits
+
+* to run on one image
+
+python ~/github/HalphaImaging/python3/subtract_sky.py --mef –oneimage ksb_220428_040758_ooi_r_v1.fits
+
 REFERENCES:
 https://photutils.readthedocs.io/en/stable/background.html
 
@@ -17,6 +27,9 @@ https://reproject.readthedocs.io/en/stable/mosaicking.html
 ccdproc wcs projection
 https://ccdproc.readthedocs.io/en/latest/image_combination.html
 '''
+
+
+
 
 #from photutils import make_source_mask
 import os
@@ -111,18 +124,22 @@ if __name__ == '__main__':
     parser.add_argument('--filestring', dest = 'filestring', default = 'WFC', help = 'filestring to match. default is WFC')
     parser.add_argument('--filestring2', dest = 'filestring2', default = None, help = 'second filestring to match. default is None.  set to ooi for 90prime data.')    
     parser.add_argument('--overwrite', action = 'store_true', default = False, help = 'overwrite file?  the default is false, so that a new file with m prefix is created.')
-    parser.add_argument('--mef', action = 'store_true', default = False, help = 'set this for MEF files, like with 90prime')        
+    parser.add_argument('--mef', action = 'store_true', default = False, help = 'set this for MEF files, like with 90prime')
+    parser.add_argument('--oneimage', dest = 'oneimage', default = None,help = 'supply an image name to run sky subtraction on one image')    
+    
     args = parser.parse_args()
 
     #if args.hdi:
     #    keys = ['naxis1', 'naxis2', 'imagetyp', 'filter', 'exptime','instrmnt']
     #else:
     #    keys = ['naxis1', 'naxis2', 'imagetyp', 'filter', 'exptime','instrmnt']
-
-    matchstring = args.filestring+'*.fits'
-    if args.filestring2 is not None:
-        matchstring = args.filestring+'*'+args.filestring2
-    files = glob.glob(matchstring)
-    files.sort()
-    #print(files)
-    subtract_median(files,overwrite=args.overwrite,MEF=args.mef)
+    if args.oneimage is not None:
+        subtract_median_one(args.oneimage,overwrite=args.overwrite,MEF=args.mef)
+    else:
+        matchstring = args.filestring+'*.fits'
+        if args.filestring2 is not None:
+            matchstring = args.filestring+'*'+args.filestring2
+        files = glob.glob(matchstring)
+        files.sort()
+        #print(files)
+        subtract_median(files,overwrite=args.overwrite,MEF=args.mef)
