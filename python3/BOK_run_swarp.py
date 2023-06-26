@@ -467,8 +467,10 @@ if __name__ == '__main__':
         sub_pool.join()
         sub_results = [r.get() for r in subresults]
         
-        # subtract median
+        # subtract median from r-band images
         #os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_r_v1.fits'))
+
+        # subtract median from halpha images
         #os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring {} --filestring2 {} --mef '.format(args.filestring,'ooi_Ha4nm_v1.fits'))
         
     if args.combinemasks:
