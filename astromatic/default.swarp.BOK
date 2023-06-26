@@ -94,7 +94,7 @@ COMBINE_BUFSIZE        256             # RAM dedicated to co-addition(MB)
  
 #------------------------------ Miscellaneous ---------------------------------
  
-DELETE_TMPFILES        Y               # Delete temporary resampled FITS files
+DELETE_TMPFILES        N               # Delete temporary resampled FITS files
                                        # (Y/N)?
 #COPY_KEYWORDS          OBJECT,FILTER,TELESCOP,INSTRUME,GAIN1,DATE-OBS,AIRMASS,MAGZERO,MAGSIG,SEEING          # List of FITS keywords to propagate
 COPY_KEYWORDS          OBJECT,FILTER,DATE-OBS,GAIN1          # List of FITS keywords to propagate

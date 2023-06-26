@@ -261,7 +261,10 @@ def run_swarp(image_list,refimage=None):
         data,header = fits.getdata(refimage,header=True)
         w = WCS(header)
         image_size = data.shape
-        pixel_scale = 0.453 # pixel scale for 90prime
+        # should get pixel scale automatically from image header
+        # if this is not exactly what is in the ref image, then we will get an offset
+        
+        pixel_scale = 0.4533 # pixel scale for 90prime
         ra,dec = w.wcs_pix2world(int(image_size[0]/2.),int(image_size[1]/2.),1)
         center = str(ra)+','+str(dec)
         mosaic_image_size = str(image_size[1])+','+str(image_size[0])
