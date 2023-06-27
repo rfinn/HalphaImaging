@@ -452,6 +452,7 @@ if __name__ == '__main__':
     parser.add_argument('--combinemasks', dest = 'combinemasks', default = False, action='store_true',help = 'set this to combine weight image and bad pixel mask.')
     parser.add_argument('--sortfiles', dest = 'sortfiles', default = False, action='store_true',help = 'write image and weights to files')
     parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true',help = 'run swarp to create coadded images')
+    parser.add_argument('--onetarget', dest = 'onetarget', default = None,help = 'run swarp on one target.  give the VFID2162_r to recreate the coadds')    
     parser.add_argument('--getzp', dest = 'getzp', default = False, action='store_true',help = 'run getzp to determine photometric zp of r and Halpha images')
 
     
@@ -550,10 +551,13 @@ if __name__ == '__main__':
 
         
     if args.swarp:
-        for target in primary_targets:
-            run_swarp_all_filters(target)
-            # break below is for debugging purposes to run on one target
-            #break
+        if args.onetarget is None:
+            for target in primary_targets:
+                run_swarp_all_filters(target)
+                # break below is for debugging purposes to run on one target
+                #break
+        else:
+            run_swarp_all_filters(args.onetarget)
 
         ##
         # not running in mp b/c a bunch of coadds got corrupted
