@@ -233,7 +233,7 @@ class getzp():
             v1=.95
             v2=1.05
 
-        
+
     def getzp(self):
         plt.close('all')
         if self.verbose:
@@ -337,7 +337,7 @@ class getzp():
             print("hey Rose - ")
             print("using default.sex.BOK!!!")
             print()
-            defaultcat = 'default.sex.BOK'
+            defaultcat = 'default.sex.BOK.getzp'
         header = fits.getheader(self.image)
         try:
             expt = header['EXPTIME']
