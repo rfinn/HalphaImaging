@@ -1043,7 +1043,7 @@ if __name__ == '__main__':
     parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2'])    
     parser.add_argument('--verbose',dest = 'verbose', default = False, action = 'store_true',help = 'print extra debug/status statements')
     parser.add_argument('--getrefcatonly',dest = 'getrefcatonly',default=False,action='store_true',help='download reference PANSTARRS catalog only.  use this before running with slurm')
-    parser.add_argument('--fixbok',dest = 'fixbok',default=False,action='store_true',help='fix offset b/w bok amps. basically just using this flag when calculating amp offsets in MEF images.')    
+    parser.add_argument('--fixbok',dest = 'fixbok',default=True,action='store_false',help='fix offset b/w bok amps. basically just using this flag when calculating amp offsets in MEF images. call this to NOT fix offset...  I know...')    
     #args = parser.parse_args(raw_args)
     args = parser.parse_args()
     #zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
