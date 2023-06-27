@@ -223,7 +223,7 @@ class getzp():
         self.flatten = int(args.flatten)
         self.norder = int(args.norder)
         self.fwhm = args.fwhm
-        self.fixbok = (args.nofixbok)
+        self.fixbok = args.fixbok
         self.args = args
         global v1, v2
         if self.filter == 'ha':
