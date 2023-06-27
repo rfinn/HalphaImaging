@@ -30,6 +30,10 @@ python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring mksb --fixam
 
   python ~/github/HalphaImaging/python3/BOK_run_swarp.py --filestring zmksb --swarp
 
+* run swarp on one target
+
+  python ~/github/HalphaImaging/python3/BOK_run_swarp.py --swarp --onetarget VFID2621_r
+
 * copy coadds to the coadd directory
 
   cp VF*.fits /data-pool/Halpha/coadds/all-virgo-coadds/.
