@@ -84,9 +84,11 @@ def runone(i,f):
     
     # construct string
     getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter}"
+    if instrument == 'BOK':
+        getzpstring += ' --fixbok'
     print()
     print(f"Running getzp.py for file {i}/{len(rfiles)}")
-    print(getzpstring)
+    #print(getzpstring)
 
     # run getzp
     os.system(getzpstring)
