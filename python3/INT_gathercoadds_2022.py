@@ -96,6 +96,7 @@ for subdir in flist1:
         
         # this is directory structure setup by theli
         # when I processed them myself, the coadds are in the main directory
+        print(coadd_r)
         if os.path.exists(coadd_r):
             print("found ",coadd_r)
             if os.path.exists(coadd_ha):
