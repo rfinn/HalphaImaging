@@ -61,6 +61,7 @@ from astropy.time import Time
 homedir = os.getenv("HOME")
 # define directory for all coadds
 output_dir_coadds ='/media/rfinn/hdata/coadds/virgo-coadds-int-2022/'
+output_dir_coadds ='/data-pool/Halpha/coadds/virgo-coadds-int-2022-v2/'
 if not os.path.exists(output_dir_coadds):
     os.mkdir(output_dir_coadds)
 telescope = 'INT'
@@ -81,10 +82,10 @@ for subdir in flist1:
     if os.path.isdir(subdir) & subdir.startswith('target-r_'):
 
         # the 2022 data don't need the extra flattening so need to remove the f from the image name
-        coadd_r = os.path.join(subdir,'coadd_r/fcoadd.fits')
+        #coadd_r = os.path.join(subdir,'coadd_r/fcoadd.fits')
         weight_r = os.path.join(subdir,'coadd_r/coadd.weight.fits')        
                                 
-        coadd_ha = os.path.join(subdir.replace('-r','-Halpha'),'coadd_Halpha/ffcoadd.fits')
+        #coadd_ha = os.path.join(subdir.replace('-r','-Halpha'),'coadd_Halpha/ffcoadd.fits')
         weight_ha = os.path.join(subdir.replace('-r','-Halpha'),'coadd_Halpha/coadd.weight.fits')
         
         # this is directory structure setup by theli
