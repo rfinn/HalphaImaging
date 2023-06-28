@@ -7,7 +7,7 @@ PROCEDURE:
 
 * this is an updated version of INT_gathercoadds.py
   - previously, the object names were pointing20, for example, whereas in 2022 they 
-    are named for the primary target according to its VFID, e.g. VFID1010
+    are named for the primary target according to its VFID, e.g. VFID1010 (v1 catalogs)
 
 * in 2022, I used theli to split targets, and that made the naming conventions differ
   - theli makes target-r_0, target-r_1, etc
@@ -17,6 +17,8 @@ PROCEDURE:
   - target-Halpha_0/coadd-Halpha/coadd.fits
   - and move them to VFID3054/
 
+* Updating 2023-06-28 to run on draco
+  - the data were copied there under /data-pool/laptop-backup/rfinn/data/INT/2022-allfiles-v2
 
 * run this from the base data directory, like ~/data/INT
   - this have subfolders arranged by date
@@ -30,10 +32,14 @@ PROCEDURE:
 
 
 USAGE:
-* run after INT_batch_getzp_2022.py
-  - assumes that coadds will be named fcoadd.fits after flattening from getzp.py
 
-* run in /media/rfinn/ssd4t/rfinn/data/INT/2022-allfiles-v2/
+* NO LONGER TRUE- I run getzp in the final mosaic directory so that all the plots for all the coadds
+  are in the same place
+X  run after INT_batch_getzp_2022.py
+X  - assumes that coadds will be named fcoadd.fits after flattening from getzp.py
+
+* UPDATE: on draco, data are in /data-pool/laptop-backup/rfinn/data/INT/2022-allfiles-v2
+X run in /media/rfinn/ssd4t/rfinn/data/INT/2022-allfiles-v2/
 
 
 NEXT UP:
@@ -103,7 +109,13 @@ for subdir in flist1:
                         full_dateobs = mjd_obs.isot
                         dateobs = full_dateobs.split('T')[0].replace('-','')                        
                     pointing = h['OBJECT']
-                    
+
+                    ##
+                    # TODO - make sure I'm using the RA and DEC from the Halpha image
+                    # because the r-band image will be aligned to that and could have a different RA and DEC
+                    #
+                    # this is an update after moving to draco
+                    ##
                     if float(dec) < 0:
                         outfile = output_dir_coadds+'VF-{:.4f}-{:.4f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filter)
                     else:
