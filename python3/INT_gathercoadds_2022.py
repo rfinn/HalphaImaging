@@ -61,7 +61,7 @@ from astropy.time import Time
 homedir = os.getenv("HOME")
 # define directory for all coadds
 output_dir_coadds ='/media/rfinn/hdata/coadds/virgo-coadds-int-2022/'
-output_dir_coadds ='/data-pool/Halpha/coadds/virgo-coadds-int-2022-v2/'
+output_dir_coadds ='/data-pool/Halpha/coadds/virgo-coadds-int-2022-v3/'
 if not os.path.exists(output_dir_coadds):
     os.mkdir(output_dir_coadds)
 telescope = 'INT'
@@ -127,9 +127,9 @@ for subdir in flist1:
                     # this is an update after moving to draco
                     ##
                     if float(dec) < 0:
-                        outfile = output_dir_coadds+'VF-{:.4f}-{:.4f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filter)
+                        outfile = output_dir_coadds+'VF-{:.3f}-{:.3f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filter)
                     else:
-                        outfile = output_dir_coadds+'VF-{:.4f}+{:.4f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filter)
+                        outfile = output_dir_coadds+'VF-{:.3f}+{:.3f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filter)
 
                     # copy imfile to outfile
                     out1 = outfile+'.fits'

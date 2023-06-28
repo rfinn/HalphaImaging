@@ -53,6 +53,7 @@ wcskeys = ['NAXIS1','NAXIS2','CRVAL1','CRVAL2','CRPIX1','CD1_1','CD1_2','CRPIX2'
 for k in wcskeys:
     newheader.set(k, value=hdu1[0].header[k])
 #hdu3 = fits.open(args.image2.split('.fits')[0]+'-shifted.fits')
+newheader.set('HAIMAGE',args.image1)
 fits.writeto(args.image2.split('.fits')[0]+'-shifted.fits', im2new, header=newheader, overwrite=True)
 hdu2.close()
 #hdu3.close()
