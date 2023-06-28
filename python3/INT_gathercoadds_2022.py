@@ -88,10 +88,12 @@ for subdir in flist1:
     if os.path.isdir(subdir) & subdir.startswith('target-r_'):
         print("got here!")
         # the 2022 data don't need the extra flattening so need to remove the f from the image name
-        coadd_r = os.path.join(subdir,'coadd_r/fcoadd.fits')
+        # looks like fcoadd.fits does not exist for the missing coadds, so changing this to coadd.fits
+        # can deal with flattening once the coadds are gathered up
+        coadd_r = os.path.join(subdir,'coadd_r/coadd.fits')
         weight_r = os.path.join(subdir,'coadd_r/coadd.weight.fits')        
                                 
-        coadd_ha = os.path.join(subdir.replace('-r','-Halpha'),'coadd_Halpha/ffcoadd.fits')
+        coadd_ha = os.path.join(subdir.replace('-r','-Halpha'),'coadd_Halpha/coadd.fits')
         weight_ha = os.path.join(subdir.replace('-r','-Halpha'),'coadd_Halpha/coadd.weight.fits')
         
         # this is directory structure setup by theli
