@@ -7,6 +7,10 @@ This is a major rewrite of BOK_pipeline_fixampoffsets.py
 
 to make use of .head file - need to run SE in mef mode
 
+
+This duplicates a lot of getzp.py but it seemed simpler...
+
+
 USEAGE: 
 
 python ~/github/HalphaImaging/python3/BOK_fixampoffsets.py imagename 
