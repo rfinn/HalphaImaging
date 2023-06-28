@@ -86,7 +86,7 @@ print(flist1)
 for subdir in flist1:
     # if item is a directory and the name contains pointing, then assume it is a target
     if os.path.isdir(subdir) & subdir.startswith('target-r_'):
-
+        print("got here!")
         # the 2022 data don't need the extra flattening so need to remove the f from the image name
         coadd_r = os.path.join(subdir,'coadd_r/fcoadd.fits')
         weight_r = os.path.join(subdir,'coadd_r/coadd.weight.fits')        
