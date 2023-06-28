@@ -6,6 +6,11 @@ USAGE:
 
 python process_one_coadd.py rimage haimage
 
+or 
+
+python ~/github/HalphaImaging/python3/process_one_coadd.py VF-177.200+56.055-INT-20220502-VFID0957-r-shifted.fits  VF-177.200+56.055-INT-20220502-VFID0957-Halpha.fits
+
+
 start in the directory containing the images
 
 """
@@ -37,7 +42,7 @@ if not os.path.exists('SEcats_getzp'):
     os.mkdir('SEcats_getzp')
 
 images = [rimage,haimage]
-if im in images
+for im in images:
     se_cat = im.replace('.fits','.cat')
 
     s = f"mv {se_cat} SEcats_getzp/."
