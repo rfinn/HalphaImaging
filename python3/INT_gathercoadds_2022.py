@@ -76,7 +76,13 @@ working_dir = os.getcwd()
 # overwrite output files if they exist
 overwrite = True
 flist1.sort()
+
+
+# creating filelist by hand because we are only missing a few galaxies
+flist1 = ['target-r_5','target-r_6','target-r_7','target-r_8','target-r_9']
 print(flist1)
+
+
 for subdir in flist1:
     # if item is a directory and the name contains pointing, then assume it is a target
     if os.path.isdir(subdir) & subdir.startswith('target-r_'):
