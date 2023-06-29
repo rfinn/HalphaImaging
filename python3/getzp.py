@@ -531,7 +531,7 @@ class getzp():
         PS1_r = self.pan['rmag']
         PS1_g = self.pan['gmag']
         self.pan_gr_color = self.pan['gmag'] - self.pan['rmag']        
-        if self.filter == 'R' and (self.instrument == 'h'): # this should be the only observations through an R filter
+        if self.filter == 'R' and (self.instrument == 'h' | self.instrument == 'm'): # this should be the only observations through an R filter
             print("correcting color for R filter at KPNO")            
             ###################################
             # Calculate Johnson R
@@ -581,7 +581,7 @@ class getzp():
 
             #self.R = self.pan['rmag']
         # bok is using the kpno halpha+4nm filter, so use the same correction for these
-        elif self.filter == 'ha' and ((self.instrument == 'b') | (self.instrument == 'h')) :
+        elif self.filter == 'ha' and ((self.instrument == 'b') | (self.instrument == 'h') | (self.instrument == 'm')) :
             print("correcting color for ha filter at KPNO")                        
             #Best fit quadratic Ha4 - PS1_r = 0.0016*(PS1_g-PS1_r)^2 + -0.2134*(PS1_g-PS1_r) + 0.0168
             #self.R = self.pan['rmag']
