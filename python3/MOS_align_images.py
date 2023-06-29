@@ -8,6 +8,9 @@ USAGE:
 
 %run ~/github/HalphaImaging/int_align_images.py --image1 coadd-Ha.fits --image2 coadd-r.fits --weight2 coadd-r.weight.fits
 
+can run on multiple in parallel 
+
+parallel --eta --ungroup python ~/github/HalphaImaging/python3/MOS_align_images.py --image1 NGC5846_0{1}Ha.fits --image2 NGC5846_0{2}R.fits ::: {1..7} ::: {1..7}
 
 '''
 
@@ -29,12 +32,6 @@ from reproject.mosaicking import find_optimal_celestial_wcs
 
 import argparse
 
-
-def getcoaddname(himage):
-    if float(dec) < 0:
-        outfile = output_dir_coadds+'VF-{:.3f}-{:.3f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filter)
-    else:
-        outfile = output_dir_coadds+'VF-{:.3f}+{:.3f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filter)
 
 
 start_time = time.perf_counter()
@@ -83,7 +80,7 @@ haweight_outname = f'VF-{ra:.3f}+{dec:.3f}-MOS-{dateobs}-{object}-Ha4.weight.fit
 ##
 # SHIFT Halpha IMAGE
 ##
-print('\t shifting image')
+print(f'shifting image {args.image1} -> {haimage_outname}' )
 im2new, im2footprint = reproject_interp(hdu1[0], wcs_out, shape_out=shape_out)
 
 # we want to keep most of the info in the original header, and just update the WCS
@@ -93,7 +90,7 @@ wcskeys = ['NAXIS1','NAXIS2','CRVAL1','CRVAL2','CRPIX1','CD1_1','CD1_2','CRPIX2'
 for k in wcskeys:
     if k == 'NAXIS1':
         newheader.set(k, value=shape_out[1])
-    elif k == 'NAXIS1':
+    elif k == 'NAXIS2':
         newheader.set(k, value=shape_out[0])
     else:
         newheader.set(k, value=header_out[k])
@@ -110,7 +107,9 @@ hdu1w.close()
 ##
 # SHIFT R IMAGE
 ##
-print('\t shifting image')
+print()
+print(f'shifting image {args.image2} -> {rimage_outname}' )
+
 im2new, im2footprint = reproject_interp(hdu2[0], wcs_out, shape_out=shape_out)
 
 # we want to keep most of the info in the original header, and just update the WCS
@@ -120,7 +119,7 @@ wcskeys = ['NAXIS1','NAXIS2','CRVAL1','CRVAL2','CRPIX1','CD1_1','CD1_2','CRPIX2'
 for k in wcskeys:
     if k == 'NAXIS1':
         newheader.set(k, value=shape_out[1])
-    elif k == 'NAXIS1':
+    elif k == 'NAXIS2':
         newheader.set(k, value=shape_out[0])
     else:
         newheader.set(k, value=header_out[k])
