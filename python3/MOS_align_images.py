@@ -39,13 +39,14 @@ parser = argparse.ArgumentParser(description ='group objects by filter and targe
 parser.add_argument('--image1', dest = 'image1', default = 'test-ha.fits', help = 'Image to serve as reference')
 # mosaic images don't have weight images, so just saving the footprint as the weight image
 #parser.add_argument('--weight1', dest = 'weight1', default = None, help = 'Weight map for image1')
-parser.add_argument('--image2', dest = 'image2', default = 'test-r.fits', help = 'Image to align to reference')
+#parser.add_argument('--image2', dest = 'image2', default = 'test-r.fits', help = 'Image to align to reference')
 #parser.add_argument('--weight2', dest = 'weight2', default = None, help = 'Weight map for image2')
 
 args = parser.parse_args()
 
+image2 = args.image2.replace('Ha.fits','R.fits')
 hdu1 = fits.open(args.image1)
-hdu2 = fits.open(args.image2)
+hdu2 = fits.open(image2)
 #hdu1 = CCDData.read(args.image1,unit='adu/s')
 #hdu2 = CCDData.read(args.image2,unit='adu/s')
 
@@ -108,7 +109,7 @@ hdu1w.close()
 # SHIFT R IMAGE
 ##
 print()
-print(f'shifting image {args.image2} -> {rimage_outname}' )
+print(f'shifting image {image2} -> {rimage_outname}' )
 
 im2new, im2footprint = reproject_interp(hdu2[0], wcs_out, shape_out=shape_out)
 
