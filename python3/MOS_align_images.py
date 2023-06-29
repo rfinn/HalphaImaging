@@ -44,7 +44,7 @@ parser.add_argument('--image1', dest = 'image1', default = 'test-ha.fits', help 
 
 args = parser.parse_args()
 
-image2 = args.image2.replace('Ha.fits','R.fits')
+image2 = args.image1.replace('Ha.fits','R.fits')
 hdu1 = fits.open(args.image1)
 hdu2 = fits.open(image2)
 #hdu1 = CCDData.read(args.image1,unit='adu/s')
