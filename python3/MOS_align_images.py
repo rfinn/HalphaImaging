@@ -61,7 +61,8 @@ hdu2 = fits.open(image2)
 wcs_out, shape_out = find_optimal_celestial_wcs([hdu1,hdu2])
 header_out = wcs_out.to_header()
 
-
+print(header_out)
+sys.exit()
 # construct output filenames
 ra = header_out['CRVAL1']
 dec = header_out['CRVAL2']
