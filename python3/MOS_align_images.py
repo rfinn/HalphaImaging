@@ -67,7 +67,7 @@ ra = header_out['CRVAL1']
 dec = header_out['CRVAL2']
 
 dateobs = hdu1[0].header['DATE-OBS'].split('T')[0].replace('-','')
-object = args.image1[0:10]
+object = args.image1[1:11]
 
 rimage_outname = f'VF-{ra:.3f}+{dec:.3f}-MOS-{dateobs}-{object}-R.fits'
 haimage_outname = f'VF-{ra:.3f}+{dec:.3f}-MOS-{dateobs}-{object}-Ha4.fits'

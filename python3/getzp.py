@@ -118,6 +118,9 @@ def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=19,
     print("in panstarrs_query...")
     print(t)
     return t[0]
+
+def astropy_poly2d(x,y,z):
+    
 def polyfit2d(x, y, z, order=3):
     # from  https://stackoverflow.com/questions/7997152/python-3d-polynomial-surface-fit-order-dependent
     ncols = (order + 1)**2
@@ -900,34 +903,37 @@ class getzp():
         # this is not used
         self.nodata =  self.weightdata == 0
 
-        ##########################################################
-        # This is some fine tuning for INT data, but not actually using this?
-        #
-        # center of geometric distortion ~= (3500, 2400)
-        # top chip has y > 4300
-        # blank area starts at x > 4300
-        # end of image at x = 6300, y=6400
-        # so drop some of top left points into top right
-        # 
-        flip_data = (self.xim < (6300-3500)) & (self.yim > 4300)
 
-        # add points from the top left corner into blank corner
-        # looks like I'm not actually using this though
-        nrandom = 40
-        fakex = 2*3500 - self.xim[flip_data]
-        fakey = self.yim[flip_data]
-        fakez = self.zim[flip_data]                
+        if self.instrument == 'i':
 
-        fakey = fakey[fakex < 6300]
-        fakez = fakez[fakex < 6300]                
-        fakex = fakex[fakex < 6300]        
+            ##########################################################
+            # This is some fine tuning for INT data, but not actually using this?
+            #
+            # center of geometric distortion ~= (3500, 2400)
+            # top chip has y > 4300
+            # blank area starts at x > 4300
+            # end of image at x = 6300, y=6400
+            # so drop some of top left points into top right
+            # 
+            flip_data = (self.xim < (6300-3500)) & (self.yim > 4300)
 
-        # combine fake data with original data
-        #self.xim = np.array(self.xim.tolist()+fakex.tolist())
-        #self.yim = np.array(self.yim.tolist()+fakey.tolist())
-        #self.zim = np.array(self.zim.tolist()+fakez.tolist())
-        ##########################################################
-        
+            # add points from the top left corner into blank corner
+            # looks like I'm not actually using this though
+            nrandom = 40
+            fakex = 2*3500 - self.xim[flip_data]
+            fakey = self.yim[flip_data]
+            fakez = self.zim[flip_data]                
+
+            fakey = fakey[fakex < 6300]
+            fakez = fakez[fakex < 6300]                
+            fakex = fakex[fakex < 6300]        
+
+            # combine fake data with original data
+            #self.xim = np.array(self.xim.tolist()+fakex.tolist())
+            #self.yim = np.array(self.yim.tolist()+fakey.tolist())
+            #self.zim = np.array(self.zim.tolist()+fakez.tolist())
+            ##########################################################
+
         # clip data
         clip_flag = sigma_clip(self.zim,sigma=3,maxiters=10,masked=True)
         
