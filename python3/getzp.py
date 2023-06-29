@@ -531,7 +531,7 @@ class getzp():
         PS1_r = self.pan['rmag']
         PS1_g = self.pan['gmag']
         self.pan_gr_color = self.pan['gmag'] - self.pan['rmag']        
-        if self.filter == 'R' and (self.instrument == 'h' | self.instrument == 'm'): # this should be the only observations through an R filter
+        if self.filter == 'R' and ((self.instrument == 'h') | (self.instrument == 'm')): # this should be the only observations through an R filter
             print("correcting color for R filter at KPNO")            
             ###################################
             # Calculate Johnson R
