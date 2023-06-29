@@ -40,9 +40,10 @@ def getcoaddname(himage):
 start_time = time.perf_counter()
 parser = argparse.ArgumentParser(description ='group objects by filter and target for combining with swarp')
 parser.add_argument('--image1', dest = 'image1', default = 'test-ha.fits', help = 'Image to serve as reference')
-parser.add_argument('--weight1', dest = 'weight1', default = None, help = 'Weight map for image1')
+# mosaic images don't have weight images, so just saving the footprint as the weight image
+#parser.add_argument('--weight1', dest = 'weight1', default = None, help = 'Weight map for image1')
 parser.add_argument('--image2', dest = 'image2', default = 'test-r.fits', help = 'Image to align to reference')
-parser.add_argument('--weight2', dest = 'weight2', default = None, help = 'Weight map for image2')
+#parser.add_argument('--weight2', dest = 'weight2', default = None, help = 'Weight map for image2')
 
 args = parser.parse_args()
 
@@ -102,6 +103,9 @@ newheader.set('FILTER','ha4')
 fits.writeto(haimage_outname, im2new, header=newheader, overwrite=True)
 hdu1.close()
 
+fits.writeto(haweight_outname, im2footprint,newheader, overwrite=True)
+hdu1w.close()
+
 
 ##
 # SHIFT R IMAGE
@@ -127,28 +131,12 @@ newheader.set('FILTER','R')
 fits.writeto(rimage_outname, im2new, header=newheader, overwrite=True)
 hdu2.close()
 
+fits.writeto(rweight_outname, im2wnew,newheader, overwrite=True)
+hdu2w.close()
+
+
+
+
 end_time = time.perf_counter()
 print('\t elapsed time = ',end_time - start_time)
 
-##
-# shift weight images
-##
-
-if args.weight1 is not None:
-    print('\t shifting weight image')
-    im2new, im2footprint = reproject_interp(hdu1w[0], wcs_out, shape_out=shape_out)
-    #im2wnew = wcs_project(hdu2w[0],WCS(hdu1[0].header),target_shape=hdu1[0].data.shape)
-    fits.writeto(haweight_outname, im2wnew,newheader, overwrite=True)
-    hdu1w.close()
-
-if args.weight2 is not None:
-    print('\t shifting weight image')
-    im2new, im2footprint = reproject_interp(hdu2w[0], wcs_out, shape_out=shape_out)
-    #im2wnew = wcs_project(hdu2w[0],WCS(hdu1[0].header),target_shape=hdu1[0].data.shape)
-    fits.writeto(rweight_outname, im2wnew,newheader, overwrite=True)
-    hdu2w.close()
-
-
-end_time = time.perf_counter()
-print('\t total time = ',end_time - start_time)
-hdu1.close()
