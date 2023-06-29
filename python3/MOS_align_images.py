@@ -88,13 +88,14 @@ im2new, im2footprint = reproject_interp(hdu1[0], wcs_out, shape_out=shape_out)
 newheader = hdu1[0].header
 # update wcs to image 1
 wcskeys = ['NAXIS1','NAXIS2','CRVAL1','CRVAL2','CRPIX1','CD1_1','CD1_2','CRPIX2','CD2_1','CD2_2']
-for k in wcskeys:
+reprojectkeys = ['NAXIS1','NAXIS2','CRVAL1','CRVAL2','CRPIX1','PC1_1','PC1_2','CRPIX2','PC2_1','PC2_2']
+for i,k in enumerate(wcskeys):
     if k == 'NAXIS1':
         newheader.set(k, value=shape_out[1])
     elif k == 'NAXIS2':
         newheader.set(k, value=shape_out[0])
     else:
-        newheader.set(k, value=header_out[k])
+        newheader.set(k, value=header_out[reprojectkeys[i]])
 
 newheader.set('FILTER','ha4')
 

@@ -89,7 +89,7 @@ zpfunc = lambda x, zp: x + zp
 # this function allows the slope to vary
 zpfuncwithslope = lambda x, m, zp: m*x + zp
 
-pixelscale = {'HDI':0.43, 'INT':0.331, 'BOK':0.45252} 
+pixelscale = {'HDI':0.43, 'INT':0.331, 'BOK':0.45252,'MOS':0.425 } 
 
 def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=19,
                     maxsources=10000):
@@ -200,6 +200,8 @@ class getzp():
             self.pixelscale = pixelscale['INT']
         elif self.instrument == 'b':
             self.pixelscale = pixelscale['BOK']            
+        elif self.instrument == 'm':
+            self.pixelscale = pixelscale['MOS']            
         self.filter = args.filter
 
 
