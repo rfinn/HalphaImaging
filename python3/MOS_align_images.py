@@ -52,11 +52,11 @@ hdu2 = fits.open(args.image2)
 #hdu1 = CCDData.read(args.image1,unit='adu/s')
 #hdu2 = CCDData.read(args.image2,unit='adu/s')
 
-if args.weight1 is not None:
-    hdu1w = fits.open(args.weight1)
+#if args.weight1 is not None:
+#    hdu1w = fits.open(args.weight1)
     #hdu2w = CCDData.read(args.weight2,unit='adu')
-if args.weight2 is not None:
-    hdu2w = fits.open(args.weight2)
+#if args.weight2 is not None:
+#    hdu2w = fits.open(args.weight2)
     #hdu2w = CCDData.read(args.weight2,unit='adu')
 
 # Find optimal shape of output image
