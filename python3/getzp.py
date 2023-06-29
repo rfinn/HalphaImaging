@@ -693,7 +693,7 @@ class getzp():
             plt.savefig('getzp-fig2.png')
             #plt.plot(xl,1.2*yl,'k:')
 
-        
+        flag = self.fitflag
         residual = np.zeros(len(flag))
         ####################################
         ## had been dividing by yfit, but that doesn't make sense
@@ -1004,7 +1004,7 @@ def main(raw_args=None):
     parser.add_argument('--nsigma', dest = 'nsigma', default = 3.5, help = 'number of std to use in iterative rejection of ZP fitting.  default is 3.5')
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
     parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
-    parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT data from 2022 does not seem to show it either.',choices=['0','1','2'])    
+    parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT most of data from 2022 does not seem to show it either.',choices=['0','1','2'])    
     parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2'])    
     parser.add_argument('--verbose',dest = 'verbose', default = False, action = 'store_true',help = 'print extra debug/status statements')
     parser.add_argument('--getrefcatonly',dest = 'getrefcatonly',default=False,action='store_true',help='download reference PANSTARRS catalog only.  use this before running with slurm')
