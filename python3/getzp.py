@@ -641,7 +641,7 @@ class getzp():
                 plt.colorbar(label='g-r')
         plt.xlabel('Pan-STARRS Corrected',fontsize=16)
         plt.ylabel('SE MAG',fontsize=16)
-        xl = np.linspace(14,17,10)
+        xl = np.linspace(14,19,10)
         yl = np.polyval(polyfit_results,xl)
         s = 'fit: y = %.2f PAN + %.2f'%(polyfit_results[0],polyfit_results[1])
         plt.plot(xl,yl,'k--',label=s)
