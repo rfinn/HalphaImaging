@@ -31,10 +31,10 @@ elif 'HDI' in rimage:
     instrument='h'
 
 # Solve for zp
-s = f"python ~/github/HalphaImaging/python3/getzp.py --image {rimage} --instrument {instrument} --filter r"
+s = f"python ~/github/HalphaImaging/python3/getzp.py --image {rimage} --instrument {instrument} --filter r --flatten 1"
 os.system(s)
 
-s = f"python ~/github/HalphaImaging/python3/getzp.py --image {haimage} --instrument {instrument} --filter ha"
+s = f"python ~/github/HalphaImaging/python3/getzp.py --image {haimage} --instrument {instrument} --filter ha --flatten 1"
 os.system(s)
 
 
