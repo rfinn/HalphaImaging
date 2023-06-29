@@ -118,7 +118,7 @@ newheader = hdu2[0].header
 # update wcs to image 1
 wcskeys = ['NAXIS1','NAXIS2','CRVAL1','CRVAL2','CRPIX1','CD1_1','CD1_2','CRPIX2','CD2_1','CD2_2']
 for k in wcskeys:
-    if k == 'NAXIS1'
+    if k == 'NAXIS1':
         newheader.set(k, value=shape_out[1])
     elif k == 'NAXIS1':
         newheader.set(k, value=shape_out[0])
