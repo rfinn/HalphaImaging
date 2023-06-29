@@ -495,7 +495,7 @@ class getzp():
         ###################################################################
         if self.verbose:
             print(f'\t matched {np.sum(self.matchflag)} objects')
-        self.fitflag = self.matchflag  & (self.pan['rmag'] > 14.5) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.pan['rmag'] < 18.5) #& (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.matchedarray1['MAG_AUTO'] > -11.)
+        self.fitflag = self.matchflag  & (self.pan['rmag'] > 14.) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.pan['rmag'] < 18.5) #& (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.matchedarray1['MAG_AUTO'] > -11.)
         if self.verbose:
             print(f'\t number that pass fit {np.sum(self.fitflag)}')
         # for WFC on INT, restrict area to central region
