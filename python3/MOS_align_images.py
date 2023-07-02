@@ -21,6 +21,7 @@ from astropy.wcs import WCS
 from astropy.nddata import CCDData
 import glob
 import time
+
 # an astropy module to reproject images
 from reproject import reproject_interp
 from reproject import reproject_exact
@@ -62,7 +63,7 @@ wcs_out, shape_out = find_optimal_celestial_wcs([hdu1,hdu2])
 header_out = wcs_out.to_header()
 
 print(header_out)
-sys.exit()
+#sys.exit()
 # construct output filenames
 ra = header_out['CRVAL1']
 dec = header_out['CRVAL2']
@@ -88,23 +89,27 @@ im2new, im2footprint = reproject_interp(hdu1[0], wcs_out, shape_out=shape_out)
 # we want to keep most of the info in the original header, and just update the WCS
 newheader = hdu1[0].header
 # update wcs to image 1
-wcskeys = ['NAXIS1','NAXIS2','CRVAL1','CRVAL2','CRPIX1','CD1_1','CD1_2','CRPIX2','CD2_1','CD2_2']
-reprojectkeys = ['NAXIS1','NAXIS2','CRVAL1','CRVAL2','CRPIX1','PC1_1','PC1_2','CRPIX2','PC2_1','PC2_2']
-for i,k in enumerate(wcskeys):
+wcskeys = ['CD1_1','CD1_2','CD2_2','CD2_1']
+for w in wcskeys:
+    newheader.remove(w)
+reprojectkeys = ['NAXIS1','NAXIS2']
+for i,k in enumerate(reprojectkeys):
     if k == 'NAXIS1':
         newheader.set(k, value=shape_out[1])
     elif k == 'NAXIS2':
         newheader.set(k, value=shape_out[0])
-    else:
-        newheader.set(k, value=header_out[reprojectkeys[i]])
+
+# add the keys from the new header
+for k in header_out:
+    newheader.set(k, value=header_out[k])
 
 newheader.set('FILTER','ha4')
 
 fits.writeto(haimage_outname, im2new, header=newheader, overwrite=True)
 hdu1.close()
 
-fits.writeto(haweight_outname, im2footprint,newheader, overwrite=True)
-hdu1w.close()
+fits.writeto(haweight_outname, im2footprint,header=newheader, overwrite=True)
+
 
 
 ##
@@ -118,14 +123,19 @@ im2new, im2footprint = reproject_interp(hdu2[0], wcs_out, shape_out=shape_out)
 # we want to keep most of the info in the original header, and just update the WCS
 newheader = hdu2[0].header
 # update wcs to image 1
-wcskeys = ['NAXIS1','NAXIS2','CRVAL1','CRVAL2','CRPIX1','CD1_1','CD1_2','CRPIX2','CD2_1','CD2_2']
-for k in wcskeys:
+for w in wcskeys:
+    newheader.remove(w)
+reprojectkeys = ['NAXIS1','NAXIS2']
+for i,k in enumerate(reprojectkeys):
     if k == 'NAXIS1':
         newheader.set(k, value=shape_out[1])
     elif k == 'NAXIS2':
         newheader.set(k, value=shape_out[0])
-    else:
-        newheader.set(k, value=header_out[k])
+
+# add the keys from the new header
+for k in header_out:
+    newheader.set(k, value=header_out[k])
+
 
 newheader.set('HAIMAGE',args.image1)
 newheader.set('FILTER','R')
@@ -133,8 +143,8 @@ newheader.set('FILTER','R')
 fits.writeto(rimage_outname, im2new, header=newheader, overwrite=True)
 hdu2.close()
 
-fits.writeto(rweight_outname, im2wnew,newheader, overwrite=True)
-hdu2w.close()
+fits.writeto(rweight_outname, im2footprint,header=newheader, overwrite=True)
+
 
 
 

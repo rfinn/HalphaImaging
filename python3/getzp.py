@@ -73,6 +73,7 @@ from astropy.stats import mad_std
 from astropy.table import Table
 
 from scipy.optimize import curve_fit
+from scipy import interpolate
 try:
     from scipy.stats import median_abs_deviation as MAD2
 except:
@@ -81,6 +82,10 @@ from astroquery.vizier import Vizier
 from photutils import Background2D, MedianBackground
 import itertools
 
+#################################################
+## GLOBAL VARIABLES
+#################################################
+FIT_SPLINE = True
 
 # function for fitting ZP equation
 # this one forces slope = 1
@@ -119,7 +124,40 @@ def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=19,
     print(t)
     return t[0]
 
-def astropy_poly2d(x,y,z):
+def fitspline2d(x,y,z,nx,ny,order=3,s=1000):
+    """
+    Fit a 2d spline to a surface given a set of (x,y,z) coordinates
+
+    I am using this to fit a surface to the residuals of measures vs panstarrs flux,
+    so this is basically making an flatfield image.
+
+    INPUT:
+    x,y = positions of points
+    z = in this case, z is the ratio of f_obs/f_panstarrs
+    nx = dimension of image in x direction
+    ny = dimension of image in x direction
+    norder = 3; order of the spline
+    s = 1000; smoothing factor for spline
+
+    RETURN:
+    zim = 2d image (ny,nx) that represents the spline fit; you can normalize input image by this
+          to obtain "flattened" image
+
+    REFERENCE:
+    https://docs.scipy.org/doc/scipy/tutorial/interpolate/smoothing_splines.html#d-smoothing-splines
+
+    """
+    print()
+    print("fitting 2d spline.  go refresh your coffee...\n")
+    xnew_edges, ynew_edges = np.mgrid[0:nx+1:complex(nx+1), 0:ny+1:complex(ny+1)]
+    xnew = xnew_edges[:-1, :-1] + np.diff(xnew_edges[:2, 0])[0] / 2.
+    ynew = ynew_edges[:-1, :-1] + np.diff(ynew_edges[0, :2])[0] / 2.
+    tck = interpolate.bisplrep(x, y, z, s=s,kx=order,ky=order)
+    znew = interpolate.bisplev(xnew[:,0], ynew[0,:], tck)
+    zim = np.transpose(znew)
+    # testing to see if transpose is not necessary
+    #zim = znew
+    return zim
     
 def polyfit2d(x, y, z, order=3):
     # from  https://stackoverflow.com/questions/7997152/python-3d-polynomial-surface-fit-order-dependent
@@ -140,7 +178,10 @@ def polyval2d(x, y, m):
     return z
 
 def fit_circle_func():
-    #fit function centered on 
+    """
+    #fit function centered on center of FOV
+    never developed this...
+    """
     pass
 
 def get_filebasename(fname):
@@ -226,6 +267,7 @@ class getzp():
         self.naper = int(args.naper)
         self.mag = int(args.mag)
         self.flatten = int(args.flatten)
+        self.spline = args.spline
         self.norder = int(args.norder)
         self.fwhm = args.fwhm
         self.fixbok = args.fixbok
@@ -934,21 +976,26 @@ class getzp():
             #self.zim = np.array(self.zim.tolist()+fakez.tolist())
             ##########################################################
 
+            
         # clip data
         clip_flag = sigma_clip(self.zim,sigma=3,maxiters=10,masked=True)
-        
-        # Fit a 2nd order, 2d polynomial
-        m = polyfit2d(self.xim[~clip_flag.mask],self.yim[~clip_flag.mask],self.zim[~clip_flag.mask],order=norder)
-
-        # Evaluate it on a grid...        
         ny, nx = self.imagedata.shape
-        xx, yy = np.meshgrid(np.linspace(self.xim.min(), self.xim.max(), nx), 
-                         np.linspace(self.yim.min(), self.yim.max(), ny))
-        self.zz = polyval2d(xx, yy, m)
+        if self.spline:
+            self.zz = fitspline2d(self.xim[~clip_flag.mask],self.yim[~clip_flag.mask],self.zim[~clip_flag.mask],nx,ny,order=3,s=1000)
 
+        else:
+            # Fit a 2nd order, 2d polynomial
+            m = polyfit2d(self.xim[~clip_flag.mask],self.yim[~clip_flag.mask],self.zim[~clip_flag.mask],order=norder)
+
+            # Evaluate it on a grid...        
+
+            xx, yy = np.meshgrid(np.linspace(self.xim.min(), self.xim.max(), nx), 
+                         np.linspace(self.yim.min(), self.yim.max(), ny))
+            self.zz = polyval2d(xx, yy, m)
+            
         # Plot
         plt.figure()
-        plt.imshow(self.zz,extent=(self.xim.min(), self.yim.max(), self.xim.max(), self.yim.min()),vmin=v1,vmax=v2)
+        plt.imshow(self.zz,extent=(self.xim.min(), self.yim.max(), self.xim.max(), self.yim.min()),vmin=v1,vmax=v2,origin="lower")
         plt.scatter(self.xim[~clip_flag.mask], self.yim[~clip_flag.mask], c=self.zim[~clip_flag.mask],vmin=v1,vmax=v2,s=15)
         cb=plt.colorbar()
         cb.set_label('f-meas/f-pan')
@@ -1012,11 +1059,13 @@ def main(raw_args=None):
     parser.add_argument('--nsigma', dest = 'nsigma', default = 3.5, help = 'number of std to use in iterative rejection of ZP fitting.  default is 3.5')
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
     parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
-    parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT most of data from 2022 does not seem to show it either.',choices=['0','1','2'])    
+    parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT most of data from 2022 does not seem to show it either.',choices=['0','1','2'])
+    parser.add_argument('--spline',dest = 'spline', default = False, action = 'store_true',help = 'Fit surface with a spline rather than a 2d polynomial')        
     parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2','3','4','5'])    
     parser.add_argument('--verbose',dest = 'verbose', default = False, action = 'store_true',help = 'print extra debug/status statements')
     parser.add_argument('--getrefcatonly',dest = 'getrefcatonly',default=False,action='store_true',help='download reference PANSTARRS catalog only.  use this before running with slurm')
-    parser.add_argument('--nofixbok',dest = 'nofixbok',default=False,action='store_true',help='fix offset b/w bok amps')    
+    parser.add_argument('--nofixbok',dest = 'nofixbok',default=False,action='store_true',help='fix offset b/w bok amps')
+
     args = parser.parse_args(raw_args)
     #zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
     zp = getzp(args)
@@ -1047,7 +1096,8 @@ if __name__ == '__main__':
     parser.add_argument('--nsigma', dest = 'nsigma', default = 3.5, help = 'number of std to use in iterative rejection of ZP fitting.  default is 3.5')
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
     parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
-    parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT data from 2022 does not seem to show it either.',choices=['0','1','2'])    
+    parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT data from 2022 does not seem to show it either.',choices=['0','1','2'])
+    parser.add_argument('--spline',dest = 'spline', default = False, action = 'store_true',help = 'Fit surface with a spline rather than a 2d polynomial')            
     parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2','3','4'])    
     parser.add_argument('--verbose',dest = 'verbose', default = False, action = 'store_true',help = 'print extra debug/status statements')
     parser.add_argument('--getrefcatonly',dest = 'getrefcatonly',default=False,action='store_true',help='download reference PANSTARRS catalog only.  use this before running with slurm')
