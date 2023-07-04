@@ -157,6 +157,7 @@ def fitspline2d(x,y,z,nx,ny,order=3,s=1000):
     zim = np.transpose(znew)
     # testing to see if transpose is not necessary
     #zim = znew
+    print("returning to your regular program...")
     return zim
     
 def polyfit2d(x, y, z, order=3):
@@ -268,6 +269,8 @@ class getzp():
         self.mag = int(args.mag)
         self.flatten = int(args.flatten)
         self.spline = args.spline
+        self.spline_order = int(args.spline_order)
+        self.spline_smooth = int(args.spline_smooth)
         self.norder = int(args.norder)
         self.fwhm = args.fwhm
         self.fixbok = args.fixbok
@@ -981,7 +984,7 @@ class getzp():
         clip_flag = sigma_clip(self.zim,sigma=3,maxiters=10,masked=True)
         ny, nx = self.imagedata.shape
         if self.spline:
-            self.zz = fitspline2d(self.xim[~clip_flag.mask],self.yim[~clip_flag.mask],self.zim[~clip_flag.mask],nx,ny,order=3,s=1000)
+            self.zz = fitspline2d(self.xim[~clip_flag.mask],self.yim[~clip_flag.mask],self.zim[~clip_flag.mask],nx,ny,order=self.spline_order,s=self.spline_smooth)
 
         else:
             # Fit a 2nd order, 2d polynomial
@@ -995,7 +998,7 @@ class getzp():
             
         # Plot
         plt.figure()
-        plt.imshow(self.zz,extent=(self.xim.min(), self.yim.max(), self.xim.max(), self.yim.min()),vmin=v1,vmax=v2,origin="lower")
+        plt.imshow(self.zz,vmin=v1,vmax=v2,origin="lower")
         plt.scatter(self.xim[~clip_flag.mask], self.yim[~clip_flag.mask], c=self.zim[~clip_flag.mask],vmin=v1,vmax=v2,s=15)
         cb=plt.colorbar()
         cb.set_label('f-meas/f-pan')
@@ -1060,7 +1063,9 @@ def main(raw_args=None):
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
     parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
     parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT most of data from 2022 does not seem to show it either.',choices=['0','1','2'])
-    parser.add_argument('--spline',dest = 'spline', default = False, action = 'store_true',help = 'Fit surface with a spline rather than a 2d polynomial')        
+    parser.add_argument('--spline',dest = 'spline', default = False, action = 'store_true',help = 'Fit surface with a spline rather than a 2d polynomial')
+    parser.add_argument('--spline_order',dest = 'spline_order', default = 3,help = 'order of spline.  default is 3.')
+    parser.add_argument('--spline_smooth',dest = 'spline_smooth', default = 1000,help = 'smoothing for spline.  default is 1000.')                
     parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2','3','4','5'])    
     parser.add_argument('--verbose',dest = 'verbose', default = False, action = 'store_true',help = 'print extra debug/status statements')
     parser.add_argument('--getrefcatonly',dest = 'getrefcatonly',default=False,action='store_true',help='download reference PANSTARRS catalog only.  use this before running with slurm')
@@ -1097,7 +1102,10 @@ if __name__ == '__main__':
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
     parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
     parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT data from 2022 does not seem to show it either.',choices=['0','1','2'])
-    parser.add_argument('--spline',dest = 'spline', default = False, action = 'store_true',help = 'Fit surface with a spline rather than a 2d polynomial')            
+    parser.add_argument('--spline',dest = 'spline', default = False, action = 'store_true',help = 'Fit surface with a spline rather than a 2d polynomial')
+    parser.add_argument('--spline_order',dest = 'spline_order', default = 3,help = 'order of spline.  default is 3.')
+    parser.add_argument('--spline_smooth',dest = 'spline_smooth', default = 1000,help = 'smoothing for spline.  default is 1000.')                
+    
     parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2','3','4'])    
     parser.add_argument('--verbose',dest = 'verbose', default = False, action = 'store_true',help = 'print extra debug/status statements')
     parser.add_argument('--getrefcatonly',dest = 'getrefcatonly',default=False,action='store_true',help='download reference PANSTARRS catalog only.  use this before running with slurm')
