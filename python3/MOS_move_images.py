@@ -25,6 +25,6 @@ wlist = glob.glob(indir+'VF*weight.fits')
 wlist.sort()
 
 for w in wlist:
-    outname = os.path.join(outdir,os.path.basename(f))    
+    outname = os.path.join(outdir,os.path.basename(w))    
     print(f"{w} -> {outname}")
     #shutil.copyfile(f,outname)
