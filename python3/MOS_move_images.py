@@ -20,6 +20,7 @@ for f in flist:
     #shutil.copyfile(f,outname)
 
 
+print('\n\n')
 wlist = glob.glob(indir+'VF*weight.fits')
 wlist.sort()
 
