@@ -29,6 +29,8 @@ elif 'INT' in rimage:
     instrument='i'
 elif 'HDI' in rimage:
     instrument='h'
+elif 'MOS' in rimage:
+    instrument='m'
 
 # Solve for zp
 #s = f"python ~/github/HalphaImaging/python3/getzp.py --image {rimage} --instrument {instrument} --filter r --flatten 1"
