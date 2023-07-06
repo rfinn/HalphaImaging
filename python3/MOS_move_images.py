@@ -14,6 +14,15 @@ flist = glob.glob(indir+'fVF*.fits')
 flist.sort()
 
 for f in flist:
-    outname = f.replace('fVF','VF')
+    outname = os.path.join(outdir,os.path.basename(f).replace('fVF','VF'))
     print(f"{f} -> {outname}")
+    #shutil.copyfile(f,outname)
+
+
+wlist = glob.glob(indir+'VF*weight.fits')
+wlist.sort()
+
+for w in wlist:
+    outname = os.path.join(outdir,os.path.basename(f))    
+    print(f"{w} -> {outname}")
     #shutil.copyfile(f,outname)
