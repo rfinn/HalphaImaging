@@ -30,6 +30,7 @@ elif 'INT' in rimage:
 elif 'HDI' in rimage:
     instrument='h'
 elif 'MOS' in rimage:
+    print("mosaic instrument!")
     instrument='m'
 
 # Solve for zp
