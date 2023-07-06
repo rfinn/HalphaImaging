@@ -6,6 +6,7 @@ move fVF*.fits from /data-pool/Halpha/coadds/virgo-coadds-MOSAIC/ to VF*.fits in
 """
 import shutil
 import glob
+import os
 
 indir = '/data-pool/Halpha/coadds/virgo-coadds-MOSAIC/'
 outdir = '/data-pool/Halpha/coadds/all-virgo-coadds/'
