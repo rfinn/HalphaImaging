@@ -17,7 +17,7 @@ flist.sort()
 for f in flist:
     outname = os.path.join(outdir,os.path.basename(f).replace('fVF','VF'))
     print(f"{f} -> {outname}")
-    #shutil.copyfile(f,outname)
+    shutil.copyfile(f,outname)
 
 
 print('\n\n')
@@ -27,4 +27,4 @@ wlist.sort()
 for w in wlist:
     outname = os.path.join(outdir,os.path.basename(w))    
     print(f"{w} -> {outname}")
-    #shutil.copyfile(f,outname)
+    shutil.copyfile(f,outname)
