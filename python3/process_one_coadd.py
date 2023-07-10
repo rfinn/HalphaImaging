@@ -71,3 +71,5 @@ os.chdir('/data-pool/Halpha/html_dev/')
 full_path_rimage = os.path.join(startdir,rimage)
 s = f"python ~/github/Virgo/programs/build_web_coadds2.py --oneimage {full_path_rimage} "
 os.system(s)
+
+os.chdir(startdir)
