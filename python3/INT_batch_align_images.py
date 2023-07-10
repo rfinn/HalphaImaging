@@ -21,6 +21,7 @@ homedir = os.getenv("HOME")
 telescope = 'INT'
 # get list of current directory
 flist1 = glob.glob('VF-*r.fits')
+flist1 = ['VF-233.701+16.330-INT-20220504-VFID4086-r.fits','VF-234.069+16.541-INT-20220502-VFID4037-r.fits']
 working_dir = os.getcwd()
 # overwrite output files if they exist
 overwrite = True

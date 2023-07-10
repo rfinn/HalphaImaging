@@ -12,15 +12,15 @@ PROCEDURE:
 * in 2022, I used theli to split targets, and that made the naming conventions differ
   - theli makes target-r_0, target-r_1, etc
 
-* the goal of this script is to get the coadd in 
-  - target-r_0/coadd-r/coadd.fits and t
-  - target-Halpha_0/coadd-Halpha/coadd.fits
-  - and move them to VFID3054/
+X* the goal of this script is to get the coadd in 
+X  - target-r_0/coadd-r/coadd.fits and t
+X  - target-Halpha_0/coadd-Halpha/coadd.fits
+X  - and move them to VFID3054/
 
 * Updating 2023-06-28 to run on draco
   - the data were copied there under /data-pool/laptop-backup/rfinn/data/INT/2022-allfiles-v2
 
-* run this from the base data directory, like ~/data/INT
+* run this from the base data directory, like ~/data/INT/2022-allfiles-v2/
   - this have subfolders arranged by date
 
 * it then looks in targetXXX-r/coadd-r for the coadd.fits file
@@ -29,7 +29,7 @@ PROCEDURE:
 * it will repeat for Halpha
 
 * coadds will be renamed by RA, DEC, telescope, pointing, and filter
-
+  - uses RA and DEC from Halpha image
 
 USAGE:
 
@@ -80,6 +80,7 @@ flist1.sort()
 
 # creating filelist by hand because we are only missing a few galaxies
 flist1 = ['target-r_5','target-r_6','target-r_7','target-r_8','target-r_9']
+flist1 = ['target-r_7a','target-r_7b']
 print(flist1)
 
 

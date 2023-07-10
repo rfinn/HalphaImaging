@@ -29,12 +29,21 @@ elif 'INT' in rimage:
     instrument='i'
 elif 'HDI' in rimage:
     instrument='h'
+elif 'MOS' in rimage:
+    print("mosaic instrument!")
+    instrument='m'
 
 # Solve for zp
-s = f"python ~/github/HalphaImaging/python3/getzp.py --image {rimage} --instrument {instrument} --filter r"
+#s = f"python ~/github/HalphaImaging/python3/getzp.py --image {rimage} --instrument {instrument} --filter r --flatten 1"
+# running for the rogue INT images in the all-virgo-cutouts, so don't need to flatten again
+if instrument == 'm':
+    s = f"python ~/github/HalphaImaging/python3/getzp.py --image {rimage} --instrument {instrument} --filter R"
+else:
+    s = f"python ~/github/HalphaImaging/python3/getzp.py --image {rimage} --instrument {instrument} --filter r"
 os.system(s)
 
-s = f"python ~/github/HalphaImaging/python3/getzp.py --image {haimage} --instrument {instrument} --filter ha"
+#s = f"python ~/github/HalphaImaging/python3/getzp.py --image {haimage} --instrument {instrument} --filter ha --flatten 1"
+s = f"python ~/github/HalphaImaging/python3/getzp.py --image {haimage} --instrument {instrument} --filter ha "
 os.system(s)
 
 

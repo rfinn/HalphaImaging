@@ -73,6 +73,7 @@ from astropy.stats import mad_std
 from astropy.table import Table
 
 from scipy.optimize import curve_fit
+from scipy import interpolate
 try:
     from scipy.stats import median_abs_deviation as MAD2
 except:
@@ -81,6 +82,10 @@ from astroquery.vizier import Vizier
 from photutils import Background2D, MedianBackground
 import itertools
 
+#################################################
+## GLOBAL VARIABLES
+#################################################
+FIT_SPLINE = True
 
 # function for fitting ZP equation
 # this one forces slope = 1
@@ -89,7 +94,7 @@ zpfunc = lambda x, zp: x + zp
 # this function allows the slope to vary
 zpfuncwithslope = lambda x, m, zp: m*x + zp
 
-pixelscale = {'HDI':0.43, 'INT':0.331, 'BOK':0.45252} 
+pixelscale = {'HDI':0.43, 'INT':0.331, 'BOK':0.45252,'MOS':0.425 } 
 
 def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=19,
                     maxsources=10000):
@@ -118,6 +123,43 @@ def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=19,
     print("in panstarrs_query...")
     print(t)
     return t[0]
+
+def fitspline2d(x,y,z,nx,ny,order=3,s=1000):
+    """
+    Fit a 2d spline to a surface given a set of (x,y,z) coordinates
+
+    I am using this to fit a surface to the residuals of measures vs panstarrs flux,
+    so this is basically making an flatfield image.
+
+    INPUT:
+    x,y = positions of points
+    z = in this case, z is the ratio of f_obs/f_panstarrs
+    nx = dimension of image in x direction
+    ny = dimension of image in x direction
+    norder = 3; order of the spline
+    s = 1000; smoothing factor for spline
+
+    RETURN:
+    zim = 2d image (ny,nx) that represents the spline fit; you can normalize input image by this
+          to obtain "flattened" image
+
+    REFERENCE:
+    https://docs.scipy.org/doc/scipy/tutorial/interpolate/smoothing_splines.html#d-smoothing-splines
+
+    """
+    print()
+    print("fitting 2d spline.  go refresh your coffee...\n")
+    xnew_edges, ynew_edges = np.mgrid[0:nx+1:complex(nx+1), 0:ny+1:complex(ny+1)]
+    xnew = xnew_edges[:-1, :-1] + np.diff(xnew_edges[:2, 0])[0] / 2.
+    ynew = ynew_edges[:-1, :-1] + np.diff(ynew_edges[0, :2])[0] / 2.
+    tck = interpolate.bisplrep(x, y, z, s=s,kx=order,ky=order)
+    znew = interpolate.bisplev(xnew[:,0], ynew[0,:], tck)
+    zim = np.transpose(znew)
+    # testing to see if transpose is not necessary
+    #zim = znew
+    print("returning to your regular program...")
+    return zim
+    
 def polyfit2d(x, y, z, order=3):
     # from  https://stackoverflow.com/questions/7997152/python-3d-polynomial-surface-fit-order-dependent
     ncols = (order + 1)**2
@@ -137,7 +179,10 @@ def polyval2d(x, y, m):
     return z
 
 def fit_circle_func():
-    #fit function centered on 
+    """
+    #fit function centered on center of FOV
+    never developed this...
+    """
     pass
 
 def get_filebasename(fname):
@@ -200,6 +245,8 @@ class getzp():
             self.pixelscale = pixelscale['INT']
         elif self.instrument == 'b':
             self.pixelscale = pixelscale['BOK']            
+        elif self.instrument == 'm':
+            self.pixelscale = pixelscale['MOS']            
         self.filter = args.filter
 
 
@@ -221,6 +268,9 @@ class getzp():
         self.naper = int(args.naper)
         self.mag = int(args.mag)
         self.flatten = int(args.flatten)
+        self.spline = args.spline
+        self.spline_order = int(args.spline_order)
+        self.spline_smooth = int(args.spline_smooth)
         self.norder = int(args.norder)
         self.fwhm = args.fwhm
         self.fixbok = args.fixbok
@@ -529,7 +579,7 @@ class getzp():
         PS1_r = self.pan['rmag']
         PS1_g = self.pan['gmag']
         self.pan_gr_color = self.pan['gmag'] - self.pan['rmag']        
-        if self.filter == 'R' and (self.instrument == 'h'): # this should be the only observations through an R filter
+        if self.filter == 'R' and ((self.instrument == 'h') | (self.instrument == 'm')): # this should be the only observations through an R filter
             print("correcting color for R filter at KPNO")            
             ###################################
             # Calculate Johnson R
@@ -579,7 +629,7 @@ class getzp():
 
             #self.R = self.pan['rmag']
         # bok is using the kpno halpha+4nm filter, so use the same correction for these
-        elif self.filter == 'ha' and ((self.instrument == 'b') | (self.instrument == 'h')) :
+        elif self.filter == 'ha' and ((self.instrument == 'b') | (self.instrument == 'h') | (self.instrument == 'm')) :
             print("correcting color for ha filter at KPNO")                        
             #Best fit quadratic Ha4 - PS1_r = 0.0016*(PS1_g-PS1_r)^2 + -0.2134*(PS1_g-PS1_r) + 0.0168
             #self.R = self.pan['rmag']
@@ -898,49 +948,57 @@ class getzp():
         # this is not used
         self.nodata =  self.weightdata == 0
 
-        ##########################################################
-        # This is some fine tuning for INT data, but not actually using this?
-        #
-        # center of geometric distortion ~= (3500, 2400)
-        # top chip has y > 4300
-        # blank area starts at x > 4300
-        # end of image at x = 6300, y=6400
-        # so drop some of top left points into top right
-        # 
-        flip_data = (self.xim < (6300-3500)) & (self.yim > 4300)
 
-        # add points from the top left corner into blank corner
-        # looks like I'm not actually using this though
-        nrandom = 40
-        fakex = 2*3500 - self.xim[flip_data]
-        fakey = self.yim[flip_data]
-        fakez = self.zim[flip_data]                
+        if self.instrument == 'i':
 
-        fakey = fakey[fakex < 6300]
-        fakez = fakez[fakex < 6300]                
-        fakex = fakex[fakex < 6300]        
+            ##########################################################
+            # This is some fine tuning for INT data, but not actually using this?
+            #
+            # center of geometric distortion ~= (3500, 2400)
+            # top chip has y > 4300
+            # blank area starts at x > 4300
+            # end of image at x = 6300, y=6400
+            # so drop some of top left points into top right
+            # 
+            flip_data = (self.xim < (6300-3500)) & (self.yim > 4300)
 
-        # combine fake data with original data
-        #self.xim = np.array(self.xim.tolist()+fakex.tolist())
-        #self.yim = np.array(self.yim.tolist()+fakey.tolist())
-        #self.zim = np.array(self.zim.tolist()+fakez.tolist())
-        ##########################################################
-        
+            # add points from the top left corner into blank corner
+            # looks like I'm not actually using this though
+            nrandom = 40
+            fakex = 2*3500 - self.xim[flip_data]
+            fakey = self.yim[flip_data]
+            fakez = self.zim[flip_data]                
+
+            fakey = fakey[fakex < 6300]
+            fakez = fakez[fakex < 6300]                
+            fakex = fakex[fakex < 6300]        
+
+            # combine fake data with original data
+            #self.xim = np.array(self.xim.tolist()+fakex.tolist())
+            #self.yim = np.array(self.yim.tolist()+fakey.tolist())
+            #self.zim = np.array(self.zim.tolist()+fakez.tolist())
+            ##########################################################
+
+            
         # clip data
         clip_flag = sigma_clip(self.zim,sigma=3,maxiters=10,masked=True)
-        
-        # Fit a 2nd order, 2d polynomial
-        m = polyfit2d(self.xim[~clip_flag.mask],self.yim[~clip_flag.mask],self.zim[~clip_flag.mask],order=norder)
-
-        # Evaluate it on a grid...        
         ny, nx = self.imagedata.shape
-        xx, yy = np.meshgrid(np.linspace(self.xim.min(), self.xim.max(), nx), 
-                         np.linspace(self.yim.min(), self.yim.max(), ny))
-        self.zz = polyval2d(xx, yy, m)
+        if self.spline:
+            self.zz = fitspline2d(self.xim[~clip_flag.mask],self.yim[~clip_flag.mask],self.zim[~clip_flag.mask],nx,ny,order=self.spline_order,s=self.spline_smooth)
 
+        else:
+            # Fit a 2nd order, 2d polynomial
+            m = polyfit2d(self.xim[~clip_flag.mask],self.yim[~clip_flag.mask],self.zim[~clip_flag.mask],order=norder)
+
+            # Evaluate it on a grid...        
+
+            xx, yy = np.meshgrid(np.linspace(self.xim.min(), self.xim.max(), nx), 
+                         np.linspace(self.yim.min(), self.yim.max(), ny))
+            self.zz = polyval2d(xx, yy, m)
+            
         # Plot
         plt.figure()
-        plt.imshow(self.zz,extent=(self.xim.min(), self.yim.max(), self.xim.max(), self.yim.min()),vmin=v1,vmax=v2)
+        plt.imshow(self.zz,vmin=v1,vmax=v2,origin="lower")
         plt.scatter(self.xim[~clip_flag.mask], self.yim[~clip_flag.mask], c=self.zim[~clip_flag.mask],vmin=v1,vmax=v2,s=15)
         cb=plt.colorbar()
         cb.set_label('f-meas/f-pan')
@@ -1004,11 +1062,15 @@ def main(raw_args=None):
     parser.add_argument('--nsigma', dest = 'nsigma', default = 3.5, help = 'number of std to use in iterative rejection of ZP fitting.  default is 3.5')
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
     parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
-    parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT most of data from 2022 does not seem to show it either.',choices=['0','1','2'])    
-    parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2'])    
+    parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT most of data from 2022 does not seem to show it either.',choices=['0','1','2'])
+    parser.add_argument('--spline',dest = 'spline', default = False, action = 'store_true',help = 'Fit surface with a spline rather than a 2d polynomial')
+    parser.add_argument('--spline_order',dest = 'spline_order', default = 3,help = 'order of spline.  default is 3.')
+    parser.add_argument('--spline_smooth',dest = 'spline_smooth', default = 1000,help = 'smoothing for spline.  default is 1000.')                
+    parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2','3','4','5'])    
     parser.add_argument('--verbose',dest = 'verbose', default = False, action = 'store_true',help = 'print extra debug/status statements')
     parser.add_argument('--getrefcatonly',dest = 'getrefcatonly',default=False,action='store_true',help='download reference PANSTARRS catalog only.  use this before running with slurm')
-    parser.add_argument('--nofixbok',dest = 'nofixbok',default=False,action='store_true',help='fix offset b/w bok amps')    
+    parser.add_argument('--nofixbok',dest = 'nofixbok',default=False,action='store_true',help='fix offset b/w bok amps')
+
     args = parser.parse_args(raw_args)
     #zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
     zp = getzp(args)
@@ -1039,8 +1101,12 @@ if __name__ == '__main__':
     parser.add_argument('--nsigma', dest = 'nsigma', default = 3.5, help = 'number of std to use in iterative rejection of ZP fitting.  default is 3.5')
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
     parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
-    parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT data from 2022 does not seem to show it either.',choices=['0','1','2'])    
-    parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2'])    
+    parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT data from 2022 does not seem to show it either.',choices=['0','1','2'])
+    parser.add_argument('--spline',dest = 'spline', default = False, action = 'store_true',help = 'Fit surface with a spline rather than a 2d polynomial')
+    parser.add_argument('--spline_order',dest = 'spline_order', default = 3,help = 'order of spline.  default is 3.')
+    parser.add_argument('--spline_smooth',dest = 'spline_smooth', default = 1000,help = 'smoothing for spline.  default is 1000.')                
+    
+    parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2','3','4'])    
     parser.add_argument('--verbose',dest = 'verbose', default = False, action = 'store_true',help = 'print extra debug/status statements')
     parser.add_argument('--getrefcatonly',dest = 'getrefcatonly',default=False,action='store_true',help='download reference PANSTARRS catalog only.  use this before running with slurm')
     parser.add_argument('--fixbok',dest = 'fixbok',default=True,action='store_false',help='fix offset b/w bok amps. basically just using this flag when calculating amp offsets in MEF images. call this to NOT fix offset...  I know...')    

@@ -79,7 +79,31 @@ def convert_headfile_header(filename):
             continue
     return newheader
                             
-            
+def fit_surface2points(x,y,z):
+    """would like another way to fit residuals, maybe boxcar smooth?
+    polynomial sometimes introduces too much structure
+
+    https://stackoverflow.com/questions/39727040/matplotlib-2d-plot-from-x-y-z-values
+    """
+    from scipy.interpolate import interp2d
+
+    # f will be a function with two arguments (x and y coordinates),
+    # but those can be array_like structures too, in which case the
+    # result will be a matrix representing the values in the grid 
+    # specified by those arguments
+    f = interp2d(x,y,z,kind="linear")
+
+    x_coords = np.arange(min(x),max(x)+1)
+    y_coords = np.arange(min(y),max(y)+1)
+    Z = f(x_coords,y_coords)
+
+    fig = plt.imshow(Z,
+           extent=[min(x_list),max(x_list),min(y_list),max(y_list)],
+           origin="lower")
+    # Show the positions of the sample points, just to have some reference
+    fig.axes.set_autoscale_on(False)
+    plt.scatter(x_list,y_list,400,facecolors='none')
+    pass    
         
         
 
