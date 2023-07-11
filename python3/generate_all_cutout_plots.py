@@ -22,12 +22,8 @@ def getone(d):
     workingdir = os.getcwd()
     os.chdir(d)
 
-    a = glob.glob('VF*INT*-r-shifted.fits')
-    b = glob.glob('VF*HDI*-r.fits')
-    c = glob.glob('VF*HDI*-R.fits')
-    d = glob.glob('VF*BOK*-r.fits')
-    e = glob.glob('VF*MOS*-R.fits')         
-    imlist = a + b + c + d + e
+    imlist = glob.glob('VF*-R.fits')         
+    #imlist = a + b + c + d + e
     #imlist = glob.glob(d+'*-R.fits')
     if len(imlist) == 0:
         print("did not find any images!")
