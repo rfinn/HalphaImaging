@@ -18,15 +18,22 @@ homedir = os.getenv('HOME')
 sys.path.append(homedir+'/github/HalphaImaging/python3/')
 
 def getone(d):
-    imlist = glob.glob(d+'*-R.fits')
+    a = glob.glob(args.coadd_dir+'VF*INT*-r-shifted.fits')
+    b = glob.glob(args.coadd_dir+'VF*HDI*-r.fits')
+    c = glob.glob(args.coadd_dir+'VF*HDI*-R.fits')
+    d = glob.glob(args.coadd_dir+'VF*BOK*-r.fits')
+    e = glob.glob(args.coadd_dir+'VF*MOS*-R.fits')         
+    imlist = a + b + c + d + e
+    #imlist = glob.glob(d+'*-R.fits')
     if len(imlist) == 0:
-        imlist = glob.glob(d+'*-r.fits')
-    if len(imlist) == 0:
-        continue
+        print("did not find any images!")
+        return
+    else:
+        print(f"found {len(imlist)} r-band images")
         
     for im in imlist:
         os.system('python '+homedir+'/github/HalphaImaging/python3/plot_cutouts_ha.py --r '+im+' --plotall')
-    os.chdir(workingdir)
+
 
 if __name__ == '__main__':
     import argparse
