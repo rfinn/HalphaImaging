@@ -12,12 +12,13 @@ NOTES:
 """
 #import glob
 import os
-
 import sys
+
 homedir = os.getenv('HOME')
 sys.path.append(homedir+'/github/HalphaImaging/python3/')
 
 def getone(d):
+    import glob
     a = glob.glob(args.coadd_dir+'VF*INT*-r-shifted.fits')
     b = glob.glob(args.coadd_dir+'VF*HDI*-r.fits')
     c = glob.glob(args.coadd_dir+'VF*HDI*-R.fits')
