@@ -18,12 +18,15 @@ homedir = os.getenv('HOME')
 sys.path.append(homedir+'/github/HalphaImaging/python3/')
 
 def getone(d):
-    import glob
-    a = glob.glob(f'{d}/VF*INT*-r-shifted.fits')
-    b = glob.glob(f'{d}/VF*HDI*-r.fits')
-    c = glob.glob(f'{d}/VF*HDI*-R.fits')
-    d = glob.glob(f'{d}/VF*BOK*-r.fits')
-    e = glob.glob(f'{d}/VF*MOS*-R.fits')         
+    import glob    
+    workingdir = os.getcwd()
+    os.chdir(d)
+
+    a = glob.glob('VF*INT*-r-shifted.fits')
+    b = glob.glob('VF*HDI*-r.fits')
+    c = glob.glob('VF*HDI*-R.fits')
+    d = glob.glob('VF*BOK*-r.fits')
+    e = glob.glob('VF*MOS*-R.fits')         
     imlist = a + b + c + d + e
     #imlist = glob.glob(d+'*-R.fits')
     if len(imlist) == 0:
@@ -34,7 +37,7 @@ def getone(d):
         
     for im in imlist:
         os.system('python '+homedir+'/github/HalphaImaging/python3/plot_cutouts_ha.py --r '+im+' --plotall')
-
+    os.chdir(workingdir)
 
 if __name__ == '__main__':
     import argparse
