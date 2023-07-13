@@ -303,7 +303,7 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
         im = fits.getdata(rename)
         norm = simple_norm(im, stretch='asinh',percent=99)
         plt.imshow(im, norm=norm,origin='upper')
-        plt.show()
+        #plt.show()
     #print(image_names)
     #print(multiframe)
 
@@ -629,7 +629,7 @@ class cutouts():
         self.plot_cs()
         plt.subplot(1,3,3)
         self.plot_mask()
-        plt.show(block=False)        
+        #plt.show(block=False)        
         plt.savefig(self.rootname+'-mask.png')
         plt.savefig(self.rootname+'-mask.pdf')
         
