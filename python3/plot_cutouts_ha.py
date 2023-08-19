@@ -51,10 +51,11 @@ from urllib.request import urlretrieve
 from astropy.io import fits
 from astropy.wcs import WCS
 from astropy.coordinates import SkyCoord
-from astropy.visualization import simple_norm
+
 from astropy import units as u
 from astropy.nddata import Cutout2D
 from astropy.stats import sigma_clip
+from astropy.visualization import simple_norm
 from astroquery.mast import Observations
 
 vmin = .5
@@ -445,6 +446,11 @@ class cutouts():
             self.get_galid()
 
 
+
+        self.get_galex_image()            
+        self.download_unwise_images()
+        self.load_unwise_images()
+
         try:
             print('trying to download legacy image')
             self.download_legacy()
@@ -453,10 +459,7 @@ class cutouts():
         except: # urllib.error.HTTPError:
             print('could not get legacy image')
             self.legacy_flag = False
-
-        self.get_galex_image()            
-        self.download_unwise_images()
-        self.load_unwise_images()
+        
 
         #self.plotallcutouts()
     def runha(self):
