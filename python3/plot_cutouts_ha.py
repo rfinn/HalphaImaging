@@ -448,7 +448,7 @@ class cutouts():
 
         try:
             self.get_galex_image()
-        except astroquery.exceptions.InvalidQueryError:
+        except:
             print("\nWARNING: Problem with GALEX query - maybe outside footprint?\n")
         self.download_unwise_images()
         self.load_unwise_images()
