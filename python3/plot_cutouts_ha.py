@@ -446,8 +446,10 @@ class cutouts():
             self.get_galid()
 
 
-
-        self.get_galex_image()            
+        try:
+            self.get_galex_image()
+        except astroquery.exceptions.InvalidQueryError:
+            print("\nWARNING: Problem with GALEX query - maybe outside footprint?\n")
         self.download_unwise_images()
         self.load_unwise_images()
 
@@ -457,7 +459,7 @@ class cutouts():
             self.load_legacy_images()
             self.legacy_flag = True
         except: # urllib.error.HTTPError:
-            print('could not get legacy image')
+            print('\nWARNING: could not get legacy image\n')
             self.legacy_flag = False
         
 
