@@ -450,6 +450,8 @@ class cutouts():
             self.get_galex_image()
         except:
             print("\nWARNING: Problem with GALEX query - maybe outside footprint?\n")
+            self.nuv_flag = False
+            self.galex_image = None
         self.download_unwise_images()
         self.load_unwise_images()
 
