@@ -88,7 +88,7 @@ def get_filter_uat(header):
     elif (line.find('6740') > -1) |(line.find('ha16') > -1) :
         FILTER = 'ha16'
     elif line.find('R') > -1:
-        FILTER = filefilter.append('R')
+        FILTER = 'R'
     elif line.find('r') > -1:
         FILTER = 'r'
     elif line.find(' r ') > -1:
