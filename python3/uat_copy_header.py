@@ -29,7 +29,7 @@ parser.add_argument('--ref',dest = 'ref', default=None,help='reference image, to
 
 # even for MEF files, the main header is 0, and this is what comes in 
 #parser.add_argument('--wcs',dest = 'wcs', action='store_true', default=False, help='set this if you need to update basic wcs fields (ra,dec,equinox,crval1,crval2,cd1_1,cd2_2)')
-#parser.add_argument('--fixall',dest = 'fixall', action='store_true', default=False, help='set this to copy the entire header')
+parser.add_argument('--fixall',dest = 'fixall', action='store_true', default=False, help='set this to copy the entire header')
 #parser.add_argument('--postsplit',dest = 'postsplit', action='store_true', default=False, help='set this if you are fixing headers after the mef fits file was split into 4 separate files.')
 
 args = parser.parse_args()
