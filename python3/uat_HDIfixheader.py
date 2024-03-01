@@ -157,7 +157,10 @@ for f in files:
     DATE = header['DATE']
     OBJECT = header['OBJECT']
     MJD = header['MJD-OBS']
-    FILENAME = header['FILENAME']    
+    FILENAME = header['FILENAME']
+    if RASTRNG == 'Not Available':
+        print("WARNING: No coordinate information in header ",f)
+        continue
     # process coordinates to J2000 epoch
     c = SkyCoord(ra=RA.deg*u.degree,dec=DEC.degree*u.degree,frame='fk5',equinox='J'+str(EQUINOX))
     #print 'original coords = ',c
