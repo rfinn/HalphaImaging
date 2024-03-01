@@ -50,8 +50,8 @@ for line in infile:
             os.system('mv *%04i*%s00.fits junk/.'%(i,prefix))
                        
     else:
-        print(f'mv *{number.rstrip():04i}*{prefix}00.fits junk/.')
-        os.system(f'mv *{number.rstrip():04i}*{prefix}00.fits junk/.')
+        print(f'mv *{number.rstrip():04d}*{prefix}00.fits junk/.')
+        os.system(f'mv *{number.rstrip():04d}*{prefix}00.fits junk/.')
         pass
 
 infile.close()
