@@ -45,6 +45,7 @@
 '''
 import glob
 import os
+import sys
 import numpy as np
 
 import ccdproc
@@ -89,7 +90,7 @@ ftype=[]   #skyflat or domeflat
 for line in infile:
     t=line.split()
     if args.verbose:
-        print("CMMTOBS = {line}")
+        print(f"CMMTOBS = {line}")
     fnames.append(t[0])
     ftype.append(t[1]+t[2])
     if len(t)> 4:
@@ -114,7 +115,7 @@ for line in infile:
     else:
         filter.append(t[3].rstrip('\n'))
     if args.verbose:
-        print(f"filter = {filter[-1]}")
+        print(f"filter = {filter[-1]}, ftype = {ftype[-1]}")
 infile.close()
 set_filter=set(filter)
 set_ftype=set(ftype)
@@ -129,6 +130,8 @@ for f in set_ftype:
     print("flat type=",f)
     print('####################################')
     for element in set_filter:
+        if args.verbose:
+            print(f"working on {f}, {element}")
         ftype_filter = str(f)+str(element)
         flat_filelist.append(ftype_filter)
         print('grouping files for filter type = ',element)
@@ -140,6 +143,9 @@ for f in set_ftype:
             outfile.close()
             if args.verbose:
                 print(f"\ngot {len(indices)} in {f},{element}\n")
+
+# for testing
+sys.exit()
 
 for f in flat_filelist:
     print('filelist = ',f)
