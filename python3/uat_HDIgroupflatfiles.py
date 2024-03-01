@@ -99,9 +99,9 @@ for line in infile:
 
         elif (line.find('6660') > -1) |(line.find('ha8') > -1) :
             filter.append('ha8')
-        elif (line.find('6700') > -1):
+        elif (line.find('6700') > -1) |(line.find('ha12') > -1) :
             filter.append('ha12')
-        elif (line.find('6740') > -1:
+        elif (line.find('6740') > -1) |(line.find('ha16') > -1) :
             filter.append('ha16')
         elif t[3] == 'R':
             filter.append('R')

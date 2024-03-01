@@ -46,6 +46,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description ='Flatten images with dome flat taken in corresponding filter')
 parser.add_argument('--filestring', dest='filestring', default='ztr', help='match string for input files (default =  ztr, which gets ztr*.fits)')
+parser.add_argument('--verbose', dest='verbose', default=False,action='store_true', help='print extra messages for troubleshooting')
 args = parser.parse_args()
 
 
@@ -75,7 +76,8 @@ for line in infile:
         filefilter.append('r')
     elif t[1].find('V') > -1:
         filefilter.append('V')
-        
+    else:
+        print("WARNING: no filter found for ",t[1])
     #filefilter.append(t[1].rstrip('\n').replace(' ',''))
 infile.close()
 filters=set(filefilter)
