@@ -58,7 +58,8 @@ else:
 
 print("fields = ",fields)
 for f in fields:
-    print(f,hdu[0].header[f])
+    if hdu[0].header[f] == 'Not available':
+        print(f,hdu[0].header[f])
 
 # testing
 sys.exit()
