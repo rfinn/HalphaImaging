@@ -145,7 +145,7 @@ for f in files:
         
     RASTRNG = header['RASTRNG']
     DECSTRNG = header['DECSTRNG']
-    if RASTRNG == 'Not Available':
+    if RASTRNG == 'Not available':
         print("WARNING: No coordinate information in header ",f)
         continue
     
