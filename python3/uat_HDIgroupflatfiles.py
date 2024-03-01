@@ -142,7 +142,7 @@ for f in set_ftype:
                 outfile.write(fnames[i]+'\n')
             outfile.close()
             if args.verbose:
-                print(f"\ngot {len(indices)} in {f},{element}\n")
+                print(f"\ngot {len(indices[0])} in {f},{element}\n")
 
 # for testing
 sys.exit()
