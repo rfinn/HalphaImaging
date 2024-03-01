@@ -27,7 +27,7 @@
           For normalized flats --> 'nskyflat(type of filter).fits' or 'ndomeflat          (type of filter).fits'.
 
   REQUIRED MODULES:
-  pyraf
+  astropy
 
   NOTES:
   in junkfile ftr flats still show. We changed the gethead requirements to only   bring in files that start with tr but the ftr files will not go away! =(
@@ -91,6 +91,12 @@ for line in infile:
     if len(t)> 4:
         if line.find('6620') > -1:
             filter.append('ha4')
+        elif line.find('6660') > -1:
+            filter.append('ha8')
+        elif line.find('6700') > -1:
+            filter.append('ha12')
+        elif line.find('6740') > -1:
+            filter.append('ha16')
         else:
             print('problem with determing filter!!!')
             print('probably got a multi-word entry for CMMTOBS')
