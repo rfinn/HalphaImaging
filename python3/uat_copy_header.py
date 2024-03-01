@@ -59,31 +59,8 @@ else:
 print("fields = ",fields)
 for f in fields:
     if hdu[0].header[f] == 'Not available':
-        print(f,hdu[0].header[f])
-
-# testing
+        print('before fixing: ',f,hdu[0].header[f])
+        hdu[0].header[f] == href[f]
+        print('after fixing: ',f,hdu[0].header[f])
 sys.exit()
-for f in fields:
-    #print(f)
-    if (f.find('DUMMY') > -1) | (f.find('HISTORY') > -1):
-        continue
-    try: 
-        newval = href[f]
-    except:
-        print('error with ',f)
-        continue
-
-    hdu[0].header.set(f,newval)
-
-    ## the following commands are an alternate way to update the header using sethead
-    ## however, when I ran this on the virgo vms, it creates a new image *.fit,1
-    ## and neither image seemed to have the updated header values
-    ## not sure what's going on with that, so I chose to try to fix the issue with CD1_1
-    ## because astropy has more documentation than wcstools
-    '''
-    try:
-        os.system('sethead '+args.image+' '+f+'='+str(newval))
-    except KeyError:
-        os.system('sethead -k '+args.image+' '+f+'='+str(newval))
-    '''
 hdu.writeto(args.image,overwrite=True,output_verify='ignore')
