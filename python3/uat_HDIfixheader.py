@@ -145,6 +145,10 @@ for f in files:
         
     RASTRNG = header['RASTRNG']
     DECSTRNG = header['DECSTRNG']
+    if RASTRNG == 'Not Available':
+        print("WARNING: No coordinate information in header ",f)
+        continue
+    
     naxis1 = header['NAXIS1']
     naxis2 = header['NAXIS2']
     RA = coord.Angle(RASTRNG,unit=u.hour)
@@ -158,9 +162,6 @@ for f in files:
     OBJECT = header['OBJECT']
     MJD = header['MJD-OBS']
     FILENAME = header['FILENAME']
-    if RASTRNG == 'Not Available':
-        print("WARNING: No coordinate information in header ",f)
-        continue
     # process coordinates to J2000 epoch
     c = SkyCoord(ra=RA.deg*u.degree,dec=DEC.degree*u.degree,frame='fk5',equinox='J'+str(EQUINOX))
     #print 'original coords = ',c
