@@ -59,10 +59,10 @@ else:
 print("fields = ",fields)
 for f in fields:
     if hdu[0].header[f] == 'Not available':
-        print('before fixing: ',f,hdu[0].header[f])
-        print('ref value = ',href[f])
+        #print('before fixing: ',f,hdu[0].header[f])
+        print(f"{f}: {hdu[0].header[f]} -> href[f]")
         #hdu[0].header[f] == href[f]
         hdu[0].header.set(f,href[f])        
-        print('after fixing: ',f,hdu[0].header[f])
-sys.exit()
+        #print('after fixing: ',f,hdu[0].header[f])
+#sys.exit()
 hdu.writeto(args.image,overwrite=True,output_verify='ignore')
