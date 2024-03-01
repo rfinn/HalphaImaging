@@ -166,7 +166,7 @@ for f in flat_filelist:
         print(f"\nrunning ccdproc.combine on {f}\n")
         
     # combine flat images using average combine, scale by median, sigma clip
-    flat = ccdproc.combine(flatimages,scale=np.median,method='average',sigma_clip=True,unit=u.adu)
+    flat = ccdproc.combine(flatimages,scale=np.median,method='average',sigma_clip=False,unit=u.adu)
     #med_flat = ccdproc.combine(flatimages, method='median')
     # normalize flat image by dividing by mean
     norm_flat = flat / np.mean(flat)
