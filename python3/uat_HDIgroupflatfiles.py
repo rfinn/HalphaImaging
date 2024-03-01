@@ -170,7 +170,7 @@ for f in flat_filelist:
     #med_flat = ccdproc.combine(flatimages, method='median')
     # normalize flat image by dividing by mean
     norm_flat = flat / np.mean(flat)
-    print('writing fits')
+    print(f"writing fits {'n'+f+'.fits'}")
     fits.writeto('n'+f+'.fits', norm_flat, overwrite=True)
 
 
