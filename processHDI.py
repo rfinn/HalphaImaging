@@ -45,6 +45,7 @@ parser.add_argument('--submed', dest='submed', default=False,action='store_true'
 parser.add_argument('--swarp', dest='swarp', default=False,action='store_true', help='run swarp to make coadded images.')
 parser.add_argument('--filelist', dest='filelist', default='swarp_input', help='list of image sets to run swarp on.  the file should contain the list of all Rband groups, for example: ls pointing*_R > swarp_input.  This will look for the corresponding list of halpha images.')
 parser.add_argument('--zp', dest='zp', default=False,action='store_true', help='run getzp.py on all *coadd.fits images')
+parser.add_argument('--uat', dest='uat', default=False,action='store_true', help='set when running on UAT groups data that uses a bunch of different halpha filters')
 args = parser.parse_args()
 
 trim = args.trim
@@ -71,7 +72,7 @@ if zap:
 
 # group flat files
 if group_flat:
-    os.system('python '+gitpath+'uat_HDIgroupflatfiles.py --filestring ztr')
+    os.system('python '+gitpath+'uat_HDIgroupflatfiles.py --filestring ztr --verbose')
 
 # flatten science frames with dome flats
 if dflat:
@@ -84,7 +85,10 @@ if dflat:
 
 # fix the HDI header
 if fixheader:
-    os.system('python '+gitpath+'uat_HDIfixheader.py --filestring d')
+    if args.uat:
+        os.system('python '+gitpath+'uat_HDIfixheader.py --filestring d --uat')
+    else:
+        os.system('python '+gitpath+'uat_HDIfixheader.py --filestring d')
     mylist = ['FLATTENED','d']
     if not(os.path.exists(mylist[0])):
         os.mkdir(mylist[0])

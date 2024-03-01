@@ -54,12 +54,14 @@ parser.add_argument('--pixscaley', dest='pixelscaley', default='0.00011805', hel
 #parser.add_argument('--Rpos',dest='Rpos',default=203,help='position of R filter in FWHEEL2; gethead CMMTOBS FILTER1 FILTER2 d*.fits')
 parser.add_argument('--rpos',dest='rpos',default=203,help='position of r filter in FWHEEL2; gethead CMMTOBS FILTER1 FILTER2 d*.fits')
 parser.add_argument('--hapos',dest='hapos',default=201,help='position of ha4 filter in FWHEEL2; gethead CMMTOBS FILTER1 FILTER2 d*.fits')
+parser.add_argument('--uat',dest='uat',default=False,action='store_true',help='set this for uat groups')
 args = parser.parse_args()
 files = sorted(glob.glob(args.filestring+'*.fits'))
 nfiles=len(files)
 i=1
 
 def get_filter_virgo2020(header):
+    """ this is only for virgo data that used Ha+4nm """
     fw1 = int(header['FWHEEL1'])
     fw2 = int(header['FWHEEL2'])
     if (fw1 == 106) & (fw2 == int(args.rpos)):
@@ -73,6 +75,36 @@ def get_filter_virgo2020(header):
         #print('found ha4 filter')
         FILTER = 'ha4'
     return FILTER
+
+def get_filter_uat(header):
+    line = header['CMMTOBS']
+
+    if (line.find('6620') > -1) | (line.find('ha4') > -1) :
+        FILTER = 'ha4'
+    elif (line.find('6660') > -1) |(line.find('ha8') > -1) :
+        FILTER = 'ha8'
+    elif (line.find('6700') > -1) |(line.find('ha12') > -1) :
+        FILTER = 'ha12'
+    elif (line.find('6740') > -1) |(line.find('ha16') > -1) :
+        FILTER = 'ha16'
+    elif line.find('R') > -1:
+        FILTER = filefilter.append('R')
+    elif line.find('r') > -1:
+        FILTER = 'r'
+    elif line.find(' r ') > -1:
+        FILTER = 'r'
+    elif line.find('V') > -1:
+        FILTER = 'V'
+    else:
+        print('problem with determing filter!!!')
+        FILTER = None
+    return FILTER
+
+############################################
+##  MAIN PROGRAM
+############################################
+
+
 for f in files:
     print('FIXING HEADER FOR FILE %i OF %i'%(i,nfiles))
     data, header = fits.getdata(f,header=True)
@@ -80,7 +112,11 @@ for f in files:
     header.rename_keyword('FILTER2','FWHEEL2')
 
     headerv0 = header.copy()
-    FILTER = get_filter_virgo2020(header)
+
+    if args.uat:
+        FILTER = get_filter_uat(header)
+    else:
+        FILTER = get_filter_virgo2020(header)
     try:    
         ccdsec = header['CCDSEC']
     except:

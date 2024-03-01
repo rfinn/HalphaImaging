@@ -94,7 +94,7 @@ for line in infile:
     fnames.append(t[0])
     ftype.append(t[1]+t[2])
     if len(t)> 4:
-        if line.find('6620') > -1:
+        if (line.find('6620') > -1) | (line.find('ha4') > -1) :
             filter.append('ha4')
 
         elif (line.find('6660') > -1) |(line.find('ha8') > -1) :
