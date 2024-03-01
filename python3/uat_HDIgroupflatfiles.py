@@ -97,11 +97,11 @@ for line in infile:
         if line.find('6620') > -1:
             filter.append('ha4')
 
-        elif line.find('6660') > -1:
+        elif (line.find('6660') > -1) |(line.find('ha8') > -1) :
             filter.append('ha8')
-        elif line.find('6700') > -1:
+        elif (line.find('6700') > -1):
             filter.append('ha12')
-        elif line.find('6740') > -1:
+        elif (line.find('6740') > -1:
             filter.append('ha16')
         elif t[3] == 'R':
             filter.append('R')
@@ -169,6 +169,9 @@ for f in flat_filelist:
     flat = ccdproc.combine(flatimages,scale=np.median,method='average',sigma_clip=True,unit=u.adu)
     #med_flat = ccdproc.combine(flatimages, method='median')
     # normalize flat image by dividing by mean
+
+    # adding the np.array part to get rid of error on
+    # "MaskedArray.tofile() not implemented yet."
     norm_flat = np.array(flat/ np.mean(flat))
     print(f"writing fits {'n'+f+'.fits'}")
     fits.writeto('n'+f+'.fits', norm_flat, overwrite=True)
