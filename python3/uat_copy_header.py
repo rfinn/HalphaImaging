@@ -52,12 +52,11 @@ if args.fixall:
     # this may not work for other datasets...
     goodh = set(href)
     badh = set(hdu[0].header)
-    fields = list(goodh.difference(badh))
-    print('fields to update: ',fields)
+    fields = hdu[0].keys()
 else:
     fields = args.fields
 
-
+print("fields = ",fields)
 # testing
 sys.exit()
 for f in fields:
