@@ -131,7 +131,8 @@ for f in set_ftype:
             for i in indices[0]:
                 outfile.write(fnames[i]+'\n')
             outfile.close()
-            if args.verbose(f"got {len(indices)} in {element}")
+            if args.verbose:
+                print(f"\ngot {len(indices)} in {element}\n")
 
 for f in flat_filelist:
     print('filelist = ',f)
