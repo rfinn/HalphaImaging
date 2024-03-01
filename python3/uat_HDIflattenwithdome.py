@@ -58,16 +58,16 @@ filefilter=[]
 for line in infile:
     t=line.split('.fits')
     filenames.append(t[0]+'.fits')
-    if t[1].find('ha4') > -1:
-        filefilter.append('ha4')
-    elif t[1].find('ha8') > -1:
-        filefilter.append('ha8')
-    elif t[1].find('ha12') > -1:
-        filefilter.append('ha12')
-    elif t[1].find('ha16') > -1:
-        filefilter.append('ha16')
-    elif t[1].find('6620') > -1:
-        filefilter.append('ha4')
+    if (line.find('6620') > -1) | (t[1].find('ha4') > -1):
+        filter.append('ha4')
+
+    elif (line.find('6660') > -1) |(line.find('ha8') > -1) :
+        filter.append('ha8')
+    elif (line.find('6700') > -1) |(line.find('ha12') > -1) :
+        filter.append('ha12')
+    elif (line.find('6740') > -1) |(line.find('ha16') > -1) :
+        filter.append('ha16')
+    
     elif t[1].find('R') > -1:
         filefilter.append('R')
     elif t[1].find('r') > -1:
