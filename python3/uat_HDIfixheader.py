@@ -79,13 +79,13 @@ def get_filter_virgo2020(header):
 def get_filter_uat(header):
     line = header['CMMTOBS']
 
-    if (line.find('6620') > -1) | (line.find('ha4') > -1) :
+    if (line.find('6620') > -1) | (line.find('ha4') > -1) | (line.find('Ha4') > -1) :
         FILTER = 'ha4'
-    elif (line.find('6660') > -1) |(line.find('ha8') > -1) :
+    elif (line.find('6660') > -1) |(line.find('ha8') > -1) | (line.find('Ha8') > -1) :
         FILTER = 'ha8'
-    elif (line.find('6700') > -1) |(line.find('ha12') > -1) :
+    elif (line.find('6700') > -1) |(line.find('ha12') > -1)| (line.find('Ha12') > -1) :
         FILTER = 'ha12'
-    elif (line.find('6740') > -1) |(line.find('ha16') > -1) :
+    elif (line.find('6740') > -1) |(line.find('ha16') > -1)| (line.find('Ha16') > -1) :
         FILTER = 'ha16'
     elif line.find('R') > -1:
         FILTER = 'R'

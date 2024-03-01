@@ -58,13 +58,13 @@ filefilter=[]
 for line in infile:
     t=line.split('.fits')
     filenames.append(t[0]+'.fits')
-    if (line.find('6620') > -1) | (t[1].find('ha4') > -1):
+    if (line.find('6620') > -1) | (line.find('ha4') > -1) | (line.find('Ha4') > -1) :
         filefilter.append('ha4')
-    elif (line.find('6660') > -1) |(line.find('ha8') > -1) :
+    elif (line.find('6660') > -1) |(line.find('ha8') > -1) | (line.find('Ha4') > -1) :
         filefilter.append('ha8')
-    elif (line.find('6700') > -1) |(line.find('ha12') > -1) :
+    elif (line.find('6700') > -1) |(line.find('ha12') > -1) | (line.find('Ha4') > -1) :
         filefilter.append('ha12')
-    elif (line.find('6740') > -1) |(line.find('ha16') > -1) :
+    elif (line.find('6740') > -1) |(line.find('ha16') > -1) | (line.find('Ha4') > -1) :
         filefilter.append('ha16')
     
     elif t[1].find('R') > -1:
