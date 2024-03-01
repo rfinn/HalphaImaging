@@ -145,7 +145,7 @@ for f in set_ftype:
                 print(f"\ngot {len(indices[0])} in {f},{element}\n")
 
 # for testing
-sys.exit()
+#sys.exit()
 
 for f in flat_filelist:
     print('filelist = ',f)
@@ -157,6 +157,8 @@ for f in flat_filelist:
         print('Hope that is ok...')
         continue
     for q in filelist: flatimages.append(q.rstrip())
+    if args.verbose:
+        print(f"flatimages = {flatimages}")
     if len(flatimages) < 3:
         print('problem combining images from ',f)
         continue
