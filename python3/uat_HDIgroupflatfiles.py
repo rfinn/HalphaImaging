@@ -62,6 +62,7 @@ iraf.ccdred()
 parser = argparse.ArgumentParser(description ='Groups images by filter and creates flatfield images')
 parser.add_argument('--filestring', dest='filestring', default='ztr', help='match string for input files (default =  ztr, which gets ztr*.fits)')
 parser.add_argument('--siena', dest='siena', default=False,action='store_true', help='set this if reducing data from Siena STL11000M CCD')
+parser.add_argument('--verbose', dest='verbose', default=False,action='store_true', help='print extra messages for troubleshooting')
 args = parser.parse_args()
 files = sorted(glob.glob(args.filestring+'*.fits'))
 nfiles=len(files)
@@ -97,6 +98,8 @@ for line in infile:
             filter.append('ha12')
         elif line.find('6740') > -1:
             filter.append('ha16')
+        elif t[3] == 'R':
+            filter.append('R')
         else:
             print('problem with determing filter!!!')
             print('probably got a multi-word entry for CMMTOBS')
