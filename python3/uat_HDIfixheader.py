@@ -146,7 +146,8 @@ for f in files:
     RASTRNG = header['RASTRNG']
     DECSTRNG = header['DECSTRNG']
     if RASTRNG == 'Not available':
-        print("WARNING: No coordinate information in header ",f,"\n")
+        print("WARNING: No coordinate information in header ",f)
+        print("Skipping image...\n")
         continue
     
     naxis1 = header['NAXIS1']
