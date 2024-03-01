@@ -148,6 +148,7 @@ for f in flat_filelist:
         continue
     if args.verbose:
         print(f"\nrunning ccdproc.combine on {f}\n")
+        
     # combine flat images using average combine, scale by median, sigma clip
     flat = ccdproc.combine(flatimages,scale=np.median,method='average',sigma_clip=True,unit=u.adu)
     #med_flat = ccdproc.combine(flatimages, method='median')
