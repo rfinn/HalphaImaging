@@ -57,9 +57,12 @@ else:
     fields = args.fields
 
 print("fields = ",fields)
+for f in fields:
+    print(f,hdu[0].header[f])
+
 # testing
 sys.exit()
-for f in fields:
+
     #print(f)
     if (f.find('DUMMY') > -1) | (f.find('HISTORY') > -1):
         continue
