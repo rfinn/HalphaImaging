@@ -131,6 +131,7 @@ for f in set_ftype:
             for i in indices[0]:
                 outfile.write(fnames[i]+'\n')
             outfile.close()
+            if args.verbose(f"got {len(indices)} in {element}")
 
 for f in flat_filelist:
     print('filelist = ',f)
@@ -145,6 +146,8 @@ for f in flat_filelist:
     if len(flatimages) < 3:
         print('problem combining images from ',f)
         continue
+    if args.verbose:
+        print(f"\nrunning ccdproc.combine on {f}\n")
     # combine flat images using average combine, scale by median, sigma clip
     flat = ccdproc.combine(flatimages,scale=np.median,method='average',sigma_clip=True,unit=u.adu)
     #med_flat = ccdproc.combine(flatimages, method='median')
