@@ -85,13 +85,17 @@ filter=[]
 ftype=[]   #skyflat or domeflat
 
 
+
 for line in infile:
     t=line.split()
+    if args.verbose:
+        print("CMMTOBS = {line}")
     fnames.append(t[0])
     ftype.append(t[1]+t[2])
     if len(t)> 4:
         if line.find('6620') > -1:
             filter.append('ha4')
+
         elif line.find('6660') > -1:
             filter.append('ha8')
         elif line.find('6700') > -1:
@@ -106,8 +110,11 @@ for line in infile:
             print("I'm storing the second word...")
             print('filter = ',t[4].rstrip('\n'))
             filter.append(t[4].rstrip('\n'))
+              
     else:
         filter.append(t[3].rstrip('\n'))
+    if args.verbose:
+        print(f"filter = {filter[-1]}")
 infile.close()
 set_filter=set(filter)
 set_ftype=set(ftype)
@@ -132,7 +139,7 @@ for f in set_ftype:
                 outfile.write(fnames[i]+'\n')
             outfile.close()
             if args.verbose:
-                print(f"\ngot {len(indices)} in {element}\n")
+                print(f"\ngot {len(indices)} in {f},{element}\n")
 
 for f in flat_filelist:
     print('filelist = ',f)
