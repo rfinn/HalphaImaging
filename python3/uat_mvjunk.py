@@ -47,10 +47,10 @@ for line in infile:
         b = int(t[1])+1
         for i in range(a,b):
             print('mv *%04i*%s00.fits junk/.'%(i,prefix))
-            #os.system('mv *%04i*%s00.fits junk/.'%(i,prefix))
+            os.system('mv *%04i*%s00.fits junk/.'%(i,prefix))
                        
     else:
-        #os.system('mv *'+number.rstrip()+'*'+prefix+'00.fits junk/.')
+        os.system('mv *'+number.rstrip()+'*'+prefix+'00.fits junk/.')
         pass
 
 infile.close()
