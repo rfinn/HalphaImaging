@@ -52,7 +52,7 @@ if args.fixall:
     # this may not work for other datasets...
     goodh = set(href)
     badh = set(hdu[0].header)
-    fields = hdu[0].keys()
+    fields = hdu[0].header.keys()
 else:
     fields = args.fields
 
