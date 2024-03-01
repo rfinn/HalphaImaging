@@ -51,5 +51,6 @@ for line in infile:
                        
     else:
         #os.system('mv *'+number.rstrip()+'*'+prefix+'00.fits junk/.')
+        pass
 
 infile.close()
