@@ -19,7 +19,7 @@ import sys
 from astropy.io import fits
 import argparse
 import astropy
-
+from astropy import units as u
 from astropy.nddata import CCDData
 import ccdproc
 from astropy.modeling import models
