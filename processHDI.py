@@ -88,7 +88,7 @@ if group_flat:
 
 # flatten science frames with dome flats
 if dflat: # prepends 'f'
-    os.system('python '+gitpath+'uat_HDIflattenwithdome.py')
+    os.system('python '+gitpath+'uat_HDIflattenwithdome.py --filestring b')
     #mylist = ['ZAPPED','z']
     mylist = ['BIASSUB','b']    
     if not(os.path.exists(mylist[0])):
