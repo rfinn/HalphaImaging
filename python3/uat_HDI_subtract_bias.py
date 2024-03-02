@@ -25,9 +25,11 @@ from astropy.modeling import models
 
 parser = argparse.ArgumentParser(description ='Subtract overscan bias and trim images.')
 parser.add_argument('--filestring', dest = 'filestring', default = 'tc', help = 'string to use to get input files (default = "c", which grabs all of the files "c*o00.fits")')
+parser.add_argument('--verbose', dest='verbose', default=False,action='store_true', help='print extra messages for troubleshooting')
+
 #parser.add_argument('--gain', dest = 'gain', default= 1.3, help = 'gain in e-/ADU.  default is 1.3, which applies to HDI camera')
 #parser.add_argument('--rdnoise', dest = 'rdnoise', default= 7.3, help = 'gain in e-/ADU.  default is 1.3, which applies to HDI camera')
-
+args = parser.parse_args()
 
 # get list of bias frames
 biasfiles = glob.glob(args.filestring+'*b00.fits')
