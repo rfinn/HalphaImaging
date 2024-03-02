@@ -58,6 +58,15 @@ print('  Writing {}'.format(combinedbiasfile))
 combinedbias.write(combinedbiasfile, overwrite=True)
 
 ############################################################
+# mv bias frames to BIAS subdirectory
+############################################################
+if not os.path.exists('BIAS_FRAMES'):
+    os.mkdir('BIAS_FRAMES')
+for b in biasfiles:
+    os.rename(b,'BIAS_FRAMES/'+b)
+
+
+############################################################
 # subtract bias from other images
 ############################################################
 

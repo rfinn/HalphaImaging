@@ -68,10 +68,13 @@ if trim: # prepends 'tr'
 if bias: # prepends 'b'
     # make master bias
     # subtract bias from flat and science    
-    os.system('python '+gitpath+'uat_overscantrim.py --filestring trc')
+    os.system('python '+gitpath+'uat_HDI_subtract_bias.py --filestring trc')
 
     mylist = ['TRIMMED','tr']
-
+    if not(os.path.exists(mylist[0])):
+        os.mkdir(mylist[0])
+        os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
+    
     
 
 # group flat files
@@ -82,7 +85,7 @@ if group_flat:
 if dflat: # prepends 'f'
     os.system('python '+gitpath+'uat_HDIflattenwithdome.py')
     #mylist = ['ZAPPED','z']
-    mylist = ['BIAS','b']    
+    mylist = ['BIASSUB','b']    
     if not(os.path.exists(mylist[0])):
         os.mkdir(mylist[0])
         os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
