@@ -93,7 +93,7 @@ for f in allfiles:
 
     # subtract overscan
     head_updates = {'SUBBIAS':True}
-    b_subtracted = ccdproc.subtract_bias(ccd, bias, add_keyword = head_updates)
+    b_subtracted = ccdproc.subtract_bias(ccd, combinedbias, add_keyword = head_updates)
     
     b_subtracted.write('b'+f, overwrite=True)    
     
