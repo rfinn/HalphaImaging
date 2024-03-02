@@ -15,6 +15,7 @@ ccdproc
 
 import glob
 import os
+import sys
 from astropy.io import fits
 import argparse
 import astropy
