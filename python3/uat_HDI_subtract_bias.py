@@ -55,7 +55,7 @@ combinedbias = ccdproc.combine(biasfiles,method='average',sigma_clip=True,unit=u
                        sigma_clip_dev_func=astropy.stats.mad_std)
 
 combinedbias.data = combinedbias.data.astype('f4')
-combinedbias.header['NBIAS'] = nbias
+combinedbias.header['NBIAS'] = len(biasfiles)
 combinedbias.header['COMBINED'] = True
 
 combinedbiasfile = 'bias_average.fits'
