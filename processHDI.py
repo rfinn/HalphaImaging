@@ -33,10 +33,12 @@ parser = argparse.ArgumentParser(description ='Reduce HDI data, trim through sca
 
 
 parser.add_argument('--trim', dest='trim', default=False,action='store_true', help='trim images')
-parser.add_argument('--zap', dest='zap', default=False,action='store_true', help='run cosmic ray reject (this takes a long time)')
+parser.add_argument('--bias', dest='bias', default=False,action='store_true', help='combine bias and subtract from science and flats')
+
 parser.add_argument('--groupflat', dest='groupflat', default=False,action='store_true', help='group files by filter and create normalized flats')
 parser.add_argument('--flatwdome', dest='flatwdome', default=False,action='store_true', help='flatten images with dome flats')
 parser.add_argument('--fixheader', dest='fixheader', default=False,action='store_true', help='fix headeer to get files ready for scamp.')
+parser.add_argument('--zap', dest='zap', default=False,action='store_true', help='run cosmic ray reject (this takes a long time)')
 parser.add_argument('--filestring', dest = 'filestring', default = 'h', help = 'string to use to get input files (default = "h", which grabs all of the files "h*o00.fits")')
 
 parser.add_argument('--se', dest='se', default=False,action='store_true', help='run sextractor.  best to do this on all files from an observing run at once.')
@@ -49,9 +51,12 @@ parser.add_argument('--uat', dest='uat', default=False,action='store_true', help
 args = parser.parse_args()
 
 trim = args.trim
-zap = args.zap
+bias = args.bias
+
+
 group_flat = args.groupflat
 dflat = args.flatwdome
+zap = args.zap
 fixheader=args.fixheader
 #astr = args.astr
 
