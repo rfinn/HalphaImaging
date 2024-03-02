@@ -55,47 +55,57 @@ dflat = args.flatwdome
 fixheader=args.fixheader
 #astr = args.astr
 
-if bias:
-    # make master bias
-
-    # subtract bias from flat and science
 
     
-if trim:
+if trim: # prepends 'tr'
     os.system('python '+gitpath+'uat_overscantrim.py --filestring c')
-mylist = ['ORIGINALS','c']
-if not(os.path.exists(mylist[0])):
-    os.mkdir(mylist[0])
-    os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
-
-# zap cosmic rays
-if zap:
-    os.system('python '+gitpath+'uat_zapcosmicrays.py --filestring tr')
-    mylist = ['TRIMMED','tr']
+    mylist = ['ORIGINALS','c']
     if not(os.path.exists(mylist[0])):
         os.mkdir(mylist[0])
         os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
+
+
+if bias: # prepends 'b'
+    # make master bias
+    # subtract bias from flat and science    
+    os.system('python '+gitpath+'uat_overscantrim.py --filestring trc')
+
+    mylist = ['TRIMMED','tr']
+
+    
 
 # group flat files
 if group_flat:
-    os.system('python '+gitpath+'uat_HDIgroupflatfiles.py --filestring ztr --verbose')
+    os.system('python '+gitpath+'uat_HDIgroupflatfiles.py --filestring b --verbose')
 
 # flatten science frames with dome flats
-if dflat:
+if dflat: # prepends 'f'
     os.system('python '+gitpath+'uat_HDIflattenwithdome.py')
-    mylist = ['ZAPPED','z']
+    #mylist = ['ZAPPED','z']
+    mylist = ['BIAS','b']    
     if not(os.path.exists(mylist[0])):
         os.mkdir(mylist[0])
         os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
 
 
-# fix the HDI header
-if fixheader:
-    if args.uat:
-        os.system('python '+gitpath+'uat_HDIfixheader.py --filestring d --uat')
-    else:
-        os.system('python '+gitpath+'uat_HDIfixheader.py --filestring d')
+#############################################################
+# zap cosmic rays - on science frames only - save bucko time
+#############################################################
+if zap: # prepends 'z'
+    os.system('python '+gitpath+'uat_zapcosmicrays.py --filestring d')
     mylist = ['FLATTENED','d']
+    if not(os.path.exists(mylist[0])):
+        os.mkdir(mylist[0])
+        os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
+        
+# fix the HDI header
+if fixheader: # prepends 'h'
+    if args.uat:
+        os.system('python '+gitpath+'uat_HDIfixheader.py --filestring z --uat')
+    else:
+        os.system('python '+gitpath+'uat_HDIfixheader.py --filestring z')
+    #mylist = ['FLATTENED','d']
+    mylist = ['ZAPPED','z']    
     if not(os.path.exists(mylist[0])):
         os.mkdir(mylist[0])
         os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
