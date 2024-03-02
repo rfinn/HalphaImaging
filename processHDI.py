@@ -55,6 +55,12 @@ dflat = args.flatwdome
 fixheader=args.fixheader
 #astr = args.astr
 
+if bias:
+    # make master bias
+
+    # subtract bias from flat and science
+
+    
 if trim:
     os.system('python '+gitpath+'uat_overscantrim.py --filestring c')
 mylist = ['ORIGINALS','c']
