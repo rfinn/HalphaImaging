@@ -80,7 +80,7 @@ flatfiles = glob.glob(args.filestring+'*f00.fits')
 # get list of bias frames
 sciencefiles = glob.glob(args.filestring+'*o00.fits')
 
-allfiles = flatfiles + sciencfiles
+allfiles = flatfiles + sciencefiles
 
 
 for f in allfiles:
