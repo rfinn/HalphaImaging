@@ -366,6 +366,7 @@ def get_galex_image(ra,dec,imsize):
 
     # write out with the correct header
     w = cutout.wcs
+    w = WCS(nuv_header)
     try:
         ((ymin,ymax),(xmin,xmax)) = cutout.bbox_original
     except AttributeError:
@@ -377,7 +378,7 @@ def get_galex_image(ra,dec,imsize):
     # add sky subtraction here
     
     newfile.header = nuv_header
-    newfile.header.update(w[ymin:ymax,xmin:xmax].to_header())
+    newfile.header.update(cutout.wcs.to_header())
                 
     #fits.writeto(self.nuv_image_name, cutout.data, header=cutout.header, overwrite=True)
     
