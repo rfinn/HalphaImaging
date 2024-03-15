@@ -361,6 +361,7 @@ def get_galex_image(ra,dec,imsize):
 
     nuv_wcs = WCS(nuv_header)
     position = SkyCoord(ra,dec,unit="deg",frame='icrs')
+    cutout = Cutout2D(nuv,position,(imsize*u.arcsec,imsize*u.arcsec),wcs=nuv_wcs)
     try:
         cutout = Cutout2D(nuv,position,(imsize*u.arcsec,imsize*u.arcsec),wcs=nuv_wcs)
     except:
@@ -593,6 +594,7 @@ class cutouts():
             self.nuv_image_name = 'galex/'+self.galid+'-nuv-'+imsize_arcsec+'.fits'            
 
 
+        
         if os.path.exists(self.nuv_image_name):
             self.nuv_image,h = fits.getdata(self.nuv_image_name,header=True)
             self.nuv_flag = True
