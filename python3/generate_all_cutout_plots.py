@@ -59,7 +59,7 @@ if __name__ == '__main__':
         for d in dirlist:
             image_pool = mp.Pool(mp.cpu_count())
             #image_pool = mp.pool.ThreadPool(mp.cpu_count())    
-            myresults = [image_pool.apply_async(buildone,args=(d,)) for d in dirlist]
+            myresults = [image_pool.apply_async(getone,args=(d,)) for d in dirlist]
             
             image_pool.close()
             image_pool.join()

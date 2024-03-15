@@ -603,7 +603,8 @@ class cutouts():
         else:
             cutout = get_galex_image(self.ra,self.dec,self.xsize_arcsec)
             if cutout is not None:
-                fits.writeto(self.nuv_image_name, cutout.data, overwrite=True)
+                
+                fits.writeto(self.nuv_image_name, cutout.data, header=cutout.header, overwrite=True)
                 self.nuv_image = cutout.data
                 self.nuv_flag = True
             else:

@@ -3,7 +3,7 @@
 """
 GOAL: launch HDI reduction for all nights' data from a given run simultaneously.  I don't know how much is memory intensive vs processor intensive, but it can't hurt, right?
 
-
+** Need to check through all of the folders first to look for any issues with image headers. **
 
 USAGE:
 Feed data directory on command line, e.g.:
