@@ -629,7 +629,7 @@ class cutouts():
             if cutout_hdu is not None:
                 self.nuv_image = cutout_hdu.data
                 self.nuv_flag = True
-                fits.writeto(self.nuv_image_name,cutout_hdu,overwrite=True)
+                fits.writeto(self.nuv_image_name,cutout_hdu.data,header=cutout_hdu.header,overwrite=True)
             else:
                 self.nuv_flag = False
     def plotcutouts(self,plotsingle=True):
