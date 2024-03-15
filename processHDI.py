@@ -85,6 +85,10 @@ if bias: # prepends 'b'
 # group flat files
 if group_flat:
     os.system('python '+gitpath+'uat_HDIgroupflatfiles.py --filestring b --verbose')
+    mylist = ['FLAT_FRAMES','btr']
+    if not(os.path.exists(mylist[0])):
+        os.mkdir(mylist[0])
+        os.system('mv '+mylist[1]+'*f00.fits '+mylist[0]+'/.')
 
 # flatten science frames with dome flats
 if dflat: # prepends 'f'
