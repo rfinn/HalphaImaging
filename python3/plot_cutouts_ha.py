@@ -361,6 +361,7 @@ def get_galex_image(ra,dec,imsize):
 
     nuv_wcs = WCS(nuv_header)
     position = SkyCoord(ra,dec,unit="deg",frame='icrs')
+    print("\nYoohoo!\n")
     cutout = Cutout2D(nuv,position,(imsize*u.arcsec,imsize*u.arcsec),wcs=nuv_wcs)
     try:
         cutout = Cutout2D(nuv,position,(imsize*u.arcsec,imsize*u.arcsec),wcs=nuv_wcs)
