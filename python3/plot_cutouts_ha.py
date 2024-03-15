@@ -362,14 +362,34 @@ def get_galex_image(ra,dec,imsize):
     nuv_wcs = WCS(nuv_header)
     position = SkyCoord(ra,dec,unit="deg",frame='icrs')
     print("\nYoohoo!\n")
-    cutout = Cutout2D(nuv,position,(imsize*u.arcsec,imsize*u.arcsec),wcs=nuv_wcs)
+    cutout = Cutout2D(nuv,position,(imsize*u.arcsec,imsize*u.arcsec),wcs=nuv_wcs,mode='trim')
+
+    # write out with the correct header
+    w = WCS(cutout.wcs)
+    try:
+        ((ymin,ymax),(xmin,xmax)) = self.cutoutR.bbox_original
+    except AttributeError:
+        print('make sure you have selected a galaxy and saved the cutout')
+        return
+    
+    newfile = fits.PrimaryHDU()
+    newfile.data = cutout.data
+    # add sky subtraction here
+    
+    newfile.header = self.r_header
+    newfile.header.update(w[ymin:ymax,xmin:xmax].to_header())
+                
+    #fits.writeto(self.nuv_image_name, cutout.data, header=cutout.header, overwrite=True)
+    
+
     #try:
     #    cutout = Cutout2D(nuv,position,(imsize*u.arcsec,imsize*u.arcsec),wcs=nuv_wcs)
     #except:
     #    print('WARNING: problem getting galex cutout')
     #    cutout = None
 
-    return cutout
+    # now returns an hdu with data and header
+    return newfile
     
 def display_image(image,percent=99.9,lowrange=False,mask=None,sigclip=True):
     lowrange=False
@@ -605,12 +625,11 @@ class cutouts():
             except:
                 print('WARNING: could not get galex pixelscale')
         else:
-            cutout = get_galex_image(self.ra,self.dec,self.xsize_arcsec)
-            if cutout is not None:
-                
-                fits.writeto(self.nuv_image_name, cutout.data, header=cutout.header, overwrite=True)
+            cutout_hdu = get_galex_image(self.ra,self.dec,self.xsize_arcsec)
+            if cutout_hdu is not None:
                 self.nuv_image = cutout.data
                 self.nuv_flag = True
+                fits.writeto(self.nuv_image_name,cutout_hdu,overwrite=True)
             else:
                 self.nuv_flag = False
     def plotcutouts(self,plotsingle=True):
