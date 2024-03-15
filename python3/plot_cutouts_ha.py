@@ -367,7 +367,7 @@ def get_galex_image(ra,dec,imsize):
     # write out with the correct header
     w = cutout.wcs
     try:
-        ((ymin,ymax),(xmin,xmax)) = self.cutoutR.bbox_original
+        ((ymin,ymax),(xmin,xmax)) = cutout.bbox_original
     except AttributeError:
         print('make sure you have selected a galaxy and saved the cutout')
         return
