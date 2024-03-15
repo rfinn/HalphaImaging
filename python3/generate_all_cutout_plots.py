@@ -32,6 +32,7 @@ def getone(d):
         print(f"found {len(imlist)} r-band images")
         
     for im in imlist:
+        print('python '+homedir+'/github/HalphaImaging/python3/plot_cutouts_ha.py --r '+im+' --plotall')
         os.system('python '+homedir+'/github/HalphaImaging/python3/plot_cutouts_ha.py --r '+im+' --plotall')
     os.chdir(workingdir)
 
