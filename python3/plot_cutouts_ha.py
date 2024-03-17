@@ -469,7 +469,6 @@ class cutouts():
             self.get_galid()
 
 
-        self.get_galex_image()
         try:
             self.get_galex_image()
         except:
