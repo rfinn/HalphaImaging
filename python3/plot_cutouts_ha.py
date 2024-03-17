@@ -178,7 +178,7 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
     if downloadwise:
         imsize = int(imsize)
         print('wise image size = ',imsize)
-        baseurl = 'http://unwise.me/cutout_fits?version=allwise'
+        baseurl = 'https://unwise.me/cutout_fits?version=allwise'
         imurl = baseurl +'&ra=%.5f&dec=%.5f&size=%s&bands=%s'%(ra,dec,imsize,bands)
         print('downloading unwise images')
         print(imurl)
