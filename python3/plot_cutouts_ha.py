@@ -62,6 +62,8 @@ vmin = .5
 vmax = 50.
 
 UNWISE_PIXSCALE = 2.75
+
+# why am I using 1 arcsec for the legacy images???
 LEGACY_PIXSCALE = 1
 
 
@@ -98,18 +100,22 @@ def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',band='g',makep
 
 
     print('legacy imsize = ',imsize)
-    
+    #https://www.legacysurvey.org/viewer/ls-dr9/1/14/7963/6632.cat.json
+    #https://www.legacysurvey.org/viewer/exposures/?ra=57.8589&dec=-15.4102&layer=ls-dr9
+    #https://www.legacysurvey.org/viewer/fits-cutout?ra=57.8554&dec=-15.4054&pixscale=0.5&layer=ls-dr9&size=300
     # check if images already exist
     # if not download images
     if not(os.path.exists(jpeg_name)):
         print('retrieving ',jpeg_name)
-        url='http://legacysurvey.org/viewer/jpeg-cutout?ra='+str(ra)+'&dec='+str(dec)+'&layer=dr8&size='+str(imsize)+'&pixscale='+str(pixscale)
+        url='http://legacysurvey.org/viewer/jpeg-cutout?ra='+str(ra)+'&dec='+str(dec)+'&layer=ls-dr10&size='+str(imsize)+'&pixscale='+str(pixscale)
+        print(url)
         urlretrieve(url, jpeg_name)
     else:
         print('previously downloaded ',jpeg_name)
     if not(os.path.exists(fits_name)):
         print('retrieving ',fits_name)
-        url='http://legacysurvey.org/viewer/cutout.fits?ra='+str(ra)+'&dec='+str(dec)+'&layer=dr8&size='+str(imsize)+'&pixscale='+str(pixscale)+'&bands='+band
+        url='http://legacysurvey.org/viewer/cutout.fits?ra='+str(ra)+'&dec='+str(dec)+'&layer=ls-dr10&size='+str(imsize)+'&pixscale='+str(pixscale)+'&bands='+band
+        print(url)
         urlretrieve(url, fits_name)
     else:
         print('previously downloaded ',fits_name)
@@ -121,7 +127,7 @@ def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',band='g',makep
     except IndexError:
         print('problem accessing image')
         print(fits_name)
-        url='http://legacysurvey.org/viewer/cutout.fits?ra='+str(ra1)+'&dec='+str(dec1)+'&layer=dr8&size='+str(image_size)+'&pixscale=1.00'
+        url='http://legacysurvey.org/viewer/cutout.fits?ra='+str(ra1)+'&dec='+str(dec1)+'&layer=ls-dr10&size='+str(image_size)+'&pixscale=1.00'
         print(url)
         return None
 
@@ -131,12 +137,11 @@ def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',band='g',makep
 
     # plot the images
     if makeplots:
-        if jpeg:
-            t = Image.open(jpeg_name)
-            plt.imshow(t,origin='upper')
-        else:
-            norm = simple_norm(t[1],stretch='asinh',percent=99.5)            
-            plt.imshow(t[1],origin='upper',cmap='gray_r', norm=norm)
+        t = Image.open(jpeg_name)
+        plt.imshow(t,origin='upper')
+    #else:
+    #        norm = simple_norm(t[1],stretch='asinh',percent=99.5)            
+    #        plt.imshow(t[1],origin='upper',cmap='gray_r', norm=norm)
 
     # return the name of the fits images and jpeg image
     return fits_name, jpeg_name
