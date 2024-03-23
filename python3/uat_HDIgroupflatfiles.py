@@ -99,7 +99,9 @@ for line in infile:
 
 
     try:
-        if len(t)> 4:
+        if len(t) == 2:# adding some additional cases to accomodate 2014-04-25 what has only filter
+            filter.append(t[1].rstrip('\n'))
+        elif len(t)> 4:
             if (line.find('6620') > -1) | (line.find('ha4') > -1) | (line.find('Ha4') > -1) :
                 filter.append('ha4')
 
@@ -117,12 +119,9 @@ for line in infile:
                 print("I'm storing the second word...")
                 print('filter = ',t[4].rstrip('\n'))
                 filter.append(t[4].rstrip('\n'))
-
         else:
             filter.append(t[3].rstrip('\n'))
-    except IndexError: # adding some additional cases to accomodate 2014-04-25 what has only filter
-        if len(t) == 2:
-            filter.append(t[1].rstrip('\n'))
+        
     if args.verbose:
         print(f"filter = {filter[-1]}, ftype = {ftype[-1]}")
 infile.close()
