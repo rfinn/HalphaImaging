@@ -96,27 +96,33 @@ for line in infile:
         ftype.append(t[1]+t[2])
     except IndexError: # some dome flats in 2014 just have filter but not 'dome flat FILTER'
         ftype.append('domeflat')
-    if len(t)> 4:
-        if (line.find('6620') > -1) | (line.find('ha4') > -1) | (line.find('Ha4') > -1) :
-            filter.append('ha4')
 
-        elif (line.find('6660') > -1) |(line.find('ha8') > -1) | (line.find('Ha8') > -1) :
-            filter.append('ha8')
-        elif (line.find('6700') > -1) |(line.find('ha12') > -1)| (line.find('Ha12') > -1) :
-            filter.append('ha12')
-        elif (line.find('6740') > -1) |(line.find('ha16') > -1) | (line.find('Ha16') > -1) :
-            filter.append('ha16')
-        elif t[3] == 'R':
-            filter.append('R')
+
+    try:
+        if len(t)> 4:
+            if (line.find('6620') > -1) | (line.find('ha4') > -1) | (line.find('Ha4') > -1) :
+                filter.append('ha4')
+
+            elif (line.find('6660') > -1) |(line.find('ha8') > -1) | (line.find('Ha8') > -1) :
+                filter.append('ha8')
+            elif (line.find('6700') > -1) |(line.find('ha12') > -1)| (line.find('Ha12') > -1) :
+                filter.append('ha12')
+            elif (line.find('6740') > -1) |(line.find('ha16') > -1) | (line.find('Ha16') > -1) :
+                filter.append('ha16')
+            elif t[3] == 'R':
+                filter.append('R')
+            else:
+                print('problem with determing filter!!!')
+                print('probably got a multi-word entry for CMMTOBS')
+                print("I'm storing the second word...")
+                print('filter = ',t[4].rstrip('\n'))
+                filter.append(t[4].rstrip('\n'))
+
         else:
-            print('problem with determing filter!!!')
-            print('probably got a multi-word entry for CMMTOBS')
-            print("I'm storing the second word...")
-            print('filter = ',t[4].rstrip('\n'))
-            filter.append(t[4].rstrip('\n'))
-              
-    else:
-        filter.append(t[3].rstrip('\n'))
+            filter.append(t[3].rstrip('\n'))
+    except IndexError: # adding some additional cases to accomodate 2014-04-25 what has only filter
+        if len(t) == 2:
+            filter.append(t[1].rstrip('\n'))
     if args.verbose:
         print(f"filter = {filter[-1]}, ftype = {ftype[-1]}")
 infile.close()
