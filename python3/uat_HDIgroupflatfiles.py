@@ -121,7 +121,9 @@ for line in infile:
                 filter.append(t[4].rstrip('\n'))
         else:
             filter.append(t[3].rstrip('\n'))
-        
+    except:
+        print("Problem getting filter from CMMTOBS = ",line)
+        sys.exit()
     if args.verbose:
         print(f"filter = {filter[-1]}, ftype = {ftype[-1]}")
 infile.close()
