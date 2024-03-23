@@ -92,35 +92,45 @@ for line in infile:
     if args.verbose:
         print(f"CMMTOBS = {line}")
     fnames.append(t[0])
-    try:
-        ftype.append(t[1]+t[2])
-    except IndexError: # some dome flats in 2014 just have filter but not 'dome flat FILTER'
+    if line.find("sky"):
+        ftype.append("skyflat")
+    elif line.find("dome"):
+        ftype.append("domeflat")
+    else:
         ftype.append('domeflat')
 
 
     try:
-        if len(t) == 2:# adding some additional cases to accomodate 2014-04-25 what has only filter
-            filter.append(t[1].rstrip('\n'))
-        elif len(t)> 4:
-            if (line.find('6620') > -1) | (line.find('ha4') > -1) | (line.find('Ha4') > -1) :
-                filter.append('ha4')
+        if (line.find('6620') > -1) | (line.find('ha4') > -1) | (line.find('Ha4') > -1) :
+            filter.append('ha4')
 
-            elif (line.find('6660') > -1) |(line.find('ha8') > -1) | (line.find('Ha8') > -1) :
-                filter.append('ha8')
-            elif (line.find('6700') > -1) |(line.find('ha12') > -1)| (line.find('Ha12') > -1) :
-                filter.append('ha12')
-            elif (line.find('6740') > -1) |(line.find('ha16') > -1) | (line.find('Ha16') > -1) :
-                filter.append('ha16')
-            elif t[3] == 'R':
-                filter.append('R')
-            else:
-                print('problem with determing filter!!!')
-                print('probably got a multi-word entry for CMMTOBS')
-                print("I'm storing the second word...")
-                print('filter = ',t[4].rstrip('\n'))
-                filter.append(t[4].rstrip('\n'))
-        else:
-            filter.append(t[3].rstrip('\n'))
+        elif (line.find('6660') > -1) |(line.find('ha8') > -1) | (line.find('Ha8') > -1) :
+            filter.append('ha8')
+        elif (line.find('6700') > -1) |(line.find('ha12') > -1)| (line.find('Ha12') > -1) :
+            filter.append('ha12')
+        elif (line.find('6740') > -1) |(line.find('ha16') > -1) | (line.find('Ha16') > -1) :
+            filter.append('ha16')
+        elif line.find('R') > -1:
+            filter.append('R')
+        elif line.find('r') > -1:
+            filter.append('r')
+        elif line.find('V') > -1:
+            filter.append('V')
+        elif line.find('B') > -1:
+            filter.append('B')
+        
+        #if len(t) == 2:# adding some additional cases to accomodate 2014-04-25 what has only filter
+        #    filter.append(t[1].rstrip('\n'))
+        #    
+        #elif len(t)> 2:
+        #    else:
+        #        print('problem with determing filter!!!')
+        #        print('probably got a multi-word entry for CMMTOBS')
+        #        print("I'm storing the second word...")
+        #        print('filter = ',t[4].rstrip('\n'))
+        #        filter.append(t[4].rstrip('\n'))
+        #else:
+        #    filter.append(t[3].rstrip('\n'))
     except:
         print("Problem getting filter from CMMTOBS = ",line)
         sys.exit()
