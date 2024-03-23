@@ -67,7 +67,7 @@ if trim: # prepends 'tr'
     mylist = ['ORIGINALS','c']
     if not(os.path.exists(mylist[0])):
         os.mkdir(mylist[0])
-        os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
+    os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
 
 
 if bias: # prepends 'b'
@@ -78,7 +78,7 @@ if bias: # prepends 'b'
     mylist = ['TRIMMED','tr']
     if not(os.path.exists(mylist[0])):
         os.mkdir(mylist[0])
-        os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
+    os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
     
     
 
@@ -88,7 +88,7 @@ if group_flat:
     mylist = ['FLAT_FRAMES','btr']
     if not(os.path.exists(mylist[0])):
         os.mkdir(mylist[0])
-        os.system('mv '+mylist[1]+'*f00.fits '+mylist[0]+'/.')
+    os.system('mv '+mylist[1]+'*f00.fits '+mylist[0]+'/.')
 
 # flatten science frames with dome flats
 if dflat: # prepends 'f'
@@ -97,7 +97,7 @@ if dflat: # prepends 'f'
     mylist = ['BIASSUB','b']    
     if not(os.path.exists(mylist[0])):
         os.mkdir(mylist[0])
-        os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
+    os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
 
 
 #############################################################
@@ -108,7 +108,7 @@ if zap: # prepends 'z'
     mylist = ['FLATTENED','d']
     if not(os.path.exists(mylist[0])):
         os.mkdir(mylist[0])
-        os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
+    os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
         
 # fix the HDI header
 if fixheader: # prepends 'h'
@@ -120,7 +120,7 @@ if fixheader: # prepends 'h'
     mylist = ['ZAPPED','z']    
     if not(os.path.exists(mylist[0])):
         os.mkdir(mylist[0])
-        os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
+    os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
 
 
 # best approach is to create a directory of all flattened images
