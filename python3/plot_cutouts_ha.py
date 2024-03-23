@@ -107,14 +107,14 @@ def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',band='g',makep
     # if not download images
     if not(os.path.exists(jpeg_name)):
         print('retrieving ',jpeg_name)
-        url='http://legacysurvey.org/viewer/jpeg-cutout?ra='+str(ra)+'&dec='+str(dec)+'&layer=ls-dr10&size='+str(imsize)+'&pixscale='+str(pixscale)
+        url='http://legacysurvey.org/viewer/jpeg-cutout?ra='+str(ra)+'&dec='+str(dec)+'&layer=ls-dr9&size='+str(imsize)+'&pixscale='+str(pixscale)
         print(url)
         urlretrieve(url, jpeg_name)
     else:
         print('previously downloaded ',jpeg_name)
     if not(os.path.exists(fits_name)):
         print('retrieving ',fits_name)
-        url='http://legacysurvey.org/viewer/cutout.fits?ra='+str(ra)+'&dec='+str(dec)+'&layer=ls-dr10&size='+str(imsize)+'&pixscale='+str(pixscale)+'&bands='+band
+        url='http://legacysurvey.org/viewer/cutout.fits?ra='+str(ra)+'&dec='+str(dec)+'&layer=ls-dr9&size='+str(imsize)+'&pixscale='+str(pixscale)+'&bands='+band
         print(url)
         urlretrieve(url, fits_name)
     else:
@@ -127,7 +127,7 @@ def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',band='g',makep
     except IndexError:
         print('problem accessing image')
         print(fits_name)
-        url='http://legacysurvey.org/viewer/cutout.fits?ra='+str(ra1)+'&dec='+str(dec1)+'&layer=ls-dr10&size='+str(image_size)+'&pixscale=1.00'
+        url='http://legacysurvey.org/viewer/cutout.fits?ra='+str(ra1)+'&dec='+str(dec1)+'&layer=ls-dr9&size='+str(image_size)+'&pixscale=1.00'
         print(url)
         return None
 

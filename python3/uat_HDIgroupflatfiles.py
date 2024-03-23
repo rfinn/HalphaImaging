@@ -92,7 +92,10 @@ for line in infile:
     if args.verbose:
         print(f"CMMTOBS = {line}")
     fnames.append(t[0])
-    ftype.append(t[1]+t[2])
+    try:
+        ftype.append(t[1]+t[2])
+    except IndexError: # some dome flats in 2014 just have filter but not 'dome flat FILTER'
+        ftype.append('domeflat')
     if len(t)> 4:
         if (line.find('6620') > -1) | (line.find('ha4') > -1) | (line.find('Ha4') > -1) :
             filter.append('ha4')
