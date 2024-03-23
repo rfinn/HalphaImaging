@@ -92,9 +92,9 @@ for line in infile:
     if args.verbose:
         print(f"CMMTOBS = {line}")
     fnames.append(t[0])
-    if line.find("sky"):
+    if "sky" in line:
         ftype.append("skyflat")
-    elif line.find("dome"):
+    elif "dome" in line:
         ftype.append("domeflat")
     else:
         ftype.append('domeflat')
@@ -112,8 +112,8 @@ for line in infile:
             filter.append('ha16')
         elif line.find('R') > -1:
             filter.append('R')
-        elif line.find('r') > -1:
-            filter.append('r')
+        #elif line.find('r') > -1: # doesn't work for 2014 data - ugh!!!
+        #    filter.append('r')
         elif line.find('V') > -1:
             filter.append('V')
         elif line.find('B') > -1:
