@@ -95,6 +95,8 @@ def get_filter_uat(header):
         FILTER = 'r'
     elif line.find('V') > -1:
         FILTER = 'V'
+    elif line.find('B') > -1:
+        FILTER = 'B'
     else:
         print('problem with determing filter!!!')
         FILTER = None

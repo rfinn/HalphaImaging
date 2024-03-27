@@ -112,7 +112,7 @@ for line in infile:
             filter.append('ha16')
         elif line.find('R') > -1:
             filter.append('R')
-        #elif line.find('r') > -1: # doesn't work for 2014 data - ugh!!!
+        #elif line.find('r') > -1: # doesn't work for 2014 data - ugh!!!, also 'r' is in the filename, so need to remove filename from line
         #    filter.append('r')
         elif line.find('V') > -1:
             filter.append('V')
@@ -122,15 +122,15 @@ for line in infile:
         #if len(t) == 2:# adding some additional cases to accomodate 2014-04-25 what has only filter
         #    filter.append(t[1].rstrip('\n'))
         #    
-        #elif len(t)> 2:
+        elif len(t)> 2:
         #    else:
-        #        print('problem with determing filter!!!')
-        #        print('probably got a multi-word entry for CMMTOBS')
-        #        print("I'm storing the second word...")
-        #        print('filter = ',t[4].rstrip('\n'))
-        #        filter.append(t[4].rstrip('\n'))
-        #else:
-        #    filter.append(t[3].rstrip('\n'))
+            print('problem with determing filter!!!')
+            print('probably got a multi-word entry for CMMTOBS')
+            print("I'm storing the second word...")
+            print('filter = ',t[4].rstrip('\n'))
+            filter.append(t[4].rstrip('\n'))
+        else:
+            filter.append(t[3].rstrip('\n'))
     except:
         print("Problem getting filter from CMMTOBS = ",line)
         sys.exit()
