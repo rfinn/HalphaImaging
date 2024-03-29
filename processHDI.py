@@ -179,10 +179,17 @@ if (args.uat & args.swarp):
         print("looking for halpha file list with ",rootname+'_h*')
         fnames = glob.glob(rootname+'_h*')
         print('halpha file = ',fnames)
+        haflag = True
         if len(fnames) > 1:
             print('got more than one Halpha image - crazy!')
             print('hope this is ok...')
             multiha = True
+        elif len(fnames) == 1:
+            multiha = False
+            halist = fnames[0]
+        elif len(fnames) == 0:
+            haflag = False
+            
         else:
             multiha = False
             halist = fnames[0]
@@ -198,17 +205,17 @@ if (args.uat & args.swarp):
         print('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f)
         os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f)
         
-
-        if multiha:
-            for h in fnames:
-                # run swarp on halpha, with r as reference image
-                os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+h+' --refimage '+rcoadd_image+' --noback')
-        else:
+        if haflag:
+            if multiha:
+                for h in fnames:
+                    # run swarp on halpha, with r as reference image
+                    os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+h+' --refimage '+rcoadd_image+' --noback')
+            else:
+                # run swarp on r, with r as reference image
+                os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+halist+' --refimage '+rcoadd_image)#+' --noback')
             # run swarp on r, with r as reference image
-            os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+halist+' --refimage '+rcoadd_image)#+' --noback')
-        # run swarp on r, with r as reference image
-        os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image)#+' --noback')
-        #break
+            os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image)#+' --noback')
+            #break
         
     infile.close()
 
