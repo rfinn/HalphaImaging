@@ -43,7 +43,8 @@ import multiprocessing as mp
 homedir = os.getenv("HOME")
 import sys
 sys.path.append(os.path.join(homedir,'/github/HalpaImaging/python3/'))
-import imutils
+import ha_imutils as imutils
+
 
 
 

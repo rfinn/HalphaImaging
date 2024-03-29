@@ -26,7 +26,9 @@ import sys
 print(homedir)
 
 sys.path.append('/home/rfinn/github/HalphaImaging/python3/')
-import imutils
+
+#import imutils
+import ha_imutils as imutils
 
 from reproject import reproject_interp
 #from reproject.mosaicking import reproject_and_coadd

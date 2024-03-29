@@ -21,7 +21,8 @@ import os
 import sys
 
 sys.path.append(os.getenv("HOME")+'/github/HalphaImaging/python3/')
-import imutils
+#import imutils
+import ha_imutils as imutils
 import ccdproc
 import numpy as np
 

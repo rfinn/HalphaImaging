@@ -26,7 +26,8 @@ import sys
 print(homedir)
 
 sys.path.append('/home/rfinn/github/HalphaImaging/python3/')
-import imutils
+#import imutils
+import ha_imutils as imutils
 import ccdproc as ccdp
 
 from reproject.mosaicking import find_optimal_celestial_wcs

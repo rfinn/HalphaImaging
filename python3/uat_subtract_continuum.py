@@ -76,7 +76,7 @@ else:
     t = args.r.split('-')
     id = t[0]
 r,r_header = fits.getdata(rimage,header=True)
-ha,ha_header = fits.getdata(haimage,header=True)
+ha,ha_header = fits.getdata(haimage,header=True)0
 
 scale = float(args.scale)
 
