@@ -232,13 +232,16 @@ if (args.swarp & ~args.uat):
         print('rootname = ',rootname)
         fnames = glob.glob(rootname+'_h*coadd.fits')
         print('halpha file = ',fnames)
+        haflag = True
         if len(fnames) > 1:
             print('got more than one Halpha image - crazy!')
             print('hope this is ok...')
             multiha = True
-        else:
+        elif len(fnames) == 1:
             multiha = False
             halist = fnames[0]
+        elif len(fnames) == 0:
+            haflag = False
         # get name of R-band coadd
         rcoadd_image = f+'.noback.coadd.fits'
         # run swarp on r images
@@ -246,16 +249,17 @@ if (args.swarp & ~args.uat):
         os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --noback')
         
 
-        if multiha:
-            for h in fnames:
-                # run swarp on halpha, with r as reference image
-                os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+h+' --refimage '+rcoadd_image+' --noback')
-        else:
+        if haflag:
+            if multiha:
+                for h in fnames:
+                    # run swarp on halpha, with r as reference image
+                    os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+h+' --refimage '+rcoadd_image+' --noback')
+            else:
+                # run swarp on r, with r as reference image
+                os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+halist+' --refimage '+rcoadd_image+' --noback')
             # run swarp on r, with r as reference image
-            os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+halist+' --refimage '+rcoadd_image+' --noback')
-        # run swarp on r, with r as reference image
-        os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image+' --noback')
-        #break
+            os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image+' --noback')
+            #break
         
     infile.close()
 
