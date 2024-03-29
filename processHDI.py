@@ -212,7 +212,7 @@ if (args.uat & args.swarp):
         
     infile.close()
 
-if (args.swarp & not args.uat):
+if (args.swarp & ~args.uat):
     infile = open(args.filelist,'r')
     print('running swarp')
     i = 0
