@@ -61,6 +61,7 @@ if not os.path.exists(rimage):
         rimage = filelist[0]
         weightimage = rimage.replace('r.fits','r.weight.fits')
         rshifted = rimage.replace('r.fits','r-shifted.fits')
+        print('phew, found alternate r-band image name: ',rimage)
 if os.path.exists(rshifted):
     print("shifted image found - skipping ",himage)
     sys.exit()
