@@ -46,8 +46,9 @@ print('\t shifting image')
 im2new, im2footprint = reproject_interp(hdu2[0], hdu1[0].header)
 #wcsout = WCS(hdu1)
 #im2new = wcs_project(hdu2,target_wcs=wcsout,target_shape=hdu1.data.shape)
-#im2new.write(args.image2.split('.fits')[0]+'-shifted.fits', overwrite=True)#
-hdu3 = fits.open(args.image2.split('.fits')[0]+'-shifted.fits')
+#im2new.write(args.image2.split('.fits')[0]+'-shifted.fits', overwrite=True)
+#hdu3 = fits.open(args.image2.split('.fits')[0]+'-shifted.fits')
+
 newheader.set('HAIMAGE',args.image1)
 fits.writeto(args.image2.split('.fits')[0]+'-shifted.fits', im2new, header=newheader, overwrite=True)
 hdu2.close()
