@@ -48,6 +48,11 @@ im2new, im2footprint = reproject_interp(hdu2[0], hdu1[0].header)
 #im2new = wcs_project(hdu2,target_wcs=wcsout,target_shape=hdu1.data.shape)
 #im2new.write(args.image2.split('.fits')[0]+'-shifted.fits', overwrite=True)
 #hdu3 = fits.open(args.image2.split('.fits')[0]+'-shifted.fits')
+newheader = hdu2[0].header
+# update wcs to image 1
+wcskeys = ['NAXIS1','NAXIS2','CRVAL1','CRVAL2','CRPIX1','CD1_1','CD1_2','CRPIX2','CD2_1','CD2_2']
+for k in wcskeys:
+    newheader.set(k, value=hdu1[0].header[k])
 
 newheader.set('HAIMAGE',args.image1)
 fits.writeto(args.image2.split('.fits')[0]+'-shifted.fits', im2new, header=newheader, overwrite=True)
