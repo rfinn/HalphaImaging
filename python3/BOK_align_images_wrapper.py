@@ -23,19 +23,19 @@ should have 66 files
 
 Then to test with one galaxy
 
-python ~/github/HalphaImaging/python3/BOK_align_images.py  VF-172.650+35.671-BOK-20210417-VFID2484-Ha4.fits
+python ~/github/HalphaImaging/python3/BOK_align_images_wrapper.py  VF-172.650+35.671-BOK-20210417-VFID2484-Ha4.fits
 
 
 and then run using parallel:
 
-parallel --eta python ~/github/HalphaImaging/python3/BOK_align_images.py  :::: Ha4_filelist
+parallel --eta python ~/github/HalphaImaging/python3/BOK_align_images_wrapper.py  :::: Ha4_filelist
 
 """
 import os
 import sys
 
 himage = sys.argv[1]
-rimage = haimage.replace('Ha4.fits','r.fits')
-weightimage = haimage.replace('r.fits','r.weight.fits')
+rimage = himage.replace('Ha4.fits','r.fits')
+weightimage = rimage.replace('r.fits','r.weight.fits')
 
 os.system(f"python ~/github/HalphaImaging/python3/INT_align_images.py --image1 {himage} --image2 {rimage} --weight2 {weightimage}")
