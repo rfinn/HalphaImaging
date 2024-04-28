@@ -46,13 +46,8 @@ print('\t shifting image')
 im2new, im2footprint = reproject_interp(hdu2[0], hdu1[0].header)
 #wcsout = WCS(hdu1)
 #im2new = wcs_project(hdu2,target_wcs=wcsout,target_shape=hdu1.data.shape)
-#im2new.write(args.image2.split('.fits')[0]+'-shifted.fits', overwrite=True)
-newheader = hdu2[0].header
-# update wcs to image 1
-wcskeys = ['NAXIS1','NAXIS2','CRVAL1','CRVAL2','CRPIX1','CD1_1','CD1_2','CRPIX2','CD2_1','CD2_2']
-for k in wcskeys:
-    newheader.set(k, value=hdu1[0].header[k])
-#hdu3 = fits.open(args.image2.split('.fits')[0]+'-shifted.fits')
+#im2new.write(args.image2.split('.fits')[0]+'-shifted.fits', overwrite=True)#
+hdu3 = fits.open(args.image2.split('.fits')[0]+'-shifted.fits')
 newheader.set('HAIMAGE',args.image1)
 fits.writeto(args.image2.split('.fits')[0]+'-shifted.fits', im2new, header=newheader, overwrite=True)
 hdu2.close()
@@ -64,8 +59,14 @@ print('\t elapsed time = ',end_time - start_time)
 if args.weight2 is not None:
     print('\t shifting weight image')
     im2wnew, im2wfootprint = reproject_interp(hdu2w[0], hdu1[0].header)
+    newheader = hdu2w[0].header
+    # update wcs to image 1
+    wcskeys = ['NAXIS1','NAXIS2','CRVAL1','CRVAL2','CRPIX1','CD1_1','CD1_2','CRPIX2','CD2_1','CD2_2']
+    for k in wcskeys:
+        newheader.set(k, value=hdu1[0].header[k])
+    
     #im2wnew = wcs_project(hdu2w[0],WCS(hdu1[0].header),target_shape=hdu1[0].data.shape)
-    fits.writeto(args.weight2.split('.fits')[0]+'-shifted.fits', im2wnew,hdu1[0].header, overwrite=True)
+    fits.writeto(args.weight2.split('.fits')[0]+'-shifted.fits', im2wnew,newheader, overwrite=True)
     hdu2w.close()
 hdu1.close()
 end_time = time.perf_counter()

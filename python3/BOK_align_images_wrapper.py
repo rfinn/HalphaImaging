@@ -38,4 +38,8 @@ himage = sys.argv[1]
 rimage = himage.replace('Ha4.fits','r.fits')
 weightimage = rimage.replace('r.fits','r.weight.fits')
 
+rshifted = rimage.replace('r.fits','r-shifted.fits')
+if os.path.exists(rshifted):
+    print("shifted image found - skipping ",himage)
+    sys.exit()
 os.system(f"python ~/github/HalphaImaging/python3/INT_align_images.py --image1 {himage} --image2 {rimage} --weight2 {weightimage}")
