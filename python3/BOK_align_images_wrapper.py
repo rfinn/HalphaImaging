@@ -34,7 +34,7 @@ parallel --eta python ~/github/HalphaImaging/python3/BOK_align_images_wrapper.py
 import os
 import sys
 import glob
-
+overwrite=True
 himage = sys.argv[1]
 rimage = himage.replace('Ha4.fits','r.fits')
 weightimage = rimage.replace('r.fits','r.weight.fits')
@@ -62,7 +62,7 @@ if not os.path.exists(rimage):
         weightimage = rimage.replace('r.fits','r.weight.fits')
         rshifted = rimage.replace('r.fits','r-shifted.fits')
         print('phew, found alternate r-band image name: ',rimage)
-if os.path.exists(rshifted):
+if os.path.exists(rshifted) and not overwrite:
     print("shifted image found - skipping ",himage)
     sys.exit()
 os.system(f"python ~/github/HalphaImaging/python3/INT_align_images.py --image1 {himage} --image2 {rimage} --weight2 {weightimage}")
