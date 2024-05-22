@@ -43,7 +43,7 @@ if args.weight2 is not None:
     #hdu2w = CCDData.read(args.weight2,unit='adu')
 
 print('\t shifting image')
-im2new, im2footprint = reproject_interp(hdu2[0], hdu1[0].header)
+im2new, im2footprint = reproject_interp(hdu2[0], hdu1[0].header,shape_out=hdu1[0].data.shape)
 #wcsout = WCS(hdu1)
 #im2new = wcs_project(hdu2,target_wcs=wcsout,target_shape=hdu1.data.shape)
 #im2new.write(args.image2.split('.fits')[0]+'-shifted.fits', overwrite=True)
