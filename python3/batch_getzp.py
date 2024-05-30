@@ -39,10 +39,15 @@ def runone(i,f):
     # skip CS images
     if f.find('CS.fits') > -1:
         return
+    if f.find('CS-ZP.fits') > -1:
+        return
     # how do we skip the unshifted files?
     # this only seems to apply to INT data (why did I need to shift these, anyway???)
     # so if file has INT and -r
     if ('INT' in f) and ('r.fits' in f):
+        return
+    
+    if ('BOK' in f) and ('r.fits' in f):
         return
     
     # determine telescope and filter from filename
