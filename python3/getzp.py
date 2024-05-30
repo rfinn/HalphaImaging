@@ -618,11 +618,16 @@ class getzp():
             # use Legacy calibration
             # https://www.legacysurvey.org/dr10/description/
             # r90Prime = rPS+0.00110−0.06875(g−i)+0.02480(g−i)^2−0.00855(g−i)^3
-            self.R = PS1_r  +0.00110 - 0.6875*(PS1_g-PS1_i) + 0.0248*(PS1_g-PS1_i)**2 + -0.00855*(PS1_g-PS1_i)**3  
+            ##
+            ## THIS DID NOT WORK - GOING BACK TO MATTEOS TRANFORMATION
+            ##
+            #self.R = PS1_r  +0.00110 - 0.6875*(PS1_g-PS1_i) + 0.0248*(PS1_g-PS1_i)**2 + -0.00855*(PS1_g-PS1_i)**3  
         # this is the kpno r filter
         elif self.filter == 'r' and self.instrument == 'h':
             print("correcting color for r filter at KPNO")            
             #Best fit quadratic KPSr - PS1_r = 0.0084*(PS1_g-PS1_r)^2 + -0.0420*(PS1_g-PS1_r) + 0.0036
+
+            
             self.R = self.pan['rmag']
             self.R = PS1_r + 0.0084*(PS1_g-PS1_r)**2 + -0.0420*(PS1_g-PS1_r) + 0.0036            
 
