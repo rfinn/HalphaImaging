@@ -521,8 +521,8 @@ if __name__ == '__main__':
         mcombine_results = combine_all_masks(filetable['FILENAME'])
  
     if args.se:
-        os.system('ln -s ~/github/HalphaImaging/astromatic/default.* .')        
-        filelist = glob.glob('mksb*v1.fits')
+        os.system('cp ~/github/HalphaImaging/astromatic/default.* .')        
+        filelist = glob.glob(args.filestring+'*ooi*v1.fits')
         filelist.sort()
         # link the astromatic files
         
@@ -536,7 +536,7 @@ if __name__ == '__main__':
        
 
     if args.scamp:
-        os.system('ln -s ~/github/HalphaImaging/astromatic/default.* .')        
+        os.system('cp  ~/github/HalphaImaging/astromatic/default.* .')        
         os.system('ls '+args.filestring+'*.cat > scamp_input_cats')
         print('RUNNING SCAMP')
         # TODO - check to see what needs to be updated in default.scamp.INT
