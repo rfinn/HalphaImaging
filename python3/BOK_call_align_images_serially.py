@@ -20,4 +20,6 @@ infiles = open(filelist,'r')
 for line in infiles:
     t = line.rstrip()
     print(t)
-
+    s = f"python ~/github/HalphaImaging/python3/BOK_align_images_wrapper.py {t}"
+    os.system(s)
+    
