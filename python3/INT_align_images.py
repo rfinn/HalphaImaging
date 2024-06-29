@@ -8,7 +8,7 @@ USAGE:
 
 %run ~/github/HalphaImaging/int_align_images.py --image1 coadd-Ha.fits --image2 coadd-r.fits --weight2 coadd-r.weight.fits
 
-
+test
 '''
 
 import os
