@@ -62,6 +62,7 @@ if not os.path.exists(outim2):
     hdu2.close()
     #hdu3.close()
     end_time = time.perf_counter()
+    hdu1.close()
     print('\t elapsed time = ',end_time - start_time)
 else:
     print(args.image2.split('.fits')[0]+'-shifted.fits', " shifted image already exists - skipping...")
@@ -69,6 +70,7 @@ else:
 # fix header keyword
 if (args.weight2 is not None) and (not os.path.exists(args.weight2.split('.fits')[0]+'-shifted.fits')):
     print('\t shifting weight image')
+    hdu1 = fits.open(args.image1)    
     hdu2w = fits.open(args.weight2)
     #hdu2w = CCDData.read(args.weight2,unit='adu')
                                    
@@ -82,8 +84,9 @@ if (args.weight2 is not None) and (not os.path.exists(args.weight2.split('.fits'
     #im2wnew = wcs_project(hdu2w[0],WCS(hdu1[0].header),target_shape=hdu1[0].data.shape)
     fits.writeto(args.weight2.split('.fits')[0]+'-shifted.fits', im2wnew,newheader, overwrite=True)
     hdu2w.close()
+    hdu1.close()
 else:
     print("weight image not provided, or shifted weight image already exists: skipping. ",)
-hdu1.close()
+
 end_time = time.perf_counter()
 print('\t total time = ',end_time - start_time)
