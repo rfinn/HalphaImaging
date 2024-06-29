@@ -579,7 +579,7 @@ if __name__ == '__main__':
 
         
     if args.getzp:
-        rfiles = glob.glob('VF*r.fits')
+        rfiles = glob.glob('VF*r-shifted.fits')
         getzp_pool = mp.Pool(mp.cpu_count())
         zpresults = [getzp_pool.apply_async(getonezp,args=(imname,'r'),callback=getzp_collect_results) for imname in rfiles]
     
