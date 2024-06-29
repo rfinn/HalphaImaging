@@ -35,7 +35,7 @@ import os
 import sys
 import glob
 
-OVERWRITE=False
+OVERWRITE=True
 himage = sys.argv[1]
 rimage = himage.replace('Ha4.fits','r.fits')
 weightimage = rimage.replace('r.fits','r.weight.fits')
