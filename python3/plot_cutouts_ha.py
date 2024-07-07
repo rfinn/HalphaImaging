@@ -65,9 +65,10 @@ UNWISE_PIXSCALE = 2.75
 
 # why am I using 1 arcsec for the legacy images???
 LEGACY_PIXSCALE = 1
+LEGACY_PIXSCALE = 0.262
 
 
-def get_legacy_images(ra,dec,galid='VFID0',pixscale=1,imsize='60',band='g',makeplots=False,subfolder=None):
+def get_legacy_images(ra,dec,galid='VFID0',pixscale=0.262,imsize='60',band='g',makeplots=False,subfolder=None):
     """
     Download legacy image for a particular ra, dec
     
@@ -243,8 +244,6 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
             matchstring = "*w{}-img-m.fits".format(b)            
             if subfolder is not None:
                 allfiles = glob.glob(subfolder+'/'+galid+matchstring)
-
-
                 
             else:
                 allfiles = glob.glob(galid+matchstring)
@@ -256,6 +255,7 @@ def get_unwise_image(ra,dec,galid='VFID0',pixscale=2.75,imsize='60',bands='1234'
             os.system(s)
 
             # rename coadd.fits to the output image name
+            # how does this go into unwise subdirectory???
             outimage = str(galid)+'-unwise-w'+str(b)+'-coadd.fits'
             if subfolder is not None:
                 os.rename('coadd.fits',os.path.join(subfolder,outimage))
