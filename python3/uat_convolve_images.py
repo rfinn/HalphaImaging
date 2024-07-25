@@ -115,7 +115,7 @@ if __name__ == '__main__':
     
     
     image_names, image_fwhm = get_fwhm_psfex()
-    print(image_fwhm)
+    #print(image_fwhm)
     #Need worst FWHM to convolve to
     fwhm_max=np.max(image_fwhm)
 
@@ -133,7 +133,7 @@ if __name__ == '__main__':
     # (sigma_out)^2 = (sigma_in)^2 + (sigma_filter)^2
     #
     # (sigma_filter) = np.sqrt[(fwhm_out/2.35)^2 - (sigma_in/2.35)^2] 
-    sigma_filter = np.sqrt((0.95*fwhm_max/2.35)**2 - (image_fwhm/2.35)**2)
+    sigma_filter = np.sqrt((float(args.gscale)*fwhm_max/2.35)**2 - (image_fwhm/2.35)**2)
     #convolve_images()
 
     for i in range(len(image_names)):
