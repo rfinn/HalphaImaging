@@ -108,6 +108,12 @@ if __name__ == '__main__':
     if not os.path.exists('PSFEX_OUTPUT'):
         os.mkdir("PSFEX_OUTPUT")
     os.system("cp ~/github/HalphaImaging/astromatic/default.psfex .")
+
+    # run psfex on the images
+    os.system('ls hz*o00.cat > input_list')
+    os.system('psfex @input_list -XML_NAME psfex.xml')
+    
+    
     image_names, image_fwhm = get_fwhm_psfex()
     print(image_fwhm)
     #Need worst FWHM to convolve to
