@@ -97,7 +97,7 @@ if __name__ == '__main__':
     #The goal of this program is to have a python-based convolution routine
     parser = argparse.ArgumentParser(description ='This code will convolve image cutouts that have bad focus so that we can get a more precise continuum subtraction.')
     parser.add_argument('--prefix', dest = 'prefix', default = 'pointing-1',  help = 'Input the string of images to be convolved (before continuum subtraction, after cutouts). Enter prefix pointing (e.g. pointing-1)')
-    parser.add_argument('--test',dest = 'test', default = False, action='store_true')
+    parser.add_argument('--gscale',dest = 'gscale', default = .95,help='scale the max fwhm to get the desired output.  default = 0.95')
     args = parser.parse_args()
 
 
@@ -105,12 +105,17 @@ if __name__ == '__main__':
     #search_prefix = args.string+'*-Ha.fits'
     #search_prefix = args.prefix+'*coadd.fits'
     #input_images = glob.glob(search_prefix)
-
+    if not os.path.exists('PSFEX_OUTPUT'):
+        os.mkdir("PSFEX_OUTPUT")
     os.system("cp ~/github/HalphaImaging/astromatic/default.psfex .")
     image_names, image_fwhm = get_fwhm_psfex()
-
+    print(image_fwhm)
     #Need worst FWHM to convolve to
     fwhm_max=np.max(image_fwhm)
+
+
+    
+    
 
     # keep track of image with max FWHM so we don't run convolution on this
     allindex = np.arange(len(image_names))
@@ -162,5 +167,4 @@ if __name__ == '__main__':
     print("image   fwhm    gfwhm")
     print("------------------------")
     for i in range(len(image_names)):
-        print(f"{image_names[i]}: {image_fwhm[i]:.2f} {gimage_fwhm[i]:.2f} ratio={image_fwhm[i]/gimage_fwhm[i]:.3f}")
-
+        print(f"{image_names[i]}: {image_fwhm[i]:.2f} {gimage_fwhm[i]:.2f} ratio={gimage_fwhm[i]/fwhm_max:.3f}")
