@@ -146,10 +146,11 @@ if __name__ == '__main__':
         # keep track of image with max FWHM so we don't run convolution on this
         allindex = np.arange(len(image_names))
         max_fwhm_index = allindex[image_fwhm == fwhm_max][0]
+        
         print('the largest FWHM = ',fwhm_max)
 
         # skip any images that are within of fwhm_max
-        convolve_flag = np.abs(image_fwhm - max_fwhm_image) > float(args.cthreshold)
+        convolve_flag = np.abs(image_fwhm - fwhm_max) > float(args.cthreshold)
         
         # convolve all images to worst seeing
         # use pyraf.iraf.gauss (sigma = FWHM/2.35)
