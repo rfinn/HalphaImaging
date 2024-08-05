@@ -31,11 +31,9 @@ MASK_TYPE        CORRECT        # type of detection MASKing: can be one of
                                 # NONE, BLANK or CORRECT
  
 #------------------------------ Photometry -----------------------------------
-#PHOT_FLUXFRAC    0.5#,0.5,0.3
-PHOT_FLUXFRAC    0.9,0.5,0.3
+PHOT_FLUXFRAC    0.5#,0.5,0.3
 # setting PHOT_APERTURES to ~5" for PSFEx
-#PHOT_APERTURES   20             # MAG_APER aperture diameter(s) in pixels
-PHOT_APERTURES   10,12,15,20,25,30             # MAG_APER aperture diameter(s) in pixels
+PHOT_APERTURES   20             # MAG_APER aperture diameter(s) in pixels
 PHOT_AUTOPARAMS  2.5, 3.5       # MAG_AUTO parameters: <Kron_fact>,<min_radius>
 PHOT_PETROPARAMS 2.0, 3.5       # MAG_PETRO parameters: <Petrosian_fact>,
                                 # <min_radius>

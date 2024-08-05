@@ -50,7 +50,7 @@ elif args.INT:
     print('running on INT data')
     filestring = args.filestring+'*PA.fits'
 try:
-    os.system('gethead '+filestring+' FILTER, OBJECT, EXPTIME > junkfile2')
+    os.system('gethead FILTER, OBJECT, EXPTIME '+filestring+'> junkfile2')
     infile=open('junkfile2','r')
     #print('in here')
     fnames=[]      #creates empty list to contain file name
