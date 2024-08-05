@@ -181,7 +181,10 @@ if __name__ == '__main__':
                 chdu.writeto('g'+image_names[i], overwrite=True) 
 
         # run source extractor on convolved images
-        os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --s --filestring ghz')
+        # copy psfex files as default
+        os.system('cp ~/github/HalphaImaging/astromatic/default.param.psfex default.param')
+        os.system('cp ~/github/HalphaImaging/astromatic/default.sex.HDI.psfex default.sex.HDI')        
+        os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --s --filestring ghz --psfex')
         # run psfex on convolved images
 
         os.system('ls ghz*o00.cat > gauss_list')

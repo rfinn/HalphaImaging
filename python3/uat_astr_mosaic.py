@@ -59,6 +59,7 @@ parser.add_argument('--refimage',dest = 'refimage', default = None,  help = 'use
 parser.add_argument('--m',dest = 'm', default = False, action = 'store_true', help = 'set if running for mosaic data')
 parser.add_argument('--int',dest = 'int', default = False, action = 'store_true', help = 'set if running on INT data')
 parser.add_argument('--noback',dest = 'noback', default = False, action = 'store_true', help = 'set to disable background subtraction in swarp')
+parser.add_argument('--psfex',dest = 'psfex', default = False, action = 'store_true', help = 'use psfex config files when running sextractor')
 
 args = parser.parse_args()
 
@@ -93,6 +94,8 @@ if args.s:
         elif args.pisces:
             os.system('sex ' + f + ' -c default.sex.siena -CATALOG_NAME ' + froot + '.cat -DETECT_MINAREA 10 -DETECT_THRESH 2 -ANALYSIS_THRESH 2 -BACK_SIZE 128 -GAIN 100')
             print('HEY! PISCES!!!!!')
+        elif args.psfex:
+            os.system('sex ' + f + ' -c default.sex.HDI.psfex -CATALOG_NAME ' + froot + '.cat')
         else:
             os.system('sex ' + f + ' -c default.sex.HDI -CATALOG_NAME ' + froot + '.cat')
         #os.rename('check.fits', froot + 'check.fits')
