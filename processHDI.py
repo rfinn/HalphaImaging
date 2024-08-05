@@ -287,5 +287,9 @@ if args.zp:
             photfilter = 'R'
         elif f.find('-R') > -1:
             photfilter = 'R'
-        os.system('python '+gitpath+'getzp.py --image '+f+' --filter '+photfilter+' --instrument i ')
+
+        if args.uat:
+            os.system('python '+gitpath+'getzp.py --image '+f+' --filter '+photfilter+' --instrument h ')
+        else:
+            os.system('python '+gitpath+'getzp.py --image '+f+' --filter '+photfilter+' --instrument i ')
         #break
