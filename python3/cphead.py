@@ -13,7 +13,21 @@ so swarp doesn't associate the corrected headers
 import glob
 import os
 
+###########################################
+# copy scamp files
+###########################################
+
 flist = glob.glob('h*.head')
+
+for f in flist:
+    command = "cp {} m{}".format(f,f)
+    os.system(command)
+
+
+###########################################
+# copy source extractor files as well
+###########################################
+flist = glob.glob('h*.cat')
 
 for f in flist:
     command = "cp {} m{}".format(f,f)
