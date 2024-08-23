@@ -27,7 +27,7 @@ args = parser.parse_args()
 flist = glob.glob('h*.head')
 
 for f in flist:
-    command = "cp {} m{}".format(f,f)
+    command = "cp {} "+args.filestring+"{}".format(f,f)
     os.system(command)
 
 
