@@ -108,13 +108,23 @@ if __name__ == '__main__':
     #search_prefix = args.string+'*-Ha.fits'
     #search_prefix = args.prefix+'*coadd.fits'
     #input_images = glob.glob(search_prefix)
+
+
+    ######################################################
+    ## RUN SOURCE EXTRACTOR USING THE CORRECT CONFIG FILE
+    ######################################################
+    os.system('ls '+args.filestring+'*o00.cat > input_list')
+
+
+    
+
+    ######################################################
+    ## RUN PSFEX ON THE IMAGES
+    ######################################################
     if not os.path.exists('PSFEX_OUTPUT'):
         os.mkdir("PSFEX_OUTPUT")
     os.system("cp ~/github/HalphaImaging/astromatic/default.psfex .")
-
-    # run psfex on the images
-    os.system('ls '+args.filestring+'*o00.cat > input_list')
-    os.system('psfex @input_list -XML_NAME psfex.xml')
+    os.system('psfex @input_list -XML_NAME psfex.xml')    
     
     
     image_names, image_fwhm = get_fwhm_psfex()
@@ -185,10 +195,10 @@ if __name__ == '__main__':
         # copy psfex files as default
         os.system('cp ~/github/HalphaImaging/astromatic/default.param.psfex default.param')
         os.system('cp ~/github/HalphaImaging/astromatic/default.sex.HDI.psfex default.sex.HDI')        
-        os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --s --filestring ghz --psfex')
+        os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --s --filestring gmhz --psfex')
         # run psfex on convolved images
 
-        os.system('ls ghz*o00.cat > gauss_list')
+        os.system('ls gmhz*o00.cat > gauss_list')
         os.system('psfex @gauss_list -XML_NAME gpsfex.xml')
         #
 
