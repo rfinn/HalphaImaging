@@ -27,7 +27,7 @@ args = parser.parse_args()
 flist = glob.glob('h*.head')
 
 for f in flist:
-    command = "cp {f} {args.addprefix}{f}"
+    command = f"cp {f} {args.addprefix}{f}"
     os.system(command)
 
 
