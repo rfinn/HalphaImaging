@@ -144,7 +144,7 @@ if args.submed:
     os.system('python '+gitpath+'subtract_median.py --filestring '+args.filestring)
 
     # sort objects by field
-    os.system('python '+gitpath+'uat_HDIsortobjects.py --filestring '+args.filestring)
+    os.system('python '+gitpath+'uat_HDIsortobjects.py --filestring m'+args.filestring)
 
 
 # run swarp?
