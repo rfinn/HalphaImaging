@@ -15,7 +15,7 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser(description ='Run sextractor, scamp, and swarp to determine WCS solution and make mosaics')
-parser.add_argument('--filestring', dest = 'filestring', default = 'gm', help = 'string to prepend to the scamp h*.head files (default = "gm", which assumes  "h*o00.fits")')
+parser.add_argument('--addprefix', dest = 'addprefix', default = 'gm', help = 'string to prepend to the scamp h*.head files (default = "gm", which assumes  "h*o00.fits")')
 
 args = parser.parse_args()
 
@@ -27,7 +27,7 @@ args = parser.parse_args()
 flist = glob.glob('h*.head')
 
 for f in flist:
-    command = "cp {} "+args.filestring+"{}".format(f,f)
+    command = "cp {} "+args.addprefix+"{}".format(f,f)
     os.system(command)
 
 
