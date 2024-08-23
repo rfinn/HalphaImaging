@@ -194,11 +194,12 @@ if __name__ == '__main__':
         # run source extractor on convolved images
         # copy psfex files as default
         os.system('cp ~/github/HalphaImaging/astromatic/default.param.psfex default.param')
-        os.system('cp ~/github/HalphaImaging/astromatic/default.sex.HDI.psfex default.sex.HDI')        
-        os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --s --filestring gmhz --psfex')
+        os.system('cp ~/github/HalphaImaging/astromatic/default.sex.HDI.psfex default.sex.HDI') 
+        conv_filestring = 'g'+args.filestring       
+        os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --s --filestring '+conv_filestring+' --psfex')
         # run psfex on convolved images
 
-        os.system('ls gmhz*o00.cat > gauss_list')
+        os.system('ls '+conv_filestring+'*o00.cat > gauss_list')
         os.system('psfex @gauss_list -XML_NAME gpsfex.xml')
         #
 
