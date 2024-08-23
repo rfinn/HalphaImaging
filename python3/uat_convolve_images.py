@@ -99,7 +99,8 @@ if __name__ == '__main__':
     parser.add_argument('--prefix', dest = 'prefix', default = 'pointing-1',  help = 'Input the string of images to be convolved (before continuum subtraction, after cutouts). Enter prefix pointing (e.g. pointing-1)')
     parser.add_argument('--gscale',dest = 'gscale', default = .95,help='scale the max fwhm to get the desired output.  default = 0.95')
     parser.add_argument('--convolve',dest = 'convolve', default = False, action ='store_true',help='set this to convolve images.  by default, psfex is run but we do not run convolution.')
-    parser.add_argument('--cthreshold',dest = 'cthreshold', default = 0.5, help='threshold for applying convolution to image.  Images with fwhm within cthreshold pixels of fwhm_max will not have convolution applied. default value is 0.5 pixels. the input image is copied over as g*.')    
+    parser.add_argument('--cthreshold',dest = 'cthreshold', default = 0.5, help='threshold for applying convolution to image.  Images with fwhm within cthreshold pixels of fwhm_max will not have convolution applied. default value is 0.5 pixels. the input image is copied over as g*.')
+    parser.add_argument('--filestring', dest = 'filestring', default = 'mh', help = 'string to use to get input files (default = "mh", which grabs all of the files "mh*o00.fits")')    
     args = parser.parse_args()
 
 
@@ -112,7 +113,7 @@ if __name__ == '__main__':
     os.system("cp ~/github/HalphaImaging/astromatic/default.psfex .")
 
     # run psfex on the images
-    os.system('ls hz*o00.cat > input_list')
+    os.system('ls '+args.filestring+'*o00.cat > input_list')
     os.system('psfex @input_list -XML_NAME psfex.xml')
     
     
