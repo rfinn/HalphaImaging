@@ -16,7 +16,7 @@ TODONE : add a random wait time before starting program so that image servers ar
 import os
 import sys
 import time
-import np
+import numpy as np
 homedir = os.getenv('HOME')
 sys.path.append(homedir+'/github/HalphaImaging/python3/')
 
