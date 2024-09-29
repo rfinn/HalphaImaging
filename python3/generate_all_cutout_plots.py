@@ -9,14 +9,18 @@ NOTES:
 
 - it will go into each subdir and run the script to generate cutouts!
 
+TODO : add a random wait time before starting program so that image servers are not overwhelmed
+
 """
 #import glob
 import os
 import sys
-
+import time
+import np
 homedir = os.getenv('HOME')
 sys.path.append(homedir+'/github/HalphaImaging/python3/')
 
+randomtimes = 
 def getone(d):
     import glob    
     workingdir = os.getcwd()
@@ -32,8 +36,18 @@ def getone(d):
         print(f"found {len(imlist)} r-band images")
         
     for im in imlist:
+        #####################################################################################
+        # add a few seconds sleep time to avoid overwhelming servers when running in parallel
+        #####################################################################################        
+        sleeptime = 5.*np.random.random()
+        time.sleep(sleeptime)
+
+        #####################################################################################
+        # call program to download images
+        #####################################################################################        
         print('python '+homedir+'/github/HalphaImaging/python3/plot_cutouts_ha.py --r '+im+' --plotall')
         os.system('python '+homedir+'/github/HalphaImaging/python3/plot_cutouts_ha.py --r '+im+' --plotall')
+        #####################################################################################        
     os.chdir(workingdir)
 
 if __name__ == '__main__':
