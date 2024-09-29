@@ -9,7 +9,7 @@ NOTES:
 
 - it will go into each subdir and run the script to generate cutouts!
 
-TODO : add a random wait time before starting program so that image servers are not overwhelmed
+TODONE : add a random wait time before starting program so that image servers are not overwhelmed
 
 """
 #import glob
@@ -20,7 +20,7 @@ import np
 homedir = os.getenv('HOME')
 sys.path.append(homedir+'/github/HalphaImaging/python3/')
 
-randomtimes = 
+
 def getone(d):
     import glob    
     workingdir = os.getcwd()
