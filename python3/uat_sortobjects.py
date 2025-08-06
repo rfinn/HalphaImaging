@@ -1,28 +1,29 @@
 #!/usr/bin/env python
 
-'''
-  GOAL:
-  make lists of files that contain
-  - the same object
-  - the same filter
-  - are exposed for over a minute
+"""
+GOAL:
+make lists of files that contain
+- the same object
+- the same filter
+- are exposed for over a minute
 
+REQUIREMENTS:
+- only looks at images with the title in the format f*o00.fits
+- must be run in folder containing files to sort
+- will create the output file in the format object_filter
 
-  REQUIREMENTS:
-  - only looks at images with the title in the format f*o00.fits
-  - must be run in folder containing files to sort
-  - will create the output file in the format object_filter
+EXAMPLE:
+In the directory containing all flattened objects with fixed headers to be sorted type in the command line:
+      '/home/share/research/pythonCode/uat_sortobjects.py'(or whatever the path is to where this program is stored)
 
-  EXAMPLE:
-   In the directory containing all flattened objects with fixed headers to be sorted type in the command line:
-      '/home/share/research/pythonCode/uat_HDIsortobjects.py'(or whatever the path is to where this program is stored)
+AUTHORS:
+- written by Rose A. Finn
+- edited by Grant Boughton & Kelly Whalen
 
-written by Rose A. Finn
-edited by Grant Boughton & Kelly Whalen
+NOTES:
+- updating to handle mosaic image names for UAT halpha groups project, Aug 2025, R. Finn
 
-   NOTES:
-       - updating to handle mosaic image names, Aug 2025, R. Finn
-'''
+"""
 import glob
 import os
 import numpy as np
@@ -54,6 +55,11 @@ elif args.INT:
 elif args.MOS:
     print("running on MOSAIC data processed by Becky")
     filestring = args.filestring+'*.fits'
+
+    
+############################################################
+## get information about image filter, object, exptime 
+############################################################   
 try:
     os.system('gethead FILTER, OBJECT, EXPTIME '+filestring+'> junkfile2')
     infile=open('junkfile2','r')
@@ -86,26 +92,35 @@ except:
         fobject.append(header['OBJECT'])
         exptime.append(header['EXPTIME'])
 
-filters=set(ftype)    #takes all inputs from ftype and adds the unique ones to                        the set of filters
+############################################################
+# get list of unique filters and objects
+############################################################  
+filters=set(ftype)    #takes all inputs from ftype and adds the unique ones to the set of filters
 objecttypes=set(fobject)
-  
-ftype=np.array(ftype) # make into character array
+
+# make into character array
+ftype=np.array(ftype) 
 fobject=np.array(fobject)
 exptime=np.array(exptime,'f')
 
+
 for f in filters:
     for t in objecttypes:
-        objectgroup=str(t)+ '_' + str(f) #creates a variable that is the                                                 combined characteristics of the image
-        indices=np.where((f == ftype) & (t == fobject) & (exptime > 60)) #finds                                                                       indices where the filter and name                                                            of object match the values searched                                                          for in the for loop
+        #creates a variable that is the combined characteristics of the image
+        objectgroup=str(t)+ '_' + str(f) 
+
+        #finds indices where the filter and name of object match the values searched for in the for loop
+        indices=np.where((f == ftype) & (t == fobject) & (exptime > 60)) 
         if len(indices[0]) > 0:
             if objectgroup.find(' ') > -1: # get rid of long filter names
                 t = objectgroup.split()
                 filename = t[0]+'-'+t[1]
             else:
                 filename = objectgroup
-            outfile = open(filename,'w') #writes the name of file to a
-                                            #file titled the characteristics
-                                            #stated in the variable objectgroup
+
+            #writes the name of file to a file titled the characteristics stated in the variable objectgroup
+            outfile = open(filename,'w') 
+        
             for i in indices[0]:
                 outfile.write(fnames[i]+'\n')
             outfile.close()
