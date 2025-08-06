@@ -21,7 +21,7 @@ written by Rose A. Finn
 edited by Grant Boughton & Kelly Whalen
 
    NOTES:
-       - updating to handle mosaic image names, Aug 2025
+       - updating to handle mosaic image names, Aug 2025, R. Finn
 '''
 import glob
 import os
@@ -33,6 +33,7 @@ parser = argparse.ArgumentParser(description ='group objects by filter and targe
 parser.add_argument('--filestring', dest = 'filestring', default = 'h', help = 'string to use to get input files (default = "h" which grabs all files "h*o00.fits")')
 parser.add_argument('--siena', dest = 'siena', default = False, action='store_true', help = 'set if running on siena data')
 parser.add_argument('--int', dest = 'INT', default = False, action='store_true', help = 'set if running on INT WFC data')
+parser.add_argument('--mos', dest = 'MOS', default = False, action='store_true', help = 'set if running on MOSAIC data that Becky processed')
 
 args = parser.parse_args()
 
@@ -50,6 +51,9 @@ if args.siena:
 elif args.INT:
     print('running on INT data')
     filestring = args.filestring+'*PA.fits'
+elif args.MOS:
+    print("running on MOSAIC data processed by Becky")
+    filestring = args.filestring+'*.fits'
 try:
     os.system('gethead FILTER, OBJECT, EXPTIME '+filestring+'> junkfile2')
     infile=open('junkfile2','r')
