@@ -20,7 +20,8 @@
 written by Rose A. Finn
 edited by Grant Boughton & Kelly Whalen
 
-   
+   NOTES:
+       - updating to handle mosaic image names, Aug 2025
 '''
 import glob
 import os
