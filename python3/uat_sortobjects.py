@@ -143,6 +143,18 @@ for f in filters:
                     destination = os.path.join(objname,fname)
                     os.rename(fname, destination)
 
+                    # check to see if there is a .cat file
+                    catfile = fname.replace('.fits','.cat')
+                    if os.path.exists(catfile):
+                        os.rename(catfile, os.path.join(objname,catfile))
+
+                    # check to see if there is a .head file
+                    headfile = fname.replace('.fits','.head')
+                    if os.path.exists(headfile):
+                        os.rename(headfile, os.path.join(objname,headfile))
+                        
+                                      
+
                 # close the file containing the list
                 infile.close()
                 
