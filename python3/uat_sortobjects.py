@@ -12,9 +12,12 @@ REQUIREMENTS:
 - must be run in folder containing files to sort
 - will create the output file in the format object_filter
 
-EXAMPLE:
+USAGE:
 In the directory containing all flattened objects with fixed headers to be sorted type in the command line:
-      '/home/share/research/pythonCode/uat_sortobjects.py'(or whatever the path is to where this program is stored)
+
+python /home/share/research/pythonCode/uat_sortobjects.py --help
+
+python /home/share/research/pythonCode/uat_sortobjects.py --mos # to run on mosaic data
 
 AUTHORS:
 - written by Rose A. Finn
