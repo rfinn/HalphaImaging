@@ -38,6 +38,7 @@ parser.add_argument('--filestring', dest = 'filestring', default = 'h', help = '
 parser.add_argument('--siena', dest = 'siena', default = False, action='store_true', help = 'set if running on siena data')
 parser.add_argument('--int', dest = 'INT', default = False, action='store_true', help = 'set if running on INT WFC data')
 parser.add_argument('--mos', dest = 'MOS', default = False, action='store_true', help = 'set if running on MOSAIC data that Becky processed')
+parser.add_argument('--subdir', dest = 'subdir', default = False, action='store_true', help = 'set if you want to move each object into its own subdirectory.  otherwise, this program will just create file lists that group files with same object and filter.')
 
 args = parser.parse_args()
 
@@ -109,7 +110,10 @@ exptime=np.array(exptime,'f')
 
 for f in filters:
     for t in objecttypes:
-        #creates a variable that is the combined characteristics of the image
+        # save the object name
+        objname = t
+        
+        #creates a variable that is the combined object + filter
         objectgroup=str(t)+ '_' + str(f) 
 
         #finds indices where the filter and name of object match the values searched for in the for loop
@@ -127,7 +131,25 @@ for f in filters:
             for i in indices[0]:
                 outfile.write(fnames[i]+'\n')
             outfile.close()
-            
+
+            # move fits files and list to a subdirectory named after the object
+            if args.subdir:
+                if not os.path.exists(objname):
+                    os.mkdir(objname)
+                # open the file we just wrote 
+                infile = open(filename, 'r')
+                for line in infile:
+                    fname = line.rstrip()
+                    destination = os.path.join(objname,fname)
+                    os.rename(fname, destination)
+
+                # close the file containing the list
+                infile.close()
+                
+                # move the file as well to subdirectory
+                destination = os.path.join(objname,filename)
+                os.rename(filename, destination)
+                
                 
 os.remove('junkfile2')
 
