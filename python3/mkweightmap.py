@@ -17,7 +17,7 @@ python ~/github/HalphaImaging/python3/uat_MOSmkweightmap.py
 """
 from astropy.io import fits
 import sys
-from astropy.io import fits
+import argparse
 
 
 parser = argparse.ArgumentParser(description ='group objects by filter and target for combining with swarp')
