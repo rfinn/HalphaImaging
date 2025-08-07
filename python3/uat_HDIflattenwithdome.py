@@ -37,6 +37,8 @@ EDITED BY:
 
   updated 7/27/18 by RAF
   
+  updated 8/7/25 to include the B filter in the filter list
+
 '''
 import glob
 import os
@@ -74,6 +76,8 @@ for line in infile:
     elif t[1].find(' r ') > -1:
         filefilter.append('r')
     elif t[1].find('V') > -1:
+        filefilter.append('V')
+    elif t[1].find('B') > -1:
         filefilter.append('V')
     else:
         print("WARNING: no filter found for ",t[1])
