@@ -19,6 +19,7 @@ from astropy.io import fits
 import sys
 import argparse
 import numpy as np
+import glob
 
 parser = argparse.ArgumentParser(description ='group objects by filter and target for combining with swarp')
 parser.add_argument('--filename', dest = 'filename', default = 'iwf000.fits', help = 'filename of input file')
@@ -35,7 +36,25 @@ hdu = fits.open(args.filename)
 
 # create a flag with values == args.badval set to zero
 weight = hdu[0].data == int(args.badval)
+
+# now the bad values are set to zero and good values are equal to 1
 weight = np.array(~weight,dtype=np.int8)
+
+# check if there is a bpm for mosaic
+mosaic_masks = ['mosaic_bpm_2013.fits']
+for mfile in mosaic_masks:
+    if os.path.exists(mfile):
+        # open mask
+        mhdu = fits.open(mfile)
+        break
+    # create array with good values equal to 1
+    mosaic_weight = mhdu[0].data == 0
+    # convert to integer array
+    mosaic_weight = np.array(mosaic_weight, dtype=np.int8)
+
+    # add mosaic mask to weight image
+    weight = weight * mosaic_weight
+    break
 
 # save the flag as a weight image
 outfile = filename.replace('.fits','.weight.fits')
