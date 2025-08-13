@@ -28,14 +28,14 @@ args = parser.parse_args()
 
 
 # get image name from the argument line
-filename = args
+#filename = args.filename
 
 # read in image
 hdu = fits.open(args.filename)
 
 # create a flag with values == args.badval set to zero
-weight = hdu[0].data == int(badval)
-weight = ~weight
+weight = hdu[0].data == int(args.badval)
+weight = np.array(~weight,dtype=np.int8)
 
 # save the flag as a weight image
 outfile = filename.replace('.fits','.weight.fits')
