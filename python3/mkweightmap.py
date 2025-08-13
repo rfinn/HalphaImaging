@@ -19,7 +19,8 @@ from astropy.io import fits
 import sys
 import argparse
 import numpy as np
-import glob
+import os
+
 
 parser = argparse.ArgumentParser(description ='group objects by filter and target for combining with swarp')
 parser.add_argument('--filename', dest = 'filename', default = 'iwf000.fits', help = 'filename of input file')
