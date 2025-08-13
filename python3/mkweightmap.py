@@ -18,7 +18,7 @@ python ~/github/HalphaImaging/python3/uat_MOSmkweightmap.py
 from astropy.io import fits
 import sys
 import argparse
-
+import numpy as np
 
 parser = argparse.ArgumentParser(description ='group objects by filter and target for combining with swarp')
 parser.add_argument('--filename', dest = 'filename', default = 'iwf000.fits', help = 'filename of input file')
@@ -28,7 +28,7 @@ args = parser.parse_args()
 
 
 # get image name from the argument line
-#filename = args.filename
+filename = args.filename
 
 # read in image
 hdu = fits.open(args.filename)
