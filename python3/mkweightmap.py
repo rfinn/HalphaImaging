@@ -67,5 +67,8 @@ outfile = filename.replace('.fits','.weight.fits')
 # writing the output
 fits.writeto(outfile, weight, header=hdu[0].header, overwrite=True)
 
+if outfile.startswith('if'):
+    fits.writeto('g'+outfile, weight, header=hdu[0].header, overwrite=True)
+
 
 
