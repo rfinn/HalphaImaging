@@ -45,17 +45,21 @@ weight = np.array(~weight,dtype=np.int8)
 mosaic_masks = ['mosaic_bpm_2013.fits']
 for mfile in mosaic_masks:
     if os.path.exists(mfile):
+        print(f"found a mosaic pbm file to add to mask: {mfile}")
         # open mask
         mhdu = fits.open(mfile)
-        break
-    # create array with good values equal to 1
-    mosaic_weight = mhdu[0].data == 0
-    # convert to integer array
-    mosaic_weight = np.array(mosaic_weight, dtype=np.int8)
 
-    # add mosaic mask to weight image
-    weight = weight * mosaic_weight
-    break
+        # create array with good values equal to 1
+        mosaic_weight = mhdu[0].data == 0
+        # convert to integer array
+        mosaic_weight = np.array(mosaic_weight, dtype=np.int8)
+        
+        # add mosaic mask to weight image
+        weight = weight * mosaic_weight
+
+        # close the mask file
+        mhdu.close()
+        break
 
 # save the flag as a weight image
 outfile = filename.replace('.fits','.weight.fits')
