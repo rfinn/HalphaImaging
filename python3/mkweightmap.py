@@ -59,6 +59,7 @@ for mfile in mosaic_masks:
 # save the flag as a weight image
 outfile = filename.replace('.fits','.weight.fits')
 
+# writing the output
 fits.writeto(outfile, weight, header=hdu[0].header, overwrite=True)
 
 
