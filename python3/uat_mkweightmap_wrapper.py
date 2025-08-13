@@ -28,4 +28,4 @@ args = parser.parse_args()
 filelist = glob.glob(args.filestring+"*.fits")
 
 for f in filelist:
-    os.system(f"{homedir}/github/HalphaImaging/python3/mkweightmap.py --filename {f} --badval 0")
+    os.system(f"python {homedir}/github/HalphaImaging/python3/mkweightmap.py --filename {f} --badval 0")
