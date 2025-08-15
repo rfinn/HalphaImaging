@@ -14,7 +14,8 @@ import glob
 import os
 import argparse
 
-parser = argparse.ArgumentParser(description ='Run sextractor, scamp, and swarp to determine WCS solution and make mosaics')
+parser = argparse.ArgumentParser(description ='Copy the header files with a new prefix to match the further processed images so that swarp correctly associates the header files with the image files.')
+parser.add_argument('--filestring', dest = 'filestring', default = 'h', help = 'string to use to get input files (default = "h", which grabs all of the files "h*.head")')
 parser.add_argument('--addprefix', dest = 'addprefix', default = 'gm', help = 'string to prepend to the scamp h*.head files (default = "gm", which assumes  "h*o00.fits")')
 
 args = parser.parse_args()
@@ -24,7 +25,7 @@ args = parser.parse_args()
 # copy scamp files
 ###########################################
 
-flist = glob.glob('h*.head')
+flist = glob.glob(args.filestring+'*.head')
 
 for f in flist:
     command = f"cp {f} {args.addprefix}{f}"
