@@ -44,7 +44,7 @@ weight = np.array(~weight,dtype=np.int8)
 # check if there is a bpm for mosaic
 mfile = args.filename.replace('.fits','_bpm.fits')
 if os.path.exists(mfile):
-    print(f"found a mosaic pbm file to add to mask: {mfile}")
+    print(f"found a mosaic bpm file to add to mask: {mfile}")
     # open mask
     mhdu = fits.open(mfile)
 
