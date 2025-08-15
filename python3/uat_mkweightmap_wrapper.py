@@ -30,4 +30,6 @@ filelist = glob.glob(args.filestring+"*.fits")
 for f in filelist:
     if (f.find('.weight.fits') > -1):
         continue
+    if (f.find('_bpm.fits') > -1):
+        continue
     os.system(f"python {homedir}/github/HalphaImaging/python3/mkweightmap.py --filename {f} --badval 0")
