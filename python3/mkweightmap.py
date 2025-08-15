@@ -42,7 +42,7 @@ weight = hdu[0].data == int(args.badval)
 weight = np.array(~weight,dtype=np.int8)
 
 # check if there is a bpm for mosaic
-mosaic_masks = [args.filename.replace('.fits','_bpm.fits')]
+mfile = args.filename.replace('.fits','_bpm.fits')
 if os.path.exists(mfile):
     print(f"found a mosaic pbm file to add to mask: {mfile}")
     # open mask
@@ -67,9 +67,15 @@ outfile = filename.replace('.fits','.weight.fits')
 # writing the output
 fits.writeto(outfile, weight, header=hdu[0].header, overwrite=True)
 
+'''
+Commenting this out because the right way to do this is to convolve the mask 
+in the same way the image is convolved.
+
+
 if outfile.startswith('if'):
-
-    fits.writeto('g'+outfile, weight, header=hdu[0].header, overwrite=True)
-
+    if os.path.exists('g'+filename):
+        # copy a version
+        fits.writeto('g'+outfile, weight, header=hdu[0].header, overwrite=True)
+'''
 
 
