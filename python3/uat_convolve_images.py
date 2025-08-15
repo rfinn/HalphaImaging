@@ -29,7 +29,7 @@ REQUIRED SOFTWARE:
 EXTRA NOTES:
 
 WRITTEN BY:
-Rose Finn, started who knows when
+Rose Finn, started with Becky, who knows when...
 
 EDITED BY:
 Rose Finn, 2024-07-25
@@ -100,7 +100,8 @@ if __name__ == '__main__':
     parser.add_argument('--gscale',dest = 'gscale', default = .95,help='scale the max fwhm to get the desired output.  default = 0.95')
     parser.add_argument('--convolve',dest = 'convolve', default = False, action ='store_true',help='set this to convolve images.  by default, psfex is run but we do not run convolution.')
     parser.add_argument('--cthreshold',dest = 'cthreshold', default = 0.5, help='threshold for applying convolution to image.  Images with fwhm within cthreshold pixels of fwhm_max will not have convolution applied. default value is 0.5 pixels. the input image is copied over as g*.')
-    parser.add_argument('--filestring', dest = 'filestring', default = 'mh', help = 'string to use to get input files (default = "mh", which grabs all of the files "mh*o00.fits")')    
+    parser.add_argument('--filestring', dest = 'filestring', default = 'mh', help = 'string to use to get input files (default = "mh", which grabs all of the files "mh*.fits")')
+    parser.add_argument('--hdi', dest = 'hdi', default = False, action='store_true', help = 'string to use to get input files (default = "mh", which grabs all of the files "mh*o00.fits").  basically, requires the o00 that we see in object frame names for hdi.')        
     args = parser.parse_args()
 
 
@@ -113,7 +114,11 @@ if __name__ == '__main__':
     ######################################################
     ## RUN SOURCE EXTRACTOR USING THE CORRECT CONFIG FILE
     ######################################################
-    os.system('ls '+args.filestring+'*o00.cat > input_list')
+    if args.hdi:
+        os.system('ls '+args.filestring+'*o00.cat > input_list')
+    else:
+        # removing o00 to make this compatible with mosaic data
+        os.system('ls '+args.filestring+'*.cat > input_list')
 
 
     
