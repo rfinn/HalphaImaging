@@ -125,6 +125,8 @@ if args.swarp:
     if args.int:
         pixel_scale = 0.331
         defaultswarp = 'default.swarp.INT'
+    elif args.mos:
+        defaultswarp = 'default.swarp.MOS'
     if args.noback:
         outimage = '.noback.coadd.fits'
         weightimage = '.noback.coadd.weight.fits'        
@@ -153,7 +155,10 @@ if args.swarp:
                 t=line.split('.fits')
                 outfile.write(t[0]+'_bpm.pl \n')
             outfile.close
-            os.system('swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -WEIGHT_TYPE MAP_WEIGHT -WEIGHT_IMAGE @masks')
+            # may have used this command for virgo mosaic images
+            #os.system('swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -WEIGHT_TYPE MAP_WEIGHT -WEIGHT_IMAGE @masks')
+            # updating for uat Halpha groups, mosaic data
+            os.system('swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -WEIGHT_TYPE MAP_WEIGHT')
         else:
             # CENTER_TYPE MANUAL
             #CENTER RA,DEC
