@@ -130,7 +130,7 @@ if args.swarp:
     if args.int:
         pixel_scale = 0.331
         defaultswarp = 'default.swarp.INT'
-    elif args.mos:
+    elif args.m:
         defaultswarp = 'default.swarp.MOS'
     if args.noback:
         outimage = '.noback.coadd.fits'
