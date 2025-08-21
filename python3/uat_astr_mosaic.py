@@ -91,6 +91,10 @@ if args.s:
         # do not run source extractor if there is a 'weight' in the filename
         if f.find('.weight') > -1:
             continue
+
+        # do not run source extractor if there is a 'bpm' in the filename
+        if f.find('.bpm') > -1:
+            continue
         
         print(('RUNNING SEXTRACTOR ON FILE %i OF %i'%(i,nfiles)))
         t = f.split('.fits')
