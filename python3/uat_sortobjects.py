@@ -205,8 +205,8 @@ for f in filters:
                 destination = os.path.join(objname,filename)
                 os.rename(filename, destination)
                 
-                
-os.remove('junkfile2')
+if os.path.exists('junkfile2'):            
+    os.remove('junkfile2')
 
 
 
