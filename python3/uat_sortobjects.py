@@ -114,9 +114,9 @@ fobject=[]     #creates empty list to contain name of object
 exptime=[]     #creates empty list to contain time(s) exposed
 
 for f in files:
-    if f.found('bpm') > -1:
+    if f.find('bpm') > -1:
         continue
-    if f.found('weight') > -1:
+    if f.find('weight') > -1:
         continue
     data, header = fits.getdata(f,header=True)
     fnames.append(f)
