@@ -123,8 +123,16 @@ for f in files:
     print(f)
     filt = header['FILTER'].split()
     obj = header['OBJECT'].split()
-    ftype.append('_'.join(filt))
-    fobject.append('_'.join(obj))
+
+
+    # try just taking the first element of each list
+    # not sure if this will work for all cases
+    if args.MOS:
+        ftype.append(filt[0])
+        fobject.append(obj[0])
+    else:
+        ftype.append('_'.join(filt))
+        fobject.append('_'.join(obj))
     exptime.append(header['EXPTIME'])
 
 ############################################################
