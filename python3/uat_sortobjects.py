@@ -75,8 +75,13 @@ try:
     for line in infile:
         t=line.split()      #splits input at each space and puts each element into                          list t
         fnames.append(t[0]) #adds the element in index 0 of list t to the empty                             list fnames
-        fobject.append(t[2].rstrip('\n').replace(' ',''))
-        exptime.append(t[3].rstrip('\n').replace(' ',''))
+        if args.MOS:
+            fobject.append(t[5].rstrip('\n').replace(' ',''))
+            exptime.append(t[6].rstrip('\n').replace(' ',''))
+        else:
+            fobject.append(t[2].rstrip('\n').replace(' ',''))
+            exptime.append(t[3].rstrip('\n').replace(' ',''))
+            
         ftype.append(t[1])
     
     infile.close()
@@ -112,6 +117,10 @@ for f in filters:
     for t in objecttypes:
         # save the object name
         objname = t
+
+        # replace any spaces in object name with an underscore to account for cases where the
+        # object name is e.g. MKW8 r instead of MKW8
+        objname.replace(' ','_')
         
         #creates a variable that is the combined object + filter
         objectgroup=str(t)+ '_' + str(f) 
