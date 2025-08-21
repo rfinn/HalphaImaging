@@ -204,7 +204,9 @@ for f in filters:
                 # move the file as well to subdirectory
                 destination = os.path.join(objname,filename)
                 os.rename(filename, destination)
-                
+
+# this is a holdover from when I was using gethead to get the header parameters
+# rather than getting parameters using fits.header
 if os.path.exists('junkfile2'):            
     os.remove('junkfile2')
 
