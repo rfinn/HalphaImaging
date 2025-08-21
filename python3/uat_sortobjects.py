@@ -116,9 +116,12 @@ exptime=[]     #creates empty list to contain time(s) exposed
 for f in files:
     data, header = fits.getdata(f,header=True)
     fnames.append(f)
-    ftype.append('_'.join(header['FILTER']))
-    fobject.append('_'.join(header['OBJECT']))
-    exptime.append('_'.join(header['EXPTIME']))
+    print(f)
+    filt = header['FILTER']
+    obj = header['OBJECT']
+    ftype.append('_'.join(filt))
+    fobject.append('_'.join(obj))
+    exptime.append(header['EXPTIME'])
 
 ############################################################
 # get list of unique filters and objects
