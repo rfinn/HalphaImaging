@@ -121,8 +121,8 @@ for f in files:
     data, header = fits.getdata(f,header=True)
     fnames.append(f)
     print(f)
-    filt = header['FILTER']
-    obj = header['OBJECT']
+    filt = header['FILTER'].split()
+    obj = header['OBJECT'].split()
     ftype.append('_'.join(filt))
     fobject.append('_'.join(obj))
     exptime.append(header['EXPTIME'])
