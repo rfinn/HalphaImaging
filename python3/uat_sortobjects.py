@@ -62,8 +62,11 @@ elif args.MOS:
 
     
 ############################################################
-## get information about image filter, object, exptime 
+## get information about image filter, object, exptime
+## directly from image header
 ############################################################   
+
+'''
 try:
     os.system('gethead FILTER, OBJECT, EXPTIME '+filestring+'> junkfile2')
     infile=open('junkfile2','r')
@@ -97,9 +100,25 @@ except:
     for f in files:
         data, header = fits.getdata(f,header=True)
         fnames.append(f)
-        ftype.append(header['FILTER'])
-        fobject.append(header['OBJECT'])
-        exptime.append(header['EXPTIME'])
+        ftype.append('_'.join(header['FILTER']))
+        fobject.append('_'.join(header['OBJECT']))
+        exptime.append('_'.join(header['EXPTIME']))
+'''
+
+    
+files = glob.glob(filestring)
+#print(files)
+fnames=[]      #creates empty list to contain file name
+ftype=[]       #creates empty list to contain type of filter
+fobject=[]     #creates empty list to contain name of object
+exptime=[]     #creates empty list to contain time(s) exposed
+
+for f in files:
+    data, header = fits.getdata(f,header=True)
+    fnames.append(f)
+    ftype.append('_'.join(header['FILTER']))
+    fobject.append('_'.join(header['OBJECT']))
+    exptime.append('_'.join(header['EXPTIME']))
 
 ############################################################
 # get list of unique filters and objects
