@@ -79,7 +79,10 @@ try:
 except:
     from scipy.stats import median_absolute_deviation as MAD2
 from astroquery.vizier import Vizier
-from photutils import Background2D, MedianBackground
+try:
+    from photutils import Background2D, MedianBackground # photutils v 1.3.0
+except ImportError: # photutils v 2.2
+    from photutils.background import Background2D, MedianBackground
 import itertools
 
 #################################################
@@ -399,6 +402,8 @@ class getzp():
                 ADUlimit = 400000./60#/float(expt)
             elif self.filter == 'ha':
                 ADUlimit = 40000./180.
+        if self.instrument == 'm':
+            ADUlimit = 40000.
         #print('saturation limit in ADU/s {:.1f}'.format(ADUlimit))
         if self.fwhm is None:
             t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)
@@ -603,6 +608,16 @@ class getzp():
             #Best fit quadratic KPHr - PS1_r = 0.0170*(PS1_g-PS1_r)^2 + -0.1864*(PS1_g-PS1_r) + 0.0213
             self.R = PS1_r + 0.0170*(PS1_g-PS1_r)**2 + -0.1864*(PS1_g-PS1_r) + 0.0213
 
+            # Aug 2025 - testing Kostov & Bonev linear transformation
+            self.R = self.pan['rmag'] + (-0.142)*(self.pan['gmag']-self.pan['rmag']) - 0.142
+            
+            # Aug 2025
+            # testing ZP for HDI without using color transformation
+            # trying to track down the offset we are seeing between HDI and other instruments
+            # in the sense that the HDI R mags are systematically fainter
+
+            #self.R = PS1_r            
+
         elif self.filter == 'r' and self.instrument == 'i':
             print("correcting color for r filter at INT")                        
             #self.R = self.pan['rmag']
@@ -629,7 +644,9 @@ class getzp():
 
             
             self.R = self.pan['rmag']
-            self.R = PS1_r + 0.0084*(PS1_g-PS1_r)**2 + -0.0420*(PS1_g-PS1_r) + 0.0036            
+            self.R = PS1_r + 0.0084*(PS1_g-PS1_r)**2 + -0.0420*(PS1_g-PS1_r) + 0.0036
+
+
 
         # halpha filters
         elif self.filter == 'ha' and self.instrument == 'i':
