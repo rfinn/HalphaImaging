@@ -65,9 +65,9 @@ def run_sextractor(image1,image2, default_se_dir = '/Users/rfinn/github/HalphaIm
     t = image1.split('.fits')
     froot1 = t[0]
     if zp1flag:
-        os.system('sex ' + image1+','+image1 + ' -c default.sex.hdi -CATALOG_NAME ' + froot1 + '.cat -MAG_ZEROPOINT '+str(ZP1))
+        os.system('sex ' + image1+','+image1 + ' -c default.sex.HDI -CATALOG_NAME ' + froot1 + '.cat -MAG_ZEROPOINT '+str(ZP1))
     else:
-        os.system('sex ' + image1+','+image1 + ' -c default.sex.hdi -CATALOG_NAME ' + froot1 + '.cat')
+        os.system('sex ' + image1+','+image1 + ' -c default.sex.HDI -CATALOG_NAME ' + froot1 + '.cat')
     try:
         os.rename('check.fits', froot1 + 'check.fits')
     except FileNotFoundError:
@@ -76,9 +76,9 @@ def run_sextractor(image1,image2, default_se_dir = '/Users/rfinn/github/HalphaIm
     t = image2.split('.fits')
     froot2 = t[0]
     if zp2flag:
-        os.system('sex ' + image1+','+image2 + ' -c default.sex.hdi -CATALOG_NAME ' + froot2 + '.cat -MAG_ZEROPOINT '+str(ZP2))
+        os.system('sex ' + image1+','+image2 + ' -c default.sex.HDI -CATALOG_NAME ' + froot2 + '.cat -MAG_ZEROPOINT '+str(ZP2))
     else:
-        os.system('sex ' + image1+','+image2 + ' -c default.sex.hdi -CATALOG_NAME ' + froot2 + '.cat')
+        os.system('sex ' + image1+','+image2 + ' -c default.sex.HDI -CATALOG_NAME ' + froot2 + '.cat')
     try:
         os.rename('check.fits', froot2 + 'check.fits')
     except FileNotFoundError:
