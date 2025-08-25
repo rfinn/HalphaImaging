@@ -70,7 +70,7 @@ def run_sextractor(image1,image2, default_se_dir = '/Users/rfinn/github/HalphaIm
         os.system('sex ' + image1+','+image1 + ' -c default.sex.hdi -CATALOG_NAME ' + froot1 + '.cat')
     try:
         os.rename('check.fits', froot1 + 'check.fits')
-    except FileNotFound:
+    except FileNotFoundError:
         print("WARNING: did not find check.fits for image 2")
     # run on second image
     t = image2.split('.fits')
@@ -81,7 +81,7 @@ def run_sextractor(image1,image2, default_se_dir = '/Users/rfinn/github/HalphaIm
         os.system('sex ' + image1+','+image2 + ' -c default.sex.hdi -CATALOG_NAME ' + froot2 + '.cat')
     try:
         os.rename('check.fits', froot2 + 'check.fits')
-    except FileNotFound:
+    except FileNotFoundError:
         print("WARNING: did not find check.fits for image 2")
 
 def make_plot(image1, image2, return_flag = False, image_dir = './'):
