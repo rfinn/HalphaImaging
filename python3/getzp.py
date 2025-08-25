@@ -609,7 +609,7 @@ class getzp():
             self.R = PS1_r + 0.0170*(PS1_g-PS1_r)**2 + -0.1864*(PS1_g-PS1_r) + 0.0213
 
             # Aug 2025 - testing Kostov & Bonev linear transformation
-            self.R = self.pan['rmag'] + (-0.142)*(self.pan['gmag']-self.pan['rmag']) - 0.142
+            #self.R = self.pan['rmag'] + (-0.142)*(self.pan['gmag']-self.pan['rmag']) - 0.142
             
             # Aug 2025
             # testing ZP for HDI without using color transformation
