@@ -88,10 +88,16 @@ def make_plot(image1, image2, return_flag = False, image_dir = './'):
     from matplotlib import pyplot as plt
     t = image1.split('.fits')
     froot1 = t[0]
-    cat1 = fits.getdata(froot1+'.cat',2)
+    try:
+        cat1 = fits.getdata(froot1+'.cat',2)
+    except OSError:
+        cat1 = fits.getdata(froot1+'.cat')
     t = image2.split('.fits')
     froot2 = t[0]
-    cat2 = fits.getdata(froot2+'.cat',2)
+    try:
+        cat2 = fits.getdata(froot2+'.cat',2)
+    except OSError:
+        cat2 = fits.getdata(froot2+'.cat')
     plt.figure(figsize=(6,4))
     plt.subplots_adjust(bottom=.2,left=.15,right=.95)
     x = cat2.FLUX_AUTO
