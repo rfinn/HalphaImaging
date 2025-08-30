@@ -92,7 +92,7 @@ def runone(i,f):
     #if instrument == 'BOK':
     #    getzpstring += ' --fixbok'
     print()
-    print(f"Running getzp.py for file {i}/{len(rfiles)}")
+    print(f"Running getzp.py for file {f}")
     #print(getzpstring)
 
     # run getzp
