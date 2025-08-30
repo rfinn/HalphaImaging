@@ -98,21 +98,31 @@ def runone(i,f):
     # run getzp
     os.system(getzpstring)
 
-# grab all files in the directory
+# run one galaxy at a time, in parallel
 if len(sys.argv) > 1:
-    matchstring = sys.argv[1]
-    rfiles = glob.glob('VF*'+matchstring+'*.fits')
-else:
-    rfiles = glob.glob('VF*.fits')
-rfiles.sort()
-indices = np.arange(len(rfiles))
+    filename = sys.argv[1]
+    runone(0,filename)
 
-#for rimage in rimages: # loop through list
-image_pool = mp.Pool(mp.cpu_count())
-myresults = [image_pool.apply_async(runone,args=(i,rfiles[i]),callback=collect_results) for i in indices]
     
-image_pool.close()
-image_pool.join()
-image_results = [r.get() for r in myresults]
+else:
+    # don't need this if I am going to run using gnu parallel instead
+    if len(sys.argv) > 2:
+        matchstring = sys.argv[1]
+        rfiles = glob.glob('VF*'+matchstring+'*.fits') # grab subset of files in the directory
+    else:
+        rfiles = glob.glob('VF*.fits') # grab all files in the directory
+        rfiles.sort()
+        indices = np.arange(len(rfiles))
+
+        #for rimage in rimages: # loop through list
+        image_pool = mp.Pool(mp.cpu_count())
+        myresults = [image_pool.apply_async(runone,args=(i,rfiles[i]),callback=collect_results) for i in indices]
+    
+        image_pool.close()
+        image_pool.join()
+        image_results = [r.get() for r in myresults]
+
+
+    
 
 
