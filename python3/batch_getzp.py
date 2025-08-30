@@ -83,6 +83,8 @@ def runone(i,f):
         iinstrument = 'h'
     elif instrument == 'MOSAIC':
         iinstrument == 'm'
+    elif instrument == 'MOS':
+        iinstrument == 'm'
     else:
         print('WARNING: did not recognize instrument ',instrument, f)
         sys.exit()
