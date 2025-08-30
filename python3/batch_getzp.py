@@ -101,6 +101,7 @@ def runone(i,f):
 # run one galaxy at a time, in parallel
 if len(sys.argv) > 1:
     filename = sys.argv[1]
+    print("calling runone for ",filename)
     runone(0,filename)
 
     
