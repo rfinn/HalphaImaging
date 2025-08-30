@@ -83,7 +83,7 @@ def runone(i,f):
         iinstrument = 'h'
     elif instrument == 'MOSAIC':
         iinstrument == 'm'
-    elif instrument == 'MOS':
+    elif instrument == 'MOS': # didn't have this case for mosaic images
         iinstrument == 'm'
     else:
         print('WARNING: did not recognize instrument ',instrument, f)
