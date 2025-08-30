@@ -82,9 +82,9 @@ def runone(i,f):
     elif instrument == 'HDI':
         iinstrument = 'h'
     elif instrument == 'MOSAIC':
-        iinstrument == 'm'
+        iinstrument = 'm'
     elif instrument == 'MOS': # didn't have this case for mosaic images
-        iinstrument == 'm'
+        iinstrument = 'm'
     else:
         print('WARNING: did not recognize instrument ',instrument, f)
         sys.exit()
