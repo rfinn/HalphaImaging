@@ -70,7 +70,7 @@ from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.stats import sigma_clip
 from astropy.stats import mad_std
-from astropy.table import Table
+from astropy.table import Table, hstack, Column
 
 from scipy.optimize import curve_fit
 from scipy import interpolate
@@ -334,6 +334,8 @@ class getzp():
                 self.renorm_wfc()
                 # this creates 'ff'+imagename
                 self.rerun_zp_fit()
+        print("writing out the merged panstarrs + SE table")
+        self.write_pan_se_table()
     
     def getzp_wfc(self):
         self.getzp()
@@ -938,7 +940,9 @@ class getzp():
         if self.filter == 'R':
             # conversion from Blanton+2007
             # http://www.astronomy.ohio-state.edu/~martini/usefuldata.html
-            header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1]+.21)))
+            # header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1]+.21)))
+            # changed this to write out phot zp in AB system for ALL filters
+            header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1])))
 
             header.set('LAMB(um)',float(.6442))
 
@@ -1075,6 +1079,36 @@ class getzp():
         # check to make sure the systematic residuals have been removed
         self.fit_residual_surface(suffix='round2',norder=self.norder)
 
+    def write_pan_se_table(self):
+
+        # join the panstarrs and SE matched tables
+        outtab = hstack([self.pan,self.matchedarray1])
+
+        ##################################################
+        # convert the SE mag columns using best fit zp
+        ##################################################        
+
+        # magnitude colums
+        magcols = ['MAG_'+i for i in ['ISO','ISOCOR','AUTO','BEST','PETRO']]
+        for m in magcols:
+            outtab[m] += self.zp
+
+        # aperture magnitude columns
+        n_aper_mag = len(outtab['MAG_APER'][0])
+        for i in range(n_aper_mag):
+            outtab['MAG_APER'][:,i] += self.zp 
+            
+        # add the color-transformed R magnitude
+        c = Column(self.R, name='pan2instmag')
+        outtab.add_column(c)
+
+        # write out combined table
+        subdir = 'matched_panstarrs_se_tables'
+        if not os.path.exists(subdir):
+            os.mkdir(subdir)
+        flag = self.fitflag # only keep stars that are used in fitting for the ZP        
+        outname = os.path.join(subdir, get_filebasename(self.image)+'_pan_SE_tab.fits')
+        outtab[flag].write(outname, format='fits', overwrite=True)
 
 def main(raw_args=None):
     parser = argparse.ArgumentParser(description ='Run sextractor, get Pan-STARRS catalog, and then computer photometric ZP\n \n from within ipython: \n %run ~/github/Virgo/programs/getzp.py --image pointing031-r.coadd.fits --instrument i \n \n The y intercept is -1*ZP. \n \n x and y data can be accessed at zp.x and zp.y in case you want to make additional plots.', formatter_class=argparse.RawTextHelpFormatter)
