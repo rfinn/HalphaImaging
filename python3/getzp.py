@@ -1087,11 +1087,11 @@ class getzp():
         ##################################################
         # convert the SE mag columns using best fit zp
         ##################################################        
-
+        print("columns in pan se merged table: ", outtab.colnames)
         # magnitude colums
         magcols = ['MAG_'+i for i in ['ISO','ISOCOR','AUTO','BEST','PETRO']]
         for m in magcols:
-            outtab[m] += self.zp
+            outtab[m] = outtab[m] +  self.zp
 
         # aperture magnitude columns
         n_aper_mag = len(outtab['MAG_APER'][0])
