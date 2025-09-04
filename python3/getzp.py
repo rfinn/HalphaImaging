@@ -1082,7 +1082,7 @@ class getzp():
     def write_pan_se_table(self):
 
         # join the panstarrs and SE matched tables
-        outtab = hstack([self.pan,self.matchedarray1])
+        outtab = hstack([self.pan,Table(self.matchedarray1)])
 
         ##################################################
         # convert the SE mag columns using best fit zp
