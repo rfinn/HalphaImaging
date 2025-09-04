@@ -1103,8 +1103,9 @@ class getzp():
         subdir = 'matched_panstarrs_se_tables'
         if not os.path.exists(subdir):
             os.mkdir(subdir)
-        
-        outname = os.path.join(subdir, get_filebasename(self.image)+'_pan_SE_tab.fits')
+
+        fname = f"{get_filebasename(self.image)}_{self.filter}_pan_SE_tab.fits"
+        outname = os.path.join(subdir, fname)
         #outname = get_filebasename(self.image)+'_pan_SE_tab.fits'
         print("Writing merged panstarrs - SE table as ",outname)
         # only keep stars that are used in fitting for the ZP
