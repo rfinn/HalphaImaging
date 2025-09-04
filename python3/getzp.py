@@ -1098,9 +1098,6 @@ class getzp():
         for i in range(n_aper_mag):
             outtab['MAG_APER'][:,i] += self.zp 
             
-        # add the color-transformed R magnitude
-        c = Column(self.R, name='pan2instmag')
-        outtab.add_column(c)
 
         # write out combined table
         subdir = 'matched_panstarrs_se_tables'
@@ -1110,8 +1107,13 @@ class getzp():
         outname = os.path.join(subdir, get_filebasename(self.image)+'_pan_SE_tab.fits')
         outname = get_filebasename(self.image)+'_pan_SE_tab.fits'
         print("Writing merged panstarrs - SE table as ",outname)
-        # only keep stars that are used in fitting for the ZP                
-        outtab[self.fitflag].write(outname, format='fits', overwrite=True)
+        # only keep stars that are used in fitting for the ZP
+        outtab = outtab[self.fitflag]
+        # add the color-transformed R magnitude
+        c = Column(self.R[self.fitflag], name='pan2instmag')
+        outtab.add_column(c)
+        
+        outtab.write(outname, format='fits', overwrite=True)
 
 def main(raw_args=None):
     parser = argparse.ArgumentParser(description ='Run sextractor, get Pan-STARRS catalog, and then computer photometric ZP\n \n from within ipython: \n %run ~/github/Virgo/programs/getzp.py --image pointing031-r.coadd.fits --instrument i \n \n The y intercept is -1*ZP. \n \n x and y data can be accessed at zp.x and zp.y in case you want to make additional plots.', formatter_class=argparse.RawTextHelpFormatter)
