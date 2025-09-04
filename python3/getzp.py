@@ -1028,7 +1028,8 @@ class getzp():
                          np.linspace(self.yim.min(), self.yim.max(), ny))
             self.zz = polyval2d(xx, yy, m)
             
-        # Plot
+
+            # Plot
         plt.figure()
         plt.imshow(self.zz,vmin=v1,vmax=v2,origin="lower")
         plt.scatter(self.xim[~clip_flag.mask], self.yim[~clip_flag.mask], c=self.zim[~clip_flag.mask],vmin=v1,vmax=v2,s=15)
@@ -1091,12 +1092,12 @@ class getzp():
         # magnitude colums
         magcols = ['MAG_'+i for i in ['ISO','ISOCOR','AUTO','BEST','PETRO']]
         for m in magcols:
-            outtab[m] = outtab[m] +  self.zp
+            outtab[m] = outtab[m] +  -self.zp
 
         # aperture magnitude columns
         n_aper_mag = len(outtab['MAG_APER'][0])
         for i in range(n_aper_mag):
-            outtab['MAG_APER'][:,i] += self.zp 
+            outtab['MAG_APER'][:,i] += -self.zp 
             
 
         # write out combined table
