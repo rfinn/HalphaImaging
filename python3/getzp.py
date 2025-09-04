@@ -1087,7 +1087,7 @@ class getzp():
         ##################################################
         # convert the SE mag columns using best fit zp
         ##################################################        
-        print("columns in pan se merged table: ", outtab.colnames)
+        #print("columns in pan se merged table: ", outtab.colnames)
         # magnitude colums
         magcols = ['MAG_'+i for i in ['ISO','ISOCOR','AUTO','BEST','PETRO']]
         for m in magcols:
@@ -1105,7 +1105,7 @@ class getzp():
             os.mkdir(subdir)
         
         outname = os.path.join(subdir, get_filebasename(self.image)+'_pan_SE_tab.fits')
-        outname = get_filebasename(self.image)+'_pan_SE_tab.fits'
+        #outname = get_filebasename(self.image)+'_pan_SE_tab.fits'
         print("Writing merged panstarrs - SE table as ",outname)
         # only keep stars that are used in fitting for the ZP
         outtab = outtab[self.fitflag]
