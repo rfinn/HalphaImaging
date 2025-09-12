@@ -1082,7 +1082,12 @@ class getzp():
 
         # join the panstarrs and SE matched tables
         outtab = hstack([self.pan,Table(self.matchedarray1)])
-        outtab.meta['description'] = "descrip"
+
+        # trying to fix error that we were getting saying that keyword "description" is too long
+        # (>8 characters or has illegal characters)
+        original_description = outtab.meta['description']
+        del outtab.meta['description']
+        outtab.meta['DSCRPTN'] = original_description[:70] # Truncating the value to 70 characters as an example
         ##################################################
         # convert the SE mag columns using best fit zp
         ##################################################        
