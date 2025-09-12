@@ -1082,7 +1082,7 @@ class getzp():
 
         # join the panstarrs and SE matched tables
         outtab = hstack([self.pan,Table(self.matchedarray1)])
-        outtab.meta['description'] = "testing description"
+        outtab.meta['description'] = "descrip"
         ##################################################
         # convert the SE mag columns using best fit zp
         ##################################################        
