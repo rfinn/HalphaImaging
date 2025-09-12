@@ -334,8 +334,6 @@ class getzp():
                 self.renorm_wfc()
                 # this creates 'ff'+imagename
                 self.rerun_zp_fit()
-        print("writing out the merged panstarrs + SE table")
-        self.write_pan_se_table()
     
     def getzp_wfc(self):
         self.getzp()
@@ -1105,7 +1103,7 @@ class getzp():
         if not os.path.exists(subdir):
             os.mkdir(subdir)
 
-        fname = f"{get_filebasename(self.image)}_{self.filter}_pan_SE_tab.fits"
+        fname = f"{get_filebasename(self.image)}".replace('.fits',f"_{self.filter}_pan_SE_tab.fits")
         outname = os.path.join(subdir, fname)
         #outname = get_filebasename(self.image)+'_pan_SE_tab.fits'
         print("Writing merged panstarrs - SE table as ",outname)
@@ -1187,6 +1185,8 @@ if __name__ == '__main__':
     zp.getzp()
     print('ZP = {:.3f} +/- {:.3f}, {}'.format(-1*zp.zp,zp.zperr,zp.image))
     #return zp,-1*zp.zp,zp.zperr
+    print("writing out the merged panstarrs + SE table")
+    zp.write_pan_se_table()
 
     # replicating main function for testing, so I can access zp in jupyter
     #main()
