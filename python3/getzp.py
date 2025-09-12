@@ -488,7 +488,7 @@ class getzp():
         ###################################
         # this naming convention uses the same panstarrs catalog
         # for both the r and halpha images - saves time!
-        ptab_name = get_filebasename(self.image)+'_pan_tab.csv'
+        ptab_name = get_filebasename(self.image).replace('.fits','_pan_tab.csv')
 
         if os.path.exists(ptab_name):
             print('panstarrs table already downloaded')
