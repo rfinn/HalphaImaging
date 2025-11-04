@@ -62,7 +62,7 @@ def get_fwhm(input_images): #measure FWHM of SE catalogs
         se_cat = t[0]+'.cat'
         data = fits.getdata(se_cat,2)
         # select unsaturated stars using : class_star > 0.9 and (10 < m < 13)
-        flag = (data.CLASS_STAR > 0.9) #& (data.MAG_AUTO > 10.) & (data.MAG_AUTO < 13.)
+        flag = (data.CLASS_STAR > 0.9) & (data.MAG_AUTO > 10.) & (data.MAG_AUTO < 13.)
         image_fwhm[i] = np.nanmedian(data.FWHM_IMAGE[flag])
         image_fwhm_std[i] = np.std(data.FWHM_IMAGE[flag])
     return image_fwhm, image_fwhm_std
@@ -222,7 +222,7 @@ if __name__ == '__main__':
         print('#######################################')
         print('COMPARING ORIGINAL AND FINAL FWHM')
         print('#######################################')
-        print("image   fwhm    gfwhm(auto)  gfwhm(manual)")
+        print("image            fwhm  gfwhm(auto) gfwhm(man)")
         print("------------------------")
         for i in range(len(image_names)):
             print(f"{image_names[i]}: {image_fwhm[i]:.2f} {gimage_fwhm[i]:.2f} {myimage_fwhm[i]:.2f} ratio={gimage_fwhm[i]/fwhm_max:.3f}")
