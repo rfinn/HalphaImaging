@@ -236,5 +236,8 @@ if __name__ == '__main__':
                 psfexfile = f"{p}_g{image_names[i]}"
                 if os.path.exists(psfexfile):
                     os.remove(psfexfile)
+                psfexfile = f"{p}_{image_names[i]}"
+                if os.path.exists(psfexfile):
+                    os.remove(psfexfile)
 # the end
         
