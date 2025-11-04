@@ -1085,9 +1085,14 @@ class getzp():
 
         # trying to fix error that we were getting saying that keyword "description" is too long
         # (>8 characters or has illegal characters)
-        original_description = outtab.meta['description']
-        del outtab.meta['description']
-        outtab.meta['DSCRPTN'] = original_description[:70] # Truncating the value to 70 characters as an example
+        try:
+            original_description = outtab.meta['description']
+            del outtab.meta['description']
+            outtab.meta['DSCRPTN'] = original_description[:70] # Truncating the value to 70 characters 
+        except KeyError:
+            continue
+
+        
         ##################################################
         # convert the SE mag columns using best fit zp
         ##################################################        
