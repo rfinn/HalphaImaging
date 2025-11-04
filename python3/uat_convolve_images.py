@@ -197,7 +197,7 @@ if __name__ == '__main__':
                 chdu.writeto('g'+image_names[i], overwrite=True)
             weightfile = image_names[i].replace('.fits','.weight.fits')
             if os.path.exists(weightfile):
-                os.system(f"cp {weighfile} g{weightfile}")
+                os.system(f"cp {weightfile} g{weightfile}")
 
         # run source extractor on convolved images
         # copy psfex files as default
