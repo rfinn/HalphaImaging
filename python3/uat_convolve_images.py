@@ -216,14 +216,17 @@ if __name__ == '__main__':
 
         gimage_names, gimage_fwhm = get_fwhm_psfex(psfout='gpsfex.xml')
 
+        # get fwhm from se cats of convolved images
+        
+        myimage_fwhm, myimage_std = get_fwhm(gimages_names)
 
         print('#######################################')
         print('COMPARING ORIGINAL AND FINAL FWHM')
         print('#######################################')
-        print("image   fwhm    gfwhm")
+        print("image   fwhm    gfwhm(auto)  gfwhm(manual)")
         print("------------------------")
         for i in range(len(image_names)):
-            print(f"{image_names[i]}: {image_fwhm[i]:.2f} {gimage_fwhm[i]:.2f} ratio={gimage_fwhm[i]/fwhm_max:.3f}")
+            print(f"{image_names[i]}: {image_fwhm[i]:.2f} {gimage_fwhm[i]:.2f} {myimage_fwhm[i]:.2f} ratio={gimage_fwhm[i]/fwhm_max:.3f}")
 
             # write to a file
         newtab = Table([image_names,image_fwhm,gimage_fwhm])
