@@ -218,7 +218,7 @@ if __name__ == '__main__':
 
         # get fwhm from se cats of convolved images
         
-        myimage_fwhm, myimage_std = get_fwhm(gimages_names)
+        myimage_fwhm, myimage_std = get_fwhm(gimage_names)
 
         print('#######################################')
         print('COMPARING ORIGINAL AND FINAL FWHM')
