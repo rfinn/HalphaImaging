@@ -208,7 +208,7 @@ if __name__ == '__main__':
         # run psfex on convolved images
 
         # removing o00 to make this compatible with mosaic data
-        os.system('ls '+conv_filestring+'*.cat > input_list')
+        os.system('ls '+conv_filestring+'*.cat > gauss_list')
         
         #os.system('ls '+conv_filestring+'*o00.cat > gauss_list')
         os.system('psfex @gauss_list -XML_NAME gpsfex.xml')
