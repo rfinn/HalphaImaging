@@ -133,6 +133,8 @@ if __name__ == '__main__':
     
     
     image_names, image_fwhm = get_fwhm_psfex()
+    a, b = get_fwhm(image_names)
+    image_fwhm = a
     #print(image_fwhm)
     #Need worst FWHM to convolve to
     fwhm_max=np.max(image_fwhm)
