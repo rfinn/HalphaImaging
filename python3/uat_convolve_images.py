@@ -101,7 +101,8 @@ if __name__ == '__main__':
     parser.add_argument('--convolve',dest = 'convolve', default = False, action ='store_true',help='set this to convolve images.  by default, psfex is run but we do not run convolution.')
     parser.add_argument('--cthreshold',dest = 'cthreshold', default = 0.5, help='threshold for applying convolution to image.  Images with fwhm within cthreshold pixels of fwhm_max will not have convolution applied. default value is 0.5 pixels. the input image is copied over as g*.')
     parser.add_argument('--filestring', dest = 'filestring', default = 'mh', help = 'string to use to get input files (default = "mh", which grabs all of the files "mh*.fits")')
-    parser.add_argument('--hdi', dest = 'hdi', default = False, action='store_true', help = 'string to use to get input files (default = "mh", which grabs all of the files "mh*o00.fits").  basically, requires the o00 that we see in object frame names for hdi.')        
+    parser.add_argument('--hdi', dest = 'hdi', default = False, action='store_true', help = 'string to use to get input files (default = "mh", which grabs all of the files "mh*o00.fits").  basically, requires the o00 that we see in object frame names for hdi.')
+    parser.add_argument('--cleanup', dest = 'cleanup', default = False, action='store_true', help = 'set this to delete the output diagnostic files created by psfex.  Default is False.')            
     args = parser.parse_args()
 
 
@@ -231,15 +232,16 @@ if __name__ == '__main__':
         newtab = Table([image_names,image_fwhm,gimage_fwhm])
         newtab.write("psfex_original_and_convolved_fwhm.csv",format='csv',overwrite=True)
 
-        # cleanup snap* samp* resi* proto* chi*
-        prefixes = ['snap', 'samp', 'resi', 'proto', 'chi']
-        for i in range(len(image_names)):
-            for p in prefixes:
-                psfexfile = f"{p}_g{image_names[i]}"
-                if os.path.exists(psfexfile):
-                    os.remove(psfexfile)
-                psfexfile = f"{p}_{image_names[i]}"
-                if os.path.exists(psfexfile):
-                    os.remove(psfexfile)
-# the end
+        if args.cleanup:
+            # cleanup snap* samp* resi* proto* chi*
+            prefixes = ['snap', 'samp', 'resi', 'proto', 'chi']
+            for i in range(len(image_names)):
+                for p in prefixes:
+                    psfexfile = f"{p}_g{image_names[i]}"
+                    if os.path.exists(psfexfile):
+                        os.remove(psfexfile)
+                        psfexfile = f"{p}_{image_names[i]}"
+                        if os.path.exists(psfexfile):
+                            os.remove(psfexfile)
+                            # the end
         
