@@ -194,7 +194,10 @@ if __name__ == '__main__':
                 convolved_data = convolve(hdu.data, kernel)
 
                 chdu = fits.PrimaryHDU(convolved_data, header=hdu.header)
-                chdu.writeto('g'+image_names[i], overwrite=True) 
+                chdu.writeto('g'+image_names[i], overwrite=True)
+            weightfile = image_names[i].replace('.fits','.weight.fits')
+            if os.path.exists(weightfile):
+                os.system(f"cp {weighfile} g{weightfile}")
 
         # run source extractor on convolved images
         # copy psfex files as default
