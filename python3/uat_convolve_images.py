@@ -233,6 +233,8 @@ if __name__ == '__main__':
         prefixes = ['snap', 'samp', 'resi', 'proto', 'chi']
         for i in range(len(image_names)):
             for p in prefixes:
-                if os.path.exists(p+'_'+image_names[i]):
-                    os.remove(p+'_'+image_names[i])
+                psfexfile = f"{p}_g{image_names[i]}"
+                if os.path.exists(psfexfile):
+                    os.remove(psfexfile)
+# the end
         
