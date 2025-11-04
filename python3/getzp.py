@@ -1090,7 +1090,7 @@ class getzp():
             del outtab.meta['description']
             outtab.meta['DSCRPTN'] = original_description[:70] # Truncating the value to 70 characters 
         except KeyError:
-            continue
+            print("WARNING: could not get description in meta data.  Maybe this is ok?")
 
         
         ##################################################
