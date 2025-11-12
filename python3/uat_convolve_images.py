@@ -102,6 +102,7 @@ if __name__ == '__main__':
     parser.add_argument('--cthreshold',dest = 'cthreshold', default = 0.5, help='threshold for applying convolution to image.  Images with fwhm within cthreshold pixels of fwhm_max will not have convolution applied. default value is 0.5 pixels. the input image is copied over as g*.')
     parser.add_argument('--filestring', dest = 'filestring', default = 'mh', help = 'string to use to get input files (default = "mh", which grabs all of the files "mh*.fits")')
     parser.add_argument('--hdi', dest = 'hdi', default = False, action='store_true', help = 'string to use to get input files (default = "mh", which grabs all of the files "mh*o00.fits").  basically, requires the o00 that we see in object frame names for hdi.')
+    parser.add_argument('--usemedian', dest = 'usemedian', default = False, action='store_true', help = 'set this flag to use the median when calculating psf width instead of mean.')
     parser.add_argument('--cleanup', dest = 'cleanup', default = False, action='store_true', help = 'set this to delete the output diagnostic files created by psfex.  Default is False.')            
     args = parser.parse_args()
 
@@ -133,8 +134,9 @@ if __name__ == '__main__':
     
     
     image_names, image_fwhm = get_fwhm_psfex()
-    a, b = get_fwhm(image_names)
-    image_fwhm = a
+    if args.usemedian:
+        a, b = get_fwhm(image_names)
+        image_fwhm = a
     #print(image_fwhm)
     #Need worst FWHM to convolve to
     fwhm_max=np.max(image_fwhm)
