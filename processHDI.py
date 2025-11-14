@@ -180,7 +180,7 @@ if (args.uat & args.swarp):
 
 
         print("looking for halpha file list with ",rootname+'_h*')
-        fnames1 = glob.glob(rootname+'_h?')
+        fnames1 = glob.glob(rootname+'_h*')
         fnames = []
         for f in fnames1:
             if f.endswith('.fits'):
