@@ -715,14 +715,19 @@ class getzp():
                 plt.colorbar(label='g-r')                
             else:
                 plt.plot(x,residual, 'ko',label=s)
-
+            ymin, ymax = plt.ylim()
                 
         else:
-            #print(f"inside plot_fitresults, len(x) = {len(x)}, len(color)={len(color)}")            
-            plt.errorbar(x,y,yerr=yerr,fmt='None',ecolor='0.5',label='SE MAG',alpha=.4,zorder=1)
+            #print(f"inside plot_fitresults, len(x) = {len(x)}, len(color)={len(color)}")
+            # plot datapoints and get ymin and ymax, then use this to get limits for plot with errorbars
             if color is not None:
                 plt.scatter(x,y,s=30,label=s,c=color,zorder=10)
                 plt.colorbar(label='g-r')
+            else:
+                plt.scatter(x,y,s=30,label=s,zorder=10)
+            ymin,ymax = plt.ylim()
+            plt.errorbar(x,y,yerr=yerr,fmt='None',ecolor='0.5',label='SE MAG',alpha=.4,zorder=1)
+        plt.ylim(ymin,ymax)
         plt.xlabel('Pan-STARRS Corrected',fontsize=16)
         plt.ylabel('SE MAG',fontsize=16)
         xl = np.linspace(14,19,10)
@@ -740,11 +745,16 @@ class getzp():
                 plt.scatter(x,residual,s=30,label=s,c=color)
             else:
                 plt.plot(x,residual, 'ko',label=s)
+            ymin,ymax = plt.ylim()
         else:
-            plt.errorbar(x,residual,yerr=yerr,fmt='None',ecolor='0.5',label='SE MAG '+s,alpha=.4,zorder=1)
             if color is not None:
                 plt.scatter(x,residual,s=30,label=s,c=color,zorder=10)
                 plt.colorbar(label='g-r')
+            else:
+                plt.scatter(x,residual,s=30,label=s,zorder=10)
+            ymin,ymax = plt.ylim()
+            plt.errorbar(x,residual,yerr=yerr,fmt='None',ecolor='0.5',label='SE MAG '+s,alpha=.4,zorder=1)
+        plt.ylim(ymin,ymax)
         plt.xlabel('Pan-STARRS Corrected',fontsize=16)
         plt.ylabel('YFIT - SE R-band MAG',fontsize=16)
         plt.legend()
