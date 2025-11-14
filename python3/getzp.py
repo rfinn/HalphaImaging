@@ -13,6 +13,10 @@ To print the value in ipython, type:
 -1*zp.bestc[1]
 
 
+To run on mosaic data, set the flatten and spline flags:
+
+%run ~/github/HalphaImaging/getzp.py --image pointing031-r.coadd.fits --instrument m --filter r --flatten 1 --spline
+
 UPDATES:
 * implemented scipy.optimize.curve_fit in getzp.py to 
     * keep slope fixed at 1
@@ -282,6 +286,8 @@ class getzp():
         if self.filter == 'ha':
             v1 = .9
             v2 = 1.1
+            v1 = .95
+            v2 = 1.05 #  keep halph range to match broad band filters
         else:
             v1=.95
             v2=1.05
