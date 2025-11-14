@@ -163,6 +163,7 @@ if (args.uat & args.swarp):
     i = 0
     for f in infile:
         f = f.rstrip()
+        print(f"input filelist = {f}", f.split('_R')) # test        
         print('PROCESSING INPUT FILE: ',f)
         if f.find(r'_R') > -1:
             print('R filter')
