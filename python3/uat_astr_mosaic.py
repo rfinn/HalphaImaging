@@ -59,6 +59,7 @@ parser.add_argument('--swarp', dest = 'swarp', default = False, action = 'store_
 parser.add_argument('--l', dest = 'l', default = False, help = 'List of images to input to swarp')
 parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
 parser.add_argument('--refimage',dest = 'refimage', default = None,  help = 'use a reference image to set center and size of output mosaic')
+parser.add_argument('--instrument', dest='instrument', default='h', const='h', nargs='?', choices=['h', 'i', 'm'], help='instrument.  options are h=HDI, m=mosaic, i=INT')
 parser.add_argument('--m',dest = 'm', default = False, action = 'store_true', help = 'set if running for mosaic data')
 parser.add_argument('--int',dest = 'int', default = False, action = 'store_true', help = 'set if running on INT data')
 parser.add_argument('--noback',dest = 'noback', default = False, action = 'store_true', help = 'set to disable background subtraction in swarp')
@@ -99,8 +100,12 @@ if args.s:
         print(('RUNNING SEXTRACTOR ON FILE %i OF %i'%(i,nfiles)))
         t = f.split('.fits')
         froot = t[0]
-        if args.int:
+        if args.instrument == 'i':
             os.system('sex ' + f + ' -c default.sex.INT -CATALOG_NAME ' + froot + '.cat')
+        elif args.instrument == 'h':
+            os.system('sex ' + f + ' -c default.sex.HDI -CATALOG_NAME ' + froot + '.cat')
+        elif args.instrument == 'm':
+            os.system('sex ' + f + ' -c default.sex.MOS -CATALOG_NAME ' + froot + '.cat')
         elif args.siena:
             os.system('sex ' + f + ' -c default.sex.siena -CATALOG_NAME ' + froot + '.cat')
         elif args.pisces:
@@ -119,7 +124,7 @@ if args.scamp:
     print('RUNNING SCAMP')
     if args.siena:
         os.system('scamp @scamp_input_cats -c default.scamp.siena')
-    if args.int:
+    if args.instrument == 'i':
         os.system('scamp @scamp_input_cats -c default.scamp.INT')
     elif args.pisces:
         os.system('scamp @scamp_input_cats -c default.scamp.pisces ')
@@ -130,12 +135,14 @@ if args.scamp:
 if args.swarp:
     #HDI data
     pixel_scale = 0.425
-    defaultswarp = 'default.swarp'
-    if args.int:
+    defaultswarp = 'default.swarp' # for HDI
+    if args.instrument == 'i':
         pixel_scale = 0.331
         defaultswarp = 'default.swarp.INT'
-    elif args.m:
+    elif args.instrument == 'm':
         defaultswarp = 'default.swarp.MOS'
+    elif args.instrument == 'h':
+        defaultswarp = 'default.swarp.HDI'
     if args.noback:
         outimage = '.noback.coadd.fits'
         weightimage = '.noback.coadd.weight.fits'        

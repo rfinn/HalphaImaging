@@ -46,6 +46,8 @@ parser.add_argument('--scamp', dest='scamp', default=False,action='store_true', 
 parser.add_argument('--submed', dest='submed', default=False,action='store_true', help='run subtract_median to remove the background before running swarp.')
 parser.add_argument('--swarp', dest='swarp', default=False,action='store_true', help='run swarp to make coadded images.')
 parser.add_argument('--filelist', dest='filelist', default='swarp_input', help='list of image sets to run swarp on.  the file should contain the list of all Rband groups, for example: ls pointing*_R > swarp_input.  This will look for the corresponding list of halpha images.')
+parser.add_argument('--instrument', dest='instrument', default='h', const='h', nargs='?', choices=['h', 'i', 'm'], help='instrument.  options are h=HDI, m=mosaic, i=INT')
+#parser.add_argument('--instrument', dest='instrument', default='h', help='instrument.  options are h=HDI, m=mosaic, i=INT')
 parser.add_argument('--zp', dest='zp', default=False,action='store_true', help='run getzp.py on all *coadd.fits images')
 parser.add_argument('--uat', dest='uat', default=False,action='store_true', help='set when running on UAT groups data that uses a bunch of different halpha filters')
 args = parser.parse_args()
@@ -131,10 +133,10 @@ if fixheader: # prepends 'h'
 # images taken on different nights. :)
 if args.se:
     # run sextractor to create object lists
-    os.system('python '+gitpath+'uat_astr_mosaic.py --s --filestring '+args.filestring)
+    os.system(f'python {gitpath}uat_astr_mosaic.py --s --filestring {args.filestring} --instrument {args.instrument}')
 if args.scamp:
     # run scamp to solve for astrometry
-    os.system('python '+gitpath+'uat_astr_mosaic.py --scamp --filestring '+args.filestring)
+    os.system(f'python {gitpath}uat_astr_mosaic.py --scamp --filestring {args.filestring} --instrument {args.instrument}')
 
     # sort objects by field
     os.system('python '+gitpath+'uat_HDIsortobjects.py --filestring '+args.filestring)
@@ -202,19 +204,19 @@ if (args.uat & args.swarp):
         #####################################################
         # run swarp on r images
         #####################################################        
-        print('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f)
-        os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f)
+        print(f'python {gitpath}uat_astr_mosaic.py --swarp --l {f} --instrument {args.instrument}')
+        os.system(f'python {gitpath}uat_astr_mosaic.py --swarp --l {f} --instrument {args.instrument}')
         
         if haflag:
             if multiha:
                 for h in fnames:
                     # run swarp on halpha, with r as reference image
-                    os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+h+' --refimage '+rcoadd_image+' --noback')
+                    os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+h+' --refimage '+rcoadd_image+' --noback'+' --instrument '+args.instrument)
             else:
                 # run swarp on r, with r as reference image
-                os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+halist+' --refimage '+rcoadd_image)#+' --noback')
+                os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+halist+' --refimage '+rcoadd_image+' --instrument '+args.instrument)#+' --noback')
             # run swarp on r, with r as reference image
-            os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image)#+' --noback')
+            os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image+' --instrument '+args.instrument)#+' --noback')
             #break
         
     infile.close()
