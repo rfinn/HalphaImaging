@@ -19,8 +19,9 @@ from astropy.nddata import CCDData
 import glob
 import time
 # an astropy module to reproject images
-from reproject import reproject_interp
-from reproject import reproject_exact
+#from reproject import reproject_interp
+#from reproject import reproject_exact
+from reproject import reproject_adaptive
 from ccdproc import wcs_project
 
 import argparse
@@ -46,7 +47,7 @@ if not os.path.exists(outim2):
 
 
     print('\t shifting image')
-    im2new, im2footprint = reproject_interp(hdu2[0], hdu1[0].header,shape_out=hdu1[0].data.shape)
+    im2new, im2footprint = reproject_adaptive(hdu2[0], hdu1[0].header,shape_out=hdu1[0].data.shape, conserve_flux=True)
     #wcsout = WCS(hdu1)
     #im2new = wcs_project(hdu2,target_wcs=wcsout,target_shape=hdu1.data.shape)
     #im2new.write(args.image2.split('.fits')[0]+'-shifted.fits', overwrite=True)
@@ -74,7 +75,8 @@ if (args.weight2 is not None) and (not os.path.exists(args.weight2.split('.fits'
     hdu2w = fits.open(args.weight2)
     #hdu2w = CCDData.read(args.weight2,unit='adu')
                                    
-    im2wnew, im2wfootprint = reproject_interp(hdu2w[0], hdu1[0].header)
+    #im2wnew, im2wfootprint = reproject_interp(hdu2w[0], hdu1[0].header)
+    im2wnew, im2wfootprint = reproject_adaptive(hdu2w[0], hdu1[0].header, conserve_flux=True)
     newheader = hdu2w[0].header
     # update wcs to image 1
     wcskeys = ['NAXIS1','NAXIS2','CRVAL1','CRVAL2','CRPIX1','CD1_1','CD1_2','CRPIX2','CD2_1','CD2_2']
