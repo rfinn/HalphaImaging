@@ -191,6 +191,8 @@ if (args.uat & args.swarp):
                 continue
             elif f.endswith('~'):
                 continue
+            elif f.endswith('.png'):
+                continue
             fnames.append(f)
         print('halpha file = ',fnames)
         haflag = True
