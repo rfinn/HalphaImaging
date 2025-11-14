@@ -179,10 +179,19 @@ if (args.uat & args.swarp):
 
 
 
-        print("looking for halpha file list with ",rootname+'_h?')
+        print("looking for halpha file list with ",rootname+'_h*')
         fnames1 = glob.glob(rootname+'_h?')
-        fnames2 = glob.glob(rootname+'_h??')
-        fnames = fnames1 + fnames2
+        fnames = []
+        for f in fnames1:
+            if f.endswith('.fits'):
+                continue
+            elif f.endswith('.cat'):
+                continue
+            elif f.endswith('.csv'):
+                continue
+            elif f.endswith('~'):
+                continue
+            fnames.append(f)
         print('halpha file = ',fnames)
         haflag = True
         if len(fnames) > 1:
