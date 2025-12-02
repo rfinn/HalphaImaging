@@ -123,7 +123,7 @@ if args.s:
         ## RUN SOURCE EXTRACTOR
         se_call = f"sex {f} -c {config_file} -CATALOG_NAME {froot}.cat {extra_commands}"
 
-        print(f"running source extractor 
+        print(f"running source extractor as: {se_call}")
         os.system(se_call)
         
         #os.rename('check.fits', froot + 'check.fits')
