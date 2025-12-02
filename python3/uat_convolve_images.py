@@ -245,14 +245,14 @@ if __name__ == '__main__':
     object_name = gheader['OBJECT']
 
     # write out original images
-    print("writing out list of unconvolved files (to feed into swarp if no convolution): {object_name}_all")
+    print(f"writing out list of unconvolved files (to feed into swarp if no convolution): {object_name}_all")
     outfile = open(f"{object_name}_all", 'w')
     for gname in image_names:
         outfile.write(f"{gname}\n")
     outfile.close()
 
     # create list of convolved image names
-    print("writing out list of convolved files to feed into swarp: g{object_name}_all")
+    print(f"writing out list of convolved files to feed into swarp: g{object_name}_all")
     outfile = open(f"g{object_name}_all", 'w')
     for gname in gimage_names:
         outfile.write(f"{gname}\n")
