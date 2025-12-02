@@ -236,21 +236,30 @@ if __name__ == '__main__':
         newtab = Table([image_names,image_fwhm,gimage_fwhm])
         newtab.write("psfex_original_and_convolved_fwhm.csv",format='csv',overwrite=True)
 
-        ##########################################
-        ## CREATE LISTS WITH THE CONVOLVED FILES
-        ##########################################
+    #######################################################
+    ## CREATE LISTS WITH THE ALL INPUT AND CONVOLVED FILES
+    #######################################################
 
-        # get the object name using first imaging in gimage_names
-        gheader = fits.getheader(gimage_names[0])
-        object_name = gheader['OBJECT']
-        print("writing out list of files to feed into swarp: g{object_name}_all"
-        outfile = open(f"g{object_name}_all", 'w')
-        
-        # write out list r-band with 
-        for gname in gimage_names:
-            outfile.write(f"{gname}\n")
-        outfile.close()
-        
+    # get the object name using first imaging in gimage_names
+    gheader = fits.getheader(gimage_names[0])
+    object_name = gheader['OBJECT']
+
+    # write out original images
+    print("writing out list of unconvolved files (to feed into swarp if no convolution): {object_name}_all")
+    outfile = open(f"{object_name}_all", 'w')
+    for gname in image_names:
+        outfile.write(f"{gname}\n")
+    outfile.close()
+
+    # create list of convolved image names
+    print("writing out list of convolved files to feed into swarp: g{object_name}_all")
+    outfile = open(f"g{object_name}_all", 'w')
+    for gname in gimage_names:
+        outfile.write(f"{gname}\n")
+    outfile.close()
+
+    
+    
     if args.cleanup:
         print("\nCLEANING UP PSFEX FILES")
         # cleanup snap* samp* resi* proto* chi*
