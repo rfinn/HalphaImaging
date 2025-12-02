@@ -236,16 +236,16 @@ if __name__ == '__main__':
         newtab = Table([image_names,image_fwhm,gimage_fwhm])
         newtab.write("psfex_original_and_convolved_fwhm.csv",format='csv',overwrite=True)
 
-        if args.cleanup:
-            # cleanup snap* samp* resi* proto* chi*
-            prefixes = ['snap', 'samp', 'resi', 'proto', 'chi']
-            for i in range(len(image_names)):
-                for p in prefixes:
-                    psfexfile = f"{p}_g{image_names[i]}"
+    if args.cleanup:
+        # cleanup snap* samp* resi* proto* chi*
+        prefixes = ['snap', 'samp', 'resi', 'proto', 'chi']
+        for i in range(len(image_names)):
+            for p in prefixes:
+                psfexfile = f"{p}_g{image_names[i]}"
+                if os.path.exists(psfexfile):
+                    os.remove(psfexfile)
+                    psfexfile = f"{p}_{image_names[i]}"
                     if os.path.exists(psfexfile):
                         os.remove(psfexfile)
-                        psfexfile = f"{p}_{image_names[i]}"
-                        if os.path.exists(psfexfile):
-                            os.remove(psfexfile)
-                            # the end
+                        # the end
         
