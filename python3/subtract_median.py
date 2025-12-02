@@ -100,11 +100,15 @@ def subtract_median_one(fname,MEF=True,overwrite=False):
                 if mmed is not np.nan:
                     hdu[i].data -= mmed
                     median = mmed
-                    hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
+                    hdu[i].header.set('MEDSUB',value=median,comment='sky med subtract_med')                 
+                    hdu[i].header.set('SKYMED',value=median,comment='sky med subtract_med')
+                    hdu[i].header.set('SKYSTD',value=mstd,comment='sky std subtract_med')
                 
             else:
                 hdu[i].data = d
-                hdu[i].header.set('MEDSUB',value=median,comment='median subtraction')
+                hdu[i].header.set('MEDSUB',value=median,comment='sky med subtract_med')                
+                hdu[i].header.set('SKYMED',value=median,comment='sky med subtract_med')
+                hdu[i].header.set('SKYSTD',value=median,comment='sky std subtract_med')                
             
             
     else:
@@ -127,7 +131,10 @@ if __name__ == '__main__':
     parser.add_argument('--overwrite', action = 'store_true', default = False, help = 'overwrite file?  the default is false, so that a new file with m prefix is created.')
     parser.add_argument('--mef', action = 'store_true', default = False, help = 'set this for MEF files, like with 90prime')
     parser.add_argument('--oneimage', dest = 'oneimage', default = None,help = 'supply an image name to run sky subtraction on one image')    
-    
+    # TODO
+    # add a mosaic flag, where median will be calculated for each amplifier (8 ccds, and each ccd has two amplifiers)
+    # determine sky in each amp and subtract
+    # need pixel box of full amplifier and pixel box to use for calcu
     args = parser.parse_args()
 
     #if args.hdi:
