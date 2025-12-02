@@ -100,21 +100,28 @@ if args.s:
         print(('RUNNING SEXTRACTOR ON FILE %i OF %i'%(i,nfiles)))
         t = f.split('.fits')
         froot = t[0]
+        extra_commands = ""
         if args.instrument == 'i':
-            os.system('sex ' + f + ' -c default.sex.INT -CATALOG_NAME ' + froot + '.cat')
+            config_file = "default.sex.INT"
         elif args.instrument == 'h':
-            os.system('sex ' + f + ' -c default.sex.HDI -CATALOG_NAME ' + froot + '.cat')
+            config_file = "default.sex.HDI"
         elif args.instrument == 'm':
-            os.system('sex ' + f + ' -c default.sex.MOS -CATALOG_NAME ' + froot + '.cat')
-        elif args.siena:
-            os.system('sex ' + f + ' -c default.sex.siena -CATALOG_NAME ' + froot + '.cat')
+            config_file = "default.sex.MOS" # TODO: need to create this config file
+        elif args.siena | args.pisces:
+            config_file = "default.sex.siena"
         elif args.pisces:
-            os.system('sex ' + f + ' -c default.sex.siena -CATALOG_NAME ' + froot + '.cat -DETECT_MINAREA 10 -DETECT_THRESH 2 -ANALYSIS_THRESH 2 -BACK_SIZE 128 -GAIN 100')
+            config_file = "default.sex.siena"
+            extra_commands = " -DETECT_MINAREA 10 -DETECT_THRESH 2 -ANALYSIS_THRESH 2 -BACK_SIZE 128 -GAIN 100"
             print('HEY! PISCES!!!!!')
         elif args.psfex:
-            os.system('sex ' + f + ' -c default.sex.HDI.psfex -CATALOG_NAME ' + froot + '.cat')
+            config_file = "default.sex.HDI.psfex"
         else:
-            os.system('sex ' + f + ' -c default.sex.HDI -CATALOG_NAME ' + froot + '.cat')
+            config_file = "default.sex.HDI"
+
+        ## RUN SOURCE EXTRACTOR
+        se_call = f"sex {f} -c {config_file} -CATALOG_NAME {froot}.cat {extra_commands}"
+        os.system(se_call)
+        
         #os.rename('check.fits', froot + 'check.fits')
             
         i += 1
