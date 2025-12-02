@@ -237,7 +237,7 @@ if __name__ == '__main__':
         newtab.write("psfex_original_and_convolved_fwhm.csv",format='csv',overwrite=True)
 
     if args.cleanup:
-        print("CLEANING UP PSFEX FILES")
+        print("\nCLEANING UP PSFEX FILES")
         # cleanup snap* samp* resi* proto* chi*
         prefixes = ['snap', 'samp', 'resi', 'proto', 'chi']
         for i in range(len(image_names)):
