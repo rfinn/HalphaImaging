@@ -254,8 +254,8 @@ if __name__ == '__main__':
     # create list of convolved image names
     print(f"writing out list of convolved files to feed into swarp: g{object_name}_all")
     outfile = open(f"g{object_name}_all", 'w')
-    for gname in gimage_names:
-        outfile.write(f"{gname}\n")
+    for gname in image_names:
+        outfile.write(f"g{gname}\n")
     outfile.close()
 
     
