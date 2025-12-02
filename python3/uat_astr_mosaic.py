@@ -106,20 +106,24 @@ if args.s:
         elif args.instrument == 'h':
             config_file = "default.sex.HDI"
         elif args.instrument == 'm':
-            config_file = "default.sex.MOS" # TODO: need to create this config file
+            config_file = "default.sex.MOS" 
         elif args.siena | args.pisces:
             config_file = "default.sex.siena"
         elif args.pisces:
             config_file = "default.sex.siena"
             extra_commands = " -DETECT_MINAREA 10 -DETECT_THRESH 2 -ANALYSIS_THRESH 2 -BACK_SIZE 128 -GAIN 100"
             print('HEY! PISCES!!!!!')
-        elif args.psfex:
-            config_file = "default.sex.HDI.psfex"
         else:
             config_file = "default.sex.HDI"
 
+        if args.psfex:
+            config_file = "default.sex.HDI.psfex"
+            
+
         ## RUN SOURCE EXTRACTOR
         se_call = f"sex {f} -c {config_file} -CATALOG_NAME {froot}.cat {extra_commands}"
+
+        print(f"running source extractor 
         os.system(se_call)
         
         #os.rename('check.fits', froot + 'check.fits')
