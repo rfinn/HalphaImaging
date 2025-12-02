@@ -241,7 +241,7 @@ if __name__ == '__main__':
     #######################################################
 
     # get the object name using first imaging in gimage_names
-    gheader = fits.getheader(gimage_names[0])
+    gheader = fits.getheader(image_names[0])
     object_name = gheader['OBJECT']
 
     # write out original images
