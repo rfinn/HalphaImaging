@@ -145,7 +145,7 @@ if args.scamp:
     
 if args.swarp:
     #HDI data
-    pixel_scale = 0.425
+    pixel_scale = 0.4250
     defaultswarp = 'default.swarp' # for HDI
     if args.instrument == 'i':
         pixel_scale = 0.331
@@ -169,8 +169,8 @@ if args.swarp:
         center = str(ra)+','+str(dec)
         mosaic_image_size = str(image_size[1])+','+str(image_size[0])
 
-        # get pixel scale from the ref image
-
+        # get pixel scale from the ref image rather than using something fixed for all images
+        # it could be that the different halpha images will have different
         pscale = wcs.utils.proj_plane_pixel_scales(refwcs) # in deg -> arcsec
         pixel_scale = round(pscale[0]*3600,5) # in arcsec per pixel
         
@@ -191,14 +191,14 @@ if args.swarp:
             # may have used this command for virgo mosaic images
             #os.system('swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -WEIGHT_TYPE MAP_WEIGHT -WEIGHT_IMAGE @masks')
             # updating for uat Halpha groups, mosaic data
-            os.system('swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -WEIGHT_TYPE MAP_WEIGHT')
+            os.system('swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -WEIGHT_TYPE MAP_WEIGHT -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale))
         else:
             # CENTER_TYPE MANUAL
             #CENTER RA,DEC
             #PIXEL_SCALE 0.425
             if args.refimage:
                 print('using reference image with swarp')
-                commandstring = 'swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -CENTER_TYPE MANUAL -CENTER '+center+' -PIXEL_SCALE '+str(pixel_scale)+' -IMAGE_SIZE '+mosaic_image_size+' -RESAMPLE N'
+                commandstring = 'swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -CENTER_TYPE MANUAL -CENTER_TYPE MANUAL -CENTER '+center+' -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale)+' -IMAGE_SIZE '+mosaic_image_size+' -RESAMPLE N'
             else:
                 commandstring='swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage
             if args.noback:
