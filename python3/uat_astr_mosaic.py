@@ -162,12 +162,18 @@ if args.swarp:
         weightimage = '.coadd.weight.fits'                
     if args.refimage:
         data,header = fits.getdata(args.refimage,header=True)
-        w = WCS(header)
+        refwcs = WCS(header)
         image_size = data.shape
 
-        ra,dec = w.wcs_pix2world(image_size[0]/2.,image_size[1]/2.,1)
+        ra,dec = refwcs.wcs_pix2world(image_size[0]/2.,image_size[1]/2.,1)
         center = str(ra)+','+str(dec)
         mosaic_image_size = str(image_size[1])+','+str(image_size[0])
+
+        # get pixel scale from the ref image
+
+        pscale = wcs.utils.proj_plane_pixel_scales(refwcs) # in deg -> arcsec
+        pixel_scale = round(pscale[0]*3600,5) # in arcsec per pixel
+        
         #print(('output mosaic image size = ',mosaic_image_size))
         #print(('center of mosaic = ',center))
     if not(args.l):
