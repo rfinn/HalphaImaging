@@ -145,7 +145,7 @@ if args.scamp:
     
 if args.swarp:
     #HDI data
-    pixel_scale = 0.4250
+    pixel_scale = 0.4255
     defaultswarp = 'default.swarp' # for HDI
     if args.instrument == 'i':
         pixel_scale = 0.331
