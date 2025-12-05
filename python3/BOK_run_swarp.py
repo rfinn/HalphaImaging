@@ -256,6 +256,8 @@ def run_swarp(image_list,refimage=None):
     
     os.system('cp ~/github/HalphaImaging/astromatic/default.swarp.BOK .')
 
+    pixel_scale = 0.4533 # pixel scale for 90prime
+    
     ##
     # add RA and DEC - 2023-05-10
     # didn't actually do this for the 2021 data, but changing now so that this is
@@ -265,11 +267,13 @@ def run_swarp(image_list,refimage=None):
     # however, the RA and DEC of the first image is not necessarily going to be
     # the RA and DEC of the mosaiced image -
     # maybe this is why I didn't fully implement
+    #
+    # I have a function above that updates the RA and DEC from the coadded image
     ##
     output_image = 'VF-{}-BOK-{}-{}.fits'.format(dateobs,vfid,filter)
     output_weight_image = 'VF-{}-BOK-{}-{}.weight.fits'.format(dateobs,vfid,filter)    
     # start building swarp command
-    commandstring = 'swarp @{} -WEIGHT_IMAGE @{} -c default.swarp.BOK -IMAGEOUT_NAME {} -WEIGHTOUT_NAME {} '.format(image_list,weight_list,output_image,output_weight_image)
+    commandstring = 'swarp @{} -WEIGHT_IMAGE @{} -c default.swarp.BOK -IMAGEOUT_NAME {} -WEIGHTOUT_NAME {} -PIXSCALE_TYPE MANUAL -PIXEL_SCALE {} '.format(image_list,weight_list,output_image,output_weight_image, pixel_scale)
     
     if refimage is not None:
         # copying this from uat_astr_mosaic.py
@@ -280,12 +284,12 @@ def run_swarp(image_list,refimage=None):
         # should get pixel scale automatically from image header
         # if this is not exactly what is in the ref image, then we will get an offset
         
-        pixel_scale = 0.4533 # pixel scale for 90prime
+        
         ra,dec = w.wcs_pix2world(int(image_size[0]/2.),int(image_size[1]/2.),1)
         center = str(ra)+','+str(dec)
         mosaic_image_size = str(image_size[1])+','+str(image_size[0])
         
-        commandstring = commandstring + ' -CENTER_TYPE MANUAL -CENTER {} -PIXEL_SCALE {} -IMAGE_SIZE {} '.format(center,pixel_scale,mosaic_image_size)
+        commandstring = commandstring + ' -CENTER_TYPE MANUAL -CENTER {} -IMAGE_SIZE {} '.format(center,mosaic_image_size)
 
 
     print('')
@@ -361,9 +365,11 @@ def run_swarp_all_filters(target):
             print("Warning - couldn't find Halpha images")
             return
     ha_coadd = run_swarp(hafilelist,refimage=rband_coadd)
-    
+
+
     # run swarp on r-band, using r-band mosaic as ref image
-    rband_coadd = run_swarp(rfilelist,refimage=rband_coadd)
+    ## 2025-12-05: DONT NEED TO RUN THIS NEXT STEP NOW THAT I AM USING THE SWARP KEYWORDS CORRECTLY!!!    
+    #rband_coadd = run_swarp(rfilelist,refimage=rband_coadd)
 
     # update headers
     # but how does ref image have a 
@@ -544,8 +550,7 @@ if __name__ == '__main__':
         pass
 
 
-    # TODO - add a function to fix ZP offsets in individual images.
-    # like BOK_pipeline_fixampoffsets.py - but no median subtraction
+    # TODONE -- did this in getzp.py! -- - add a function to fix ZP offsets in individual images. like BOK_pipeline_fixampoffsets.py - but no median subtraction
 
     if args.fixamps:
         os.system('python ~/github/HalphaImaging/python3/BOK_fixamps_wrapper.py')
