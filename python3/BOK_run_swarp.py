@@ -253,7 +253,8 @@ def run_swarp(image_list,refimage=None):
 
     # remove the nm from Ha4nm
     filter = filter.replace('nm','')
-    
+
+    ## 2025-12-05: for some reason, default.swarp.BOK is on draco but was not committed to the repository.  added it now.
     os.system('cp ~/github/HalphaImaging/astromatic/default.swarp.BOK .')
 
     pixel_scale = 0.4533 # pixel scale for 90prime
