@@ -145,15 +145,19 @@ if args.scamp:
     
 if args.swarp:
     #HDI data
-    pixel_scale = 0.4255
+
     defaultswarp = 'default.swarp' # for HDI
     if args.instrument == 'i':
         pixel_scale = 0.331
         defaultswarp = 'default.swarp.INT'
     elif args.instrument == 'm':
         defaultswarp = 'default.swarp.MOS'
+        pixel_scale = 0.4255        
     elif args.instrument == 'h':
         defaultswarp = 'default.swarp.HDI'
+        pixel_scale = 0.4255
+
+    # TODO - do I need a case for BOK?
     if args.noback:
         outimage = '.noback.coadd.fits'
         weightimage = '.noback.coadd.weight.fits'        
@@ -181,7 +185,11 @@ if args.swarp:
     else:
         
         print('RUNNING SWARP')
-        if args.m: 
+        # this is the basic command for running swarp
+        commandstring = 'swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage +' -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale)
+        if args.m:
+
+            # not sure why I am doing this anymore...
             infile = open(args.l,'r')
             outfile = open('masks','w')
             for line in infile:
@@ -191,18 +199,20 @@ if args.swarp:
             # may have used this command for virgo mosaic images
             #os.system('swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -WEIGHT_TYPE MAP_WEIGHT -WEIGHT_IMAGE @masks')
             # updating for uat Halpha groups, mosaic data
-            os.system('swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -WEIGHT_TYPE MAP_WEIGHT -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale))
+            #os.system('swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -WEIGHT_TYPE MAP_WEIGHT -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale))
+            commandstring += ' -WEIGHT_TYPE MAP_WEIGHT'
         else:
             # CENTER_TYPE MANUAL
             #CENTER RA,DEC
             #PIXEL_SCALE 0.425
             if args.refimage:
                 print('using reference image with swarp')
-                commandstring = 'swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -CENTER_TYPE MANUAL -CENTER_TYPE MANUAL -CENTER '+center+' -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale)+' -IMAGE_SIZE '+mosaic_image_size#+' -RESAMPLE N'
-            else:
-                commandstring='swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage +' -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale)
+                #commandstring = 'swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -CENTER_TYPE MANUAL -CENTER_TYPE MANUAL -CENTER '+center+' -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale)+' -IMAGE_SIZE '+mosaic_image_size#+' -RESAMPLE N'
+                commandstring += ' -CENTER_TYPE MANUAL -CENTER '+center+' -IMAGE_SIZE '+mosaic_image_size
+            #else:
+            #    commandstring='swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage +' -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale)
             if args.noback:
-                commandstring = commandstring+' -SUBTRACT_BACK N'
+                commandstring += ' -SUBTRACT_BACK N'
             print('running the following command:')
             print(commandstring)
             os.system(commandstring)
