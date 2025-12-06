@@ -157,7 +157,7 @@ if args.swarp:
         defaultswarp = 'default.swarp.HDI'
         pixel_scale = 0.4255
 
-    # TODO - do I need a case for BOK?
+    # TODONE - do I need a case for BOK? No, I have a separate program for post-pipeline (NOAO pipeline) processing of BOK images: BOK_run_swarp.py
     if args.noback:
         outimage = '.noback.coadd.fits'
         weightimage = '.noback.coadd.weight.fits'        
