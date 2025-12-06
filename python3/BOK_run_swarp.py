@@ -274,6 +274,7 @@ def run_swarp(image_list,refimage=None):
     output_image = 'VF-{}-BOK-{}-{}.fits'.format(dateobs,vfid,filter)
     output_weight_image = 'VF-{}-BOK-{}-{}.weight.fits'.format(dateobs,vfid,filter)    
     # start building swarp command
+    # not sure why command string is not propagating...
     commandstring = 'swarp @{} -WEIGHT_IMAGE @{} -c default.swarp.BOK -IMAGEOUT_NAME {} -WEIGHTOUT_NAME {} -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE {} '.format(image_list,weight_list,output_image,output_weight_image, pixel_scale)
     
     if refimage is not None:
@@ -295,6 +296,7 @@ def run_swarp(image_list,refimage=None):
 
     print('')
     print('Running swarp with the following command:\n',commandstring)
+    # skip actually running swarp, just to check the output commands
     os.system(commandstring)
 
 
