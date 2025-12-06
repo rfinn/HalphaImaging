@@ -240,7 +240,8 @@ def run_swarp(image_list,refimage=None):
     RETURNS:
     * name of output image from swarp
     '''
-    print(image_list)
+    
+    print("\nIn run_swarp, image_list = ",image_list," refimage = ",refimage)
     vfid,filter = image_list.split('_')
 
     
