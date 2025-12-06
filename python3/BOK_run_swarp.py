@@ -274,7 +274,7 @@ def run_swarp(image_list,refimage=None):
     output_image = 'VF-{}-BOK-{}-{}.fits'.format(dateobs,vfid,filter)
     output_weight_image = 'VF-{}-BOK-{}-{}.weight.fits'.format(dateobs,vfid,filter)    
     # start building swarp command
-    commandstring = 'swarp @{} -WEIGHT_IMAGE @{} -c default.swarp.BOK -IMAGEOUT_NAME {} -WEIGHTOUT_NAME {} -PIXSCALE_TYPE MANUAL -PIXEL_SCALE {} '.format(image_list,weight_list,output_image,output_weight_image, pixel_scale)
+    commandstring = 'swarp @{} -WEIGHT_IMAGE @{} -c default.swarp.BOK -IMAGEOUT_NAME {} -WEIGHTOUT_NAME {} -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE {} '.format(image_list,weight_list,output_image,output_weight_image, pixel_scale)
     
     if refimage is not None:
         # copying this from uat_astr_mosaic.py
@@ -585,7 +585,7 @@ if __name__ == '__main__':
 
         
     if args.getzp:
-        rfiles = glob.glob('VF*r-shifted.fits')
+        rfiles = glob.glob('VF*BOK*r.fits')
         getzp_pool = mp.Pool(mp.cpu_count())
         zpresults = [getzp_pool.apply_async(getonezp,args=(imname,'r'),callback=getzp_collect_results) for imname in rfiles]
     
@@ -596,7 +596,7 @@ if __name__ == '__main__':
         #hfiles = glob.glob('VF*Ha4.fits')
         ##
         # 2022 data have Ha4nm
-        hfiles = glob.glob('VF*Ha4.fits')
+        hfiles = glob.glob('VF*BOK*Ha4.fits')
 
         getzp_pool2 = mp.Pool(mp.cpu_count())
         zpresults2 = [getzp_pool2.apply_async(getonezp,args=(imname,'ha'),callback=getzp_collect_results2) for imname in hfiles]
