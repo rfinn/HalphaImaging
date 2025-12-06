@@ -356,6 +356,7 @@ def run_swarp_all_filters(target):
 
     '''
     # run swarp on r-band mosaic
+    print("\nCalling run_swarp for rfilelist\n")    
     rfilelist = target
     rband_coadd = run_swarp(rfilelist)
 
@@ -367,6 +368,7 @@ def run_swarp_all_filters(target):
         if not os.path.exists(hafilelist):
             print("Warning - couldn't find Halpha images")
             return
+    print("\nCalling run_swarp for hafilelist\n")
     ha_coadd = run_swarp(hafilelist,refimage=rband_coadd)
 
 
