@@ -301,7 +301,7 @@ def run_swarp(image_list,refimage=None, verbose=True):
     print('')
     print('Running swarp with the following command:\n',commandstring)
     # skip actually running swarp, just to check the output commands
-    #os.system(commandstring)
+    os.system(commandstring)
 
 
 
