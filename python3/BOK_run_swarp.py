@@ -380,7 +380,7 @@ def run_swarp_all_filters(target):
             return
     print("\nCalling run_swarp for hafilelist\n")
     ha_coadd = run_swarp(hafilelist,refimage=rband_coadd, runswarp=True)
-
+    print("\nha_coadd = ",ha_coadd)
 
     # run swarp on r-band, using r-band mosaic as ref image
     ## 2025-12-05: DONT NEED TO RUN THIS NEXT STEP NOW THAT I AM USING THE SWARP KEYWORDS CORRECTLY!!!    
