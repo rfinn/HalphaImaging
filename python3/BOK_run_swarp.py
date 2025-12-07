@@ -234,7 +234,7 @@ def combine_all_masks(filelist):
     mcombine_results = [r.get() for r in myresults]
     return mcombine_results
 
-def run_swarp(image_list,refimage=None):
+def run_swarp(image_list,refimage=None, verbose=True):
     '''
 
     RETURNS:
@@ -277,7 +277,9 @@ def run_swarp(image_list,refimage=None):
     # start building swarp command
     # not sure why command string is not propagating...
     commandstring = 'swarp @{} -WEIGHT_IMAGE @{} -c default.swarp.BOK -IMAGEOUT_NAME {} -WEIGHTOUT_NAME {} -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE {} '.format(image_list,weight_list,output_image,output_weight_image, pixel_scale)
-    
+
+    if verbose:
+        print("value of refimage = ",refimage)
     if refimage is not None:
         # copying this from uat_astr_mosaic.py
         # still need to fix this.
