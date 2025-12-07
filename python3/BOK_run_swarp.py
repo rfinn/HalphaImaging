@@ -284,9 +284,9 @@ def run_swarp(image_list,refimage=None, verbose=True, runswarp=True):
         print("made it into refimage block")
         # copying this from uat_astr_mosaic.py
         # still need to fix this.
-        data,header = fits.getdata(refimage,header=True)
-        w = WCS(header)
-        image_size = data.shape
+        rdata,rheader = fits.getdata(refimage,header=True)
+        w = WCS(rheader)
+        image_size = rdata.shape
         # should get pixel scale automatically from image header
         # if this is not exactly what is in the ref image, then we will get an offset
         
@@ -295,8 +295,8 @@ def run_swarp(image_list,refimage=None, verbose=True, runswarp=True):
         center = str(ra)+','+str(dec)
 
         # why not use CRVAL1 and CRVAL2 from reference image???
-        ra = header['CRVAL1']
-        dec = header['CRVAL2']
+        ra = rheader['CRVAL1']
+        dec = rheader['CRVAL2']
         
         mosaic_image_size = str(image_size[1])+','+str(image_size[0])
         
@@ -410,9 +410,9 @@ def run_swarp_all_filters(target):
     
     newname = get_updated_BOK_coadd_name(rband_coadd)
     print('renaming ',rband_coadd,'->',newname)
-    os.rename(rband_coadd,newname)
+    #os.rename(rband_coadd,newname)
     # rename the weight file    
-    os.rename(rband_coadd.replace('.fits','.weight.fits'),newname.replace('.fits','.weight.fits'))
+    #os.rename(rband_coadd.replace('.fits','.weight.fits'),newname.replace('.fits','.weight.fits'))
 
 def count_lines(fname):
     with open(fname) as f:
