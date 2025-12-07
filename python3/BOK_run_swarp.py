@@ -234,7 +234,7 @@ def combine_all_masks(filelist):
     mcombine_results = [r.get() for r in myresults]
     return mcombine_results
 
-def run_swarp(image_list,refimage=None, verbose=True):
+def run_swarp(image_list,refimage=None, verbose=True, runswarp=True):
     '''
 
     RETURNS:
@@ -301,7 +301,8 @@ def run_swarp(image_list,refimage=None, verbose=True):
     print('')
     print('Running swarp with the following command:\n',commandstring)
     # skip actually running swarp, just to check the output commands
-    os.system(commandstring)
+    if runswarp:
+        os.system(commandstring)
 
 
 
@@ -373,7 +374,7 @@ def run_swarp_all_filters(target):
             print("Warning - couldn't find Halpha images")
             return
     print("\nCalling run_swarp for hafilelist\n")
-    ha_coadd = run_swarp(hafilelist,refimage=rband_coadd)
+    ha_coadd = run_swarp(hafilelist,refimage=rband_coadd, runswarp=False)
 
 
     # run swarp on r-band, using r-band mosaic as ref image
