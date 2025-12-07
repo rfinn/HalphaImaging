@@ -291,8 +291,13 @@ def run_swarp(image_list,refimage=None, verbose=True, runswarp=True):
         # if this is not exactly what is in the ref image, then we will get an offset
         
         
-        ra,dec = w.wcs_pix2world(int(image_size[0]/2.),int(image_size[1]/2.),1)
+        ra,dec = w.wcs_pix2world(int(image_size[0]//2.),int(image_size[1]//2.),1)
         center = str(ra)+','+str(dec)
+
+        # why not use CRVAL1 and CRVAL2 from reference image???
+        ra = header['CRVAL1']
+        dec = header['CRVAL2']
+        
         mosaic_image_size = str(image_size[1])+','+str(image_size[0])
         
         commandstring = commandstring + ' -CENTER_TYPE MANUAL -CENTER {} -IMAGE_SIZE {} '.format(center,mosaic_image_size)
@@ -374,7 +379,7 @@ def run_swarp_all_filters(target):
             print("Warning - couldn't find Halpha images")
             return
     print("\nCalling run_swarp for hafilelist\n")
-    ha_coadd = run_swarp(hafilelist,refimage=rband_coadd, runswarp=False)
+    ha_coadd = run_swarp(hafilelist,refimage=rband_coadd, runswarp=True)
 
 
     # run swarp on r-band, using r-band mosaic as ref image
