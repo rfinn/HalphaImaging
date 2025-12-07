@@ -278,9 +278,10 @@ def run_swarp(image_list,refimage=None, verbose=True):
     # not sure why command string is not propagating...
     commandstring = 'swarp @{} -WEIGHT_IMAGE @{} -c default.swarp.BOK -IMAGEOUT_NAME {} -WEIGHTOUT_NAME {} -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE {} '.format(image_list,weight_list,output_image,output_weight_image, pixel_scale)
 
-    if verbose:
-        print("value of refimage = ",refimage)
+    #if verbose:
+    #    print("value of refimage = ",refimage)
     if refimage is not None:
+        print("made it into refimage block")
         # copying this from uat_astr_mosaic.py
         # still need to fix this.
         data,header = fits.getdata(refimage,header=True)
@@ -295,7 +296,7 @@ def run_swarp(image_list,refimage=None, verbose=True):
         mosaic_image_size = str(image_size[1])+','+str(image_size[0])
         
         commandstring = commandstring + ' -CENTER_TYPE MANUAL -CENTER {} -IMAGE_SIZE {} '.format(center,mosaic_image_size)
-
+        print("at end of ref image block, commandstring = ",commandstring)
 
     print('')
     print('Running swarp with the following command:\n',commandstring)
@@ -362,7 +363,7 @@ def run_swarp_all_filters(target):
     print("\nCalling run_swarp for rfilelist\n")    
     rfilelist = target
     rband_coadd = run_swarp(rfilelist)
-
+    print("\nrband_coadd = ", rband_coadd)
     #try:
     # run swarp on Halpha, using r-band mosaic as ref image
     hafilelist = target.replace('_r','_Ha4')
