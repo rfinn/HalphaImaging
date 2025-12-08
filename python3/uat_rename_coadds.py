@@ -86,14 +86,16 @@ if __name__ == '__main__':
         new_output_image = os.path.join(args.outdir, new_name)
         print('renaming ',fname,'->',new_output_image)
         if not args.testing:
-            os.rename(fname,new_output_image)
+            #os.rename(fname,new_output_image)
+            os.system(f"cp {fname} {new_output_image")
 
         # rename the weight file
         weightfile = fname.replace('.fits','.weight.fits')
         if os.path.exists(weightfile):
             print('renaming ',weightfile,'->',new_output_image.replace('.fits','.weight.fits'))
             if not args.testing:
-                os.rename(weightfile,new_output_image.replace('.fits','.weight.fits'))
+                #os.rename(weightfile,new_output_image.replace('.fits','.weight.fits'))
+                os.system(f"cp {weightfile} {new_output_image.replace('.fits','.weight.fits')}")
         else:
             print("WARNING: weight image does not exist for ",fname)
 
