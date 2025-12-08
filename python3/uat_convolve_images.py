@@ -85,6 +85,16 @@ def get_fwhm_psfex(psfout=None):
     for im in pt['Catalog_Name']:
         images.append(im.replace('.cat','.fits'))
     fwhm = np.array(pt['FWHM_Mean'])
+
+    # add fwhm to header
+    for i,im in enumerate(images):
+        hdu = fits.open(im)
+        hdu[0].header.set('FWHM_Mean',f"{fwhm[i]:.2f}",'PSFEx FWHM_Mean')
+        hdu.writeto(im, overwrite=True)
+    try:
+        hdu.close()
+    except:
+        print("WARNING: I do not like the command hdu.close()")
     return images, fwhm
 
 
@@ -134,6 +144,9 @@ if __name__ == '__main__':
     
     
     image_names, image_fwhm = get_fwhm_psfex()
+
+    # add psfex fwhm to image headers
+    
     if args.usemedian:
         a, b = get_fwhm(image_names)
         image_fwhm = a
@@ -146,7 +159,6 @@ if __name__ == '__main__':
 
         # or write to file
 
-        pass
 
         print('#######################################')
         print('COMPARING ORIGINAL FWHM')
