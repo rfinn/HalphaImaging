@@ -211,17 +211,23 @@ if (args.uat & args.swarp):
         #####################################################        
         print(f'python {gitpath}uat_astr_mosaic.py --swarp --l {f} --instrument {args.instrument}')
         os.system(f'python {gitpath}uat_astr_mosaic.py --swarp --l {f} --instrument {args.instrument}')
-        
+
+        #####################################################
+        # run swarp on halpha images
+        #####################################################        
         if haflag:
             if multiha:
                 for h in fnames:
                     # run swarp on halpha, with r as reference image
                     os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+h+' --refimage '+rcoadd_image+' --noback'+' --instrument '+args.instrument)
             else:
-                # run swarp on r, with r as reference image
+                # run swarp on halpha, with r as reference image
                 os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+halist+' --refimage '+rcoadd_image+' --instrument '+args.instrument)#+' --noback')
+
+
+            # don't need to do this now that we are calling swarp correctly, as of 12/07/2025!!!
             # run swarp on r, with r as reference image
-            os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image+' --instrument '+args.instrument)#+' --noback')
+            #os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image+' --instrument '+args.instrument)#+' --noback')
             #break
         
     infile.close()
