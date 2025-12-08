@@ -120,7 +120,7 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
         weight_imname = fname.replace('.coadd','.coadd.weight')
         whdu = fits.open(weight_imname)
         
-        xmax, ymax = hdu[0].data.shape 
+        ymax, xmax = hdu[0].data.shape 
         # case for mosaic data, subtract median in each CCD/AMP
         # these are boundaries that Becky measured from ds9
         xvals = [1, 1018, 2068, 3138, 4190, 5265, 6330, 7383, xmax]
