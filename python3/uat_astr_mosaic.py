@@ -80,7 +80,42 @@ nfiles = len(files)
 print(('number of files = ',nfiles))
 i = 1
 
+def update_coadd_header(coadd, input_image_list):
+    '''
+    GOAL:
+    scamp is not passing the header keywords through to the coadded image,
+    so the goal of this routine is to add the keywords manually...
 
+    INPUT:
+    * coadd - coadded image to add header keywords too
+    * input_image_list - list of images to get header keywords from
+    '''
+
+    # read in coadd header and data
+    hdu = fits.open(coadd)
+
+
+    # write out coadd with new header
+    header_fields = ['DATE-OBS','AIRMASS','EXPTIME','MEDSUB','SKYMED','SKYSTD']# List of FITS keywords to propagate
+
+    for im in input_image_list:
+        iheader = fits.getheader(im)
+
+        nimage = 1
+        for f in header_fields:
+            try:
+                hdu[0].header.set(f"{f}{nimage}",iheader[f])
+            except KeyError:
+                print(f"WARNING: Keyword {f} not found")
+            nimage += 1
+    # add ccdnoise
+    f = 'CCDNOISE'
+    hdu[0].header.set(f,iheader[f])
+
+    # write out image
+    hdu.writeto(coadd,overwrite=True)
+
+    
 if args.s:
     for f in files:
         #read_exptime = 'gethead ' + f + ' EXPTIME'
@@ -223,5 +258,9 @@ if args.swarp:
         print(commandstring)
         os.system(commandstring)
 
+
+        # add function to add header keywords from individual images into the coadd name
+        update_coadd_header(args.l + outimage,  args.l)
+    
         print('DONE')
 
