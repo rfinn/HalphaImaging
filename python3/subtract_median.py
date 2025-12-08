@@ -68,6 +68,8 @@ def subtract_median(files,overwrite=False,MEF=False,MOS=False):
     '''
     print('subtracting median from images')
     for fname in files:
+        if 'weight' in fname:
+            continue
         subtract_median_one(fname,MEF=MEF,MOS=MOS)
 
         
