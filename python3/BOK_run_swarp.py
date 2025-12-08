@@ -407,14 +407,14 @@ def run_swarp_all_filters(target):
     print('renaming ',ha_coadd,'->',new_output_image)
     os.rename(ha_coadd,new_output_image)
     # rename the weight file
-    #os.rename(ha_coadd.replace('.fits','.weight.fits'),new_output_image.replace('.fits','.weight.fits'))
+    os.rename(ha_coadd.replace('.fits','.weight.fits'),new_output_image.replace('.fits','.weight.fits'))
 
     
     newname = get_updated_BOK_coadd_name(rband_coadd)
     print('renaming ',rband_coadd,'->',newname)
-    #os.rename(rband_coadd,newname)
+    os.rename(rband_coadd,newname)
     # rename the weight file    
-    #os.rename(rband_coadd.replace('.fits','.weight.fits'),newname.replace('.fits','.weight.fits'))
+    os.rename(rband_coadd.replace('.fits','.weight.fits'),newname.replace('.fits','.weight.fits'))
 
 def count_lines(fname):
     with open(fname) as f:
