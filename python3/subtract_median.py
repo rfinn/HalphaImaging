@@ -185,10 +185,10 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
     if overwrite:
         hdu.writeto(fname,overwrite=True)
     else:
-
         hdu.writeto("m"+fname,overwrite=True)
     if MOS:
-        print("copying weight image")
+        print("copying weight image\m")
+        print(f"\tcp {weight_imname} m{weight_imname}")
         os.system(f"cp {weight_imname} m{weight_imname}")
     #hdu.close()
 if __name__ == '__main__':
