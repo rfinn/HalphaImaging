@@ -182,8 +182,8 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
     else:
 
         hdu.writeto("m"+fname,overwrite=True)
-        if MOS:
-            os.system(f"cp {weight_imname} m{weight_imname}")
+    if MOS:
+        os.system(f"cp {weight_imname} m{weight_imname}")
     hdu.close()
 if __name__ == '__main__':
     import argparse
