@@ -29,7 +29,7 @@ def subtract_median_sky(data,getstd=False,getmedian=True,subtract=True,weightima
     #clipped_array = sigma_clip(masked_data,cenfunc=np.ma.mean)
 
     # filled masked values with nans
-    nan_filled_data = maked_data.filled(np.nan)
+    nan_filled_data = masked_data.filled(np.nan)
     
     mean,median,std = sigma_clipped_stats(nan_filled_data,sigma=3.0)# removing this ,cenfunc=np.ma.mean)
     if subtract:
