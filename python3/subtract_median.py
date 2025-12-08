@@ -119,7 +119,8 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
         # get weight image
         weight_imname = fname.replace('.coadd','.coadd.weight')
         whdu = fits.open(weight_imname)
-        
+
+        weight_mask = whdu[0].data == 0
         ymax, xmax = hdu[0].data.shape 
         # case for mosaic data, subtract median in each CCD/AMP
         # these are boundaries that Becky measured from ds9
@@ -153,7 +154,7 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
                 average_med += median
                 average_std += std
                 # subtract median
-                hdu[0].data[ymin:ymax,xmin:xmax] -= median
+                hdu[0].data[weight_mask][ymin:ymax,xmin:xmax] -= median
                 hdu[0].header.set('REGION'+str(namp),value=f"{xmin}:{xmax},{ymin}:{ymax}",comment='{xmin}:{xmax},{ymin}:{ymax}')                               
                 hdu[0].header.set('MEDSUB'+str(namp),value=median,comment='sky med subtract_med')                
                 hdu[0].header.set('SKYMED'+str(namp),value=median,comment='sky med subtract_med')
@@ -179,7 +180,10 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
     if overwrite:
         hdu.writeto(fname,overwrite=True)
     else:
+
         hdu.writeto("m"+fname,overwrite=True)
+        if MOS:
+            os.system(f"cp {weight_imname} m{weight_imname}")
     hdu.close()
 if __name__ == '__main__':
     import argparse
