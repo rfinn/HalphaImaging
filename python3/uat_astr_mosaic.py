@@ -84,7 +84,7 @@ def update_coadd_header(coadd, input_image_list):
     '''
     GOAL:
     scamp is not passing the header keywords through to the coadded image,
-    so the goal of this routine is to add the keywords manually...
+    so the goal of this routine is to add the keywords manually.  This
 
     INPUT:
     * coadd - coadded image to add header keywords too
