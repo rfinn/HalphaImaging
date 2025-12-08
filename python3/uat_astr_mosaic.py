@@ -96,7 +96,7 @@ def update_coadd_header(coadd, input_image_list):
 
 
     # write out coadd with new header
-    header_fields = ['DATE-OBS','AIRMASS','EXPTIME','MEDSUB','SKYMED','SKYSTD']# List of FITS keywords to propagate
+    header_fields = ['OBSDATE','AIRMASS','EXPTIME','MEDSUB','SKYMED','SKYSTD']# List of FITS keywords to propagate
     infile = open(input_image_list,'r')
     for line in infile:
         im = line.rstrip()
@@ -112,7 +112,7 @@ def update_coadd_header(coadd, input_image_list):
     infile.close()
     # add ccdnoise
     f = 'CCDNOISE'
-    hdu[0].header.set(f,iheader[f])
+    hdu[0].header.set(f,7.3)
 
     # write out image
     hdu.writeto(coadd,overwrite=True)
