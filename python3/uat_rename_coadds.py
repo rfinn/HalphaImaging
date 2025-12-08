@@ -20,6 +20,10 @@ renaming  ./NRGb177-h02_R.coadd.weight.fits -> ./VF-181.362+20.406-HDI-2015-04-1
 renaming  ./NRGb177-h02_ha12.coadd.fits -> ./VF-181.362+20.406-HDI-2015-04-17-NRGb177-h02-ha12.fits
 renaming  ./NRGb177-h02_ha12.coadd.weight.fits -> ./VF-181.362+20.406-HDI-2015-04-17-NRGb177-h02-ha12.weight.fits
 
+
+
+python ~/github/HalphaImaging/python3/uat_rename_coadds.py --outdir /data-pool/HalphaGroups/allcoadsv0
+
 '''
 
 import os
