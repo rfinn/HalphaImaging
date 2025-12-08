@@ -116,6 +116,7 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
                 hdu[i].header.set('SKYSTD',value=std,comment='sky std subtract_med')                
             
     elif MOS:
+        print("\nworking on a mosaic image...")
         # get weight image
         weight_imname = fname.replace('.coadd','.coadd.weight')
         whdu = fits.open(weight_imname)
@@ -145,6 +146,7 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
             xmax = xvals[j+1]
 
             for k in range(len(yvals) -1 ):
+                print("\nworking on namp ",namp)
                 ymin = yvals[k]
                 ymax = yvals[k+1]
             
@@ -154,18 +156,21 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
                 average_med += median
                 average_std += std
                 # subtract median
-                hdu[0].data[ymin:ymax,xmin:xmax][good_mask[ymin:ymax,xmin:xmax]] -= median
+
                 hdu[0].header.set('REGION'+str(namp),value=f"{xmin}:{xmax},{ymin}:{ymax}",comment='{xmin}:{xmax},{ymin}:{ymax}')                               
                 hdu[0].header.set('MEDSUB'+str(namp),value=median,comment='sky med subtract_med')                
                 hdu[0].header.set('SKYMED'+str(namp),value=median,comment='sky med subtract_med')
                 hdu[0].header.set('SKYSTD'+str(namp),value=std,comment='sky std subtract_med')
+
+                hdu[0].data[ymin:ymax,xmin:xmax][good_mask[ymin:ymax,xmin:xmax]] -= median
+                
                 namp += 1
         # calculate average med and std
         average_med = average_med/(namp-1)
         average_std = average_std/(namp-1)
         hdu[0].header.set('SKYMED',value=average_med,comment='ave sky med subtract_med all amps')
         hdu[0].header.set('SKYSTD',value=average_std,comment='ave sky std subtract_med all amps')
-        
+        print("printing header\n",hdu[0].header)
     else:
         # background subtraction
         hdu[0].data,median,std = imutils.subtract_median_sky(hdu[0].data,getstd=True)
@@ -183,6 +188,7 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
 
         hdu.writeto("m"+fname,overwrite=True)
     if MOS:
+        print("copying weight image")
         os.system(f"cp {weight_imname} m{weight_imname}")
     #hdu.close()
 if __name__ == '__main__':
