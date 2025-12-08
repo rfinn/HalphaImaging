@@ -107,6 +107,7 @@ except:
 
     
 files = glob.glob(filestring)
+files.sort()
 #print(files)
 fnames=[]      #creates empty list to contain file name
 ftype=[]       #creates empty list to contain type of filter
