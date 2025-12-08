@@ -169,8 +169,15 @@ if args.swarp:
         refwcs = WCS(header)
         image_size = data.shape
 
-        ra,dec = refwcs.wcs_pix2world(image_size[0]/2.,image_size[1]/2.,1)
-        center = str(ra)+','+str(dec)
+        #ra,dec = refwcs.wcs_pix2world(image_size[0]/2.,image_size[1]/2.,1)
+        # why not use CRVAL1 and CRVAL2 from reference image???
+        ra = header['CRVAL1']
+        dec = header['CRVAL2']
+
+        center = str(ra)+','+str(dec)        
+
+
+        
         mosaic_image_size = str(image_size[1])+','+str(image_size[0])
 
         # get pixel scale from the ref image rather than using something fixed for all images
@@ -201,21 +208,20 @@ if args.swarp:
             # updating for uat Halpha groups, mosaic data
             #os.system('swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -WEIGHT_TYPE MAP_WEIGHT -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale))
             commandstring += ' -WEIGHT_TYPE MAP_WEIGHT'
-        else:
-            # CENTER_TYPE MANUAL
-            #CENTER RA,DEC
-            #PIXEL_SCALE 0.425
-            if args.refimage:
-                print('using reference image with swarp')
-                #commandstring = 'swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -CENTER_TYPE MANUAL -CENTER_TYPE MANUAL -CENTER '+center+' -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale)+' -IMAGE_SIZE '+mosaic_image_size#+' -RESAMPLE N'
-                commandstring += ' -CENTER_TYPE MANUAL -CENTER '+center+' -IMAGE_SIZE '+mosaic_image_size
-            #else:
-            #    commandstring='swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage +' -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale)
-            if args.noback:
-                commandstring += ' -SUBTRACT_BACK N'
-            print('running the following command:')
-            print(commandstring)
-            os.system(commandstring)
+        # CENTER_TYPE MANUAL
+        #CENTER RA,DEC
+        #PIXEL_SCALE 0.425
+        if args.refimage:
+            print('using reference image with swarp')
+            #commandstring = 'swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage+' -CENTER_TYPE MANUAL -CENTER_TYPE MANUAL -CENTER '+center+' -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale)+' -IMAGE_SIZE '+mosaic_image_size#+' -RESAMPLE N'
+            commandstring += ' -CENTER_TYPE MANUAL -CENTER '+center+' -IMAGE_SIZE '+mosaic_image_size
+        #else:
+        #    commandstring='swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage +' -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale)
+        if args.noback:
+            commandstring += ' -SUBTRACT_BACK N'
+        print('running the following command:')
+        print(commandstring)
+        os.system(commandstring)
 
         print('DONE')
 
