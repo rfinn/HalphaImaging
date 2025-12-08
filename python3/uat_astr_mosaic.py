@@ -111,6 +111,7 @@ def update_coadd_header(coadd, input_image_list):
         nimage = 1
         for f in header_fields:
             newfield = f"{f}{nimage}"
+            print(newfield)
             try:
                 hdu[0].header.set(newfield,iheader[f])
             except KeyError:
