@@ -87,7 +87,7 @@ if __name__ == '__main__':
         print('renaming ',fname,'->',new_output_image)
         if not args.testing:
             #os.rename(fname,new_output_image)
-            os.system(f"cp {fname} {new_output_image")
+            os.system(f"cp {fname} {new_output_image}")
 
         # rename the weight file
         weightfile = fname.replace('.fits','.weight.fits')
