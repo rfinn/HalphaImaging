@@ -118,7 +118,7 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
     elif MOS:
         print("\nworking on a mosaic image...")
         # get weight image
-        weight_imname = fname.replace('.coadd','.coadd.weight')
+        weight_imname = fname.replace('.fits','.weight.fits')
         whdu = fits.open(weight_imname)
 
         good_mask = whdu[0].data > 0
