@@ -112,7 +112,10 @@ def update_coadd_header(coadd, input_image_list):
 
     nimage = 1    
     for im in input_images:
-        hdu[0].header.set(f'IMAGE{nimage}',im)
+        # record the image name
+        hdu[0].header.set(f'INIMAG{nimage}',im)
+
+        # 
         iheader = fits.getheader(im)
 
         
