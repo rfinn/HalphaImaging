@@ -98,7 +98,8 @@ def update_coadd_header(coadd, input_image_list):
     # write out coadd with new header
     header_fields = ['DATE-OBS','AIRMASS','EXPTIME','MEDSUB','SKYMED','SKYSTD']# List of FITS keywords to propagate
     infile = open(input_image_list,'r')
-    for im in infile:
+    for line in infile:
+        im = line.rstrip()
         iheader = fits.getheader(im)
 
         nimage = 1
