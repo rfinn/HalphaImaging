@@ -70,8 +70,8 @@ if __name__ == '__main__':
         # rename the weight file
         weightfile = fname.replace('.fits','.weight.fits')
         if os.path.exists(weightfile):
-            print('renaming ',,'->',new_output_image.replace('.fits','.weight.fits'))
-            #os.rename(ha_coadd.replace('.fits','.weight.fits'),new_output_image.replace('.fits','.weight.fits'))
+            print('renaming ',weightfile,'->',new_output_image.replace('.fits','.weight.fits'))
+            #os.rename(weightfile,new_output_image.replace('.fits','.weight.fits'))
         else:
             print("WARNING: weight image does not exist for ",fname)
 
