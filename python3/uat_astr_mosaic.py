@@ -105,24 +105,26 @@ def update_coadd_header(coadd, input_image_list):
     print("\ngathering header info from these input images: \n",input_images)
     infile.close()
 
+    # add ccdnoise
+    f = 'CCDNOISE'
+    hdu[0].header.set(f,7.3)
+    
+
     nimage = 1    
     for im in input_images:
-        hdu[0].header.set('COMMENT','header info for '+im)
+        hdu[0].header.append(f'IMAGE{nimage}',im)
         iheader = fits.getheader(im)
 
         
         for f in header_fields:
             newfield = f"{f}{nimage}"
-            print(newfield)
+            #print(newfield)
             try:
-                hdu[0].header.set(newfield,iheader[f])
+                hdu[0].header.append(newfield,iheader[f])
             except KeyError:
                 print(f"WARNING: Keyword {f} not found")
         nimage += 1
 
-    # add ccdnoise
-    f = 'CCDNOISE'
-    hdu[0].header.set(f,7.3)
 
     # write out image
     hdu.writeto(coadd,overwrite=True)
