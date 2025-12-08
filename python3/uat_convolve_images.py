@@ -86,15 +86,6 @@ def get_fwhm_psfex(psfout=None):
         images.append(im.replace('.cat','.fits'))
     fwhm = np.array(pt['FWHM_Mean'])
 
-    # add fwhm to header
-    for i,im in enumerate(images):
-        hdu = fits.open(im)
-        hdu[0].header.set('FWHM_Mean',f"{fwhm[i]:.2f}",'PSFEx FWHM_Mean')
-        hdu.writeto(im, overwrite=True)
-    try:
-        hdu.close()
-    except:
-        print("WARNING: I do not like the command hdu.close()")
     return images, fwhm
 
 
@@ -145,6 +136,16 @@ if __name__ == '__main__':
     
     image_names, image_fwhm = get_fwhm_psfex()
 
+    # add fwhm to header
+    for i,im in enumerate(image_names):
+        hdu = fits.open(im)
+        hdu[0].header.set('FWHM_ORG',f"{image_fwhm[i]:.2f}",'PSFEx FWHM_Mean')
+        hdu.writeto(im, overwrite=True)
+        try:
+            hdu.close()
+        except:
+            print("WARNING: I do not like the command hdu.close()")
+    
     # add psfex fwhm to image headers
     
     if args.usemedian:
@@ -231,7 +232,17 @@ if __name__ == '__main__':
         #
 
         gimage_names, gimage_fwhm = get_fwhm_psfex(psfout='gpsfex.xml')
+        # add fwhm to header
+        for i,im in enumerate(gimage_names):
+            hdu = fits.open(im)
+            hdu[0].header.set('FWHM_CNV',f"{gimage_fwhm[i]:.2f}",'PSFEx FWHM_Mean after convolution')
+            hdu.writeto(im, overwrite=True)
+            try:
+                hdu.close()
+            except:
+                print("WARNING: I do not like the command hdu.close()")
 
+        
         # get fwhm from se cats of convolved images
         
         myimage_fwhm, myimage_std = get_fwhm(gimage_names)
