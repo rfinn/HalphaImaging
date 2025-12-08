@@ -34,6 +34,7 @@ def get_updated_uat_coadd_name(imname):
     
     dateobs_time = h['OBSDATE']
     dateobs = dateobs_time.split('T')[0]
+    dateobs.replace('-','')
 
     temptel = h['INSTRUME']
     if (temptel.find('hdi') > -1) | (temptel.find('HDI') > -1):
@@ -51,9 +52,9 @@ def get_updated_uat_coadd_name(imname):
     # create string for output name
 
     if float(dec) < 0:
-        outfile = f'UAT-{ra:07.3f}-{dec:06.3f}-{telescope}-{dateobs}-{pointing}-{filterwithsuffix}'
+        outfile = f'UAT_{ra:07.3f}-{dec:06.3f}_{telescope}_{dateobs}_{pointing}_{filterwithsuffix}'
     else:
-        outfile = f'UAT-{ra:07.3f}+{dec:06.3f}-{telescope}-{dateobs}-{pointing}-{filterwithsuffix}'
+        outfile = f'UAT_{ra:07.3f}+{dec:06.3f}_{telescope}_{dateobs}_{pointing}_{filterwithsuffix}'
     return outfile
 
 
