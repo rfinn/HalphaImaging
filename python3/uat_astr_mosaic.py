@@ -112,7 +112,7 @@ def update_coadd_header(coadd, input_image_list):
 
     nimage = 1    
     for im in input_images:
-        hdu[0].header.append(f'IMAGE{nimage}',im)
+        hdu[0].header.set(f'IMAGE{nimage}',im)
         iheader = fits.getheader(im)
 
         
@@ -120,7 +120,7 @@ def update_coadd_header(coadd, input_image_list):
             newfield = f"{f}{nimage}"
             #print(newfield)
             try:
-                hdu[0].header.append(newfield,iheader[f])
+                hdu[0].header.set(newfield,iheader[f])
             except KeyError:
                 print(f"WARNING: Keyword {f} not found")
         nimage += 1
