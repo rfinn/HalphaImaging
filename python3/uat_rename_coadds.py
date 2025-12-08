@@ -31,7 +31,7 @@ def get_updated_uat_coadd_name(imname):
         print("WARNING: could not parse header field INSTRUME")
         print("\t setting instrument to HDI")
         
-    pointing,filterwsuffix = imname.split('_')
+    pointing,filterwithsuffix = imname.split('_')
 
     # remove coadd from name
     filterwithsuffix = filterwithsuffix.replace('.coadd','')
