@@ -108,7 +108,7 @@ def update_coadd_header(coadd, input_image_list):
                 hdu[0].header.set(f"{f}{nimage}",iheader[f])
             except KeyError:
                 print(f"WARNING: Keyword {f} not found")
-            nimage += 1
+        nimage += 1
     infile.close()
     # add ccdnoise
     f = 'CCDNOISE'
