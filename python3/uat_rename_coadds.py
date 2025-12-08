@@ -12,6 +12,7 @@ User provides:
 import os
 import glob
 from astropy.io import fits
+import argparse
 
 def get_updated_uat_coadd_name(imname):
     h = fits.getheader(imname)
