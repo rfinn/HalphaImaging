@@ -34,7 +34,7 @@ def get_updated_uat_coadd_name(imname):
     
     dateobs_time = h['OBSDATE']
     dateobs = dateobs_time.split('T')[0]
-    dateobs.replace('-','')
+    dateobs = dateobs.replace('-','')
 
     temptel = h['INSTRUME']
     if (temptel.find('hdi') > -1) | (temptel.find('HDI') > -1):
