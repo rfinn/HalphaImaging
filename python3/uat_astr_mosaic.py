@@ -123,7 +123,11 @@ def update_coadd_header(coadd, input_image_list):
             newfield = f"{f}{nimage}"
             #print(newfield)
             try:
-                hdu[0].header.set(newfield,iheader[f])
+                if f in ['MEDSUB','SKYMED','SKYSTD']:
+                    hstring = f"{iheader[f]:.3f}"
+                else:
+                    hstring = iheader[f]
+                hdu[0].header.set(newfield,hstring)
             except KeyError:
                 print(f"WARNING: Keyword {f} not found")
         nimage += 1
