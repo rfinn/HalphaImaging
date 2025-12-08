@@ -162,7 +162,7 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
         # background subtraction
         hdu[0].data,median,std = imutils.subtract_median_sky(hdu[0].data,getstd=True)
         if math.isnan(median):
-            print(f"WARNING: could not subtract median for {fname}"
+            print(f"WARNING: could not subtract median for {fname}")
         else:
             hdu[0].header.set('MEDSUB',value=median,comment='median subtraction')
             hdu[0].header.set('SKYMED',value=median,comment='sky med subtract_med')
