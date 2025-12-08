@@ -103,6 +103,7 @@ def update_coadd_header(coadd, input_image_list):
         input_images.append(line.rstrip())
     input_images.sort()
     print("\ngathering header info from these input images: \n",input_images)
+    infile.close()
     
     for im in input_images:
         iheader = fits.getheader(im)
@@ -115,7 +116,7 @@ def update_coadd_header(coadd, input_image_list):
             except KeyError:
                 print(f"WARNING: Keyword {f} not found")
         nimage += 1
-    infile.close()
+
     # add ccdnoise
     f = 'CCDNOISE'
     hdu[0].header.set(f,7.3)
