@@ -35,6 +35,7 @@ https://ccdproc.readthedocs.io/en/latest/image_combination.html
 import os
 homedir = os.getenv("HOME")
 import sys
+import math
 print(homedir)
 
 sys.path.append('/home/rfinn/github/HalphaImaging/python3/')
@@ -51,7 +52,7 @@ import numpy as np
 ### SUBTRACT MEDIAN FROM IMAGE
 ##########################################################
 
-def subtract_median(files,overwrite=False,MEF=False):
+def subtract_median(files,overwrite=False,MEF=False,MOS=False):
     '''
     INPUT:
     * files - list of files for median subtraction
@@ -67,10 +68,10 @@ def subtract_median(files,overwrite=False,MEF=False):
     '''
     print('subtracting median from images')
     for fname in files:
-        subtract_median_one(fname,MEF=MEF)
+        subtract_median_one(fname,MEF=MEF,MOS=MOS)
 
         
-def subtract_median_one(fname,MEF=True,overwrite=False):
+def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
     if not overwrite:
         if os.path.exists("m"+fname) and not overwrite:
             print("m"+fname,' already exists.  moving to next file')
@@ -88,7 +89,7 @@ def subtract_median_one(fname,MEF=True,overwrite=False):
         # loop over additional extenstions and subtract median
         nextensions = len(hdu)
         for i in range(1,nextensions):
-            d,median = imutils.subtract_median_sky(hdu[i].data.copy())
+            d,median,std = imutils.subtract_median_sky(hdu[i].data.copy(),getstd=True)
 
             #print('median for hdu {} = {}'.format(i,median))
             #print('check if median is nan: {}'.format(median == np.nan))
@@ -100,22 +101,74 @@ def subtract_median_one(fname,MEF=True,overwrite=False):
                 if mmed is not np.nan:
                     hdu[i].data -= mmed
                     median = mmed
-                    hdu[i].header.set('MEDSUB',value=median,comment='sky med subtract_med')                 
-                    hdu[i].header.set('SKYMED',value=median,comment='sky med subtract_med')
+                    hdu[i].header.set('MEDSUB',value=mmed,comment='sky med subtract_med')                 
+                    hdu[i].header.set('SKYMED',value=mmed,comment='sky med subtract_med')
                     hdu[i].header.set('SKYSTD',value=mstd,comment='sky std subtract_med')
                 
             else:
                 hdu[i].data = d
                 hdu[i].header.set('MEDSUB',value=median,comment='sky med subtract_med')                
                 hdu[i].header.set('SKYMED',value=median,comment='sky med subtract_med')
-                hdu[i].header.set('SKYSTD',value=median,comment='sky std subtract_med')                
+                hdu[i].header.set('SKYSTD',value=std,comment='sky std subtract_med')                
             
+    elif MOS:
+        # get weight image
+        weight_imname = fname.replace('.coadd','.coadd.weight')
+        whdu = fits.open(weight_imname)
+        
+        xmax, ymax = hdu[0].data.shape 
+        # case for mosaic data, subtract median in each CCD/AMP
+        # these are boundaries that Becky measured from ds9
+        xvals = [1, 1018, 2068, 3138, 4190, 5265, 6330, 7383, xmax]
+        yvals = [1, 4130, ymax]
+        # subtract 1 to convert to python zero indexed system
+        xvals = xvals - 1
+        yvals = yvals - 1
+        
+        buffer = 10 # buffer for measuring sky
+
+        # keep track of overall statistics
+        
+        average_med = 0
+        average_std = 0
+        namp = 1
+        for j in range(len(xvals)-1):
+            xmin = xvals[j]
+            xmax = xvals[j+1]
+
+            for k in range(len(yvals) -1 ):
+                ymin = yvals[k]
+                ymax = yvals[k+1]
             
+                d,median,std = imutils.subtract_median_sky(hdu[0].data[ymin+buffer:ymax-buffer,xmin+buffer:xmax-buffer],getstd=True,subtract=False,\
+                                                               weightimage = whdu[0].data[ymin+buffer:ymax-buffer,xmin+buffer:xmax-buffer])
+
+                average_med += median
+                average_std += std
+                # subtract median
+                hdu[0].data[ymin:ymax,xmin:xmax] -= median
+                hdu[0].header.set('REGION'+str(namp),value=f"{xmin}:{xmax},{ymin}:{ymax}",comment='{xmin}:{xmax},{ymin}:{ymax}')                               
+                hdu[0].header.set('MEDSUB'+str(namp),value=median,comment='sky med subtract_med')                
+                hdu[0].header.set('SKYMED'+str(namp),value=median,comment='sky med subtract_med')
+                hdu[0].header.set('SKYSTD'+str(namp),value=std,comment='sky std subtract_med')
+                namp += 1
+        # calculate average med and std
+        average_med = average_med/(namp-1)
+        average_std = average_std/(namp-1)
+        hdu[0].header.set('SKYMED',value=average_med,comment='ave sky med subtract_med all amps')
+        hdu[0].header.set('SKYSTD',value=average_std,comment='ave sky std subtract_med all amps')
+        
     else:
         # background subtraction
-        hdu[0].data,median = imutils.subtract_median_sky(hdu[0].data)
-        if median is not np.nan:
+        hdu[0].data,median,std = imutils.subtract_median_sky(hdu[0].data,getstd=True)
+        if math.isnan(median):
+            print(f"WARNING: could not subtract median for {fname}"
+        else:
             hdu[0].header.set('MEDSUB',value=median,comment='median subtraction')
+            hdu[0].header.set('SKYMED',value=median,comment='sky med subtract_med')
+            hdu[0].header.set('SKYSTD',value=std,comment='sky std subtract_med')
+
+    
     if overwrite:
         hdu.writeto(fname,overwrite=True)
     else:
@@ -130,6 +183,7 @@ if __name__ == '__main__':
     parser.add_argument('--filestring2', dest = 'filestring2', default = None, help = 'second filestring to match. default is None.  set to ooi for 90prime data.')    
     parser.add_argument('--overwrite', action = 'store_true', default = False, help = 'overwrite file?  the default is false, so that a new file with m prefix is created.')
     parser.add_argument('--mef', action = 'store_true', default = False, help = 'set this for MEF files, like with 90prime')
+    parser.add_argument('--mos',  default = False, help = 'set this for MOS files')    
     parser.add_argument('--oneimage', dest = 'oneimage', default = None,help = 'supply an image name to run sky subtraction on one image')    
     # TODO
     # add a mosaic flag, where median will be calculated for each amplifier (8 ccds, and each ccd has two amplifiers)
@@ -142,7 +196,7 @@ if __name__ == '__main__':
     #else:
     #    keys = ['naxis1', 'naxis2', 'imagetyp', 'filter', 'exptime','instrmnt']
     if args.oneimage is not None:
-        subtract_median_one(args.oneimage,overwrite=args.overwrite,MEF=args.mef)
+        subtract_median_one(args.oneimage,overwrite=args.overwrite,MEF=args.mef, MOS=args.mos)
     else:
         matchstring = args.filestring+'*.fits'
         if args.filestring2 is not None:
@@ -150,4 +204,4 @@ if __name__ == '__main__':
         files = glob.glob(matchstring)
         files.sort()
         #print(files)
-        subtract_median(files,overwrite=args.overwrite,MEF=args.mef)
+        subtract_median(files,overwrite=args.overwrite,MEF=args.mef, MOS=args.mos)
