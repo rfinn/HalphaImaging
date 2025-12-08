@@ -70,6 +70,8 @@ def subtract_median(files,overwrite=False,MEF=False,MOS=False):
     for fname in files:
         if 'weight' in fname:
             continue
+        if 'bpm' in fname:
+            continue
         subtract_median_one(fname,MEF=MEF,MOS=MOS)
 
         
