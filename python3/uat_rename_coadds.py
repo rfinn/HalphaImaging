@@ -47,6 +47,7 @@ def get_updated_uat_coadd_name(imname):
         
     pointing,filterwithsuffix = imname.split('_')
 
+    pointing = pointing.replace('-','_')
     # remove coadd from name
     filterwithsuffix = filterwithsuffix.replace('.coadd','')
     # create string for output name
