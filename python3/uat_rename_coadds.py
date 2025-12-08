@@ -63,6 +63,8 @@ if __name__ == '__main__':
 
 
     for fname in filelist:
+        if 'weight' in fname:
+            continue
         new_output_image = get_updated_uat_coadd_name(fname)
         # rename as UAT-{RA}-{DEC}-{TEL}-{OBSDATE}-{POINTING}-{FILTER}
         print('renaming ',fname,'->',new_output_image)
