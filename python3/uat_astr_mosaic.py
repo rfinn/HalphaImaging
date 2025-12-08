@@ -97,8 +97,8 @@ def update_coadd_header(coadd, input_image_list):
 
     # write out coadd with new header
     header_fields = ['DATE-OBS','AIRMASS','EXPTIME','MEDSUB','SKYMED','SKYSTD']# List of FITS keywords to propagate
-
-    for im in input_image_list:
+    infile = open(input_image_list,'r')
+    for im in infile:
         iheader = fits.getheader(im)
 
         nimage = 1
@@ -108,6 +108,7 @@ def update_coadd_header(coadd, input_image_list):
             except KeyError:
                 print(f"WARNING: Keyword {f} not found")
             nimage += 1
+    infile.close()
     # add ccdnoise
     f = 'CCDNOISE'
     hdu[0].header.set(f,iheader[f])
