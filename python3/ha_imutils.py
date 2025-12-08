@@ -11,19 +11,27 @@ https://mwcraig.github.io/ccd-as-book/08-02-Creating-a-mask.html
 '''
 
 from astropy.io import fits
+
 from astropy.stats import sigma_clipped_stats
 import ccdproc
 from photutils import make_source_mask
 from astropy.io.fits import Header
 import numpy as np
 
-def subtract_median_sky(data,getstd=False,getmedian=True,subtract=True):
+def subtract_median_sky(data,getstd=False,getmedian=True,subtract=True,weightimage=None):
     ''' subtract median sky from image data '''
+    if weightimage is not None:
+        image_mask = weightimage == 0 # like for mosaic
+        data = np.ma.array(data, mask=image_mask)
+        
     mask = make_source_mask(data,nsigma=3,npixels=5,dilate_size=5)
     masked_data = np.ma.array(data,mask=mask)
     #clipped_array = sigma_clip(masked_data,cenfunc=np.ma.mean)
 
-    mean,median,std = sigma_clipped_stats(masked_data,sigma=3.0,cenfunc=np.ma.mean)
+    # filled masked values with nans
+    nan_filled_data = maked_data.filled(np.nan)
+    
+    mean,median,std = sigma_clipped_stats(nan_filled_data,sigma=3.0)# removing this ,cenfunc=np.ma.mean)
     if subtract:
         data -= median
     if getstd:
