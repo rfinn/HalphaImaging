@@ -157,10 +157,10 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
                 average_std += std
                 # subtract median
 
-                hdu[0].header.set('REGION'+str(namp),value=f"{xmin}:{xmax},{ymin}:{ymax}",comment='{xmin}:{xmax},{ymin}:{ymax}')                               
-                hdu[0].header.set('MEDSUB'+str(namp),value=median,comment='sky med subtract_med')                
-                hdu[0].header.set('SKYMED'+str(namp),value=median,comment='sky med subtract_med')
-                hdu[0].header.set('SKYSTD'+str(namp),value=std,comment='sky std subtract_med')
+                hdu[0].header.set(f'REGION{namp:02d}',value=f"{xmin}:{xmax},{ymin}:{ymax}",comment='{xmin}:{xmax},{ymin}:{ymax}')                               
+                hdu[0].header.set(f'MEDSUB{namp:02d}',value=median,comment='sky med subtract_med')                
+                hdu[0].header.set(f'SKYMED{namp:02d}',value=median,comment='sky med subtract_med')
+                hdu[0].header.set(f'SKYSTD{namp:02d}',value=std,comment='sky std subtract_med')
 
                 hdu[0].data[ymin:ymax,xmin:xmax][good_mask[ymin:ymax,xmin:xmax]] -= median
                 
