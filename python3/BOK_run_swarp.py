@@ -292,11 +292,13 @@ def run_swarp(image_list,refimage=None, verbose=True, runswarp=True):
         
         
         ra,dec = w.wcs_pix2world(int(image_size[0]//2.),int(image_size[1]//2.),1)
-        center = str(ra)+','+str(dec)
+
 
         # why not use CRVAL1 and CRVAL2 from reference image???
         ra = rheader['CRVAL1']
         dec = rheader['CRVAL2']
+
+        center = str(ra)+','+str(dec)        
         
         mosaic_image_size = str(image_size[1])+','+str(image_size[0])
         
@@ -405,7 +407,7 @@ def run_swarp_all_filters(target):
     print('renaming ',ha_coadd,'->',new_output_image)
     os.rename(ha_coadd,new_output_image)
     # rename the weight file
-    os.rename(ha_coadd.replace('.fits','.weight.fits'),new_output_image.replace('.fits','.weight.fits'))
+    #os.rename(ha_coadd.replace('.fits','.weight.fits'),new_output_image.replace('.fits','.weight.fits'))
 
     
     newname = get_updated_BOK_coadd_name(rband_coadd)
