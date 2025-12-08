@@ -123,6 +123,9 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
         # these are boundaries that Becky measured from ds9
         xvals = [1, 1018, 2068, 3138, 4190, 5265, 6330, 7383, xmax]
         yvals = [1, 4130, ymax]
+
+        xvals = np.array(xvals,'i')
+        yvals = np.array(yvals,'i')
         # subtract 1 to convert to python zero indexed system
         xvals = xvals - 1
         yvals = yvals - 1
