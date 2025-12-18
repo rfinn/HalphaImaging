@@ -157,11 +157,12 @@ if args.submed:
 #os.system('python '+gitpath+'uat_HDIsortobjects.py --filestring h')
 
 
-print("args.uat = ",args.uat)
-print("args.swarp = ",args.swarp)
-print(args.uat & args.swarp)
-if (args.uat & args.swarp):
-    print("Running swarp in uat mode")
+#print("args.uat = ",args.uat)
+#print("args.swarp = ",args.swarp)
+#print(args.uat & args.swarp)
+if args.swarp:
+    
+    print("Running swarp")
     infile = open(args.filelist,'r')
     print('running swarp')
     i = 0
@@ -200,10 +201,12 @@ if (args.uat & args.swarp):
             halist = fnames[0]
         elif len(fnames) == 0:
             haflag = False
-            
+
         else:
             multiha = False
             halist = fnames[0]
+
+
 
         #####################################################            
         # define the name of R-band coadd
@@ -229,64 +232,14 @@ if (args.uat & args.swarp):
                 os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+halist+' --refimage '+rcoadd_image+' --instrument '+args.instrument)#+' --noback')
 
 
-            # don't need to do this now that we are calling swarp correctly, as of 12/07/2025!!!
-            # run swarp on r, with r as reference image
-            #os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image+' --instrument '+args.instrument)#+' --noback')
-            #break
+        # don't need to do this now that we are calling swarp correctly, as of 12/07/2025!!!
+        # run swarp on r, with r as reference image
+        #os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image+' --instrument '+args.instrument)#+' --noback')
+        #break
         
     infile.close()
 
-if (args.swarp & ~args.uat):
-    infile = open(args.filelist,'r')
-    print('running swarp')
-    i = 0
-    for f in infile:
-        f = f.rstrip()
-        print(f"input filelist = {f}", f.split('_R')) # test
-        print('PROCESSING INPUT FILE: ',f)
-        if f.find(r'_R') > -1:
-            print('R filter')
-            rootname = f.split('_R')[0]
-        elif f.find(r'_r') > -1:
-            print('sdss r filter')
-            rootname = f.split('_r')[0]
-        else:
-            print('unexpected file name format')
-            sys.exit()
-        # get set of halpha images
-        print('rootname = ',rootname)
-        fnames = glob.glob(rootname+'_h*coadd.fits')
-        print('halpha file = ',fnames)
-        haflag = True
-        if len(fnames) > 1:
-            print('got more than one Halpha image - crazy!')
-            print('hope this is ok...')
-            multiha = True
-        elif len(fnames) == 1:
-            multiha = False
-            halist = fnames[0]
-        elif len(fnames) == 0:
-            haflag = False
-        # get name of R-band coadd
-        rcoadd_image = f+'.noback.coadd.fits'
-        # run swarp on r images
-        print('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f)
-        os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --noback')
-        
 
-        if haflag:
-            if multiha:
-                for h in fnames:
-                    # run swarp on halpha, with r as reference image
-                    os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+h+' --refimage '+rcoadd_image+' --noback')
-            else:
-                # run swarp on r, with r as reference image
-                os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+halist+' --refimage '+rcoadd_image+' --noback')
-            # run swarp on r, with r as reference image
-            os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+f+' --refimage '+rcoadd_image+' --noback')
-            #break
-        
-    infile.close()
 
     
 # solve for photometric zp
