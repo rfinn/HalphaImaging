@@ -183,4 +183,4 @@ if __name__ == '__main__':
         # read in header
         print('moving ',f,' -> ',new_output_image)
         if not args.test:
-            os.rename(f,new_output_image)
+            os.system(f"cp {f} {new_output_image}")
