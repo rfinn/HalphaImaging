@@ -181,6 +181,6 @@ if __name__ == '__main__':
         new_name = get_updated_coadd_name(f)
         new_output_image = os.path.join(args.outdir, new_name)        
         # read in header
-        print('moving ',f,' -> ',new_output_image)
+        print('copying ',f,' -> ',new_output_image)
         if not args.test:
             os.system(f"cp {f} {new_output_image}")
