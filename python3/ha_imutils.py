@@ -18,6 +18,12 @@ import ccdproc
 #    from photutils import make_source_mask
 #except ImportError:
 #    from photutils.segmentation import make_source_mask
+
+try:
+    from photutils import detect_threshold, detect_sources#, make_source_mask
+except ImportError:
+    from photutils.segmentation import detect_threshold, detect_sources#, make_source_mask
+
 from astropy.io.fits import Header
 import numpy as np
 
