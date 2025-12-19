@@ -41,7 +41,8 @@ def subtract_median_sky(data,getstd=False,getmedian=True,subtract=True,weightima
         threshold = detect_threshold(data, nsigma=3)
 
         segmentation = detect_sources(data, threshold, npixels=5)        
-        mask = segmentation.make_source_mask(data)
+        #mask = segmentation.make_source_mask(data)
+        mask = segmentation.make_source_mask()
 
     #mask = make_source_mask(data,nsigma=3,npixels=5,dilate_size=5)
     masked_data = np.ma.array(data,mask=mask)
