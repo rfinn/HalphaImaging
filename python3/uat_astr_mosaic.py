@@ -95,6 +95,7 @@ def update_coadd_header(coadd, input_image_list):
     hdu = fits.open(coadd)
 
 
+
     # write out coadd with new header
     header_fields = ['OBSDATE','AIRMASS','EXPTIME','MEDSUB','SKYMED','SKYSTD']# List of FITS keywords to propagate
     infile = open(input_image_list,'r')
@@ -105,6 +106,18 @@ def update_coadd_header(coadd, input_image_list):
     print("\ngathering header info from these input images: \n",input_images)
     infile.close()
 
+    
+    mosaic_flag = False
+    h1 = fits.getheader(input_images[0])
+    try:
+        instrument = h1['INSTRUME']
+        if 'Mos' in instrument:
+            mosaic_flag = True
+            header_fields[0] = 'DATE-OBS'
+            print(f"updating header fields for Mosaic to: {header_fields}")
+    except:
+        print(f"WARNING: could not get INSTRUME in the header of image {input_images[0]}")
+    
     # add ccdnoise
     f = 'CCDNOISE'
     hdu[0].header.set(f,7.3)
@@ -117,6 +130,7 @@ def update_coadd_header(coadd, input_image_list):
 
         # 
         iheader = fits.getheader(im)
+        # check if this is mosaic
 
         
         for f in header_fields:
@@ -252,7 +266,7 @@ if args.swarp:
         commandstring = 'swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage +' -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale)
         if args.m:
 
-            # not sure why I am doing this anymore...
+            # this create a list of bpm files that tell swarp to ignore the chip gaps, etc.
             infile = open(args.l,'r')
             outfile = open('masks','w')
             for line in infile:
