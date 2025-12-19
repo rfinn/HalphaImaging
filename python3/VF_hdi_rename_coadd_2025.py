@@ -34,7 +34,7 @@ from astropy.io import fits
 from astropy.time import Time
 
 
-def get_updated_coadd_name(imname, prefix='VF'):
+def get_updated_coadd_name(imname, survey='VF'):
     h = fits.getheader(f)
 
     ############################################
@@ -140,10 +140,10 @@ def get_updated_coadd_name(imname, prefix='VF'):
 
     if float(dec) < 0:
         #outfile = f'UAT_{ra:07.3f}-{dec:06.3f}_{telescope}_{dateobs}_{pointing}_{filterwithsuffix}'
-        outfile = f'{prefix}-{ra:07.3f}-{dec:06.3f}-{telescope}-{dateobs}-{pointing}-{filterwithsuffix}'        
+        outfile = f'{survey}-{ra:07.3f}-{dec:06.3f}-{telescope}-{dateobs}-{pointing}-{filterwithsuffix}'        
     else:
         #outfile = f'UAT_{ra:07.3f}+{dec:06.3f}_{telescope}_{dateobs}_{pointing}_{filterwithsuffix}'
-        outfile = f'{prefix}-{ra:07.3f}+{dec:06.3f}-{telescope}-{dateobs}-{pointing}-{filterwithsuffix}'        
+        outfile = f'{survey}-{ra:07.3f}+{dec:06.3f}-{telescope}-{dateobs}-{pointing}-{filterwithsuffix}'        
     return outfile
 
 
