@@ -26,8 +26,18 @@ def subtract_median_sky(data,getstd=False,getmedian=True,subtract=True,weightima
     if weightimage is not None:
         image_mask = weightimage == 0 # like for mosaic
         data = np.ma.array(data, mask=image_mask)
+
+    try:
+        from photutils import make_source_mask
         
-    mask = make_source_mask(data,nsigma=3,npixels=5,dilate_size=5)
+        mask = make_source_mask(data,nsigma=3,npixels=5,dilate_size=5)
+    except ImportError:
+        threshold = detect_threshold(data, nsigma=snrcut,sigclip_sigma=3.0)
+
+        segmentation = detect_sources(data, threshold, npixels=5)        
+        mask = segmentation.make_source_mask(data,nsigma=3,npixels=5,dilate_size=5)
+
+    #mask = make_source_mask(data,nsigma=3,npixels=5,dilate_size=5)
     masked_data = np.ma.array(data,mask=mask)
     #clipped_array = sigma_clip(masked_data,cenfunc=np.ma.mean)
 
