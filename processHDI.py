@@ -64,7 +64,7 @@ fixheader=args.fixheader
 
 
     
-if trim: # prepends 'tr'
+if args.trim: # prepends 'tr'
     os.system('python '+gitpath+'uat_overscantrim.py --filestring c')
     mylist = ['ORIGINALS','c']
     if not(os.path.exists(mylist[0])):
@@ -72,7 +72,7 @@ if trim: # prepends 'tr'
     os.system('mv '+mylist[1]+'*.fits '+mylist[0]+'/.')
 
 
-if bias: # prepends 'b'
+if args.bias: # prepends 'b'
     # make master bias
     # subtract bias from flat and science    
     os.system('python '+gitpath+'uat_HDI_subtract_bias.py --filestring trc')
@@ -85,11 +85,12 @@ if bias: # prepends 'b'
     
 
 # group flat files
-if group_flat:
+if args.groupflat:
     os.system('python '+gitpath+'uat_HDIgroupflatfiles.py --filestring b --verbose')
     mylist = ['FLAT_FRAMES','btr']
     if not(os.path.exists(mylist[0])):
         os.mkdir(mylist[0])
+    print("running: ",'mv '+mylist[1]+'*f00.fits '+mylist[0]+'/.')
     os.system('mv '+mylist[1]+'*f00.fits '+mylist[0]+'/.')
 
 # flatten science frames with dome flats

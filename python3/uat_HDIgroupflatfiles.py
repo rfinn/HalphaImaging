@@ -30,7 +30,8 @@
   astropy
 
   NOTES:
-  in junkfile ftr flats still show. We changed the gethead requirements to only   bring in files that start with tr but the ftr files will not go away! =(
+  in junkfile ftr flats still show. We changed the gethead requirements to only   
+  bring in files that start with tr but the ftr files will not go away! =(
   
   WRITTEN BY:
   Rose A. Finn
@@ -59,6 +60,11 @@ iraf.noao()
 iraf.imred()
 iraf.ccdred()    
 '''
+
+def inv_median(a):
+    return 1 / np.median(a)
+
+
 
 parser = argparse.ArgumentParser(description ='Groups images by filter and creates flatfield images')
 parser.add_argument('--filestring', dest='filestring', default='ztr', help='match string for input files (default =  ztr, which gets ztr*.fits)')
@@ -90,6 +96,7 @@ ftype=[]   #skyflat or domeflat
 for line in infile:
     t=line.split()
     if args.verbose:
+        print()
         print(f"CMMTOBS = {line}")
     fnames.append(t[0])
     if "sky" in line:
@@ -112,6 +119,8 @@ for line in infile:
             filter.append('ha16')
         elif line.find('R') > -1:
             filter.append('R')
+        elif line.find('SDSS r') > -1:
+            filter.append('r')
         #elif line.find('r') > -1: # doesn't work for 2014 data - ugh!!!, also 'r' is in the filename, so need to remove filename from line
         #    filter.append('r')
         elif line.find('V') > -1:
