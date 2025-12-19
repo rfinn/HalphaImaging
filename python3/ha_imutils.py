@@ -38,7 +38,7 @@ def subtract_median_sky(data,getstd=False,getmedian=True,subtract=True,weightima
         
         mask = make_source_mask(data,nsigma=3,npixels=5,dilate_size=5)
     except ImportError:
-        threshold = detect_threshold(data, nsigma=snrcut,sigclip_sigma=3.0)
+        threshold = detect_threshold(data, nsigma=3,sigclip_sigma=3.0)
 
         segmentation = detect_sources(data, threshold, npixels=5)        
         mask = segmentation.make_source_mask(data,nsigma=3,npixels=5,dilate_size=5)
