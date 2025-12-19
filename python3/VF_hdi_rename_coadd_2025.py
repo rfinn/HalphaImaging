@@ -50,7 +50,7 @@ def get_updated_coadd_name(imname, survey='VF'):
     #dateobs_time = h['OBSDATE']
     #dateobs = dateobs_time.split('T')[0]
     dateobs = dateobs.replace('-','')
-    print(dateobs)    
+    #print(dateobs)    
 
 
     ############################################
