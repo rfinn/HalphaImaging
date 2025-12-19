@@ -33,8 +33,6 @@ import argparse
 from astropy.io import fits
 from astropy.time import Time
 
-def test:
-    pass
 
 def get_updated_coadd_name(imname, prefix='VF'):
     header = fits.getheader(f)
