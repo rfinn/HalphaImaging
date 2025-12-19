@@ -102,9 +102,9 @@ def get_updated_coadd_name(imname, prefix='VF'):
 
     # check to see if this is a weight image
     if f.find('weight') > -1:
-        suffix=noback+'coadd.weight.fits'
+        suffix='coadd.weight.fits'
     else:
-        suffix=noback+'coadd.fits'
+        suffix='coadd.fits'
     #outfile = "VF-{}-{}-{}-{}-{}".format(dateobs,instrument,pointing,ffilter,suffix)
   
 
@@ -132,7 +132,7 @@ def get_updated_coadd_name(imname, prefix='VF'):
         print("\t setting instrument to HDI")
 
     # let's not switch everything to underscores b/c it's wreaking havoc with halphagui
-    #pointing,filterwithsuffix = imname.split('_')
+    p,filterwithsuffix = imname.split('_')
     #pointing = pointing.replace('-','_')
     # remove coadd from name
     filterwithsuffix = filterwithsuffix.replace('.coadd','')

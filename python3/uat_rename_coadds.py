@@ -50,7 +50,7 @@ def get_updated_uat_coadd_name(imname):
         print("\t setting instrument to HDI")
 
     # let's not switch everything to underscores b/c it's wreaking havoc with halphagui
-    #pointing,filterwithsuffix = imname.split('_')
+    pointing,filterwithsuffix = imname.split('_')
     #pointing = pointing.replace('-','_')
     # remove coadd from name
     filterwithsuffix = filterwithsuffix.replace('.coadd','')
