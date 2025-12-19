@@ -100,7 +100,7 @@ for line in infile:
         print(f"CMMTOBS = {line}")
     fnames.append(t[0])
 
-    line_remainder = t.split(t[0])[1]
+    line_remainder = line.split(t[0])[1]
 
     # I know this is bad, but I'm lazy...
     line = line_remainder
