@@ -99,12 +99,26 @@ for line in infile:
         print()
         print(f"CMMTOBS = {line}")
     fnames.append(t[0])
-    if "sky" in line:
+
+    line_remainder = t.split(t[0])[1]
+
+    # I know this is bad, but I'm lazy...
+    line = line_remainder
+    
+    print("DEBUG: ",line_remainder)
+    if "sky" in t[1:]:
         ftype.append("skyflat")
-    elif "dome" in line:
+        if ags.verbose:
+            print("\t skyflat")
+    elif "dome" in t[1:]:
         ftype.append("domeflat")
+        if ags.verbose:
+            print("\t domeflat")
+        
     else:
         ftype.append('domeflat')
+        if ags.verbose:
+            print("\t domeflat")
 
 
     try:
@@ -119,7 +133,7 @@ for line in infile:
             filter.append('ha16')
         elif line.find('R') > -1:
             filter.append('R')
-        elif line.find('SDSS r') > -1:
+        elif (line.find('SDSS r') > -1) | (line.find('r') > -1):
             filter.append('r')
         #elif line.find('r') > -1: # doesn't work for 2014 data - ugh!!!, also 'r' is in the filename, so need to remove filename from line
         #    filter.append('r')
@@ -142,6 +156,7 @@ for line in infile:
             filter.append(t[3].rstrip('\n'))
     except:
         print("Problem getting filter from CMMTOBS = ",line)
+        print("EXITING PROGRAM!!!")
         sys.exit()
     if args.verbose:
         print(f"filter = {filter[-1]}, ftype = {ftype[-1]}")
@@ -152,6 +167,10 @@ array_ftype=np.array(ftype)
 array_filter=np.array(filter)
 
 
+if args.verbose:
+    print("Printing filter and file lists")
+    print(array_ftype)
+    print(array_filter)
 # create files that contain all flats taken in same filter
 flat_filelist = []
 for f in set_ftype:
