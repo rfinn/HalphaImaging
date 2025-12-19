@@ -163,7 +163,7 @@ if __name__ == '__main__':
     filelist = glob.glob(os.path.join(args.indir,"*"+args.filestring+"*.fits"))
     filelist.sort()
 
-    for f in flist:
+    for f in filelist:
         new_name = get_updated_coadd_name(f)
         new_output_image = os.path.join(args.outdir, new_name)        
         # read in header
