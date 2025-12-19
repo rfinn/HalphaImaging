@@ -35,14 +35,14 @@ from astropy.time import Time
 
 
 def get_updated_coadd_name(imname, prefix='VF'):
-    header = fits.getheader(f)
+    h = fits.getheader(f)
 
     ############################################
     ## GET DATE
     ############################################    
     
     # store time 
-    t = header['EPOCH']
+    t = h['EPOCH']
     # convert to year, month,day
     t = Time(t,format='decimalyear')
     dateobs = t.iso.split()[0]
@@ -58,7 +58,7 @@ def get_updated_coadd_name(imname, prefix='VF'):
     ############################################    
     
     # read in object
-    o = header['OBJECT'] # should split into "pointing" and "10" for example
+    o = h['OBJECT'] # should split into "pointing" and "10" for example
     # try to identify format
     #print(o,len(o))
     if len(o.split()) > 1:
@@ -84,7 +84,7 @@ def get_updated_coadd_name(imname, prefix='VF'):
     ## GET FILTER
     ############################################        
     # read in filter
-    ffilter = header['FILTER']
+    ffilter = h['FILTER']
 
     ############################################
     ## NOT RELEVANT ANYMORE B/C I REMOVED NOBACK IN 2025
