@@ -108,16 +108,16 @@ for line in infile:
     print("DEBUG: ",line_remainder)
     if "sky" in t[1:]:
         ftype.append("skyflat")
-        if ags.verbose:
+        if args.verbose:
             print("\t skyflat")
     elif "dome" in t[1:]:
         ftype.append("domeflat")
-        if ags.verbose:
+        if args.verbose:
             print("\t domeflat")
         
     else:
         ftype.append('domeflat')
-        if ags.verbose:
+        if args.verbose:
             print("\t domeflat")
 
 
