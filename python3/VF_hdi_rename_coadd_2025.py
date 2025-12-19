@@ -10,6 +10,20 @@ VF-RA-DEC-TEL-DATEOBS-POINTING-FILTER.fits
 
 - instead of doing this in two steps like I did the first time around, I am updating this program to go right from coadd name to the final version.
 
+USAGE:
+
+from /mnt/qnap_home/rfinn/halpha-processed/raw/HDI/virgo-allfiles-2017/coadds-2025DEC
+
+python ~/github/HalphaImaging/python3/VF_hdi_rename_coadd_2025.py --test --outdir /data-pool/Halpha/coadds-2025DEC/
+
+
+
+
+
+
+
+
+
 
 OLD DESCRIPTION PRIOR TO DEC 2025:
 The coadd names will include the year, instrument, date, pointing and filter.  This is necessary because I used the same pointing number to refer to different fields during different runs, meaning that for each run, I remade the finding charts starting pointing001, pointing002, etc.  We don't want to overwrite coadds, to the title needs to be unique.
