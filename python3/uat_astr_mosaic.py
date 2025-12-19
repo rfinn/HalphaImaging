@@ -135,6 +135,8 @@ def update_coadd_header(coadd, input_image_list):
         
         for f in header_fields:
             newfield = f"{f}{nimage}"
+            if len(newfield) > 8:
+                newfield = newfield.replace('-','')
             #print(newfield)
             try:
                 if f in ['MEDSUB','SKYMED','SKYSTD']:
