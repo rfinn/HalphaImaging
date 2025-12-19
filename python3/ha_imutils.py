@@ -13,7 +13,7 @@ https://mwcraig.github.io/ccd-as-book/08-02-Creating-a-mask.html
 from astropy.io import fits
 
 from astropy.stats import sigma_clipped_stats
-import ccdproc
+
 #try:
 #    from photutils import make_source_mask
 #except ImportError:
@@ -64,6 +64,7 @@ def subtract_median_sky(data,getstd=False,getmedian=True,subtract=True,weightima
     
 def make_ccdmask(flat1,flat2=None):
     ''' make bad pixel mask from flat image.  use ratio of flats if flat2 is given '''
+    import ccdproc    
     if flat2 is None:
         flatimage = fits.getdata(flat1)
     else:
