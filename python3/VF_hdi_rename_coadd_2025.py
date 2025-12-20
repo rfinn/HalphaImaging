@@ -146,7 +146,10 @@ def get_updated_coadd_name(imname, survey='VF'):
         print("\t setting instrument to HDI")
 
     # let's not switch everything to underscores b/c it's wreaking havoc with halphagui
-    p,filterwithsuffix = imname.split('_')
+    try:
+        p,filterwithsuffix = imname.split('_')
+    except ValueError: # 2020 objects have an underscore instead of a dash in object names
+        p1,p2,filterwithsuffix = imname.split('_')
     #pointing = pointing.replace('-','_')
     # remove coadd from name
     filterwithsuffix = filterwithsuffix.replace('.coadd','')
