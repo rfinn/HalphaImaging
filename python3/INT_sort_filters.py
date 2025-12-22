@@ -2,7 +2,7 @@
 
 '''
 GOAL:
-- sort Bok 90Prime data according to target and filter
+- sort data according to target and filter
 -
 
 RELEVANT HEADER KEYWORDS:

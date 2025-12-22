@@ -12,7 +12,7 @@
 
   EXAMPLE:
    In the directory containing images to be sorted type in the command line:
-   python ~/github/HalphaImaging/python3/INTsortobjects.py
+   python ~/github/HalphaImaging/python3/INT_sort_objects.py
 
 written by Rose A. Finn, 2021-Jan-05
    
@@ -76,7 +76,7 @@ except:
         fobject.append(header['OBJECT'])
         exptime.append(header['EXPTIME'])
 
-filters=set(ftype)    #takes all inputs from ftype and adds the unique ones to                        the set of filters
+filters=set(ftype)    #takes all inputs from ftype and adds the unique ones to the set of filters
 objecttypes=set(fobject)
   
 ftype=np.array(ftype) # make into character array
@@ -85,8 +85,8 @@ exptime=np.array(exptime,'f')
 
 for f in filters:
     for t in objecttypes:
-        objectgroup=str(t)+ '_' + str(f) #creates a variable that is the                                                 combined characteristics of the image
-        indices=np.where((f == ftype) & (t == fobject) & (exptime > 60)) #finds                                                                       indices where the filter and name                                                            of object match the values searched                                                          for in the for loop
+        objectgroup=str(t)+ '_' + str(f) #creates a variable that is the combined characteristics of the image
+        indices=np.where((f == ftype) & (t == fobject) & (exptime > 60)) #finds indices where the filter and name of object match the values searched for in the for loop
         if len(indices[0]) > 0:
             if objectgroup.find(' ') > -1: # get rid of long filter names
                 t = objectgroup.split()

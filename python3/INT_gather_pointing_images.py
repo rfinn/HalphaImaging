@@ -3,8 +3,8 @@
 '''
 
 PROCEDURE:
-* get list of current file
-* combine images from the same pointing into one directory
+* get list of current folders in the directory
+* combine all filter images from the same pointing into one directory
 * I had already split by pointing and filter, but I want to run scamp and swarp in the directory that contains all images from a pointing
 
 

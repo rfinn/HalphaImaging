@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
 '''
+PROCEDURE:
 get list of directories
 move into each directory
 run scamp and swarp
 
+NOTES:
 This assumes that the files are already sorted by pointing, but not by filter.
 
+USAGE:
 Run this from, e.g. /home/rfinn/data/reduced/scratch-int-feb2019
 - this directory has a subdirectory for each pointing
 - the subdirectory contains both the r and Halpha image
