@@ -209,7 +209,7 @@ if __name__ == '__main__':
     parser.add_argument('--filestring2', dest = 'filestring2', default = None, help = 'second filestring to match. default is None.  set to ooi for 90prime data.')    
     parser.add_argument('--overwrite', action = 'store_true', default = False, help = 'overwrite file?  the default is false, so that a new file with m prefix is created.')
     parser.add_argument('--mef', action = 'store_true', default = False, help = 'set this for MEF files, like with 90prime')
-    parser.add_argument('--mos',  default = False, action='store_true', help = 'set this for MOS files')    
+    parser.add_argument('--mos',  default = False, action='store_true', help = 'set this for MOS files to subtract median in each amplifier separately.  If not set, it will subtract one value from the entire image.')    
     parser.add_argument('--oneimage', dest = 'oneimage', default = None,help = 'supply an image name to run sky subtraction on one image')    
     # TODO
     # add a mosaic flag, where median will be calculated for each amplifier (8 ccds, and each ccd has two amplifiers)
