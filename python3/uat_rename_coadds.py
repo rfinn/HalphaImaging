@@ -51,6 +51,7 @@ def get_updated_uat_coadd_name(imname):
     else:
         print("WARNING: could not parse header field INSTRUME")
         print("\t setting instrument to HDI")
+        telescope = "HDI"
 
     # let's not switch everything to underscores b/c it's wreaking havoc with halphagui
     pointing,filterwithsuffix = imname.split('_')
