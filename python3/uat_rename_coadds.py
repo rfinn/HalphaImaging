@@ -46,7 +46,7 @@ def get_updated_uat_coadd_name(imname):
     temptel = h['INSTRUME']
     if (temptel.find('hdi') > -1) | (temptel.find('HDI') > -1):
         telescope = "HDI"
-    elif (temptel.find('mos') > -1) | (temptel.find('MOS') > -1):
+    elif (temptel.find('mos') > -1) | (temptel.find('MOS') > -1) |  (temptel.find('Mos') > -1) :
         telescope = "MOS"
     else:
         print("WARNING: could not parse header field INSTRUME")
