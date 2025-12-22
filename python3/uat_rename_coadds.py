@@ -61,10 +61,10 @@ def get_updated_uat_coadd_name(imname):
     # create string for output name
 
     if float(dec) < 0:
-        outfile = f'UAT_{ra:07.3f}-{dec:06.3f}_{telescope}_{dateobs}_{pointing}_{filterwithsuffix}'
+        #outfile = f'UAT_{ra:07.3f}-{dec:06.3f}_{telescope}_{dateobs}_{pointing}_{filterwithsuffix}'
         outfile = f'UAT-{ra:07.3f}-{dec:06.3f}-{telescope}-{dateobs}-{pointing}-{filterwithsuffix}'        
     else:
-        outfile = f'UAT_{ra:07.3f}+{dec:06.3f}_{telescope}_{dateobs}_{pointing}_{filterwithsuffix}'
+        #outfile = f'UAT_{ra:07.3f}+{dec:06.3f}_{telescope}_{dateobs}_{pointing}_{filterwithsuffix}'
         outfile = f'UAT-{ra:07.3f}+{dec:06.3f}-{telescope}-{dateobs}-{pointing}-{filterwithsuffix}'        
     return outfile
 
