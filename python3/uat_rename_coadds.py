@@ -68,7 +68,7 @@ def get_updated_uat_coadd_name(imname):
 if __name__ == '__main__':
     telescope = 'BOK'
     
-    parser = argparse.ArgumentParser(description ='stack the 90prime images after noao pipeline')
+    parser = argparse.ArgumentParser(description ="rename UAT coadded images to f'UAT-{ra:07.3f}+{dec:06.3f}-{telescope}-{dateobs}-{pointing}-{filterwithsuffix} ")
     parser.add_argument('--filestring', dest = 'filestring', default = 'coadd', help = 'filestring to match. default is coadd, which will grab all *coadd*.fits.  Note: weight images will be renamed with their corresponding science coadd.')
         
     parser.add_argument('--indir', dest = 'indir', default = '.', help = 'directory of input images.  Default is current directory')
