@@ -35,8 +35,11 @@ def get_updated_uat_coadd_name(imname):
     h = fits.getheader(imname)
     ra = float(h['CRVAL1'])
     dec = float(h['CRVAL2'])
-    
-    dateobs_time = h['OBSDATE']
+
+    try:
+        dateobs_time = h['OBSDATE']
+    except KeyError:
+        dateobs_time = h['DATE-OBS']        
     dateobs = dateobs_time.split('T')[0]
     dateobs = dateobs.replace('-','')
 
