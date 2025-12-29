@@ -183,8 +183,12 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
     else:
         # check for a weight image
         weight_imname = fname.replace('.fits','.weight.fits')
-        if os.path.exists(weight_image):
-            weight_image = weight_imname
+        if os.path.exists(weight_imname):
+            # read in mask so we can use it in this function when subtracting median
+            whdu = fits.open(weight_imname)
+            weight_image = whdu[0].data
+            good_mask = whdu[0].data > 0
+            whdu.close()
             weightflag = True
 
             
@@ -202,11 +206,6 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
             hdu[0].header.set('SKYSTD',value=std,comment='sky std subtract_med')
 
             if weightflag:
-                # read in mask so we can use it in this function when subtracting median
-                whdu = fits.open(weight_imname)
-
-                good_mask = whdu[0].data > 0
-
                 # only subtract the median from the good values
                 hdu[0].data[good_mask] -= median
             else:
