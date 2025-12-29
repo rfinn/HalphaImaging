@@ -87,7 +87,7 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
 
     # read in image 
     hdu = fits.open(fname,memmap=False)
- 
+    weightflag = False
     if MEF:
         # if MEF flag is set, assume primary header is extension 0
         # loop over additional extenstions and subtract median
@@ -120,6 +120,7 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
         # get weight image
         weight_imname = fname.replace('.fits','.weight.fits')
         whdu = fits.open(weight_imname)
+
 
         good_mask = whdu[0].data > 0
         ymax, xmax = hdu[0].data.shape 
