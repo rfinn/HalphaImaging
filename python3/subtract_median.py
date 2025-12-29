@@ -196,7 +196,7 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
             weight_image = None
             weightflag = False
         # background subtraction
-        d,median,std = imutils.subtract_median_sky(hdu[0].data,getstd=True,weightimage=weight_image)
+        d,median,std = imutils.subtract_median_sky(hdu[0].data,getstd=True,subtract=False,weightimage=weight_image)
 
         if math.isnan(median):
             print(f"WARNING: could not subtract median for {fname}")
