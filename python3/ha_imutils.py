@@ -28,7 +28,25 @@ from astropy.io.fits import Header
 import numpy as np
 
 def subtract_median_sky(data,getstd=False,getmedian=True,subtract=True,weightimage=None):
-    ''' subtract median sky from image data '''
+    ''' 
+    subtract median sky from image data 
+
+    data: 2d array to estimate median for
+    weightimage = 2d array with zero values indicating pixels to ignore
+
+
+    '''
+    # check to see if data is all zeros
+    if np.all(data == 0):
+        median = 0
+        std = 0
+        return data,median,std
+    elif np.all(np.isnan(data)): # check to see if data is all nans
+        # return NAN values for median        
+        median = np.nan
+        std = 0
+        return data,median,std
+
     if weightimage is not None:
         image_mask = weightimage == 0 # like for mosaic
         data = np.ma.array(data, mask=image_mask)
@@ -38,8 +56,8 @@ def subtract_median_sky(data,getstd=False,getmedian=True,subtract=True,weightima
         
         mask = make_source_mask(data,nsigma=3,npixels=5,dilate_size=5)
     except ImportError:
+        # check to see if all values in the data is zeros
         threshold = detect_threshold(data, nsigma=3)
-
         segmentation = detect_sources(data, threshold, npixels=5)        
         #mask = segmentation.make_source_mask(data)
         mask = segmentation.make_source_mask()
