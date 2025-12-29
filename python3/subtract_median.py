@@ -181,8 +181,18 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
         hdu[0].header.set('SKYSTD',value=average_std,comment='ave sky std subtract_med all amps')
         #print("printing header\n",hdu[0].header)
     else:
+        # check for a weight image
+        weight_imname = fname.replace('.fits','.weight.fits')
+        if os.path.exists(weight_image):
+            weight_image = weight_imname
+            weightflag = True
+        else:
+            weight_image = None
+            weightflag = False
         # background subtraction
-        hdu[0].data,median,std = imutils.subtract_median_sky(hdu[0].data,getstd=True)
+        hdu[0].data,median,std = imutils.subtract_median_sky(hdu[0].data,getstd=True,weightimage=weight_image)
+
+        ymax, xmax = hdu[0].data.shape         
         if math.isnan(median):
             print(f"WARNING: could not subtract median for {fname}")
         else:
@@ -195,7 +205,7 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
         hdu.writeto(fname,overwrite=True)
     else:
         hdu.writeto("m"+fname,overwrite=True)
-    if MOS:
+    if MOS | weightflag:
         print("copying weight image\m")
         print(f"\tcp {weight_imname} m{weight_imname}")
         os.system(f"cp {weight_imname} m{weight_imname}")
