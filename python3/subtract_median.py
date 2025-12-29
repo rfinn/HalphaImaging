@@ -186,13 +186,14 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
         if os.path.exists(weight_image):
             weight_image = weight_imname
             weightflag = True
+
+            
         else:
             weight_image = None
             weightflag = False
         # background subtraction
-        hdu[0].data,median,std = imutils.subtract_median_sky(hdu[0].data,getstd=True,weightimage=weight_image)
+        d,median,std = imutils.subtract_median_sky(hdu[0].data,getstd=True,weightimage=weight_image)
 
-        ymax, xmax = hdu[0].data.shape         
         if math.isnan(median):
             print(f"WARNING: could not subtract median for {fname}")
         else:
@@ -200,6 +201,17 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
             hdu[0].header.set('SKYMED',value=median,comment='sky med subtract_med')
             hdu[0].header.set('SKYSTD',value=std,comment='sky std subtract_med')
 
+            if weightflag:
+                # read in mask so we can use it in this function when subtracting median
+                whdu = fits.open(weight_imname)
+
+                good_mask = whdu[0].data > 0
+
+                # only subtract the median from the good values
+                hdu[0].data[good_mask] -= median
+            else:
+                hdu[0].data -= median
+                #ymax, xmax = hdu[0].data.shape         
     
     if overwrite:
         hdu.writeto(fname,overwrite=True)
