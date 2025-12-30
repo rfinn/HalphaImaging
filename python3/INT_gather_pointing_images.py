@@ -11,6 +11,7 @@ PROCEDURE:
 '''
 
 import os
+import sys
 import shutil
 from astropy.io import fits
 import glob
@@ -24,7 +25,8 @@ if __name__ == '__main__':
         
     #parser.add_argument('--indir', dest = 'indir', default = '.', help = 'directory of input images.  Default is current directory')
     #parser.add_argument('--outdir', dest = 'outdir', default = '.', help = 'directory to write output images to.  Default is current directory')
-    parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Commands are printed when this is set, but the files are not moved.  This is useful when testing changes to the code.')    
+    parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Commands are printed when this is set, but the files are not moved.  This is useful when testing changes to the code.')
+    parser.add_argument('--runone', dest = 'runone', default = False, action='store_true', help = 'Run on first directory only.')        
 
     
     args = parser.parse_args()
@@ -88,6 +90,8 @@ if __name__ == '__main__':
                     os.system('rmdir {}'.format(hadir))
         if args.testing:
             print()
+        if args.runone:
+            sys.exit()
 
 
 
