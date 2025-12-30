@@ -81,6 +81,8 @@ if __name__ == '__main__':
                     print('rmdir {}'.format(hadir))
                 else:
                     os.system('rmdir {}'.format(hadir))
+        if args.testing:
+            print()
 
 
 
