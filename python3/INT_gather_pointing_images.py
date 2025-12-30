@@ -41,6 +41,9 @@ if __name__ == '__main__':
     # pointings will now have two listing for each filter b/c of r and Halpha
     upointings = set(pointings) # unique pointings
     print(f"found {len(upointings)} unique pointings")
+
+    # sort the list of directories
+    upointings.sort()
     
     subdirs = ['plots','shortexposure']
     hafilters = ['Halpha','Ha6657']
