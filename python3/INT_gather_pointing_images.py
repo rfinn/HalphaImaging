@@ -43,7 +43,7 @@ if __name__ == '__main__':
     print(f"found {len(upointings)} unique pointings")
 
     # convert to a list
-    upointings.tolist()
+    upointings = list(upointings)
     # sort the list of directories
     upointings.sort()
     
