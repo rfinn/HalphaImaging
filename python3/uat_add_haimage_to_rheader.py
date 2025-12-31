@@ -12,6 +12,7 @@ look for corresponding halpha image [ha4, ha8, ha12, ha16]
 import glob
 import os
 import argparse
+from astropy.io import fits
 
 def get_params_from_name_uat(image_name):
     '''
@@ -63,7 +64,7 @@ if __name__ == '__main__':
     #parser.add_argument('--scamp', dest = 'scamp', default = False, action='store_true', help = 'Run scamp')
     #parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true', help = 'Subtract a median sky value from each image.')
     #parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true', help = 'Run swarp')    
-    parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will run on one directory only.')
+    parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will print matches but will not edit headers.')
     
     args = parser.parse_args()
 
