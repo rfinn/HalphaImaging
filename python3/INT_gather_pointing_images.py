@@ -59,35 +59,25 @@ if __name__ == '__main__':
             else:
                 os.mkdir(p)
         if os.path.exists(p+'-r'):
+            s1 = f"rsync -a {p}-r/ {p}/"
+            s2 = f"rm -r {p}-r" 
             if args.testing:
-                print('mv '+p+'-r/. '+p+'/.')
-                print('rmdir '+p+'-r')
+                print(s1)
+                print(s2)
             else:
-                os.system('mv '+p+'-r/* '+p+'/.')
-                os.system('rmdir '+p+'-r')
+                os.system(s1)
+                os.system(s2)
         for h in hafilters:
             hadir = p+'-'+h
             if os.path.exists(hadir):
+                s1 = f'rsync -a {hadir}/ {p}/'
+                s2 = f"rm -r {hadir}" 
                 if args.testing:
-                    print('mv {}/. {}/.'.format(hadir,p))
+                    print(s1)
+                    print(s2)
                 else:
-                    os.system('mv {}/. {}/.'.format(hadir,p))
-                for s in subdirs:
-                    subdirpath = '{}-{}/{}'.format(p,h,s)
-                    if os.path.exists(subdirpath):
-                        command = 'mv {}/. {}/{}/.'.format(subdirpath,p,s)
-                        if args.testing:
-                            print(command)
-                        else:
-                            os.system(command)
-                    if args.testing:
-                        print('rmdir '+subdirpath)
-                    else:
-                        os.system('rmdir '+subdirpath)
-                if args.testing:
-                    print('rmdir {}'.format(hadir))
-                else:
-                    os.system('rmdir {}'.format(hadir))
+                    os.system(s1)
+                    os.system(s2)
         if args.testing:
             print()
         if args.runone:
