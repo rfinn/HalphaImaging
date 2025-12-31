@@ -31,7 +31,9 @@ for i in range(len(matchstrings)):
 
         # trying again after implementing two commands that might fix the issue with CD1_1
         hdu[0].header.set('INSTRMNT',instruments[i])
-        
-        hdu.writeto(f,overwrite=True,output_verify='ignore')
+        try:
+            hdu.writeto(f,overwrite=True,output_verify='ignore')
+        except TypeError: # getting buffer too small - maybe files are corrupted?
+            print(f"OH NO! astropy won't write {f}, file may be corrupted.  continuing on...")
         hdu.close()
         j+= 1
