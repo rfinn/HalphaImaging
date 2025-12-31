@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 '''
-adding INSTRMNT keyword to header for INT data so it can fit the geometric distortion for each chip separately.
+adding INSTRMNT keyword to header for INT data so scamp can fit the geometric distortion for each chip separately.
 
 USAGE:
 

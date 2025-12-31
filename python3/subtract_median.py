@@ -222,6 +222,11 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
         print(f"\tcp {weight_imname} m{weight_imname}")
         os.system(f"cp {weight_imname} m{weight_imname}")
     #hdu.close()
+    # check to see if a header file exists for input image.  If it does, copy it to m{header}
+    header_file = fname.replace('.fits','.head')
+    if os.path.exists(header_file):
+        print(f"copying header file {header_file} to m{header_file}")
+        os.system(f"cp {header_file} m{header_file}")
 if __name__ == '__main__':
     import argparse
 
