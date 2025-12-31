@@ -62,8 +62,8 @@ if __name__ == '__main__':
                 os.mkdir(p)
         alldirs = [rdir, hadir]
         for d in alldirs:
-            if os.path.exists():
-                s1 = f"mv {rdir}/PA_IMAGES/. {p}/"
+            if os.path.exists(d):
+                s1 = f"mv {d}/PA_IMAGES/. {p}/"
                 #s2 = f"rm -r {p}-r" 
                 if args.testing:
                     print(s1)
