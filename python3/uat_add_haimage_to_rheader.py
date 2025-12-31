@@ -47,31 +47,48 @@ def add_field_2_header(ffile, field, value):
     * field - new field for header
     * value - value to put in the header card 
     """
-    print(f"{ffile}: adding {field}={value} to header")
+    
     hdu = fits.open(ffile)
     hdu[0].header.set(field,value)
     hdu.writeto(ffile,overwrite=True)
     hdu.close()
+
+if __name__ == '__main__':
+
     
-halpha_options = [f"ha{i}" for i in [4,8,12,16]]
-print("halpha filters: ",halpha_options)
-
-rfilelist = glob.glob("UAT*R.fits")
-
-rfilelist.sort()
-
-# loop through r-band coadds
-
-for rfile in rfilelist:
-    # get the target name
-    telescope, dateobs, pointing = get_params_from_name_uat(rfile)
+    parser = argparse.ArgumentParser(description ="This program will combine images from e.g. pointing001-r and pointing001-Halpha into pointing001 and remove the filter-based directories.")
+    #parser.add_argument('--filestring', dest = 'filestring', default = 'coadd', help = 'filestring to match. default is coadd, which will grab all *coadd*.fits.  Note: weight images will be renamed with their corresponding science coadd.')
+    #parser.add_argument('--se', dest = 'se', default = False, action='store_true', help = 'Run source extractor')    
+    #parser.add_argument('--scamp', dest = 'scamp', default = False, action='store_true', help = 'Run scamp')
+    #parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true', help = 'Subtract a median sky value from each image.')
+    #parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true', help = 'Run swarp')    
+    parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will run on one directory only.')
     
-    # look for target name with halpha image
-    for h in halpha_options:
-        hfiles = glob.glob(f'UAT*-{h}.fits')
-        if len(hfiles) == 1:
-            # add hfile to rband image header
-            add_field_2_header(rfile,'HAIMAGE',hfiles[0])
+    args = parser.parse_args()
 
-            # add the rband image to the halpha image
-            add_field_2_header(hfiles[0],'RIMAGE',rfile)            
+    halpha_options = [f"ha{i}" for i in [4,8,12,16]]
+    print("halpha filters: ",halpha_options)
+
+    rfilelist = glob.glob("UAT*R.fits")
+
+    rfilelist.sort()
+
+    # loop through r-band coadds
+
+    for rfile in rfilelist:
+        # get the target name
+        telescope, dateobs, pointing = get_params_from_name_uat(rfile)
+
+        # look for target name with halpha image
+        for h in halpha_options:
+            hfiles = glob.glob(f'UAT*-{h}.fits')
+            if len(hfiles) == 1:
+                # add hfile to rband image header
+                print(f"{rfile}: adding HAIMAGE={hfiles[0]} to header")
+                if not args.testing:
+                    add_field_2_header(rfile,'HAIMAGE',hfiles[0])
+
+                # add the rband image to the halpha image
+                print(f"{hfiles[0]}: adding HIMAGE={rfile} to header")
+                if not args.testing:
+                    add_field_2_header(hfiles[0],'RIMAGE',rfile)            
