@@ -46,7 +46,7 @@ for i in range(len(matchstrings)):
                         altfile = f"/data-pool/Halpha/processed/2019febINT-all/allimages/Halpha/{f}"
                     if os.path.exists(altfile):
                         hdu.close() # close first attempt
-                        print(f"found {altfile}!")
+                        print(f"\tfound {altfile}!")
                         os.system(f"cp {altfile} .")
                         
                         hdu = fits.open(f)
