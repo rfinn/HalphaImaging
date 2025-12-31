@@ -28,11 +28,11 @@ def get_params_from_name_uat(image_name):
     if len(t) == 7: # meant to catch negative declinations
         telescope = t[2]
         dateobs = t[3]
-        pointing = t[4]+'_'+t[5]
+        pointing = t[4]+'-'+t[5]
     elif len(t) == 8:
         telescope = t[3]
         dateobs = t[4]
-        pointing = t[5]+'_'+t[6]
+        pointing = t[5]+'-'+t[6]
         
     else:
         print("ruh roh - trouble getting info from ",image_name, len(t))
@@ -84,6 +84,7 @@ if __name__ == '__main__':
         print(f"working on file {rfile}, target={pointing}")
         # look for target name with halpha image
         for h in halpha_options:
+
             hfiles = glob.glob(f'UAT*{pointing}*-{h}.fits')
 
             if len(hfiles) == 1:
