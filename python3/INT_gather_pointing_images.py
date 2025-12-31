@@ -59,7 +59,7 @@ if __name__ == '__main__':
             else:
                 os.mkdir(p)
         if os.path.exists(p+'-r'):
-            s1 = f"rsync -a {p}-r/ {p}/"
+            s1 = f"rsync -a --whole-file {p}-r/ {p}/"
             s2 = f"rm -r {p}-r" 
             if args.testing:
                 print(s1)
@@ -70,7 +70,7 @@ if __name__ == '__main__':
         for h in hafilters:
             hadir = p+'-'+h
             if os.path.exists(hadir):
-                s1 = f'rsync -a {hadir}/ {p}/'
+                s1 = f'rsync -a --whole-file {hadir}/ {p}/'
                 s2 = f"rm -r {hadir}" 
                 if args.testing:
                     print(s1)
