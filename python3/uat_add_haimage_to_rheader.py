@@ -11,6 +11,7 @@ look for corresponding halpha image [ha4, ha8, ha12, ha16]
 
 import glob
 import os
+import argparse
 
 def get_params_from_name_uat(image_name):
     '''
@@ -56,7 +57,7 @@ def add_field_2_header(ffile, field, value):
 if __name__ == '__main__':
 
     
-    parser = argparse.ArgumentParser(description ="This program will combine images from e.g. pointing001-r and pointing001-Halpha into pointing001 and remove the filter-based directories.")
+    parser = argparse.ArgumentParser(description ="This program adds the Halpha imaging name to the r-band images, searching for all UAT*-R.fits for the r-band images.")
     #parser.add_argument('--filestring', dest = 'filestring', default = 'coadd', help = 'filestring to match. default is coadd, which will grab all *coadd*.fits.  Note: weight images will be renamed with their corresponding science coadd.')
     #parser.add_argument('--se', dest = 'se', default = False, action='store_true', help = 'Run source extractor')    
     #parser.add_argument('--scamp', dest = 'scamp', default = False, action='store_true', help = 'Run scamp')
