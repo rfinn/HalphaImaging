@@ -60,7 +60,7 @@ if __name__ == '__main__':
                 os.mkdir(p)
         if os.path.exists(p+'-r'):
             if args.testing:
-                print('mv '+p+'-r/* '+p+'/.')
+                print('mv '+p+'-r/. '+p+'/.')
                 print('rmdir '+p+'-r')
             else:
                 os.system('mv '+p+'-r/* '+p+'/.')
@@ -69,13 +69,13 @@ if __name__ == '__main__':
             hadir = p+'-'+h
             if os.path.exists(hadir):
                 if args.testing:
-                    print('mv {}/* {}/.'.format(hadir,p))
+                    print('mv {}/. {}/.'.format(hadir,p))
                 else:
-                    os.system('mv {}/* {}/.'.format(hadir,p))
+                    os.system('mv {}/. {}/.'.format(hadir,p))
                 for s in subdirs:
                     subdirpath = '{}-{}/{}'.format(p,h,s)
                     if os.path.exists(subdirpath):
-                        command = 'mv {}/* {}/{}/.'.format(subdirpath,p,s)
+                        command = 'mv {}/. {}/{}/.'.format(subdirpath,p,s)
                         if args.testing:
                             print(command)
                         else:
