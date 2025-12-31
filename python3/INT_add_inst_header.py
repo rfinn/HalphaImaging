@@ -17,7 +17,7 @@ import os
 
 matchstrings = ['WFC*1PA.fits','WFC*2PA.fits','WFC*3PA.fits','WFC*4PA.fits']
 instruments = ['INTWFC1','INTWFC2','INTWFC3','INTWFC4']
-    
+print(f"\nWorking on directory {os.getcwd()}")
 for i in range(len(matchstrings)):
     files = glob.glob(matchstrings[i])
     print('chip ',i+1,' updating ',len(files),' files')
@@ -33,6 +33,7 @@ for i in range(len(matchstrings)):
         hdu[0].header.set('INSTRMNT',instruments[i])
         try:
             hdu.writeto(f,overwrite=True,output_verify='ignore')
+            
         except TypeError: # getting buffer too small - maybe files are corrupted?
             print(f"OH NO! astropy won't write {f}, file may be corrupted.  continuing on...")
         hdu.close()
