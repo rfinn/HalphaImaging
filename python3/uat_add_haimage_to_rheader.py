@@ -77,12 +77,15 @@ if __name__ == '__main__':
     # loop through r-band coadds
 
     for rfile in rfilelist:
+        print()
+
         # get the target name
         telescope, dateobs, pointing = get_params_from_name_uat(rfile)
-
+        print(f"working on file {rfile}, target={pointing}")
         # look for target name with halpha image
         for h in halpha_options:
-            hfiles = glob.glob(f'UAT*-{h}.fits')
+            hfiles = glob.glob(f'UAT*{pointing}*-{h}.fits')
+
             if len(hfiles) == 1:
                 # add hfile to rband image header
                 print(f"{rfile}: adding HAIMAGE={hfiles[0]} to header")
