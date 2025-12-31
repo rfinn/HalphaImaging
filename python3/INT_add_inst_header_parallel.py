@@ -31,6 +31,6 @@ topdir = os.getcwd()
 os.chdir(subdir)
 
 # run INT_add_inst_header.py
-os.system("python ~/github/HalphaImaging/python3/INT_add_inst_header.py"
+os.system("python ~/github/HalphaImaging/python3/INT_add_inst_header.py")
 # move back to parent directory
 os.chdir(topdir)
