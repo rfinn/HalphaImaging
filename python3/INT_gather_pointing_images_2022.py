@@ -63,7 +63,7 @@ if __name__ == '__main__':
         alldirs = [rdir, hadir]
         for d in alldirs:
             if os.path.exists(d):
-                s1 = f"mv {d}/PA_IMAGES/. {p}/"
+                s1 = f"mv {d}/PA_IMAGES/*.fits {p}/"
                 #s2 = f"rm -r {p}-r" 
                 if args.testing:
                     print(s1)
