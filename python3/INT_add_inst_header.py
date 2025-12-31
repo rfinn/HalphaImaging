@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 '''
-adding INSTRMNT keyword to header for INT data so scamp can fit the geometric distortion for each chip separately.
+adding INSTRMNT keyword to header to all WFC*PA.fits files for INT data so scamp can fit the geometric distortion for each chip separately.
 
 USAGE:
 
-python ~/github/Virgo/programs/INT_add_inst_scamp.py 
+python ~/github/Virgo/programs/INT_add_inst_header.py 
 
 '''
 
@@ -17,7 +17,6 @@ import os
 
 matchstrings = ['WFC*1PA.fits','WFC*2PA.fits','WFC*3PA.fits','WFC*4PA.fits']
 instruments = ['INTWFC1','INTWFC2','INTWFC3','INTWFC4']
-
     
 for i in range(len(matchstrings)):
     files = glob.glob(matchstrings[i])
@@ -32,7 +31,7 @@ for i in range(len(matchstrings)):
 
         # trying again after implementing two commands that might fix the issue with CD1_1
         hdu[0].header.set('INSTRMNT',instruments[i])
-
+        
         hdu.writeto(f,overwrite=True,output_verify='ignore')
         hdu.close()
         j+= 1
