@@ -52,7 +52,7 @@ for i in range(len(matchstrings)):
                         hdu = fits.open(f)
                         hdu[0].header.set('INSTRMNT',instruments[i])
                         hdu.writeto(f,overwrite=True,output_verify='ignore')
-                        print('\talt version seemed to work!')
+                        print('\tALT VERSION WORKED!')
                     else:
                         print("\tcould not find alt version of file ",altfile)
                 except TypeError:
