@@ -90,6 +90,6 @@ if __name__ == '__main__':
                     add_field_2_header(rfile,'HAIMAGE',hfiles[0])
 
                 # add the rband image to the halpha image
-                print(f"{hfiles[0]}: adding HIMAGE={rfile} to header")
+                print(f"{hfiles[0]}: adding RIMAGE={rfile} to header")
                 if not args.testing:
                     add_field_2_header(hfiles[0],'RIMAGE',rfile)            
