@@ -49,10 +49,11 @@ for i in range(len(matchstrings)):
                         os.system(f"cp {altfile} .")
                         hdu = fits.open(f)
                         hdu[0].header.set('INSTRMNT',instruments[i])
-                        try:
-                            hdu.writeto(f,overwrite=True,output_verify='ignore')
-                        except TypeError:
-                            print("\tso sorry, but was not able to get alt version of file to work")
+                        hdu.writeto(f,overwrite=True,output_verify='ignore')
+                    else:
+                        print("could not find alt version of file ",altfile)
+                except TypeError:
+                    print("\tso sorry, but was not able to get alt version of file to work")
                     # now try 
         hdu.close()
         j+= 1
