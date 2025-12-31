@@ -29,7 +29,7 @@ dirlist = open(dirlist_file, 'r')
 
 for d in dirlist:
     subdir = d.rstrip('\n')
-    
+    print(f"\nWorking on directory {subdir}")
 
     # move to directory
     topdir = os.getcwd()
