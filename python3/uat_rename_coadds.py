@@ -126,14 +126,16 @@ if __name__ == '__main__':
         weightfile = fname.replace('.fits','.weight.fits')
         # remove preceding 'f' if in mosaic mode
         if args.mosaic:
-            weightfile = weightfile[1:]
+            temp = os.path.basename(weightfile)
+            no_f = temp[1:]
+            weightfile = os.path.join(args.indir,no_f)
         if os.path.exists(weightfile):
             print('renaming ',weightfile,'->',new_output_image.replace('.fits','.weight.fits'))
             if not args.testing:
                 #os.rename(weightfile,new_output_image.replace('.fits','.weight.fits'))
                 os.system(f"cp {weightfile} {new_output_image.replace('.fits','.weight.fits')}")
         else:
-            print("WARNING: weight image does not exist for ",fname, weightfile)
+            print("WARNING: weight image does not exist for ",fname, "expecting weightfile = ",weightfile)
 
 
 
