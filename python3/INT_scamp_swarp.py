@@ -70,7 +70,8 @@ if __name__ == '__main__':
     parser.add_argument('--scamp', dest = 'scamp', default = False, action='store_true', help = 'Run scamp')
     parser.add_argument('--moveshort', dest = 'moveshort', default = False, action='store_true', help = 'Move images with short exposure time to a subdirectory.')
     parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true', help = 'Subtract a median sky value from each image.')    
-    parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true', help = 'Run swarp')    
+    parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true', help = 'Run swarp')
+    parser.add_argument('--renamecoadd', dest = 'renamecoadd', default = False, action='store_true', help = 'Rename coadd to VFS standard.')        
     parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will run on one directory only.')
     
     args = parser.parse_args()
@@ -139,9 +140,9 @@ if __name__ == '__main__':
             if args.swarp:
 
                 # gather files - why am I not getting the mWFC files?
-                os.system('ls WFC.r*PA.fits > '+subdir+'_r')
-                os.system('ls WFC.Halpha*PA.fits > '+subdir+'_Halpha')
-                os.system('ls WFC.Ha6657*PA.fits > '+subdir+'_Ha6657')            
+                os.system(f'ls {args.filestring}*.r*PA.fits > '+subdir+'_r')
+                os.system(f'ls {args.filestring}*.Halpha*PA.fits > '+subdir+'_Halpha')
+                os.system('ls {args.filestring}*.Ha6657*PA.fits > '+subdir+'_Ha6657')            
 
                 # count lines r band file, run if more than 2 lines
                 suffix = ['_r','_Halpha','_Ha6657']
@@ -158,7 +159,7 @@ if __name__ == '__main__':
                         nlines = count_lines(filelists[i])
                         if nlines > 3:
                             #os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --int --l '+filelists[i]+' --refimage '+refimage)
-                            os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --int --l '+filelists[i]+' --refimage '+refimage+' --noback')
+                            os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --int --l '+filelists[i]+' --refimage '+refimage)
                     ## don't need to rebuilt the r-band mosaic using the r-band mosaic as reference now that I am using the swarp flags correctly
                     pass
                     # run swarp again on the rband data, using the same refimage
@@ -171,14 +172,14 @@ if __name__ == '__main__':
                         nlines = count_lines(f)
                         if nlines > 2:
                             #os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --int --l '+f)
-                            os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --int --l '+f+' --noback')
+                            os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --int --l '+f)
                         else:
                             print('WARNING: not enough images to make mosaic in ',f)
                             
                 ## not removing median subtracted images - these take so long to make!
                 # remove median subtracted images
                 #os.system('rm mWFC*.fits')
-
+            if args.renamecoadd:
                 ## RENAME COADDS
                 new_output_image = get_updated_BOK_coadd_name(ha_coadd)
                 print('renaming ',ha_coadd,'->',new_output_image)
