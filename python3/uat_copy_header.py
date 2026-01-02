@@ -11,7 +11,7 @@ broken image using the coordinates in the ref image.
 
 USAGE:
 
-python ~/github/Virgo/programs/INT_fixheader.py --ref r1442821.fit --image r1442823.fit --fixall
+python ~/github/Virgo/programs/uat_copy_header.py --ref r1442821.fit --image r1442823.fit --fixall
 
 '''
 
@@ -25,7 +25,7 @@ import sys
 parser = argparse.ArgumentParser(description ='Create a crazy big catalog from HL, AGC, NSA')
 parser.add_argument('--image',dest = 'image', default=None,help='image with bad header')
 parser.add_argument('--ref',dest = 'ref', default=None,help='reference image, to use RA and DEC from')
-#parser.add_argument('--fields',dest = 'fields', nargs='+',default=['CRVAL1','CRVAL2','AIRMASS'],help='list of header fields to update. default is CRVAL1 and CRVAL2')
+parser.add_argument('--fields',dest = 'fields', nargs='+',default=['CMMTOBS','RASTRNG','DECSTRNG','EQUINOX','INSTRUME','AIRMASS','FILTER1','FILTER2'],help="list of header fields to update. default is['CMMTOBS','RASTRNG','DECSTRNG','EQUINOX','INSTRUME','AIRMASS','FILTER1','FILTER2']")
 
 # even for MEF files, the main header is 0, and this is what comes in 
 #parser.add_argument('--wcs',dest = 'wcs', action='store_true', default=False, help='set this if you need to update basic wcs fields (ra,dec,equinox,crval1,crval2,cd1_1,cd2_2)')
@@ -33,6 +33,9 @@ parser.add_argument('--fixall',dest = 'fixall', action='store_true', default=Fal
 #parser.add_argument('--postsplit',dest = 'postsplit', action='store_true', default=False, help='set this if you are fixing headers after the mef fits file was split into 4 separate files.')
 
 args = parser.parse_args()
+
+
+header_fields = ['CMMTOBS','RASTRNG','DECSTRNG','EQUINOX','INSTRUME','AIRMASS','FILTER1','FILTER2']
 
 
 # read in image and header for the image that needs to be updated
