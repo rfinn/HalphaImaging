@@ -24,6 +24,12 @@ renaming  ./NRGb177-h02_ha12.coadd.weight.fits -> ./VF-181.362+20.406-HDI-2015-0
 
 python ~/github/HalphaImaging/python3/uat_rename_coadds.py --outdir /data-pool/HalphaGroups/allcoadsv0
 
+
+UPDATES:
+* 2026 Jan 02:
+ mosaic images have underscore in object names, and the renaming script expects a dash.  adding mosaic flag
+
+
 '''
 
 import os
@@ -32,7 +38,7 @@ import glob
 from astropy.io import fits
 import argparse
 
-def get_updated_uat_coadd_name(imname):
+def get_updated_uat_coadd_name(imname,underscore=False):
     h = fits.getheader(imname)
     ra = float(h['CRVAL1'])
     dec = float(h['CRVAL2'])
@@ -55,7 +61,12 @@ def get_updated_uat_coadd_name(imname):
         telescope = "HDI"
 
     # let's not switch everything to underscores b/c it's wreaking havoc with halphagui
-    pointing,filterwithsuffix = imname.split('_')
+    try:
+        pointing,filterwithsuffix = imname.split('_')
+    except ValueError:
+        cpointing, hnumber,filterwithsuffix = imname.split('_')
+        pointing = f"{cpointing}-{hnumber}"
+        
     #pointing = pointing.replace('-','_')
     # remove coadd from name
     filterwithsuffix = filterwithsuffix.replace('.coadd','')
@@ -78,6 +89,7 @@ if __name__ == '__main__':
         
     parser.add_argument('--indir', dest = 'indir', default = '.', help = 'directory of input images.  Default is current directory')
     parser.add_argument('--outdir', dest = 'outdir', default = '.', help = 'directory to write output images to.  Default is current directory')
+    parser.add_argument('--underscore', dest = 'underscore', default = False, action='store_true', help = 'set this is the object has an underscore instead of a dash.  e.g. NGC5846_h01 instead of NGC5846-h01')    
     parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'new filenames are printed when this is set, but the files are not renamed.  This is useful when testing changes to the code.')    
 
     
@@ -94,7 +106,7 @@ if __name__ == '__main__':
             continue
         if 'CS-ZP' in fname:
             continue
-        new_name = get_updated_uat_coadd_name(os.path.basename(fname))
+        new_name = get_updated_uat_coadd_name(os.path.basename(fname), underscore=args.underscore)
         # rename as UAT-{RA}-{DEC}-{TEL}-{OBSDATE}-{POINTING}-{FILTER}
         new_output_image = os.path.join(args.outdir, new_name)
         print('renaming ',fname,'->',new_output_image)
