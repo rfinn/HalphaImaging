@@ -38,7 +38,7 @@ import glob
 from astropy.io import fits
 import argparse
 
-def get_updated_uat_coadd_name(imname,underscore=False):
+def get_updated_uat_coadd_name(imname,mosflag=False):
     h = fits.getheader(imname)
     ra = float(h['CRVAL1'])
     dec = float(h['CRVAL2'])
@@ -68,6 +68,11 @@ def get_updated_uat_coadd_name(imname,underscore=False):
         pointing = f"{cpointing}-{hnumber}"
         
     #pointing = pointing.replace('-','_')
+
+    if mosflag & pointing.startswith('f'):
+        # remove preceding 'f' from pointing
+        pointing = pointing[1:]
+        
     # remove coadd from name
     filterwithsuffix = filterwithsuffix.replace('.coadd','')
     # create string for output name
@@ -89,7 +94,7 @@ if __name__ == '__main__':
         
     parser.add_argument('--indir', dest = 'indir', default = '.', help = 'directory of input images.  Default is current directory')
     parser.add_argument('--outdir', dest = 'outdir', default = '.', help = 'directory to write output images to.  Default is current directory')
-    parser.add_argument('--underscore', dest = 'underscore', default = False, action='store_true', help = 'set this is the object has an underscore instead of a dash.  e.g. NGC5846_h01 instead of NGC5846-h01')    
+    parser.add_argument('--mosaic', dest = 'mosaic', default = False, action='store_true', help = 'set this is the object has an underscore instead of a dash.  e.g. NGC5846_h01 instead of NGC5846-h01')    
     parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'new filenames are printed when this is set, but the files are not renamed.  This is useful when testing changes to the code.')    
 
     
@@ -97,7 +102,10 @@ if __name__ == '__main__':
 
 
     # grab all the coadds in a particular directory
-    filelist = glob.glob(os.path.join(args.indir,"*"+args.filestring+"*.fits"))
+    if args.mosaic: # look for coadds that have been flattened by getzp and have therefore start with an f
+        filelist = glob.glob(os.path.join(args.indir,"f*"+args.filestring+"*.fits"))
+    else:
+        filelist = glob.glob(os.path.join(args.indir,"*"+args.filestring+"*.fits"))
     filelist.sort()
 
 
@@ -106,7 +114,7 @@ if __name__ == '__main__':
             continue
         if 'CS-ZP' in fname:
             continue
-        new_name = get_updated_uat_coadd_name(os.path.basename(fname), underscore=args.underscore)
+        new_name = get_updated_uat_coadd_name(os.path.basename(fname), mosflag=args.mosaic)
         # rename as UAT-{RA}-{DEC}-{TEL}-{OBSDATE}-{POINTING}-{FILTER}
         new_output_image = os.path.join(args.outdir, new_name)
         print('renaming ',fname,'->',new_output_image)
@@ -116,6 +124,9 @@ if __name__ == '__main__':
 
         # rename the weight file
         weightfile = fname.replace('.fits','.weight.fits')
+        # remove preceding 'f' if in mosaic mode
+        if args.mosaic:
+            weightfile = weightfile[1:]
         if os.path.exists(weightfile):
             print('renaming ',weightfile,'->',new_output_image.replace('.fits','.weight.fits'))
             if not args.testing:
