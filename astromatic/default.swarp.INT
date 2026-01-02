@@ -60,7 +60,7 @@ GAIN_DEFAULT           0.0             # Default gain if no FITS keyword found
  
 #--------------------------- Background subtraction ---------------------------
  
-SUBTRACT_BACK          Y               # Subtraction sky background (Y/N)?
+SUBTRACT_BACK          N               # Subtraction sky background (Y/N)?
                                        # (all or for each image)
  
 BACK_TYPE              AUTO            # AUTO or MANUAL
@@ -81,7 +81,7 @@ COMBINE_BUFSIZE        256             # RAM dedicated to co-addition(MB)
  
 #------------------------------ Miscellaneous ---------------------------------
  
-DELETE_TMPFILES        N               # Delete temporary resampled FITS files
+DELETE_TMPFILES        Y               # Delete temporary resampled FITS files
                                        # (Y/N)?
 COPY_KEYWORDS          OBJECT,FILTER,INSTRMNT,GAIN,EPOCH,DATE-OBS,MJD,AIRMASS  # List of FITS keywords to propagate
                                        # from the input to the output headers
