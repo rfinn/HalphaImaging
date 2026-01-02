@@ -68,7 +68,8 @@ if __name__ == '__main__':
     parser.add_argument('--filestring', dest = 'filestring', default = 'WFC', help = 'filestring to match. default is WFC, which will grab all WFC*PA.fits.')
     parser.add_argument('--se', dest = 'se', default = False, action='store_true', help = 'Run source extractor')    
     parser.add_argument('--scamp', dest = 'scamp', default = False, action='store_true', help = 'Run scamp')
-    parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true', help = 'Subtract a median sky value from each image.')
+    parser.add_argument('--moveshort', dest = 'moveshort', default = False, action='store_true', help = 'Move images with short exposure time to a subdirectory.')
+    parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true', help = 'Subtract a median sky value from each image.')    
     parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true', help = 'Run swarp')    
     parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will run on one directory only.')
     
