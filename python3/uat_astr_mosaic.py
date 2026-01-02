@@ -138,6 +138,16 @@ def update_coadd_header(coadd, input_image_list):
             if len(newfield) > 8:
                 newfield = newfield.replace('-','')
             #print(newfield)
+
+            # for int, we are getting 10s of images into a coadd, so we are over the 8 char limit
+            # shortening the header field names in this case
+            # AIRMASS -> ARMASS
+            # EXPTIME -> EXPT
+            if (len(newfield) > 8) & ('AIRMASS' in newfield): 
+                newfield = newfield.replace('I','')
+            elif (len(newfield) > 8) & ('EXPTIME' in newfield):
+                newfield = newfield.replace('IME','')
+               
             try:
                 if f in ['MEDSUB','SKYMED','SKYSTD']:
                     hstring = f"{iheader[f]:.3f}"
