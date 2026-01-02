@@ -19,7 +19,8 @@ Run this from, e.g. /home/rfinn/data/reduced/scratch-int-feb2019
 import os
 import shutil
 from astropy.io import fits
-
+import argparse
+import multiprocessing as mp
 
 def count_lines(fname):
     with open(fname) as f:
@@ -30,11 +31,20 @@ def count_lines(fname):
     except UnboundLocalError:
         return 0
 
+def run_one_se(filename):
+    #print(('RUNNING SEXTRACTOR ON FILE %i OF %i'%(i,nfiles)))
+    t = filename.split('.fits')
+    froot = t[0]
+    # DONE:TODO - check what needs to be updated in default.sex.INT - checked this an it's all ok
+    os.system('sex ' + filename + ' -c default.sex.INT -CATALOG_NAME ' + froot + '.cat')
+    
+
+    
 if __name__ == '__main__':
 
     
-    parser = argparse.ArgumentParser(description ="This program will combine images from e.g. pointing001-r and pointing001-Halpha into pointing001 and remove the filter-based directories.")
-    #parser.add_argument('--filestring', dest = 'filestring', default = 'coadd', help = 'filestring to match. default is coadd, which will grab all *coadd*.fits.  Note: weight images will be renamed with their corresponding science coadd.')
+    parser = argparse.ArgumentParser(description ="This program does most of the post-theli processing for the INT data.  Fingers crossed!")
+    parser.add_argument('--filestring', dest = 'filestring', default = 'WFC', help = 'filestring to match. default is WFC, which will grab all WFC*PA.fits.')
     parser.add_argument('--se', dest = 'se', default = False, action='store_true', help = 'Run source extractor')    
     parser.add_argument('--scamp', dest = 'scamp', default = False, action='store_true', help = 'Run scamp')
     parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true', help = 'Subtract a median sky value from each image.')
@@ -66,6 +76,21 @@ if __name__ == '__main__':
 
             # move to subdirectory
             os.chdir(subdir)
+
+            if args.se: # run source extractor
+                os.system('cp ~/github/HalphaImaging/astromatic/default.* .')        
+                filelist = glob.glob(args.filestring+'*PA.fits')
+                filelist.sort()
+                # link the astromatic files
+        
+                print(f"found {len(filelist)} files to run source extractor on")
+                se_pool = mp.Pool(mp.cpu_count())
+                seresults = [se_pool.apply_async(run_one_se,args=(filename,),callback=se_collect_results) for filename in filelist]
+        
+                se_pool.close()
+                se_pool.join()
+                se_results = [r.get() for r in seresults]
+                
             # run scamp
             if args.scamp:
                 scampflag=False # keeps track if scamp finishes successfully
@@ -86,8 +111,7 @@ if __name__ == '__main__':
 
             if args.submedian:
                 # subtract median
-                if submedian:
-                    os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring WFC')
+                os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring WFC')
                 
             # run swarp
             if args.swarp:

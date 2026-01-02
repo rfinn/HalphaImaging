@@ -562,7 +562,7 @@ if __name__ == '__main__':
         os.system('cp  ~/github/HalphaImaging/astromatic/default.* .')        
         os.system('ls '+args.filestring+'*.cat > scamp_input_cats')
         print('RUNNING SCAMP')
-        # TODO - check to see what needs to be updated in default.scamp.INT
+        # TODONE - check to see what needs to be updated in default.scamp.INT
         os.system('scamp @scamp_input_cats -c default.scamp.BOK')
         pass
 
