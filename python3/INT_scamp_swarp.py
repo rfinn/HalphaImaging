@@ -37,7 +37,7 @@ def run_one_se(filename):
     #print(('RUNNING SEXTRACTOR ON FILE %i OF %i'%(i,nfiles)))
     t = filename.split('.fits')
     froot = t[0]
-    # DONE:TODO - check what needs to be updated in default.sex.INT - checked this an it's all ok
+    # DONE:TODONE - check what needs to be updated in default.sex.INT - checked this an it's all ok
     os.system('sex ' + filename + ' -c default.sex.INT -CATALOG_NAME ' + froot + '.cat')
 
 def se_collect_results(result):
@@ -105,15 +105,18 @@ if __name__ == '__main__':
                 filelist = glob.glob(args.filestring+'*PA.fits')
                 filelist.sort()
                 # link the astromatic files
+                multiprocessing = False # just doing this brute force b/c mp seems to hang
+                if multiprocessing:
+                    print(f"found {len(filelist)} files to run source extractor on")
+                    se_pool = mp.Pool(mp.cpu_count())
+                    seresults = [se_pool.apply_async(run_one_se,args=(filename,),callback=se_collect_results) for filename in filelist]
         
-                print(f"found {len(filelist)} files to run source extractor on")
-                se_pool = mp.Pool(mp.cpu_count())
-                seresults = [se_pool.apply_async(run_one_se,args=(filename,),callback=se_collect_results) for filename in filelist]
-        
-                se_pool.close()
-                se_pool.join()
-                se_results = [r.get() for r in seresults]
-                
+                    se_pool.close()
+                    se_pool.join()
+                    se_results = [r.get() for r in seresults]
+                else:
+                    for filename in filelist:
+                        run_one_se(filename)
             # run scamp
             if args.scamp:
                 scampflag=False # keeps track if scamp finishes successfully
