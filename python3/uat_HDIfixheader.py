@@ -139,7 +139,7 @@ for f in files:
                        'AIRMASS',
                        'DATE',
                        'OBJECT',
-                       'INSTRUMENT',
+                       'INSTRUME',
                        'FILENAME',
                        'OBSERVER']
 
