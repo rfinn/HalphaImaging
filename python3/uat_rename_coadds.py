@@ -133,7 +133,7 @@ if __name__ == '__main__':
                 #os.rename(weightfile,new_output_image.replace('.fits','.weight.fits'))
                 os.system(f"cp {weightfile} {new_output_image.replace('.fits','.weight.fits')}")
         else:
-            print("WARNING: weight image does not exist for ",fname)
+            print("WARNING: weight image does not exist for ",fname, weightfile)
 
 
 
