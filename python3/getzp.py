@@ -492,8 +492,9 @@ class getzp():
         ###################################
         # this naming convention uses the same panstarrs catalog
         # for both the r and halpha images - saves time!
-        ptab_name = get_filebasename(self.image).replace('.fits','_pan_tab.csv')
-
+        ptab_name = get_filebasename(self.image).replace('.fits','_pan_tab.csv') # don't see how this works - there is no fits in the basename
+        ptab_name = get_filebasename(self.image)+'_pan_tab.csv'
+        print(f"self.image={self.image}, panstarrs table = {ptab_name}")
         if os.path.exists(ptab_name):
             print('panstarrs table already downloaded')
             self.pan = Table.read(ptab_name)
@@ -958,13 +959,15 @@ class getzp():
             # changed this to write out phot zp in AB system for ALL filters
             header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1])))
 
-            header.set('LAMB(um)',float(.6442))
+            header.set('LAMB_um',float(.6442))
 
         else:
             header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1])))
         header.set('PHOTZPER',float('{:.3f}'.format(zperr)))            
         header.set('PHOTSYS','AB')
         header.set('FLUXZPJY',float(3631))
+        # add flatten number to header
+        header.set('ZPNFLAT',int(self.flatten),'getzp --flatten number')        
         fits.writeto(self.image, im, header, overwrite=True)
         
     def fit_residual_surface(self,norder=2,suffix=None):
