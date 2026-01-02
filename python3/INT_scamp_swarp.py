@@ -18,6 +18,7 @@ Run this from, e.g. /home/rfinn/data/reduced/scratch-int-feb2019
 
 import os
 import sys
+import glob
 import shutil
 from astropy.io import fits
 import argparse
