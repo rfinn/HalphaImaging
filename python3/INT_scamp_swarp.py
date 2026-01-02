@@ -39,7 +39,12 @@ def run_one_se(filename):
     froot = t[0]
     # DONE:TODO - check what needs to be updated in default.sex.INT - checked this an it's all ok
     os.system('sex ' + filename + ' -c default.sex.INT -CATALOG_NAME ' + froot + '.cat')
-    
+
+def se_collect_results(result):
+
+    global results
+    se_results.append(result)
+
 def get_updated_coadd_name(imname):
     f = imname
     h = fits.getheader(f)
