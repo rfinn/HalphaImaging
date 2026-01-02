@@ -17,6 +17,7 @@ Run this from, e.g. /home/rfinn/data/reduced/scratch-int-feb2019
 '''
 
 import os
+import sys
 import shutil
 from astropy.io import fits
 import argparse
@@ -38,6 +39,20 @@ def run_one_se(filename):
     # DONE:TODO - check what needs to be updated in default.sex.INT - checked this an it's all ok
     os.system('sex ' + filename + ' -c default.sex.INT -CATALOG_NAME ' + froot + '.cat')
     
+def get_updated_coadd_name(imname):
+    f = imname
+    h = fits.getheader(f)
+    ra = float(h['CRVAL1'])
+    dec = float(h['CRVAL2'])
+
+    t,dateobs,telescope,pointing,filterwsuffix = f.split('-')
+    # create string for output name
+
+    if float(dec) < 0:
+        outfile = 'VF-{:07.3f}-{:06.3f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,vfid,filterwsuffix)
+    else:
+        outfile = 'VF-{:07.3f}+{:06.3f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filterwsuffix)
+    return outfile
 
     
 if __name__ == '__main__':
@@ -153,11 +168,26 @@ if __name__ == '__main__':
                         else:
                             print('WARNING: not enough images to make mosaic in ',f)
                             
-                # not removing median subtracted images - these take so long to make!
-                pass
+                ## not removing median subtracted images - these take so long to make!
                 # remove median subtracted images
                 #os.system('rm mWFC*.fits')
+
+                ## RENAME COADDS
+                new_output_image = get_updated_BOK_coadd_name(ha_coadd)
+                print('renaming ',ha_coadd,'->',new_output_image)
+                os.rename(ha_coadd,new_output_image)
+                # rename the weight file
+                os.rename(ha_coadd.replace('.fits','.weight.fits'),new_output_image.replace('.fits','.weight.fits'))
+
+
+                newname = get_updated_BOK_coadd_name(rband_coadd)
+                print('renaming ',rband_coadd,'->',newname)
+                os.rename(rband_coadd,newname)
+                # rename the weight file    
+                os.rename(rband_coadd.replace('.fits','.weight.fits'),newname.replace('.fits','.weight.fits'))
+
+    
             os.chdir(working_dir)
             if args.testing:
                 # just running on one directory for testing purposes
-                break
+                sys.exit()
