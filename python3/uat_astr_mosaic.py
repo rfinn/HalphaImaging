@@ -67,9 +67,9 @@ parser.add_argument('--psfex',dest = 'psfex', default = False, action = 'store_t
 
 args = parser.parse_args()
 
-print(('testing ',args.refimage))
-if args.refimage:
-    print((args.refimage,' has a value of True'))
+#print(('testing ',args.refimage))
+#if args.refimage:
+#    print((args.refimage,' has a value of True'))
 
 # get input files
 #print 'cp ' +args.d + '/default.* .'
@@ -152,6 +152,8 @@ def update_coadd_header(coadd, input_image_list):
                 newfield = newfield.replace('I','')
             elif (len(newfield) > 8) & ('EXPTIME' in newfield):
                 newfield = newfield.replace('IME','')
+            elif (len(newfield) > 8) & ('DATEOBS' in newfield):
+                newfield = newfield.replace('DATEOBS','DATEOB')
                
             try:
                 if f in ['MEDSUB','SKYMED','SKYSTD']:
