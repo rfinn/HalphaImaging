@@ -165,7 +165,7 @@ if __name__ == '__main__':
                         if nlines > 3:
                             print(f"building coadd for {filelists[i]} with {nlines} input images")
                             #os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --int --l '+filelists[i]+' --refimage '+refimage)
-                            os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --int --l '+filelists[i]+' --refimage '+refimage)
+                            os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --instrument i --l '+filelists[i]+' --refimage '+refimage)
                     ## don't need to rebuilt the r-band mosaic using the r-band mosaic as reference now that I am using the swarp flags correctly
                     pass
                     # run swarp again on the rband data, using the same refimage
@@ -178,7 +178,7 @@ if __name__ == '__main__':
                         nlines = count_lines(f)
                         if nlines > 2:
                             #os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --int --l '+f)
-                            os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --int --l '+f)
+                            os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --instrument i --l '+f)
                         else:
                             print('WARNING: not enough images to make mosaic in ',f)
                             

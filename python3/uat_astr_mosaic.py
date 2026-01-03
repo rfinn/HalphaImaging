@@ -117,7 +117,7 @@ def update_coadd_header(coadd, input_image_list):
             print(f"updating header fields for Mosaic to: {header_fields}")
     except:
         try:
-            # try INT keywork
+            # try INT keyword
             instrument = h1['INSTRMNT']
             header_fields[0] = 'DATE-OBS'
         except:
