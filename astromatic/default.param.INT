@@ -1,4 +1,6 @@
 NUMBER
+INSTRMNT
+FILTER
 X_IMAGE
 Y_IMAGE
 ERRAWIN_IMAGE   
@@ -122,10 +124,6 @@ FWHM_WORLD
 FLAGS
 FLAGS_WEIGHT #            Weighted extraction flags                                
 FLAGS_WIN    #            Flags for WINdowed parameters                            
-
-INSTRMNT
-FILTER
-
 #IMAFLAGS_ISO(1)
 #NIMAFLAGS_ISO(1)
 
