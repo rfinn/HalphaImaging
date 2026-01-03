@@ -84,8 +84,8 @@ CHECKPLOT_DEV          PNG             # NULL, XWIN, TK, PS, PSC, XFIG, PNG,
                                        # JPEG, AQT, PDF or SVG
 #CHECKPLOT_TYPE         FGROUPS,DISTORTION,ASTR_INTERROR2D,ASTR_INTERROR1D,ASTR_REFERROR2D,ASTR_REFERROR1D,ASTR_CHI2,PHOT_ERROR
 #CHECKPLOT_NAME         fgroups,distort,astr_interror2d,astr_interror1d,astr_referror2d,astr_referror1d,astr_chi2,psphot_error # Check-plot filename(s)
-CHECKPLOT_TYPE         AUTO
-CHECKPLOT_NAME         AUTO # Check-plot filename(s)
+CHECKPLOT_TYPE         DISTORTION # AUTO - auto is not recognized
+CHECKPLOT_NAME         distort # Check-plot filename(s)
  
 #------------------------------ Miscellaneous ---------------------------------
  
