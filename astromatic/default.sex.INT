@@ -7,7 +7,7 @@
 CATALOG_NAME     test_cat.fits       # name of the output catalog
 CATALOG_TYPE     FITS_LDAC	# NONE,ASCII,ASCII_HEAD, ASCII_SKYCAT,
                                 # ASCII_VOTABLE, FITS_1.0 or FITS_LDAC
-PARAMETERS_NAME  default.param  # name of the file containing catalog contents
+PARAMETERS_NAME  default.param.INT  # name of the file containing catalog contents
  
 #------------------------------- Extraction ----------------------------------
  
@@ -73,5 +73,5 @@ MEMORY_BUFSIZE   1024           # number of lines in buffer
 #----------------------------- Miscellaneous ---------------------------------
  
 VERBOSE_TYPE     NORMAL         # can be QUIET, NORMAL or FULL
-#WRITE_XML        N              # Write XML file (Y/N)?
-#XML_NAME         sex.xml        # Filename for XML output
+WRITE_XML        Y              # Write XML file (Y/N)?
+XML_NAME         sex.xml        # Filename for XML output
