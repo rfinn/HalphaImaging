@@ -4,7 +4,7 @@
  
 #----------------------------- Field grouping ---------------------------------
  
-FGROUP_RADIUS          .4             # Max dist (deg) between field groups
+#FGROUP_RADIUS          .4             # Max dist (deg) between field groups
  
 #---------------------------- Reference catalogs ------------------------------
  
