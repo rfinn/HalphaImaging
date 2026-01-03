@@ -16,7 +16,7 @@ import glob
 import os
 
 matchstrings = ['WFC*1PA.fits','WFC*2PA.fits','WFC*3PA.fits','WFC*4PA.fits']
-instruments = ['INTWFC1','INTWFC2','INTWFC3','INTWFC4']
+instruments = ['INTWFC01','INTWFC02','INTWFC03','INTWFC04']
 print(f"\nWorking on directory {os.getcwd()}")
 for i in range(len(matchstrings)):
     files = glob.glob(matchstrings[i])
