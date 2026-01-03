@@ -38,16 +38,25 @@ USAGE:
 X  run after INT_batch_getzp_2022.py
 X  - assumes that coadds will be named fcoadd.fits after flattening from getzp.py
 
-* UPDATE: on draco, data are in /data-pool/laptop-backup/rfinn/data/INT/2022-allfiles-v2
+* UPDATE: 
+on draco, data are in /data-pool/laptop-backup/rfinn/data/INT/2022-allfiles-v2
 X run in /media/rfinn/ssd4t/rfinn/data/INT/2022-allfiles-v2/
 
 
+UPDATE JAN2026:
+* I reconstructed the coadds after fixing the error in how I was calling swarp.  
+* The r and halpha coadds are now aligned after calling swarp
+
 NEXT UP:
 
-* align the r-band image to the Halpha image
+[ no longer necessary as of Dec 2025/Jan2026 b/c I fixed error in how I was calling swarp
+X align the r-band image to the Halpha image
   - INT_align_images.py
   - INT_batch_align_images.py
+]
 
+* run getzp in coadd directories
+* build psf
 * then feed into halphgui!
 
 

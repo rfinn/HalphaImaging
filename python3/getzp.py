@@ -705,8 +705,8 @@ class getzp():
         yfit = np.polyval(polyfit_results,x)
         residual = (yfit - y)
         plt.figure(figsize=(8,8))
-        s = ' (MAD = %.2f)'%(MAD2(residual))
-        plt.title(self.plotprefix+s)
+        s = ' (MAD = %.3f)'%(MAD2(residual))
+        
         
         plt.subplot(2,1,1)
         if len(yerr) < len(y):
@@ -736,6 +736,7 @@ class getzp():
         s = 'fit: y = %.2f PAN + %.2f'%(polyfit_results[0],polyfit_results[1])
         plt.plot(xl,yl,'k--',label=s)
         plt.legend()
+        plt.title(self.plotprefix+s)
         
         plt.subplot(2,1,2)
         s = 'MAD = %.4f'%(MAD2(residual))
@@ -898,7 +899,7 @@ class getzp():
         '''
         plt.figure(figsize=(6,4))
         
-        s = ' (mean,std,MAD = {:.2f},{:.2f},{:.2f})'.format(np.mean(residual_all),np.std(residual_all),MAD2(residual_all))
+        s = ' (mean,std,MAD = {:.3f},{:.3f},{:.3f})'.format(np.mean(residual_all),np.std(residual_all),MAD2(residual_all))
         #s = str(MAD(residual_all))
         plt.title(self.plotprefix+s)
         self.residual_allx = self.matchedarray1['X_IMAGE'][self.fitflag]

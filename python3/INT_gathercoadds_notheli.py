@@ -20,6 +20,7 @@ import os
 import shutil
 from astropy.io import fits
 import glob
+import numpy as np
 
 
 import argparse
@@ -100,9 +101,9 @@ for subdir in flist1:
             hdu[0].header.set('AIRMASS',value=airmass)
             # create string for output name
             if float(dec) < 0:
-                outfile = output_dir_coadds+'VF-{:.4f}-{:.4f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filter)
+                outfile = output_dir_coadds+'VF-{:.4f}-{:.4f}-{:s}-{:s}-{:s}-{:s}'.format(ra,np.abs(dec),telescope,dateobs,pointing,filter)
             else:
-                outfile = output_dir_coadds+'VF-{:.4f}+{:.4f}-{:s}-{:s}-{:s}-{:s}'.format(ra,abs(dec),telescope,dateobs,pointing,filter)
+                outfile = output_dir_coadds+'VF-{:.4f}+{:.4f}-{:s}-{:s}-{:s}-{:s}'.format(ra,np.abs(dec),telescope,dateobs,pointing,filter)
 
             # copy imfile to outfile
             out1 = outfile+'.fits'

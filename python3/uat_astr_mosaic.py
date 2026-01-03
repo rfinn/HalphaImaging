@@ -103,7 +103,7 @@ def update_coadd_header(coadd, input_image_list):
     for line in infile:
         input_images.append(line.rstrip())
     input_images.sort()
-    print("\ngathering header info from these input images: \n",input_images)
+    #print("\ngathering header info from these input images: \n",input_images)
     infile.close()
 
     
@@ -111,12 +111,17 @@ def update_coadd_header(coadd, input_image_list):
     h1 = fits.getheader(input_images[0])
     try:
         instrument = h1['INSTRUME']
-        if 'Mos' in instrument:
+        if ('Mos' in instrument):
             mosaic_flag = True
             header_fields[0] = 'DATE-OBS'
             print(f"updating header fields for Mosaic to: {header_fields}")
     except:
-        print(f"WARNING: could not get INSTRUME in the header of image {input_images[0]}")
+        try:
+            # try INT keywork
+            instrument = h1['INSTRMNT']
+            header_fields[0] = 'DATE-OBS'
+        except:
+            print(f"WARNING: could not get INSTRUME or INSTRMNT in the header of image {input_images[0]}")
     
     # add ccdnoise
     f = 'CCDNOISE'
@@ -230,7 +235,7 @@ if args.swarp:
 
     defaultswarp = 'default.swarp' # for HDI
     if args.instrument == 'i':
-        pixel_scale = 0.331
+        pixel_scale = 0.333
         defaultswarp = 'default.swarp.INT'
     elif args.instrument == 'm':
         defaultswarp = 'default.swarp.MOS'

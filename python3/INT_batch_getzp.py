@@ -33,7 +33,7 @@ subdir_rootname = 'pointing'
 #flist1 = ['pointing022','pointing026']
 for subdir in flist1: # loop through list
     #if os.path.isdir(subdir) & (subdir.startswith('pointing')) & (subdir.find('-') > -1):
-    if os.path.isdir(subdir) & (subdir.find('pointing') > -1):
+    if os.path.isdir(subdir) & ((subdir.find('pointing') > -1) | (subdir.find('target') > -1)):
         print('##########################################')
         print('##########################################')        
         print('WORKING ON DIRECTORY: ',subdir)
@@ -45,7 +45,11 @@ for subdir in flist1: # loop through list
         # get list of coadds
         # there will be two per directory per filter - one with background subtracted, and one without
 
-        allcoadd = glob.glob(subdir+'*noback.coadd.fits')
+        #allcoadd = glob.glob(subdir+'*noback.coadd.fits')
+        
+        # changing in 2026 because background is subtracted with subtract_median.py
+        # and I am not adding 'noback' to the coadd names
+        allcoadd = glob.glob(subdir+'*coadd.fits')        
         allcoadd.sort()
         for c in allcoadd:
             try:
@@ -53,7 +57,9 @@ for subdir in flist1: # loop through list
                     filter='ha'
                 else:
                     filter='r'
-                os.system('python ~/github/HalphaImaging/python3/getzp.py --instrument i --nexptime --image '+c+' --filter '+filter)
+                #os.system('python ~/github/HalphaImaging/python3/getzp.py --instrument i --nexptime --image {c} --filter {filter} --flatten 1')
+                # don't need --nexptime flag because I made the coadds with swarp, which normalized by exptime
+                os.system('python ~/github/HalphaImaging/python3/getzp.py --instrument i  --image {c} --filter {filter} --flatten 1')
             except:
                 print('##########################################')
                 print('WARNING: problem running getzp for ',subdir, c)

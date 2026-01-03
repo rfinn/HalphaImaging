@@ -143,9 +143,9 @@ if __name__ == '__main__':
             if args.swarp:
 
                 # gather files - why am I not getting the mWFC files?
-                os.system(f'ls {args.filestring}*.r*PA.fits > '+subdir+'_r')
-                os.system(f'ls {args.filestring}*.Halpha*PA.fits > '+subdir+'_Halpha')
-                os.system('ls {args.filestring}*.Ha6657*PA.fits > '+subdir+'_Ha6657')            
+                os.system(f'ls {args.filestring}*.r*PA.fits > {subdir}_r')
+                os.system(f'ls {args.filestring}*.Halpha*PA.fits > {subdir}_Halpha')
+                os.system(f'ls {args.filestring}*.Ha6657*PA.fits > {subdir}_Ha6657')            
 
                 # count lines r band file, run if more than 2 lines
                 suffix = ['_r','_Halpha','_Ha6657']
@@ -155,12 +155,15 @@ if __name__ == '__main__':
                 #################################################3            
                 nlines = count_lines(filelists[0])
 
+                # build the r-band coadd
                 if nlines > 2:
                     os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --int --l '+filelists[0])
                     refimage = filelists[0]+'.coadd.fits'
                     for i in [1,2]:
                         nlines = count_lines(filelists[i])
+                        print(f"looking for files in {filelists[i]} (nlines={nlines})")
                         if nlines > 3:
+                            print(f"building coadd for {filelists[i]} with {nlines} input images")
                             #os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --int --l '+filelists[i]+' --refimage '+refimage)
                             os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --int --l '+filelists[i]+' --refimage '+refimage)
                     ## don't need to rebuilt the r-band mosaic using the r-band mosaic as reference now that I am using the swarp flags correctly
