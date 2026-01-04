@@ -15,7 +15,7 @@ ASTREF_CATALOG          GAIA-EDR3          # NONE, FILE, USNO-A1,USNO-A2,USNO-B1
                                        # NOMAD-1, PPMX, CMC-14, 2MASS, DENIS-3,
                                        # SDSS-R3,SDSS-R5,SDSS-R6,SDSS-R7,
                                        # SDSS-R8, SDSS-R9
-ASTREF_BAND            DEFAULT         # Photom. band for astr.ref.magnitudes
+ASTREF_BAND            REDDEST         # Photom. band for astr.ref.magnitudes
                                        # or DEFAULT, BLUEST, or REDDEST
 ASTREFMAG_LIMITS       -99.0,20      # Select magnitude range in ASTREF_BAND
 ASTREF_WEIGHT          100             # Relative weight of ref.astrom.cat.
@@ -42,7 +42,6 @@ POSANGLE_MAXERR        5.0             # Max position-angle uncertainty (deg)
 POSITION_MAXERR        10.0             # Max positional uncertainty (arcmin)
 MATCH_RESOL            0               # Matching resolution (arcsec); 0=auto
 MATCH_FLIPPED          N               # Allow matching with flipped axes?
-#MOSAIC_TYPE            LOOSE       # UNCHANGED, SAME_CRVAL, SHARE_PROJAXIS,
 MOSAIC_TYPE            FIX_FOCALPLANE       # UNCHANGED, SAME_CRVAL, SHARE_PROJAXIS,
                                        # FIX_FOCALPLANE or LOOSE
  
