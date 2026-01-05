@@ -726,7 +726,7 @@ class getzp():
                 plt.scatter(x,y,s=30,label=s,zorder=10)
             ymin,ymax = plt.ylim()
             plt.errorbar(x,y,yerr=yerr,fmt='None',ecolor='0.5',label='SE MAG',alpha=.4,zorder=1)
-        plt.ylim(ymin,ymax) 
+        plt.ylim(ymin,ymax) # let ymin, ymax
         plt.xlabel('Pan-STARRS Corrected',fontsize=16)
         plt.ylabel('SE MAG',fontsize=16)
         xl = np.linspace(14,19,10)
