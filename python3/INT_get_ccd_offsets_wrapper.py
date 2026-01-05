@@ -22,7 +22,6 @@ move back to parent directory
 import os
 import sys
 
-
 if __name__ == '__main__':
     import argparse
 
@@ -33,7 +32,6 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     
-
     dirlist = open(args.dirlist, 'r')
 
     for d in dirlist:
@@ -46,8 +44,9 @@ if __name__ == '__main__':
         os.chdir(subdir)
 
         # run INT_add_inst_header.py
-        os.system("python ~/github/HalphaImaging/python3/INT_add_inst_se_cat.py")
+        os.system("python ~/github/HalphaImaging/python3/INT_get_ccd_offsets.py --filestring mWFC")
         # move back to parent directory
         os.chdir(topdir)
+
         if args.testing:
             sys.exit()
