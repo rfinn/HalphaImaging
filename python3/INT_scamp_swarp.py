@@ -68,7 +68,8 @@ if __name__ == '__main__':
     parser.add_argument('--filestring', dest = 'filestring', default = 'WFC', help = 'filestring to match. default is WFC, which will grab all WFC*PA.fits.')
     parser.add_argument('--se', dest = 'se', default = False, action='store_true', help = 'Run source extractor')    
     parser.add_argument('--scamp', dest = 'scamp', default = False, action='store_true', help = 'Run scamp')
-    parser.add_argument('--copyscampheader', dest = 'copyscampheader', default = False, action='store_true', help = 'Set this if you rerun scamp but do not want to rerun submedian.')    
+    parser.add_argument('--copyscampheader', dest = 'copyscampheader', default = False, action='store_true', help = 'Set this to copy scamp headers to m{header} to match with the median subtracted images.')
+    parser.add_argument('--getoffsets', dest = 'getoffsets', default = False, action='store_true', help = 'get offsets among the ccds for a given image.')        
     parser.add_argument('--moveshort', dest = 'moveshort', default = False, action='store_true', help = 'Move images with short exposure time to a subdirectory.')
     parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true', help = 'Subtract a median sky value from each image.')    
     parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true', help = 'Run swarp')
@@ -137,6 +138,9 @@ if __name__ == '__main__':
                 for f in flist:
                     os.system(f"cp {f} m{f}")
 
+            if args.getoffsets:
+                os.system("python ~/github/HalphaImaging/python3/INT_get_ccd_offsets.py")
+                    
             if args.moveshort:
                 # move short exposure times
                 os.system('python ~/github/HalphaImaging/python3/move_short_exposures.py --filestring WFC')        

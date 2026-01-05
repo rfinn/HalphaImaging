@@ -15,7 +15,7 @@ ASTREF_CATALOG          GAIA-EDR3          # NONE, FILE, USNO-A1,USNO-A2,USNO-B1
                                        # NOMAD-1, PPMX, CMC-14, 2MASS, DENIS-3,
                                        # SDSS-R3,SDSS-R5,SDSS-R6,SDSS-R7,
                                        # SDSS-R8, SDSS-R9
-ASTREF_BAND            REDDEST         # Photom. band for astr.ref.magnitudes
+ASTREF_BAND            DEFAULT         # Photom. band for astr.ref.magnitudes
                                        # or DEFAULT, BLUEST, or REDDEST
 ASTREFMAG_LIMITS       -99.0,20      # Select magnitude range in ASTREF_BAND
 ASTREF_WEIGHT          100             # Relative weight of ref.astrom.cat.
@@ -64,7 +64,7 @@ DISTORT_DEGREES        4               # Polynom degree for each group
 
 #---------------------------- Photometric solution ----------------------------
  
-SOLVE_PHOTOM           Y               # Compute photometric solution (Y/N) ?
+SOLVE_PHOTOM           N               # Compute photometric solution (Y/N) ?
 MAGZERO_OUT            0.0             # Magnitude zero-point(s) in output
 MAGZERO_INTERR         0.01            # Internal mag.zero-point accuracy
 MAGZERO_REFERR         0.03            # Photom.field mag.zero-point accuracy

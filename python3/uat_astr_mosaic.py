@@ -46,7 +46,7 @@ import os
 from astropy.io import fits
 from astropy.wcs import WCS
 import argparse
-import subprocess
+#import subprocess
 
 parser = argparse.ArgumentParser(description ='Run sextractor, scamp, and swarp to determine WCS solution and make mosaics')
 parser.add_argument('--filestring', dest = 'filestring', default = 'h', help = 'string to use to get input files (default = "h", which grabs all of the files "h*o00.fits")')
