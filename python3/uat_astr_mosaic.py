@@ -220,6 +220,8 @@ if args.s:
         i += 1
         
 if args.scamp:
+    # config files are copied at the beginning
+    #os.system('cp ~/github/HalphaImaging/astromatic/default.scamp* .')
     os.system('ls '+args.filestring+'*.cat > scamp_input_cats')
     print('RUNNING SCAMP')
     if args.siena:

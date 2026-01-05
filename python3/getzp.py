@@ -546,8 +546,6 @@ class getzp():
 
         # only keep matches with matched RA and Dec w/in 5 arcsec
         self.matchflag = dist2d.degree < 5./3600
-
-
         self.matchedarray1=np.zeros(len(pancoords),dtype=self.secat.dtype)
         self.matchedarray1[self.matchflag] = self.secat[index[self.matchflag]]
 

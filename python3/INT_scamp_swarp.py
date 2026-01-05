@@ -122,7 +122,7 @@ if __name__ == '__main__':
             if args.scamp:
                 scampflag=False # keeps track if scamp finishes successfully
                 try:
-                    os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --scamp --int --filestring WFC')
+                    os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --scamp --instrument i --int --filestring WFC')
                     scampflag=True
                     os.system('ls WFC.r*PA.fits > '+subdir+'_r')
                     os.system('ls WFC.Halpha*PA.fits > '+subdir+'_Halpha')
