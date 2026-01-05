@@ -101,29 +101,32 @@ def runone(i,f):
     os.system(getzpstring)
 
 # run one galaxy at a time, in parallel
+# don't do this - it corrupted a bunch of images - need to figure out what I'm doing wrong in getzp.py
+# might be that a store image as a temp file, and these get overwritten/accessed by multiple programs?
 if len(sys.argv) > 1:
     filename = sys.argv[1]
     print("calling runone for ",filename)
     runone(0,filename)
 
-    
-else:
-    # don't need this if I am going to run using gnu parallel instead
-    if len(sys.argv) > 2:
-        matchstring = sys.argv[1]
-        rfiles = glob.glob('VF*'+matchstring+'*.fits') # grab subset of files in the directory
-    else:
-        rfiles = glob.glob('VF*.fits') # grab all files in the directory
-        rfiles.sort()
-        indices = np.arange(len(rfiles))
 
-        #for rimage in rimages: # loop through list
-        image_pool = mp.Pool(mp.cpu_count())
-        myresults = [image_pool.apply_async(runone,args=(i,rfiles[i]),callback=collect_results) for i in indices]
-    
-        image_pool.close()
-        image_pool.join()
-        image_results = [r.get() for r in myresults]
+
+#else:
+#    # don't need this if I am going to run using gnu parallel instead
+#    if len(sys.argv) > 2:
+#        matchstring = sys.argv[1]
+#        rfiles = glob.glob('VF*'+matchstring+'*.fits') # grab subset of files in the directory
+#    else:
+#        rfiles = glob.glob('VF*.fits') # grab all files in the directory
+#        rfiles.sort()
+#        indices = np.arange(len(rfiles))#
+#
+#        #for rimage in rimages: # loop through list
+#        image_pool = mp.Pool(mp.cpu_count())
+#        myresults = [image_pool.apply_async(runone,args=(i,rfiles[i]),callback=collect_results) for i in indices]
+#    
+#        image_pool.close()
+#        image_pool.join()
+#        image_results = [r.get() for r in myresults]
 
 
     

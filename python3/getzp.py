@@ -101,7 +101,7 @@ zpfunc = lambda x, zp: x + zp
 # this function allows the slope to vary
 zpfuncwithslope = lambda x, m, zp: m*x + zp
 
-pixelscale = {'HDI':0.43, 'INT':0.331, 'BOK':0.45252,'MOS':0.425 } 
+pixelscale = {'HDI':0.43, 'INT':0.333, 'BOK':0.45252,'MOS':0.425 } 
 
 def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=19,
                     maxsources=10000):
@@ -726,7 +726,7 @@ class getzp():
                 plt.scatter(x,y,s=30,label=s,zorder=10)
             ymin,ymax = plt.ylim()
             plt.errorbar(x,y,yerr=yerr,fmt='None',ecolor='0.5',label='SE MAG',alpha=.4,zorder=1)
-        plt.ylim(ymin_fixed,ymax_fixed) # setting the same for all
+        plt.ylim(ymin,ymax) 
         plt.xlabel('Pan-STARRS Corrected',fontsize=16)
         plt.ylabel('SE MAG',fontsize=16)
         xl = np.linspace(14,19,10)
