@@ -15,9 +15,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.filter is None:
-        matchstring = f"{rgs.filestring}*.fits"
+        matchstring = f"{args.filestring}*.fits"
     else:
-        matchstring = f"{rgs.filestring}*{args.filter}.fits"
+        matchstring = f"{args.filestring}*{args.filter}.fits"
 
     filelist = glob.glob(matchstring)
     filelist.sort()
