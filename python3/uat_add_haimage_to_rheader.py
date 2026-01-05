@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
     
     parser = argparse.ArgumentParser(description ="This program adds the Halpha imaging name to the r-band images, searching for all UAT*-R.fits for the r-band images.")
-    #parser.add_argument('--filestring', dest = 'filestring', default = 'coadd', help = 'filestring to match. default is coadd, which will grab all *coadd*.fits.  Note: weight images will be renamed with their corresponding science coadd.')
+    parser.add_argument('--filestring', dest = 'filestring', default = 'UAT', help = 'filestring to match. default is UAT, which will grab all UAT*R.fits files. Note: weight images will be renamed with their corresponding science coadd.')
     #parser.add_argument('--se', dest = 'se', default = False, action='store_true', help = 'Run source extractor')    
     #parser.add_argument('--scamp', dest = 'scamp', default = False, action='store_true', help = 'Run scamp')
     #parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true', help = 'Subtract a median sky value from each image.')
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     halpha_options = [f"ha{i}" for i in [4,8,12,16]]
     print("halpha filters: ",halpha_options)
 
-    rfilelist = glob.glob("UAT*R.fits")
+    rfilelist = glob.glob(f"{args.UAT}*R.fits")
 
     rfilelist.sort()
 
