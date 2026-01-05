@@ -697,7 +697,7 @@ class getzp():
 
         plt.savefig('plots/'+self.plotprefix.replace('.fits','')+'se-pan-positions.png')        
         
-    def plot_fitresults(self, x, y, yerr=None, polyfit_results = [0,0],color=None,ymin_fixed=-0.1,ymax_fixed=0.1):
+    def plot_fitresults(self, x, y, yerr=None, polyfit_results = [0,0],color=None,ymin_fixed=-0.12,ymax_fixed=0.12):
         # plot best-fit results
         #print(f"inside plot_fitresults, len(x) = {len(x)}, len(color)={len(color)}")
         yfit = np.polyval(polyfit_results,x)
