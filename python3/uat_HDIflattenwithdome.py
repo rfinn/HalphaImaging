@@ -138,6 +138,7 @@ for f in filters:
             flatfile = "ndomeflat"+f+".fits"
         flatdata = fits.getdata(flatfile)
         for i in indices[0]:
+            # running into an issue here
             data,header = fits.getdata(filenames[i],header=True)
             dataout = data / flatdata
             header['HISTORY'] = 'Flattened using ndomeflat'+f
