@@ -42,6 +42,7 @@ if __name__ == '__main__':
         else:
             filtername = 'h'
         # TODO - NEED TO ADD CASES FOR HA8, 12, AND 16 ONCE WE HAVE THOSE TRANSFORMATIONS
+        print("running ",f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {instrument} --filter {filter}")
         os.system(f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {instrument} --filter {filter}")
         # move back to parent directory
         if args.testing:
