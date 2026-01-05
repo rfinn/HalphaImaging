@@ -697,7 +697,7 @@ class getzp():
 
         plt.savefig('plots/'+self.plotprefix.replace('.fits','')+'se-pan-positions.png')        
         
-    def plot_fitresults(self, x, y, yerr=None, polyfit_results = [0,0],color=None):
+    def plot_fitresults(self, x, y, yerr=None, polyfit_results = [0,0],color=None,ymin_fixed=-0.1,ymax_fixed=0.1):
         # plot best-fit results
         #print(f"inside plot_fitresults, len(x) = {len(x)}, len(color)={len(color)}")
         yfit = np.polyval(polyfit_results,x)
@@ -726,7 +726,7 @@ class getzp():
                 plt.scatter(x,y,s=30,label=s,zorder=10)
             ymin,ymax = plt.ylim()
             plt.errorbar(x,y,yerr=yerr,fmt='None',ecolor='0.5',label='SE MAG',alpha=.4,zorder=1)
-        plt.ylim(ymin,ymax)
+        plt.ylim(ymin_fixed,ymax_fixed) # setting the same for all
         plt.xlabel('Pan-STARRS Corrected',fontsize=16)
         plt.ylabel('SE MAG',fontsize=16)
         xl = np.linspace(14,19,10)
@@ -754,7 +754,7 @@ class getzp():
                 plt.scatter(x,residual,s=30,label=s,zorder=10)
             ymin,ymax = plt.ylim()
             plt.errorbar(x,residual,yerr=yerr,fmt='None',ecolor='0.5',label='SE MAG '+s,alpha=.4,zorder=1)
-        plt.ylim(ymin,ymax)
+        plt.ylim(ymin_fixed,ymax_fixed)
         plt.xlabel('Pan-STARRS Corrected',fontsize=16)
         plt.ylabel('YFIT - SE R-band MAG',fontsize=16)
         plt.legend()
