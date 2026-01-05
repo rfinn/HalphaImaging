@@ -140,7 +140,7 @@ if args.scamp:
     os.system(f'python {gitpath}uat_astr_mosaic.py --scamp --filestring {args.filestring} --instrument {args.instrument}')
 
     # sort objects by field
-    os.system('python '+gitpath+'uat_HDIsortobjects.py --filestring '+args.filestring)
+    os.system('python '+gitpath+'uat_sortobjects.py --filestring '+args.filestring)
 
 if args.submed:
     if args.instrument == 'm':
