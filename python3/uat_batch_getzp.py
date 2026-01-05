@@ -8,6 +8,7 @@ if __name__ == '__main__':
     import argparse
     import glob
     import os
+    import sys
     parser = argparse.ArgumentParser(description ="Run getzp on files in the current directory")
     parser.add_argument('--filestring', dest = 'filestring', default = 'UAT', help = 'filestring for coadds, default is UAT')
     parser.add_argument('--filter', dest = 'filter', default = None, help = 'add a filter name to run on one set of filters at a time.  could be useful if you want to run e.g. in two different windows.')        
