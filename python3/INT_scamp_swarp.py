@@ -75,7 +75,7 @@ if __name__ == '__main__':
     parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true', help = 'Run swarp')
     parser.add_argument('--renamecoadd', dest = 'renamecoadd', default = False, action='store_true', help = 'Rename coadd to VFS standard.')        
     parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will run on one directory only.')
-    parser.add_argument('--onedir', dest = 'onedir', default = None, action='store_true', help = 'Will run on one directory only.')    
+    parser.add_argument('--onedir', dest = 'onedir', default = None, help = 'Will run on one directory only.')    
     
     args = parser.parse_args()
 
