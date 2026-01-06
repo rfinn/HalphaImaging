@@ -97,6 +97,7 @@ def read_se_cat(se_cat):
     from astropy.table import Table
     htab = fits.getdata(se_cat,2)
     keepflag =  (htab['FLAGS'] <  1) & (htab['CLASS_STAR'] > 0.95) #& (htab['MAG_AUTO'] > -11.)
+    print("Hello!")
     print(f"\nNumber of sources in SE catalog = {np.sum(keepflag)}")
     return htab[keepflag]
 
