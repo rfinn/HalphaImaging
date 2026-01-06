@@ -231,7 +231,7 @@ def match_tables_to_panstarrs(panstarrs_table,table_list,rakey0='RAJ2000',deckey
             print(f"dist2d mean={np.mean(dist2d)}, median={np.median(dist2d)}")
             print(f"dist2d min={np.min(dist2d)}, max ={np.min(dist2d)}")
         else:
-            print(f"NUMBER OF MATCHES BETWEEN PANSTARRS AND SE = {np.sum(matchflag)}"
+            print(f"NUMBER OF MATCHES BETWEEN PANSTARRS AND SE = {np.sum(matchflag)}")
         outtab = Table(table_list[i])
         for c in pan_columns:
             newcol = Column(np.zeros(len(table_list[i]), 'd'), c)
