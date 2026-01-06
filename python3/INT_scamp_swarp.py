@@ -75,18 +75,23 @@ if __name__ == '__main__':
     parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true', help = 'Run swarp')
     parser.add_argument('--renamecoadd', dest = 'renamecoadd', default = False, action='store_true', help = 'Rename coadd to VFS standard.')        
     parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will run on one directory only.')
+    parser.add_argument('--onedir', dest = 'onedir', default = None, action='store_true', help = 'Will run on one directory only.')    
     
     args = parser.parse_args()
 
     
     homedir = os.getenv("HOME")
     telescope = 'INT'
-    # get list of current directory
-    flist1 = os.listdir()
+    if args.onedir is not None:
+        flist1 = [args.onedir]
+    else:
+        # get list of current directory
+        flist1 = os.listdir()
+        flist1.sort()        
     working_dir = os.getcwd()
     # overwrite output files if they exist
     overwrite = True
-    flist1.sort()
+
 
     #flist1 = ['pointing022','pointing026']
     # setting this to false just b/c I am redoing mosaics for these two pointings
@@ -122,8 +127,13 @@ if __name__ == '__main__':
             # run scamp
             if args.scamp:
                 scampflag=False # keeps track if scamp finishes successfully
+                os.system('cp ~/github/HalphaImaging/astromatic/default.* .')                        
                 try:
-                    os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --scamp --instrument i --int --filestring WFC')
+                    os.system('ls '+args.filestring+'*.cat > scamp_input_cats')
+                    print('RUNNING SCAMP')
+                    os.system('scamp @scamp_input_cats -c default.scamp.INT')
+                    
+                    #os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --scamp --instrument i --int --filestring WFC')
                     scampflag=True
                     os.system('ls WFC.r*PA.fits > '+subdir+'_r')
                     os.system('ls WFC.Halpha*PA.fits > '+subdir+'_Halpha')
