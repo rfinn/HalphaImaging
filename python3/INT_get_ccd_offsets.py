@@ -334,4 +334,7 @@ if __name__ == '__main__':
         # then swarp can use this to scale the images when making a coadd.
         add_scale_to_header(image_ccd_list, scale_factor_list,testing=args.testing)
 
+        if testing:
+            sys.exit()
+
 
