@@ -228,8 +228,8 @@ def match_tables_to_panstarrs(panstarrs_table,table_list,rakey0='RAJ2000',deckey
 
         if np.sum(matchflag) < 1:
             print("WARNING: NO MATCHES BETWEEN SE AND PANSTARRS CATALOG!")
-            print(f"dist2d mean={np.mean(dist2d)}, median={np.median(dist2d)}")
-            print(f"dist2d min={np.min(dist2d)}, max ={np.min(dist2d)}")
+            print(f"\tdist2d mean={np.mean(dist2d.to('arcsec')):.2f}, median={np.median(dist2d.to('arcsec')):.2f}")
+            print(f"\tdist2d min={np.min(dist2d.to('arcsec')):.2f}, max ={np.min(dist2d.to('arcsec')):.2f}")
         else:
             print(f"NUMBER OF MATCHES BETWEEN PANSTARRS AND SE = {np.sum(matchflag)}")
         outtab = Table(table_list[i])
