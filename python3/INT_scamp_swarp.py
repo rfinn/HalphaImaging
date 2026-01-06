@@ -148,8 +148,6 @@ if __name__ == '__main__':
                 for f in flist:
                     os.system(f"cp {f} m{f}")
 
-            if args.getoffsets:
-                os.system("python ~/github/HalphaImaging/python3/INT_get_ccd_offsets.py")
                     
             if args.moveshort:
                 # move short exposure times
@@ -158,6 +156,9 @@ if __name__ == '__main__':
             if args.submedian:
                 # subtract median
                 os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring WFC')
+
+            if args.getoffsets:
+                os.system("python ~/github/HalphaImaging/python3/INT_get_ccd_offsets.py --filestring mWFC")
                 
             # run swarp
             if args.swarp:
