@@ -13,6 +13,7 @@ PROCEDURE:
 
 import numpy as np
 import os
+import sys
 
 
 def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=19,
