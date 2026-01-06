@@ -222,6 +222,9 @@ def match_tables_to_panstarrs(panstarrs_table,table_list,rakey0='RAJ2000',deckey
 
         # only keep matches with matched RA and Dec w/in 3 arcsec
         matchflag = dist2d.degree < 3./3600
+
+        if np.sum(matchflag) < 1:
+            print("WARNING: NO MATCHES BETWEEN SE AND PANSTARRS CATALOG!")
         outtab = Table(table_list[i])
         for c in pan_columns:
             newcol = Column(np.zeros(len(table_list[i]), 'd'), c)
@@ -334,7 +337,7 @@ if __name__ == '__main__':
         # then swarp can use this to scale the images when making a coadd.
         add_scale_to_header(image_ccd_list, scale_factor_list,testing=args.testing)
 
-        if testing:
+        if args.testing:
             sys.exit()
 
 
