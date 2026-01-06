@@ -224,7 +224,7 @@ def match_tables_to_panstarrs(panstarrs_table,table_list,rakey0='RAJ2000',deckey
         index,dist2d,dist3d = secoords.match_to_catalog_sky(cref) # output is row matched to cmatch/se table
 
         # only keep matches with matched RA and Dec w/in 3 arcsec
-        matchflag = dist2d.degree < 3./3600
+        matchflag = dist2d.degree < 6./3600
 
         if np.sum(matchflag) < 1:
             print("WARNING: NO MATCHES BETWEEN SE AND PANSTARRS CATALOG!")
