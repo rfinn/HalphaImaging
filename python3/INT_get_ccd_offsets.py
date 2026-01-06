@@ -97,7 +97,7 @@ def read_se_cat(se_cat):
     from astropy.table import Table
     htab = fits.getdata(se_cat,2)
     keepflag =  (htab['FLAGS'] <  1) & (htab['CLASS_STAR'] > 0.95) #& (htab['MAG_AUTO'] > -11.)
-    print("Hello!")
+    #print("Hello!")
     print(f"\nNumber of sources in SE catalog = {np.sum(keepflag)}")
     return htab[keepflag]
 
@@ -228,6 +228,8 @@ def match_tables_to_panstarrs(panstarrs_table,table_list,rakey0='RAJ2000',deckey
 
         if np.sum(matchflag) < 1:
             print("WARNING: NO MATCHES BETWEEN SE AND PANSTARRS CATALOG!")
+            print(f"dist2d mean={np.mean(dist2d)}, median={np.median(dist2d)}")
+            print(f"dist2d min={np.min(dist2d)}, max ={np.min(dist2d)}") 
         outtab = Table(table_list[i])
         for c in pan_columns:
             newcol = Column(np.zeros(len(table_list[i]), 'd'), c)
