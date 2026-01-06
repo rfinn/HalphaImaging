@@ -97,6 +97,7 @@ def read_se_cat(se_cat):
     from astropy.table import Table
     htab = fits.getdata(se_cat,2)
     keepflag =  (htab['FLAGS'] <  1) & (htab['CLASS_STAR'] > 0.95) #& (htab['MAG_AUTO'] > -11.)
+    print(f"\nNumber of sources in SE catalog = {np.sum(keepflag)}")
     return htab[keepflag]
 
 def get_ra_dec_range(table_list):
@@ -159,7 +160,7 @@ def cross_match_tables(table_list,rakey0='RAJ2000',deckey0='DEJ2000', rakey1='AL
         index,dist2d,dist3d = cref.match_to_catalog_sky(cmatch)
 
         # only keep matches with matched RA and Dec w/in 3 arcsec
-        matchflag = dist2d.degree < 3./3600
+        matchflag = dist2d.degree < 5./3600
         print(f"the number of matches = {np.sum(matchflag)}")
         #print(len(cref), len(cmatch), len(index), len(dist2d), len(matchflag))
 
