@@ -281,7 +281,7 @@ if __name__ == '__main__':
         outfile.write(f"g{gname}\n")
     outfile.close()
 
-    # create list of convolved image names
+    # copy header files from m*.head to gm*.head
     print(f"copy headers")
     for gname in image_names:
         header_name = gname.replace('.fits','.head')
