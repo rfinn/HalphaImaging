@@ -43,7 +43,7 @@ if __name__ == '__main__':
         os.chdir(subdir)
 
         # run INT_add_inst_header.py
-        os.system(f"python ~/github/HalphaImaging/python3/INT_get_ccd_offsets.py --filestring {args.filestring} ")
+        os.system(f"python ~/github/HalphaImaging/python3/INT_get_ccd_offsets.py --filestring {args.filestring} --verbose")
         # move back to parent directory
         os.chdir(topdir)
 
