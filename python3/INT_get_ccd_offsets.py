@@ -315,7 +315,8 @@ if __name__ == '__main__':
     print(f"Working on directory {os.getcwd()}")
     print("################################################")        
     
-
+    # why not get all images in a particular filter???
+    filerootlist = [f"{args.filestring}.{f}." for f in ['r','Halpha','Ha6657']]
     # loop through list of image rootnames
     for i in range(len(filerootlist)):
 
