@@ -44,7 +44,7 @@ def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=19,
     print('HEY!!! in panstarrs_query, ra,dec,rad = ',ra_deg,dec_deg,rad_deg)
     field = SkyCoord(ra=ra_deg, dec=dec_deg, unit=(u.deg, u.deg),frame='icrs')
     t = vquery.query_region(field, width=("%fd" % rad_deg), catalog="II/349/ps1")
-    print("in panstarrs_query...")
+    #print("in panstarrs_query...")
     #print(t)
     return t[0]
 
