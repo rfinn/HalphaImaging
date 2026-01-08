@@ -321,7 +321,7 @@ if __name__ == '__main__':
         # get se cats and measure offsets
         # might also need to remove the preceding m if running on mWFC images
         if 'mWFC' in args.filestring:
-            se_cat_list = [s.replace('.fits','.cat').replace('mWFC','WFC') for s in image_ccd_list]
+            se_cat_list = [s.replace('.fits','.cat') for s in image_ccd_list]
         else:
             se_cat_list = [s.replace('.fits','.cat') for s in image_ccd_list]
 
