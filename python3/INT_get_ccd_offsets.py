@@ -98,7 +98,7 @@ def read_se_cat(se_cat):
     htab = fits.getdata(se_cat,2)
     keepflag =  (htab['FLAGS'] <  1) & (htab['CLASS_STAR'] > 0.95) #& (htab['MAG_AUTO'] > -11.)
     #print("Hello!")
-    print(f"\nNumber of sources in SE catalog = {np.sum(keepflag)}")
+    print(f"Number of sources in SE catalog = {np.sum(keepflag)}")
     return htab[keepflag]
 
 def get_ra_dec_range(table_list):
@@ -291,6 +291,7 @@ def add_scale_to_header(image_list, scale_list, testing=False):
 if __name__ == '__main__':
     import glob
     import argparse
+    import os
 
     parser = argparse.ArgumentParser(description ="This program measures the offset of each ccd relative to PanSTARRS, calculates the scaling required to bring the ccds onto a uniform scale, and adds a keyword PANSCALE to the image headers.  PANSCALE can be used as the flux scaling keyword with SWarp.")
     parser.add_argument('--filestring', dest = 'filestring', default = 'WFC', help = 'filestring to match. default is WFC, which will grab all WFC*PA.fits.')
@@ -309,6 +310,11 @@ if __name__ == '__main__':
 
     # sort list of unique image names
     filerootlist.sort()
+
+    print("\n################################################")
+    print(f"Working on directory {os.getcwd()}")
+    print("################################################")        
+    
 
     # loop through list of image rootnames
     for i in range(len(filerootlist)):
@@ -337,8 +343,8 @@ if __name__ == '__main__':
         
         # calculate relative scale from median of FLUX_AUTO
         scale_factor_list = get_median_offsets(panstarrs_table, se_tabs)
-        if args.verbose:
-            print(f"\tscale factors = {scale_factor_list}")
+        #if args.verbose:
+        print(f"\tscale factors = {scale_factor_list}")
         
         # add the scale factors to the header for use with SWARP
         # then swarp can use this to scale the images when making a coadd.

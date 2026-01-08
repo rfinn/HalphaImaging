@@ -36,9 +36,6 @@ if __name__ == '__main__':
 
     for d in dirlist:
         subdir = d.rstrip('\n')
-        print("################################################")
-        print(f"Working on directory {subdir}")
-        print("################################################")        
 
         # move to directory
         topdir = os.getcwd()
@@ -46,7 +43,7 @@ if __name__ == '__main__':
         os.chdir(subdir)
 
         # run INT_add_inst_header.py
-        os.system(f"python ~/github/HalphaImaging/python3/INT_get_ccd_offsets.py --filestring {args.filestring}")
+        os.system(f"python ~/github/HalphaImaging/python3/INT_get_ccd_offsets.py --filestring {args.filestring} ")
         # move back to parent directory
         os.chdir(topdir)
 
