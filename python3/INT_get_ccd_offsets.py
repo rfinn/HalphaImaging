@@ -327,7 +327,7 @@ if __name__ == '__main__':
             print(f'FYI found {len(image_ccd_list)} matching images for {filerootlist[i]}')
 
         if len(image_ccd_list) < 2:
-            print(f"\tno matches to {filerootlist[i]}, moving to next filter."
+            print(f"\tno matches to {filerootlist[i]}, moving to next filter.")
             continue
 
         # get se cats and measure offsets
