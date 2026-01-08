@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description ="This program measures the offset of each ccd relative to PanSTARRS, calculates the scaling required to bring the ccds onto a uniform scale, and adds a keyword PANSCALE to the image headers.  PANSCALE can be used as the flux scaling keyword with SWarp.")
     parser.add_argument('--dirlist', dest = 'dirlist', default = 'dirlist', help = 'file containing list of directories to run on.  default is dirlist')
-    #parser.add_argument('--verbose', dest = 'verbose', default = False, action='store_true', help = 'Print more information')        
+    parser.add_argument('--filestring', dest = 'filestring', default = 'mWFC', help = 'Filestring to pass into INT_get_ccd_offsets.py.  Usually this is mWFC or WFC.')        
     parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will run on one directory only.')
     
     args = parser.parse_args()
@@ -36,7 +36,9 @@ if __name__ == '__main__':
 
     for d in dirlist:
         subdir = d.rstrip('\n')
-        #print(f"\nWorking on directory {subdir}")
+        print("################################################")
+        print(f"Working on directory {subdir}")
+        print("################################################")        
 
         # move to directory
         topdir = os.getcwd()
@@ -44,7 +46,7 @@ if __name__ == '__main__':
         os.chdir(subdir)
 
         # run INT_add_inst_header.py
-        os.system("python ~/github/HalphaImaging/python3/INT_get_ccd_offsets.py --filestring mWFC")
+        os.system(f"python ~/github/HalphaImaging/python3/INT_get_ccd_offsets.py --filestring {args.filestring}")
         # move back to parent directory
         os.chdir(topdir)
 
