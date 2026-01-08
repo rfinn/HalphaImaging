@@ -322,8 +322,13 @@ if __name__ == '__main__':
 
         # get all files with the same root
         image_ccd_list = [m for m in flist if filerootlist[i] in m]
+        
         if args.verbose:
             print(f'FYI found {len(image_ccd_list)} matching images for {filerootlist[i]}')
+
+        if len(image_ccd_list) < 2:
+            print(f"\tno matches to {filerootlist[i]}, moving to next filter."
+            continue
 
         # get se cats and measure offsets
         # might also need to remove the preceding m if running on mWFC images
