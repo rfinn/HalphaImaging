@@ -158,7 +158,7 @@ if __name__ == '__main__':
                 os.system('python ~/github/HalphaImaging/python3/subtract_median.py --filestring WFC')
 
             if args.getoffsets:
-                os.system("python ~/github/HalphaImaging/python3/INT_get_ccd_offsets.py --filestring mWFC")
+                os.system("python ~/github/HalphaImaging/python3/INT_get_ccd_offsets.py --filestring {args.filestring}")
                 
             # run swarp
             if args.swarp:
