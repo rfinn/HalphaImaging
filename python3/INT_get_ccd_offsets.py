@@ -98,7 +98,7 @@ def read_se_cat(se_cat):
     htab = fits.getdata(se_cat,2)
     keepflag =  (htab['FLAGS'] <  1) & (htab['CLASS_STAR'] > 0.95) #& (htab['MAG_AUTO'] > -11.)
     #print("Hello!")
-    print(f"Number of sources in SE catalog = {np.sum(keepflag)}")
+    print(f"Number of sources in SE catalog = {np.sum(keepflag)} {se_cat}")
     return htab[keepflag]
 
 def get_ra_dec_range(table_list):
