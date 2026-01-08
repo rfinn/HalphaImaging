@@ -344,6 +344,8 @@ if __name__ == '__main__':
         
         # get range of coordinates
         racenter, deccenter, radius_deg = get_ra_dec_range(se_tabs)
+        if args.verbose:
+            print(f"return values from get_ra_dec_range: ra={racenter:.5f}, dec={deccenter:.5f}, rad={radius_deg:.5f}")
         # download panstarrs catalog
         panstarrs_table = get_panstarrs(filerootlist[i], racenter, deccenter, 2*radius_deg)
         
