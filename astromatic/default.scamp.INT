@@ -17,7 +17,7 @@ ASTREF_CATALOG          GAIA-EDR3          # NONE, FILE, USNO-A1,USNO-A2,USNO-B1
                                        # SDSS-R8, SDSS-R9
 ASTREF_BAND            DEFAULT         # Photom. band for astr.ref.magnitudes
                                        # or DEFAULT, BLUEST, or REDDEST
-ASTREFMAG_LIMITS       13,20      # Select magnitude range in ASTREF_BAND
+ASTREFMAG_LIMITS       13,22      # Select magnitude range in ASTREF_BAND
 ASTREF_WEIGHT          100             # Relative weight of ref.astrom.cat.
 SAVE_REFCATALOG        N               # Save ref catalogs in FITS-LDAC format?
 REFOUT_CATPATH         .               # Save path for reference catalogs
@@ -39,7 +39,7 @@ MATCH_NMAX             0               # Max.number of detections for MATCHing
                                        # (0=auto)
 PIXSCALE_MAXERR        1.2             # Max scale-factor uncertainty
 POSANGLE_MAXERR        5.0             # Max position-angle uncertainty (deg)
-POSITION_MAXERR        2.0             # Max positional uncertainty (arcmin)
+POSITION_MAXERR        1.0             # Max positional uncertainty (arcmin)
 MATCH_RESOL            0               # Matching resolution (arcsec); 0=auto
 MATCH_FLIPPED          N               # Allow matching with flipped axes?
 MOSAIC_TYPE            FIX_FOCALPLANE       # UNCHANGED, SAME_CRVAL, SHARE_PROJAXIS,
