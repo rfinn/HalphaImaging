@@ -7,7 +7,9 @@ trying to help scamp solve for the solutions by putting images back into MEF for
 
 from astropy.io import fits
 import os
+import sys
 import glob
+
 
 def build_mef_from_ccds(base_name, ccd_ids=(1, 2, 3, 4), suffix="PA"):
     """
@@ -65,7 +67,6 @@ def build_mef_from_ccds(base_name, ccd_ids=(1, 2, 3, 4), suffix="PA"):
 
 if __name__ == '__main__':
     import argparse
-    import os
 
     parser = argparse.ArgumentParser(description ="This program measures the offset of each ccd relative to PanSTARRS, calculates the scaling required to bring the ccds onto a uniform scale, and adds a keyword PANSCALE to the image headers.  PANSCALE can be used as the flux scaling keyword with SWarp.")
     parser.add_argument('--filestring', dest = 'filestring', default = 'WFC', help = 'filestring to match. default is WFC, which will grab all WFC*PA.fits.')
@@ -85,3 +86,8 @@ if __name__ == '__main__':
 
     for froot in filerootlist:
         build_mef_from_ccds(base_name, ccd_ids=(1, 2, 3, 4), suffix="PA")
+
+        
+        if args.testing:
+            sys.exit()
+
