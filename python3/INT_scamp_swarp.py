@@ -152,6 +152,8 @@ if __name__ == '__main__':
             if args.moveshort:
                 # move short exposure times
                 os.system('python ~/github/HalphaImaging/python3/move_short_exposures.py --filestring WFC')
+
+                # also move mWFC files
                 os.system('python ~/github/HalphaImaging/python3/move_short_exposures.py --filestring mWFC')                        
 
             if args.submedian:
