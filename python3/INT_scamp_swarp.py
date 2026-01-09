@@ -151,7 +151,8 @@ if __name__ == '__main__':
                     
             if args.moveshort:
                 # move short exposure times
-                os.system('python ~/github/HalphaImaging/python3/move_short_exposures.py --filestring WFC')        
+                os.system('python ~/github/HalphaImaging/python3/move_short_exposures.py --filestring WFC')
+                os.system('python ~/github/HalphaImaging/python3/move_short_exposures.py --filestring mWFC')                        
 
             if args.submedian:
                 # subtract median
@@ -178,7 +179,7 @@ if __name__ == '__main__':
 
                 # build the r-band coadd
                 if nlines > 2:
-                    os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --int --l '+filelists[0])
+                    os.system('python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --instrument i --l '+filelists[0])
                     refimage = filelists[0]+'.coadd.fits'
                     for i in [1,2]:
                         nlines = count_lines(filelists[i])

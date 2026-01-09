@@ -303,7 +303,8 @@ if __name__ == '__main__':
     # glob all WFC*PA.fits (or mWFC*PA.fits)
     flist = glob.glob(f'{args.filestring}*PA.fits')
     flist.sort()
-
+    if args.verbose:
+        print("flist = ",flist)
     # look for unique set of all image prefixes among all the *1PA.fits *2PA.fits, etc files
     allfilerootlist = [t.split('_')[0] for t in flist]
     filerootlist = list(set(allfilerootlist))

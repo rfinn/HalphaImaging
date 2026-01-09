@@ -232,13 +232,13 @@ if args.scamp:
         os.system('scamp @scamp_input_cats -c default.scamp.pisces ')
     else:
         os.system('scamp @scamp_input_cats -c default.scamp')
-    print('DONE')
+    print('DONE')MOS
     
 if args.swarp:
     #HDI data
 
     defaultswarp = 'default.swarp' # for HDI
-    if args.instrument == 'i':
+    if (args.instrument == 'i') | args.int:
         pixel_scale = 0.333
         defaultswarp = 'default.swarp.INT'
     elif args.instrument == 'm':
