@@ -68,7 +68,7 @@ def build_mef_from_ccds(base_name, ccd_ids=(1, 2, 3, 4), suffix="PA"):
 if __name__ == '__main__':
     import argparse
 
-    parser = argparse.ArgumentParser(description ="This program measures the offset of each ccd relative to PanSTARRS, calculates the scaling required to bring the ccds onto a uniform scale, and adds a keyword PANSCALE to the image headers.  PANSCALE can be used as the flux scaling keyword with SWarp.")
+    parser = argparse.ArgumentParser(description ="This program reconstructs the MEF files from the split images.  Hopefully this improves the performace of scamp for some challenging cases...")
     parser.add_argument('--filestring', dest = 'filestring', default = 'WFC', help = 'filestring to match. default is WFC, which will grab all WFC*PA.fits.')
     parser.add_argument('--verbose', dest = 'verbose', default = False, action='store_true', help = 'Print more information')        
     parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will run on one directory only.')
