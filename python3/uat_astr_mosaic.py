@@ -226,7 +226,7 @@ if args.scamp:
     print('RUNNING SCAMP')
     if args.siena:
         os.system('scamp @scamp_input_cats -c default.scamp.siena')
-    if args.instrument == 'i':
+    if (args.instrument == 'i') | args.int:
         os.system('scamp @scamp_input_cats -c default.scamp.INT')
     elif args.pisces:
         os.system('scamp @scamp_input_cats -c default.scamp.pisces ')
