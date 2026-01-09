@@ -232,7 +232,7 @@ if args.scamp:
         os.system('scamp @scamp_input_cats -c default.scamp.pisces ')
     else:
         os.system('scamp @scamp_input_cats -c default.scamp')
-    print('DONE')MOS
+    print('DONE')#MOS
     
 if args.swarp:
     #HDI data
