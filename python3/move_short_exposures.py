@@ -54,6 +54,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     keys = ['naxis1', 'naxis2', 'imagetyp', 'filter', 'exptime','instrmnt']
-
+    print(f"WORKING ON {args.filestring} files in {os.getcwd()}")
     ic = ccdp.ImageFileCollection(os.getcwd(), keywords=keys, glob_include=args.filestring+'*.fits',glob_exclude='*coadd*.fits')
     move_short_exposures(ic,exptime = float(args.exptime))
