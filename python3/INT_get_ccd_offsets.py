@@ -109,7 +109,7 @@ def get_ra_dec_range(table_list):
     RETURNS:
     * racenter - central ra position of all the tables (deg)
     * deccenter - central dec position of all the tables (deg)
-    * radius_deg - radius (deg) needed to enclose all the data points, accounts for cos(dec) effect on delta_ra
+    * radius_deg - radius (deg) needed to enclose all the data points #, accounts for cos(dec) effect on delta_ra
     """
     ramin=10000
     ramax=0
@@ -128,7 +128,7 @@ def get_ra_dec_range(table_list):
             decmax = np.max(t['DELTA_J2000'])
     racenter = 0.5*(ramax+ramin)
     deccenter = 0.5*(decmax+decmin)    
-    raradius = 0.5*(ramax-ramin)*np.cos(np.radians(deccenter))
+    raradius = 0.5*(ramax-ramin)#*np.cos(np.radians(deccenter)) # I don't think we need this?
     decradius = 0.5*(decmax-decmin)
     radius_deg = np.sqrt(decradius**2 + raradius**2)
     return racenter, deccenter, radius_deg
