@@ -23,7 +23,7 @@ https://ccdproc.readthedocs.io/en/latest/image_combination.html
 import os
 homedir = os.getenv("HOME")
 import sys
-print(homedir)
+#print(homedir)
 
 sys.path.append('/home/rfinn/github/HalphaImaging/python3/')
 #import imutils
