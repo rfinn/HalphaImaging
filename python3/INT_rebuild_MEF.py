@@ -60,7 +60,7 @@ def build_mef_from_ccds(base_name, ccd_ids=(1, 2, 3, 4), suffix="PA"):
             img_hdu = fits.ImageHDU(data=data, header=header)
             hdulist.append(img_hdu)
 
-    outname = f"{base_name}_MEF.fits"
+    outname = f"{base_name}_MEF_PA.fits"
     hdulist.writeto(outname, overwrite=True)
     print(f"Wrote {outname}")
 
