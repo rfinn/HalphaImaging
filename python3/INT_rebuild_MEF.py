@@ -85,7 +85,7 @@ if __name__ == '__main__':
     filerootlist = list(set(allfilerootlist))
 
     for froot in filerootlist:
-        build_mef_from_ccds(base_name, ccd_ids=(1, 2, 3, 4), suffix="PA")
+        build_mef_from_ccds(froot, ccd_ids=(1, 2, 3, 4), suffix="PA")
 
         
         if args.testing:
