@@ -271,6 +271,7 @@ def get_median_offsets(panstarrs_table, se_tabs):
     #    print(tab.columns)
     #    break
     medians = np.array([10**(np.nanmedian(tab['MAG_AUTO'] - tab['rmag'])/2.5) for tab in matched_tables])
+    #medians = np.array([10**(np.nanmedian(tab['MAG_APER'][:,5] - tab['rmag'])/2.5) for tab in matched_tables])    
 
     # filenames should be sorted, so last entry will be chip 4
     # normalize WRT to chip 4    
@@ -294,14 +295,14 @@ if __name__ == '__main__':
     import os
 
     parser = argparse.ArgumentParser(description ="This program measures the offset of each ccd relative to PanSTARRS, calculates the scaling required to bring the ccds onto a uniform scale, and adds a keyword PANSCALE to the image headers.  PANSCALE can be used as the flux scaling keyword with SWarp.")
-    parser.add_argument('--filestring', dest = 'filestring', default = 'WFC', help = 'filestring to match. default is WFC, which will grab all WFC*PA.fits.')
+    parser.add_argument('--filestring', dest = 'filestring', default = 'WFC', help = 'filestring to match. default is WFC, which will grab all WFC*PA.cat.')
     parser.add_argument('--verbose', dest = 'verbose', default = False, action='store_true', help = 'Print more information')        
     parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will run on one directory only.')
     
     args = parser.parse_args()    
 
     # glob all WFC*PA.fits (or mWFC*PA.fits)
-    flist = glob.glob(f'{args.filestring}*PA.fits')
+    flist = glob.glob(f'{args.filestring}*PA.cat')
     flist.sort()
     if args.verbose:
         print("flist = ",flist)
@@ -333,11 +334,11 @@ if __name__ == '__main__':
 
         # get se cats and measure offsets
         # might also need to remove the preceding m if running on mWFC images
-        if 'mWFC' in args.filestring:
-            se_cat_list = [s.replace('.fits','.cat') for s in image_ccd_list]
-        else:
-            se_cat_list = [s.replace('.fits','.cat') for s in image_ccd_list]
-
+        #if 'mWFC' in args.filestring:
+        #    se_cat_list = [s.replace('.fits','.cat') for s in image_ccd_list]
+        #else:
+        #    se_cat_list = [s.replace('.fits','.cat') for s in image_ccd_list]
+        se_cat_list = image_ccd_list
         se_cat_list.sort()
 
         # read in the SE fits tables
