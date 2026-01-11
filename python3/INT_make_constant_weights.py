@@ -8,7 +8,7 @@ import glob
 def make_constant_weight(science_fits,
                          weight_fits,
                          skystd_key='SKYSTD',
-                         panscale_key='PANSCALE'):
+                         panfzp_key='PANFZP'):
     """
     from chatgpt and RAF
 
@@ -33,10 +33,10 @@ def make_constant_weight(science_fits,
     header = hdu[0].header
 
     skystd   = float(header[skystd_key])
-    panscale = float(header[panscale_key])
+    panfzp = float(header[panfzp_key])
 
     # Constant inverse-variance weight
-    wconst = 1.0 / (skystd**2 * panscale**2)
+    wconst = 1.0 / (skystd**2 * panfzp**2)
 
     weight = np.full(data.shape, wconst, dtype=np.float32)
 

@@ -257,7 +257,7 @@ def match_tables_to_panstarrs(panstarrs_table,table_list,rakey0='RAJ2000',deckey
     
     return matched_tables
 
-def get_median_offsets(panstarrs_table, se_tabs):
+def get_median_offsets(panstarrs_table, se_tabs, exptimes):
     '''
     match catalogs by ra and dec
     keep only flag=0 sources and stars
@@ -266,15 +266,8 @@ def get_median_offsets(panstarrs_table, se_tabs):
     
     # cross match arrays
     matched_tables = match_tables_to_panstarrs(panstarrs_table, se_tabs)
-    #for tab in matched_tables:
-    #    #print(tab)
-    #    print(tab.columns)
-    #    break
-    medians = np.array([10**(np.nanmedian(tab['MAG_AUTO'] - tab['rmag'])/2.5) for tab in matched_tables])
-    #medians = np.array([10**(np.nanmedian(tab['MAG_APER'][:,5] - tab['rmag'])/2.5) for tab in matched_tables])    
-
-    # filenames should be sorted, so last entry will be chip 4
-    # normalize WRT to chip 4    
+    medians = np.array([10**(np.nanmedian(tab['MAG_AUTO'] + 2.5*np.log10(exptime) - tab['rmag'])/2.5) for tab,exptime in zip(matched_tables,exptimes)])
+ 
 
     scale_factors = medians/np.mean(medians)
     return scale_factors             
@@ -284,10 +277,10 @@ def add_scale_to_header(image_list, scale_list, testing=False):
     for i,im in enumerate(image_list):
         if not testing:
             hdu = fits.open(im)
-            hdu[0].header.set('PANSCALE',f"{scale_list[i]:.4f}",'relative scale from SE FLUX_AUTO')
+            hdu[0].header.set('PANFZP',f"{scale_list[i]:.4f}",'Pan-STARRS photometric zeropoint scale (counts/s from FLUX_AUTO/EXPTIME -> PS1 flux)')
             hdu.writeto(im, overwrite=True)
         else:
-            print(f'PANSCALE, {scale_list[i]:.4f}, ','relative scale from PANSTARRS')
+            print(f'PANFZP, {scale_list[i]:.4f}, ','relative scale from PANSTARRS')
 
 if __name__ == '__main__':
     import glob
@@ -332,13 +325,20 @@ if __name__ == '__main__':
             print(f"\tno matches to {filerootlist[i]}, moving to next filter.")
             continue
 
+        # get exposure times from the image list
+        exptimes = []
+        for i in range(len(image_ccd_list)):
+            header = fits.getheader(image_ccd_list[i])
+            exptimes.append(float(header['EXPTIME']))
+
         # get se cats and measure offsets
         # might also need to remove the preceding m if running on mWFC images
+        se_cat_list = [s.replace('.fits','.cat') for s in image_ccd_list]        
         #if 'mWFC' in args.filestring:
         #    se_cat_list = [s.replace('.fits','.cat') for s in image_ccd_list]
         #else:
         #    se_cat_list = [s.replace('.fits','.cat') for s in image_ccd_list]
-        se_cat_list = image_ccd_list
+
         se_cat_list.sort()
 
         # read in the SE fits tables
@@ -352,7 +352,7 @@ if __name__ == '__main__':
         panstarrs_table = get_panstarrs(filerootlist[i], racenter, deccenter, 2*radius_deg)
         
         # calculate relative scale from median of FLUX_AUTO
-        scale_factor_list = get_median_offsets(panstarrs_table, se_tabs)
+        scale_factor_list = get_median_offsets(panstarrs_table, se_tabs, exptimes)
         #if args.verbose:
         print(f"\tscale factors = {scale_factor_list}")
         
