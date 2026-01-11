@@ -14,6 +14,7 @@ PROCEDURE:
 import numpy as np
 import os
 import sys
+from astropy.io import fits
 
 
 def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=19,
@@ -93,7 +94,6 @@ def read_se_cat(se_cat):
     RETURN
     data table with good sources
     '''
-    from astropy.io import fits
     from astropy.table import Table
     htab = fits.getdata(se_cat,2)
     keepflag =  (htab['FLAGS'] <  1) #& (htab['CLASS_STAR'] > 0.95) #& (htab['MAG_AUTO'] > -11.)
