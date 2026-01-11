@@ -327,12 +327,12 @@ if __name__ == '__main__':
 
         # get exposure times from the image list
         exptimes = []
-        for i in range(len(image_ccd_list)):
-            header = fits.getheader(image_ccd_list[i])
+        for cimage in range(len(image_ccd_list)):
+            header = fits.getheader(cimage)
             try:
                 exptimes.append(float(header['EXPTIME']))
             except KeyError:
-                print(f"WARNING: could not get exptime in header for {image_ccd_list[i]}")
+                print(f"WARNING: could not get exptime in header for {cimage}")
                 sys.exit()
 
         # get se cats and measure offsets
