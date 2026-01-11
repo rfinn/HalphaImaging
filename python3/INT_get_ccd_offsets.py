@@ -332,7 +332,7 @@ if __name__ == '__main__':
             try:
                 exptimes.append(float(header['EXPTIME']))
             except KeyError:
-                print(f"WARNING: could not get exptime in header for {imge_ccd_list[i]}")
+                print(f"WARNING: could not get exptime in header for {image_ccd_list[i]}")
                 sys.exit()
 
         # get se cats and measure offsets
