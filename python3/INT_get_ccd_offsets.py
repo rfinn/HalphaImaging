@@ -299,8 +299,8 @@ if __name__ == '__main__':
     # glob all WFC*PA.fits (or mWFC*PA.fits)
     flist = glob.glob(f'{args.filestring}*PA.fits')
     flist.sort()
-    if args.verbose:
-        print("flist = ",flist)
+    #if args.verbose:
+    #    print("flist = ",flist)
     # look for unique set of all image prefixes among all the *1PA.fits *2PA.fits, etc files
     allfilerootlist = [t.split('_')[0] for t in flist]
     filerootlist = list(set(allfilerootlist))
@@ -361,6 +361,8 @@ if __name__ == '__main__':
         scale_factor_list = get_median_offsets(panstarrs_table, se_tabs, exptimes)
         #if args.verbose:
         print(f"\tscale factors = {scale_factor_list}")
+        print(f"\tnormalized scale factors = {scale_factor_list/np.mean(scale_factor_list)}")        
+        
         
         # add the scale factors to the header for use with SWARP
         # then swarp can use this to scale the images when making a coadd.
