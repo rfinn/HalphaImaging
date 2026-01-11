@@ -269,7 +269,9 @@ def get_median_offsets(panstarrs_table, se_tabs, exptimes):
     medians = np.array([10**(np.nanmedian(tab['MAG_AUTO'] + 2.5*np.log10(exptime) - tab['rmag'])/2.5) for tab,exptime in zip(matched_tables,exptimes)])
  
 
-    scale_factors = medians/np.mean(medians)
+    #scale_factors = medians/np.mean(medians)
+    # decided not to normalize so that the scale factor is the true tie to panstarrs
+    scale_factors = medians
     return scale_factors             
 
 def add_scale_to_header(image_list, scale_list, testing=False):
