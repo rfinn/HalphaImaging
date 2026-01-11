@@ -329,7 +329,11 @@ if __name__ == '__main__':
         exptimes = []
         for i in range(len(image_ccd_list)):
             header = fits.getheader(image_ccd_list[i])
-            exptimes.append(float(header['EXPTIME']))
+            try:
+                exptimes.append(float(header['EXPTIME']))
+            except KeyError:
+                print(f"WARNING: could not get exptime in header for {imge_ccd_list[i]}")
+                sys.exit()
 
         # get se cats and measure offsets
         # might also need to remove the preceding m if running on mWFC images
