@@ -327,7 +327,7 @@ if __name__ == '__main__':
 
         # get exposure times from the image list
         exptimes = []
-        for cimage in range(len(image_ccd_list)):
+        for cimage in image_ccd_list:
             header = fits.getheader(cimage)
             try:
                 exptimes.append(float(header['EXPTIME']))
