@@ -295,7 +295,7 @@ if __name__ == '__main__':
     args = parser.parse_args()    
 
     # glob all WFC*PA.fits (or mWFC*PA.fits)
-    flist = glob.glob(f'{args.filestring}*PA.cat')
+    flist = glob.glob(f'{args.filestring}*PA.fits')
     flist.sort()
     if args.verbose:
         print("flist = ",flist)
