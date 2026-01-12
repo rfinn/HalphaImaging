@@ -15,7 +15,7 @@ WEIGHT_TYPE            MAP_WEIGHT            # BACKGROUND,MAP_RMS,MAP_VARIANCE
 WEIGHT_SUFFIX          .weight.fits    # Suffix to use for weight-maps
 WEIGHT_IMAGE                           # Weightmap filename if suffix not used
                                        # (all or for each weight-map)
-RESCALE_WEIGHTS        N               # Rescale input weights/variances (Y/N)?				  
+RESCALE_WEIGHTS        Y               # Rescale input weights/variances (Y/N)?				  
  
 #------------------------------- Co-addition ----------------------------------
  
