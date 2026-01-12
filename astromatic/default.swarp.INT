@@ -51,13 +51,13 @@ INTERPOLATE            N               # Interpolate bad input pixels (Y/N)?
                                        # (all or for each image)
  
 FSCALASTRO_TYPE        FIXED           # NONE,FIXED, or VARIABLE
-FSCALE_KEYWORD         PANZP        # FITS keyword for the multiplicative
+FSCALE_KEYWORD         PANFZP        # FITS keyword for the multiplicative
 #FSCALE_KEYWORD         EXPTIME        # FITS keyword for the multiplicative
                                        # factor applied to each input image
 FSCALE_DEFAULT         1.0             # Default FSCALE value if not in header
  
 GAIN_KEYWORD           GAIN            # FITS keyword for effect. gain (e-/ADU)
-GAIN_DEFAULT           0.0             # Default gain if no FITS keyword found
+GAIN_DEFAULT           1             # Default gain if no FITS keyword found
  
 #--------------------------- Background subtraction ---------------------------
  
