@@ -279,7 +279,7 @@ def add_scale_to_header(image_list, scale_list, testing=False):
     for i,im in enumerate(image_list):
         if not testing:
             hdu = fits.open(im)
-            hdu[0].header.set('PANFZP',f"{scale_list[i]:.4f}",'panstarrs fluxzp SE FLUX_AUTO/EXPTIME->PS1 flux')
+            hdu[0].header.set('PANFZP',f"{scale_list[i]:.4e}",'panstarrs fluxzp SE FLUX_AUTO/EXPTIME->PS1 flux')
             hdu.writeto(im, overwrite=True)
         else:
             print(f'PANFZP, {scale_list[i]:.4f}, ','relative scale from PANSTARRS')

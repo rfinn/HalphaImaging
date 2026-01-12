@@ -37,9 +37,9 @@ FULLOUTCAT_NAME        full.cat        # Full output catalog filename
 MATCH                  Y               # Do pattern-matching (Y/N) ?
 MATCH_NMAX             0               # Max.number of detections for MATCHing
                                        # (0=auto)
-PIXSCALE_MAXERR        1.2             # Max scale-factor uncertainty
-POSANGLE_MAXERR        1.0             # Max position-angle uncertainty (deg)
-POSITION_MAXERR        1             # Max positional uncertainty (arcmin)
+PIXSCALE_MAXERR        1.1             # Max scale-factor uncertainty
+POSANGLE_MAXERR        .5             # Max position-angle uncertainty (deg)
+POSITION_MAXERR        .8             # Max positional uncertainty (arcmin)
 MATCH_RESOL            0              # Matching resolution (arcsec); 0=auto
 MATCH_FLIPPED          N               # Allow matching with flipped axes?
 MOSAIC_TYPE            FIX_FOCALPLANE       # UNCHANGED, SAME_CRVAL, SHARE_PROJAXIS,
