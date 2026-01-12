@@ -29,13 +29,18 @@ if __name__ == '__main__':
     parser.add_argument('--dirlist', dest = 'dirlist', default = 'dirlist', help = 'file containing list of directories to run on.  default is dirlist')
     parser.add_argument('--filestring', dest = 'filestring', default = 'mWFC', help = 'Filestring to pass into INT_get_ccd_offsets.py.  Usually this is mWFC or WFC.')        
     parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will run on one directory only.')
-    
+    parser.add_argument('--onedir', dest = 'onedir', default = None, help = 'Will run on one directory only.')        
     args = parser.parse_args()
     
-    dirlist = open(args.dirlist, 'r')
+    dirlist_file = open(args.dirlist, 'r')
+    dirlist = []
+    for line in dirlist_file:
+        dirlist.append(line.rstrip('\n'))
 
+    if args.onedir is not None:
+        dirlist = [args.onedir]
     for d in dirlist:
-        subdir = d.rstrip('\n')
+        #subdir = d.rstrip('\n')
 
         # move to directory
         topdir = os.getcwd()
