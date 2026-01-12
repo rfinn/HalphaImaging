@@ -219,7 +219,7 @@ if args.swarp:
         #####################################################        
         print(f'python {gitpath}uat_astr_mosaic.py --swarp --l {f} --instrument {args.instrument}')
         os.system(f'python {gitpath}uat_astr_mosaic.py --swarp --l {f} --instrument {args.instrument}')
-
+        os.system(f'cp swarp.xml swarp_{f}.xml')
         #####################################################
         # run swarp on halpha images
         #####################################################        
@@ -228,9 +228,11 @@ if args.swarp:
                 for h in fnames:
                     # run swarp on halpha, with r as reference image
                     os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+h+' --refimage '+rcoadd_image+' --noback'+' --instrument '+args.instrument)
+                    os.system(f'cp swarp.xml swarp_{f}.xml')
             else:
                 # run swarp on halpha, with r as reference image
                 os.system('python '+gitpath+'uat_astr_mosaic.py --swarp --l '+halist+' --refimage '+rcoadd_image+' --instrument '+args.instrument)#+' --noback')
+                os.system(f'cp swarp.xml swarp_{halist}.xml')
 
 
         # don't need to do this now that we are calling swarp correctly, as of 12/07/2025!!!
