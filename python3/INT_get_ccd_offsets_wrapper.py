@@ -39,9 +39,9 @@ if __name__ == '__main__':
 
     if args.onedir is not None:
         dirlist = [args.onedir]
-    for d in dirlist:
+    for subdir in dirlist:
         #subdir = d.rstrip('\n')
-
+        
         # move to directory
         topdir = os.getcwd()
 
