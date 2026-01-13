@@ -76,6 +76,7 @@ if __name__ == '__main__':
     parser.add_argument('--getzp', dest = 'getzp', default = False, action='store_true', help = 'Run getzp to flatten and normalize by exposure time.')    
     parser.add_argument('--renamecoadd', dest = 'renamecoadd', default = False, action='store_true', help = 'Rename coadd to VFS standard.')        
     parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will run on one directory only.')
+    parser.add_argument('--verbose', dest = 'verbose', default = False, action='store_true', help = 'May print more information.')    
     parser.add_argument('--onedir', dest = 'onedir', default = None, help = 'Will run on one directory only.')    
     
     args = parser.parse_args()
