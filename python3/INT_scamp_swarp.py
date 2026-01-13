@@ -73,6 +73,7 @@ if __name__ == '__main__':
     parser.add_argument('--moveshort', dest = 'moveshort', default = False, action='store_true', help = 'Move images with short exposure time to a subdirectory.')
     parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true', help = 'Subtract a median sky value from each image.')    
     parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true', help = 'Run swarp')
+    parser.add_argument('--getzp', dest = 'getzp', default = False, action='store_true', help = 'Run getzp to flatten and normalize by exposure time.')    
     parser.add_argument('--renamecoadd', dest = 'renamecoadd', default = False, action='store_true', help = 'Rename coadd to VFS standard.')        
     parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will run on one directory only.')
     parser.add_argument('--onedir', dest = 'onedir', default = None, help = 'Will run on one directory only.')    
@@ -209,6 +210,31 @@ if __name__ == '__main__':
                 ## not removing median subtracted images - these take so long to make!
                 # remove median subtracted images
                 #os.system('rm mWFC*.fits')
+
+            if args.getzp:
+                # get R-band image
+                rband_image = f"{subdir}_r.coadd.fits"
+                
+                # get halpha image
+                hafilters = ['Halpha','Ha6657']
+                halpha_images = []
+                halpha_filters = []
+                for haf in hafilters:
+                    halpha_image = f"{subdir}_{haf}.coadd.fits"
+                    if os.path.exists(halpha_image):
+                        # run getzp
+                        halpha_images.append(halpha_image)
+                        halpha_filters.append('ha')
+                
+                all_images = [rband_image] + halpha_images
+                all_filters = ['r'] + halpha_filters
+                for i,im in enumerate(all_images):
+                    # run getzp
+                    command_string = f"python ~/github/HalphaImaging/python3/getzp.py --image {im} --instrument i --filter {all_filters[i]} --normbyexptime --flatten 1"
+                    if args.verbose: # testing
+                        print("running: ",command_string)
+                    os.system(command_string)
+
             if args.renamecoadd:
                 ## RENAME COADDS
                 new_output_image = get_updated_BOK_coadd_name(ha_coadd)
