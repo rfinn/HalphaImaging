@@ -105,6 +105,10 @@ if __name__ == '__main__':
             print('##########################################')
             print('##########################################')
 
+            if not os.path.exists(subdir):
+                print(f"WARNING: could not find {subdir}")
+                continue
+            
             # move to subdirectory
             os.chdir(subdir)
 
