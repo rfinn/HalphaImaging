@@ -97,7 +97,7 @@ def update_coadd_header(coadd, input_image_list):
 
 
     # write out coadd with new header
-    header_fields = ['OBSDATE','AIRMASS','EXPTIME','MEDSUB','SKYMED','SKYSTD']# List of FITS keywords to propagate
+    header_fields = ['OBSDATE','AIRMASS','EXPTIME','SKYVALUE','MEDSUB','SKYMED','SKYSTD']# List of FITS keywords to propagate
     infile = open(input_image_list,'r')
     input_images = []
     for line in infile:
@@ -154,6 +154,8 @@ def update_coadd_header(coadd, input_image_list):
                 newfield = newfield.replace('IME','')
             elif (len(newfield) > 8) & ('DATEOBS' in newfield):
                 newfield = newfield.replace('DATEOBS','DATEOB')
+            elif (len(newfield) > 8) & ('SKYVALUE' in newfield):
+                newfield = newfield.replace('SKYVALUE','SKYVAL') # from theli
                
             try:
                 if f in ['MEDSUB','SKYMED','SKYSTD']:
@@ -284,7 +286,7 @@ if args.swarp:
         
         print('RUNNING SWARP')
         # this is the basic command for running swarp
-        commandstring = 'swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage +' -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale)
+        commandstring = 'swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage +' -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale)+' -XML_NAME swarp_+'+args.l+'.xml'
         if args.m:
 
             # this create a list of bpm files that tell swarp to ignore the chip gaps, etc.

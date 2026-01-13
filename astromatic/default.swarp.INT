@@ -10,7 +10,7 @@ HEADER_SUFFIX          .head           # Filename extension for additional heade
  
 #------------------------------- Input Weights --------------------------------
  
-WEIGHT_TYPE            MAP_WEIGHT            # BACKGROUND,MAP_RMS,MAP_VARIANCE
+WEIGHT_TYPE            MAP_WEIGHT      # BACKGROUND,MAP_RMS,MAP_VARIANCE
                                        # or MAP_WEIGHT
 WEIGHT_SUFFIX          .weight.fits    # Suffix to use for weight-maps
 WEIGHT_IMAGE                           # Weightmap filename if suffix not used
@@ -55,10 +55,11 @@ FSCALE_KEYWORD         PANFZP        # FITS keyword for the multiplicative
 #FSCALE_KEYWORD         EXPTIME        # FITS keyword for the multiplicative
                                        # factor applied to each input image
 FSCALE_DEFAULT         1.0             # Default FSCALE value if not in header
-CG 
+ 
 GAIN_KEYWORD           GAIN            # FITS keyword for effect. gain (e-/ADU)
 GAIN_DEFAULT           1             # Default gain if no FITS keyword found
- 
+
+
 #--------------------------- Background subtraction ---------------------------
  
 SUBTRACT_BACK          N               # Subtraction sky background (Y/N)?
