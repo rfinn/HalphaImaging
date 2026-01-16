@@ -281,12 +281,13 @@ def add_scale_to_header(image_list, scale_list, testing=False, full_scale_list=N
         if not testing:
             hdu = fits.open(im)
             hdu[0].header.set('PANFZP',f"{scale_list[i]:.4e}",'panstarrs fluxzp SE FLUX_AUTO/EXPTIME->PS1 flux')
+            hdu[0].header.set('PSCALE',f"{full_scale_list[i]:.4e}",'panstarrs fluxzp SE FLUX_AUTO->PS1 flux')            
             hdu.writeto(im, overwrite=True)
             #if full_scale_list is not None:
-            hdu[0].header.set('PSCALE',f"{full_scale_list[i]:.4e}",'panstarrs fluxzp SE FLUX_AUTO->PS1 flux')
+
         else:
-            print(f'PANFZP, {scale_list[i]:.4f}, ','relative scale from PANSTARRS')
-            print(f'PSCALE, {full_scale_list[i]:.4f}, ','ADU to PANSTARRS')
+            print(f'PANFZP, {scale_list[i]:.4e}, ','relative scale from PANSTARRS')
+            print(f'PSCALE, {full_scale_list[i]:.4e}, ','ADU to PANSTARRS')
 
 if __name__ == '__main__':
     import glob
