@@ -363,6 +363,8 @@ if __name__ == '__main__':
         # calculate relative scale from median of FLUX_AUTO
         # the first list includes normalization by time, whereas the second does not
         scale_factor_list, full_scale_factor_list = get_median_offsets(panstarrs_table, se_tabs, exptimes)
+        print("full_scale_factor_list = ",full_scale_factor_list)
+
         #if args.verbose:
         print(f"\tscale factors = {scale_factor_list}")
         print(f"\tnormalized scale factors = {scale_factor_list/np.mean(scale_factor_list)}")        
