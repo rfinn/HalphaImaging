@@ -286,6 +286,7 @@ def add_scale_to_header(image_list, scale_list, testing=False, full_scale_list=N
             hdu[0].header.set('PSCALE',f"{full_scale_list[i]:.4e}",'panstarrs fluxzp SE FLUX_AUTO->PS1 flux')
         else:
             print(f'PANFZP, {scale_list[i]:.4f}, ','relative scale from PANSTARRS')
+            print(f'PSCALE, {full_scale_list[i]:.4f}, ','ADU to PANSTARRS')
 
 if __name__ == '__main__':
     import glob
@@ -372,7 +373,7 @@ if __name__ == '__main__':
         
         # add the scale factors to the header for use with SWARP
         # then swarp can use this to scale the images when making a coadd.
-        add_scale_to_header(image_ccd_list, scale_factor_list,testing=args.testing, full_scale_list = full_scale_factor_list)
+        add_scale_to_header(image_ccd_list, scale_factor_list,testing=args.testing, full_scale_list=full_scale_factor_list)
 
         if args.testing:
             sys.exit()
