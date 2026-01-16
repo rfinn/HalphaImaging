@@ -384,7 +384,7 @@ class getzp():
         # check for se catalog
         secat = froot+'.cat'
 
-        os.system('ln -s ' +self.astrodir + '/default.* .')        
+        os.system('cp ' +self.astrodir + '/default.* .')        
         if self.instrument == 'h':
             defaultcat = 'default.sex.HDI'
         elif self.instrument == 'i':
