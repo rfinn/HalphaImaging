@@ -283,7 +283,7 @@ class getzp():
         self.fixbok = args.fixbok
         self.args = args
         global v1, v2
-        if self.filter == 'ha':
+        if 'ha' in self.filter:
             v1 = .9
             v2 = 1.1
             v1 = .95
@@ -405,8 +405,8 @@ class getzp():
         ADUlimit = 40000.
         if self.instrument == 'i':
             if (self.filter == 'r'):
-                ADUlimit = 400000./60#/float(expt)
-            elif self.filter == 'ha':
+                ADUlimit = 40000./60#/float(expt)
+            elif 'ha' in self.filter:
                 ADUlimit = 40000./180.
         if self.instrument == 'm':
             ADUlimit = 40000.
@@ -571,6 +571,78 @@ class getzp():
         #        (self.matchedarray1['Y_IMAGE'] < self.keepsection[3])
         #    self.fitflag = self.fitflag & self.goodarea_flag
     def color_correct_panstarrs(self):
+        """
+        from values that I calculated from filter traces and Manga MaStar normal spectral
+
+        - below are coefficients for second order polynomial fits
+        - first value is coefficient of (PS_g-PS_r)^2
+
+        FITS WITH OUTLIER REJECTION:
+
+        'BOK90prime-BASSr': [0.0096,-0.1041,0.0130,]
+        'BOK90prime-Ha4nm': [0.0383,-0.2730,0.0463,]
+        'MOS-SDSSr': [0.0029,-0.0362,0.0032,]
+        'MOS-Ha4nm': [0.0383,-0.2730,0.0463,]
+        'MOS-Ha8nm': [0.0187,-0.2485,0.0245,]
+        'MOS-Ha12nm': [0.0181,-0.2710,0.0454,]
+        'MOS-HarrisR': [0.0205,-0.1611,-0.0111,]
+        'MOS-Ha16nm': [0.0202,-0.2992,0.0736,]
+        'HDI-SDSSr': [0.0012,-0.0082,-0.0022,]
+        'HDI-Ha': [0.1538,-0.4472,0.1448,]
+        'HDI-Ha4nm': [0.0286,-0.2551,0.0386,]
+        'HDI-Ha8nm': [0.0173,-0.2439,0.0204,]
+        'HDI-HarrisR': [0.0178,-0.1395,-0.0127,]
+        'HDI-Ha12nm': [0.0181,-0.2760,0.0515,]
+        'HDI-Ha16nm': [0.0210,-0.3085,0.0846,]
+        'WFC-SDSSr214': [0.0003,-0.0126,0.0030,]
+        'WFC-Ha197': [0.1129,-0.3820,0.1105,]
+        'WFC-Ha227': [0.0174,-0.2475,0.0214,]
+        'panstarrs-g': [0.0000,1.0000,-0.0000,]
+        'panstarrs-r': [0.0000,0.0000,0.0000,]
+
+        """
+
+        filter_trans_dict = {'BOK90prime-r': [0.0096,-0.1041,0.0130],\
+                             'BOK90prime-ha4': [0.0383,-0.2730,0.0463],
+                             'MOS-r': [0.0029,-0.0362,0.0032],
+                             'MOS-ha4': [0.0383,-0.2730,0.0463],
+                             'MOS-ha8': [0.0187,-0.2485,0.0245],
+                             'MOS-ha12': [0.0181,-0.2710,0.0454],
+                             'MOS-R': [0.0205,-0.1611,-0.0111],
+                             'MOS-ha16': [0.0202,-0.2992,0.0736],
+                             'HDI-r': [0.0012,-0.0082,-0.0022],
+                             'HDI-ha': [0.1538,-0.4472,0.1448],
+                             'HDI-ha4': [0.0286,-0.2551,0.0386],
+                             'HDI-ha8': [0.0173,-0.2439,0.0204],
+                             'HDI-R': [0.0178,-0.1395,-0.0127],
+                             'HDI-ha12': [0.0181,-0.2760,0.0515],
+                             'HDI-ha16': [0.0210,-0.3085,0.0846],
+                             'WFC-r2': [0.0003,-0.0126,0.0030],
+                             'WFC-Ha197': [0.1129,-0.3820,0.1105],
+                             'WFC-Ha227': [0.0174,-0.2475,0.0214],
+                             'panstarrs-g': [0.0000,1.0000,-0.0000],
+                             'panstarrs-r': [0.0000,0.0000,0.0000]}
+        instrument_dict = {'b':'BOK90prime', 'm':'MOS','h':'HDI','i':'WFC'}
+        filter_key = f"{instrument_dict[self.instrument]}-{self.filter}"
+
+        ###################################################
+        # PANSTARRS magnitudes
+        ###################################################        
+        PS1_r = self.pan['rmag']
+        PS1_g = self.pan['gmag']
+        PS1_i = self.pan['imag']        
+        self.pan_gr_color = self.pan['gmag'] - self.pan['rmag']
+
+        try:
+            pcoeff = filter_trans_dict[filter_key]     
+            self.R = PS1_r + pcoeff[0]*(PS1_g-PS1_r)**2 + pcoeff[1]*(PS1_g-PS1_r) + pcoeff[2]
+        else KeyError:
+            print("ruh - roh!  did not find the panstarrs color transformation!!!")
+            print("setting instrumental r mag to panstarrs r mag")
+            print()
+            self.R = self.pan['rmag']
+        
+    def color_correct_panstarrs_matteo(self):
         """
         correcting panstarrs magnitudes into the observed filter systems using conversions from M. Fossati  
 
@@ -1187,7 +1259,9 @@ if __name__ == '__main__':
     parser.add_argument('--image', dest = 'image', default = 'test.coadd.fits', help = 'Image for ZP calibration')
     parser.add_argument('--instrument', dest = 'instrument', default = None, help = 'HDI = h, KPNO mosaic = m, INT = i, BOK 90Prime = b')
     parser.add_argument('--catalog', dest = 'catalog', default = None, help = 'photometric catalog to use for bootrapping photometry')    
-    parser.add_argument('--fwhm', dest = 'fwhm', default = None, help = 'image FWHM in arcseconds.  Default is none, then SE assumes 1.5 arcsec')    
+    parser.add_argument('--fwhm', dest = 'fwhm', default = None, help = 'image FWHM in arcseconds.  Default is none, then SE assumes 1.5 arcsec')
+    # TODO - change to make a list of filters
+    # r, R, ha4, ha8, ha12, ha16
     parser.add_argument('--filter', dest = 'filter', default = 'R', help = 'filter (R or r; use ha for Halpha)')
     parser.add_argument('--useri',dest = 'useri', default = False, action = 'store_true', help = 'Use r->R transformation as a function of r-i rather than the g-r relation.  g-r is the default.')
     parser.add_argument('--normbyexptime', dest = 'normbyexptime', default = False, action = 'store_true', help = "set this flag if the image is in ADU rather than ADU/s, and the program will then normalize by the exposure time.  Note: swarp produces images in ADU/s, so this is usually not necessary if using coadds from swarp.")
