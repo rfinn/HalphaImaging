@@ -18,6 +18,7 @@ To run on mosaic data, set the flatten and spline flags:
 %run ~/github/HalphaImaging/getzp.py --image pointing031-r.coadd.fits --instrument m --filter r --flatten 1 --spline
 
 UPDATES:
+* 2026-Jan: updating color transformations
 * implemented scipy.optimize.curve_fit in getzp.py to 
     * keep slope fixed at 1
     * get an estimate of error in ZP (sqrt(covariance))
@@ -555,7 +556,13 @@ class getzp():
         ###################################################################
         if self.verbose:
             print(f'\t matched {np.sum(self.matchflag)} objects')
-        self.fitflag = self.matchflag  & (self.pan['rmag'] > 14.) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.pan['rmag'] < 19) #& (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.matchedarray1['MAG_AUTO'] > -11.)
+
+        # TODONE - add color restriction to panstarrs: 0 < g-r < 1
+        ps_gr = self.pan['gmag'] - self.pan['rmag']
+        colorflag = (ps_gr > 0) & (ps_gr < 1)
+        
+        self.fitflag = colorflag & self.matchflag  & (self.pan['rmag'] > 14.) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.pan['rmag'] < 19) #& (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.matchedarray1['MAG_AUTO'] > -11.)
+        
         if self.verbose:
             print(f'\t number that pass fit {np.sum(self.fitflag)}')
         # for WFC on INT, restrict area to central region
@@ -577,8 +584,29 @@ class getzp():
         - below are coefficients for second order polynomial fits
         - first value is coefficient of (PS_g-PS_r)^2
 
-        FITS WITH OUTLIER REJECTION:
+        FITS with outlier rejection, restriction range to 0 < PS_g - PS_r < 1:
+        'BOK90prime-BASSr': [0.0092,-0.1076,0.0202,],\
+        'BOK90prime-Ha4nm': [0.0336,-0.2664,0.0507,],\
+        'MOS-SDSSr': [0.0026,-0.0370,0.0055,],\
+        'MOS-Ha4nm': [0.0336,-0.2664,0.0507,],\
+        'MOS-Ha8nm': [0.0151,-0.2452,0.0311,],\
+        'MOS-Ha12nm': [0.0149,-0.2617,0.0404,],\
+        'MOS-HarrisR': [0.0181,-0.1657,0.0056,],\
+        'MOS-Ha16nm': [0.0171,-0.2799,0.0512,],\
+        'HDI-SDSSr': [0.0013,-0.0095,0.0000,],\
+        'HDI-Ha': [0.1422,-0.4243,0.1426,],\
+        'HDI-Ha4nm': [0.0236,-0.2464,0.0402,],\
+        'HDI-Ha8nm': [0.0132,-0.2393,0.0267,],\
+        'HDI-HarrisR': [0.0156,-0.1437,0.0024,],\
+        'HDI-Ha12nm': [0.0146,-0.2624,0.0401,],\
+        'HDI-Ha16nm': [0.0178,-0.2849,0.0547,],\
+        'WFC-SDSSr214': [0.0002,-0.0123,0.0027,],\
+        'WFC-Ha197': [0.1014,-0.3588,0.1075,],\
+        'WFC-Ha227': [0.0138,-0.2456,0.0303,],\
+        'panstarrs-g': [0.0000,1.0000,0.0000,],\
+        'panstarrs-r': [0.0000,0.0000,0.0000,],\
 
+        FITS WITH OUTLIER REJECTION (-0.2 < PS_g - PS_r < 1.2; or thereabouts...):
         'BOK90prime-BASSr': [0.0096,-0.1041,0.0130,]
         'BOK90prime-Ha4nm': [0.0383,-0.2730,0.0463,]
         'MOS-SDSSr': [0.0029,-0.0362,0.0032,]
@@ -602,26 +630,27 @@ class getzp():
 
         """
 
-        filter_trans_dict = {'BOK90prime-r': [0.0096,-0.1041,0.0130],\
-                             'BOK90prime-ha4': [0.0383,-0.2730,0.0463],
-                             'MOS-r': [0.0029,-0.0362,0.0032],
-                             'MOS-ha4': [0.0383,-0.2730,0.0463],
-                             'MOS-ha8': [0.0187,-0.2485,0.0245],
-                             'MOS-ha12': [0.0181,-0.2710,0.0454],
-                             'MOS-R': [0.0205,-0.1611,-0.0111],
-                             'MOS-ha16': [0.0202,-0.2992,0.0736],
-                             'HDI-r': [0.0012,-0.0082,-0.0022],
-                             'HDI-ha': [0.1538,-0.4472,0.1448],
-                             'HDI-ha4': [0.0286,-0.2551,0.0386],
-                             'HDI-ha8': [0.0173,-0.2439,0.0204],
-                             'HDI-R': [0.0178,-0.1395,-0.0127],
-                             'HDI-ha12': [0.0181,-0.2760,0.0515],
-                             'HDI-ha16': [0.0210,-0.3085,0.0846],
-                             'WFC-r2': [0.0003,-0.0126,0.0030],
-                             'WFC-Ha197': [0.1129,-0.3820,0.1105],
-                             'WFC-Ha227': [0.0174,-0.2475,0.0214],
-                             'panstarrs-g': [0.0000,1.0000,-0.0000],
-                             'panstarrs-r': [0.0000,0.0000,0.0000]}
+        filter_trans_dict = {'BOK90prime-BASSr': [0.0092,-0.1076,0.0202,],\
+                'BOK90prime-Ha4nm': [0.0336,-0.2664,0.0507,],\
+                'MOS-SDSSr': [0.0026,-0.0370,0.0055,],\
+                'MOS-Ha4nm': [0.0336,-0.2664,0.0507,],\
+                'MOS-Ha8nm': [0.0151,-0.2452,0.0311,],\
+                'MOS-Ha12nm': [0.0149,-0.2617,0.0404,],\
+                'MOS-HarrisR': [0.0181,-0.1657,0.0056,],\
+                'MOS-Ha16nm': [0.0171,-0.2799,0.0512,],\
+                'HDI-SDSSr': [0.0013,-0.0095,0.0000,],\
+                'HDI-Ha': [0.1422,-0.4243,0.1426,],\
+                'HDI-Ha4nm': [0.0236,-0.2464,0.0402,],\
+                'HDI-Ha8nm': [0.0132,-0.2393,0.0267,],\
+                'HDI-HarrisR': [0.0156,-0.1437,0.0024,],\
+                'HDI-Ha12nm': [0.0146,-0.2624,0.0401,],\
+                'HDI-Ha16nm': [0.0178,-0.2849,0.0547,],\
+                'WFC-SDSSr214': [0.0002,-0.0123,0.0027,],\
+                'WFC-Ha197': [0.1014,-0.3588,0.1075,],\
+                'WFC-Ha227': [0.0138,-0.2456,0.0303,],\
+                'panstarrs-g': [0.0000,1.0000,0.0000,],\
+                'panstarrs-r': [0.0000,0.0000,0.0000,]}
+
         instrument_dict = {'b':'BOK90prime', 'm':'MOS','h':'HDI','i':'WFC'}
         filter_key = f"{instrument_dict[self.instrument]}-{self.filter}"
 
@@ -869,21 +898,24 @@ class getzp():
 
         # fixed radii apertures: [:,0] = 3 pix, [:,1] = 5 pix, [:,2] = 7 pixels
 
+        # TODONE - incorporate panstarrs errors in the yerr
+        yerrpan = self.pan['e_rmag'][flag]
         if self.mag == 0: # this is the default magnitude
             if self.verbose:
                 print('Using Aperture Magnitudes')
             y = self.matchedarray1['MAG_APER'][:,self.naper][flag]
-            yerr = self.matchedarray1['MAGERR_APER'][:,self.naper][flag]
+            yerr = np.sqrt(self.matchedarray1['MAGERR_APER'][:,self.naper][flag]**2 + yerrpan**2)
         elif self.mag == 1:
             if self.verbose:
                 print('Using MAG_BEST')
             y = self.matchedarray1['MAG_BEST'][flag]
-            yerr = self.matchedarray1['MAGERR_BEST'][flag]
+            yerr = np.sqrt(self.matchedarray1['MAGERR_BEST'][flag]**2 + yerrpan**2)
         elif self.mag == 2:
             if self.verbose:
                 print('Using MAG_PETRO')
             y = self.matchedarray1['MAG_PETRO'][flag]
-            yerr = self.matchedarray1['MAGERR_PETRO'][flag]
+            
+            yerr = np.sqrt(self.matchedarray1['MAGERR_PETRO'][flag]**2 + yerrpan**2)
 
 
         # start fitting procedure
@@ -1203,7 +1235,10 @@ class getzp():
         if not os.path.exists(subdir):
             os.mkdir(subdir)
 
-        fname = f"{get_filebasename(self.image)}".replace('.fits',f"_{self.filter}_pan_SE_tab.fits")
+        #print("HEY!!! self.image = ",self.image)
+        #print("HEY!!! get_filebasename(self.image) = ",get_filebasename(self.image))
+        fname = f"{get_filebasename(self.image)}_{self.filter}_pan_SE_tab.fits"
+        print("table name = ",fname)
         outname = os.path.join(subdir, fname)
         #outname = get_filebasename(self.image)+'_pan_SE_tab.fits'
         print("Writing merged panstarrs - SE table as ",outname)
