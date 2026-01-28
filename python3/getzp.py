@@ -636,7 +636,7 @@ class getzp():
         try:
             pcoeff = filter_trans_dict[filter_key]     
             self.R = PS1_r + pcoeff[0]*(PS1_g-PS1_r)**2 + pcoeff[1]*(PS1_g-PS1_r) + pcoeff[2]
-        else KeyError:
+        except KeyError:
             print("ruh - roh!  did not find the panstarrs color transformation!!!")
             print("setting instrumental r mag to panstarrs r mag")
             print()
