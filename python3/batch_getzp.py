@@ -63,9 +63,13 @@ def runone(i,f):
         filter = t[6].replace('.fits','')
         
 
-    halpha_names = ['ha4','Halpha','Ha6657','Ha4']
-    if filter in halpha_names:
-        ffilter = 'ha'
+    halpha_filters = ['ha4','Halpha','Ha6657','Ha4']
+    if filter in ['ha4','Ha4','Ha+4nm']:
+        ffilter = 'ha4'
+    elif filter == 'Halpha': #int 197
+        ffilter = 'ha197'
+    elif filter == 'Ha6657'
+        ffilter = 'ha227'
     elif filter == 'r':
         ffilter = 'r'
     elif filter == 'R':
