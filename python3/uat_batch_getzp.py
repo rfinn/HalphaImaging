@@ -24,15 +24,19 @@ if __name__ == '__main__':
     filelist = glob.glob(matchstring)
     filelist.sort()
 
-    
+    hafilters = ['ha4','ha8','ha12','ha16']
 
     for f in filelist:
+
+        
         if 'weight' in f:
             continue
         if 'CS.fits' in f:
             continue
         if 'CS-ZP.fits' in f:
             continue
+
+        
         
         if 'MOS' in f:
             instrument = 'm'
@@ -44,7 +48,11 @@ if __name__ == '__main__':
         elif 'r.fits' in f:
             filtername = 'r'
         else:
-            filtername = 'h'
+            for haf in hafilters:
+                if haf in f:
+                    filtername = haf
+                    break
+
             
         # TODO - NEED TO ADD CASES FOR HA8, 12, AND 16 ONCE WE HAVE THOSE TRANSFORMATIONS
         print("running ",f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {instrument} --filter {filtername}")
