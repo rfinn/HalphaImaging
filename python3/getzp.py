@@ -560,7 +560,7 @@ class getzp():
         # TODONE - add color restriction to panstarrs: 0 < g-r < 1
         ps_gr = self.pan['gmag'] - self.pan['rmag']
         colorflag = (ps_gr > 0) & (ps_gr < 1)
-        colorflag = (ps_gr > -0.2) & (ps_gr < 1.2)
+        #colorflag = (ps_gr > -0.2) & (ps_gr < 1.2)
         #colorflag = np.ones(len(ps_gr),'bool')
         self.fitflag = colorflag & self.matchflag  & (self.pan['rmag'] > 14.) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.pan['rmag'] < 19) #& (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.matchedarray1['MAG_AUTO'] > -11.)
         
