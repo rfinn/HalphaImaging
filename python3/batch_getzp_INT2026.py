@@ -32,34 +32,7 @@ import numpy as np
 
     
 def runone(f):
-    if f.find('weight') > -1:
-        return
 
-    # skip CS images
-    if f.find('CS.fits') > -1:
-        return
-    if f.find('CS-ZP.fits') > -1:
-        return
-    # how do we skip the unshifted files?
-    # this only seems to apply to INT data (why did I need to shift these, anyway???)
-    # so if file has INT and -r
-    if ('INT' in f) and ('r.fits' in f):
-        return
-    
-    if ('BOK' in f) and ('r.fits' in f):
-        return
-    
-    # determine telescope and filter from filename
-    t = f.split('-')
-    #print(t)
-    # check to see if declination is negative
-    # if it is, then index of instrument will be off by one
-    if f[10] == '+':
-        instrument = t[2]
-        filter = t[5].replace('.fits','')
-    else:
-        instrument = t[3]
-        filter = t[6].replace('.fits','')
         
     instrument = 'i'
     
