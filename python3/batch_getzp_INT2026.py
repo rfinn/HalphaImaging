@@ -34,7 +34,7 @@ import numpy as np
 def runone(f):
 
         
-    instrument = 'i'
+    iinstrument = 'i'
     
 
     if 'Halpha' in f: #int 197
