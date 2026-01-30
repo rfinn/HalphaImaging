@@ -469,6 +469,7 @@ class getzp():
         t = self.image.split('.fits')
         froot = t[0]
 
+        # adding subdir for catalogs
         secat_filename = f"{self.catdir}/{froot}.cat"
         self.secat = fits.getdata(secat_filename,2)
 
