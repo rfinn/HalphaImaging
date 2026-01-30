@@ -23,8 +23,9 @@ import glob
 import time
 
 # an astropy module to reproject images
-from reproject import reproject_interp
-from reproject import reproject_exact
+#from reproject import reproject_interp
+from reproject import reproject_adaptive
+#from reproject import reproject_exact
 #not using this one
 #from ccdproc import wcs_project
 
@@ -84,7 +85,7 @@ haweight_outname = f'VF-{ra:.3f}+{dec:.3f}-MOS-{dateobs}-{object}-Ha4.weight.fit
 # SHIFT Halpha IMAGE
 ##
 print(f'shifting image {args.image1} -> {haimage_outname}' )
-im2new, im2footprint = reproject_interp(hdu1[0], wcs_out, shape_out=shape_out)
+im2new, im2footprint = reproject_adaptive(hdu1[0], wcs_out, shape_out=shape_out,conserve_flux=True)
 
 # we want to keep most of the info in the original header, and just update the WCS
 newheader = hdu1[0].header
@@ -118,7 +119,7 @@ fits.writeto(haweight_outname, im2footprint,header=newheader, overwrite=True)
 print()
 print(f'shifting image {image2} -> {rimage_outname}' )
 
-im2new, im2footprint = reproject_interp(hdu2[0], wcs_out, shape_out=shape_out)
+im2new, im2footprint = reproject_adaptive(hdu2[0], wcs_out, shape_out=shape_out, conserve_flux=True)
 
 # we want to keep most of the info in the original header, and just update the WCS
 newheader = hdu2[0].header
