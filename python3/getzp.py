@@ -412,8 +412,14 @@ class getzp():
         if self.instrument == 'm':
             ADUlimit = 40000.
         #print('saturation limit in ADU/s {:.1f}'.format(ADUlimit))
+        catdir = 'getzp_secats'
+        self.catdir = catdir
+        if not os.path.exists(catdir):
+            os.mkdir(catdir)
+            
         if self.fwhm is None:
-            t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)
+            
+            t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {catdir}/{froot}.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL {str(ADUlimit)}'
             #t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '
             if self.verbose:
                 print('running SE first time to get estimate of FWHM')
@@ -430,7 +436,7 @@ class getzp():
         ###################################
         if self.verbose:
             print('reading in SE catalog from first pass')
-        secat_filename = froot+'.cat'
+        secat_filename = f"{catdir}/{froot}.cat"
         self.secat = fits.getdata(secat_filename,2)
         self.secat0 = self.secat
         # get median fwhm of image
@@ -438,13 +444,12 @@ class getzp():
         fwhm = np.median(self.secat['FWHM_IMAGE'])*self.pixelscale
             
             
-        t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)+' -SEEING_FWHM '+str(fwhm)
+        t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {catdir}/{froot}.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL {str(ADUlimit)} -SEEING_FWHM {str(fwhm)}'
         if float(fwhm) == 0:
             print('WARNING: measured FWHM is zero!')
             if self.verbose:
                 print('running SE again with new FWHM to get better estimate of CLASS_STAR')
         else:
-            t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '+str(ADUlimit)+' -SEEING_FWHM '+str(self.fwhm)
             if self.verbose:
                 print(t)
                 print('running SE w/user input for FWHM to get better estimate of CLASS_STAR')            
@@ -464,7 +469,7 @@ class getzp():
         t = self.image.split('.fits')
         froot = t[0]
 
-        secat_filename = froot+'.cat'
+        secat_filename = f"{self.catdir}/{froot}.cat"
         self.secat = fits.getdata(secat_filename,2)
 
         
