@@ -71,7 +71,9 @@ if __name__ == '__main__':
     halpha_options = [f"ha{i}" for i in [4,8,12,16]]
     print("halpha filters: ",halpha_options)
 
-    rfilelist = glob.glob(f"{args.filestring}*R.fits")
+    rfilelist1 = glob.glob(f"{args.filestring}*R.fits")
+    rfilelist2 = glob.glob(f"{args.filestring}*r.fits")
+    rfilelist = rfilelist1 + rfilelist2
 
     rfilelist.sort()
 
