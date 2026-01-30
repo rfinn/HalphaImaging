@@ -115,7 +115,7 @@ if len(sys.argv) > 1:
     # get coadds
     filelist = glob.glob('*coadd*.fits')
     # call runone for each coadd
-    for fname in filelist:
+    for f in filelist:
         if f.find('weight') > -1:
             continue
 
