@@ -61,36 +61,22 @@ def runone(f):
         instrument = t[3]
         filter = t[6].replace('.fits','')
         
+    instrument = 'i'
+    
 
-    halpha_filters = ['ha4','Halpha','Ha6657','Ha4']
-    if filter in ['ha4','Ha4','Ha+4nm']:
-        ffilter = 'ha4'
-    elif filter == 'Halpha': #int 197
+    if 'Halpha' in f: #int 197
         ffilter = 'ha197'
-    elif filter == 'Ha6657':
+    elif 'Ha6657' in f:
         ffilter = 'ha227'
-    elif filter == 'r':
+    elif 'r.coadd' in f:
         ffilter = 'r'
-    elif filter == 'R':
+    elif 'R.coadd' in f:
         ffilter = 'R'
     else:
         print('WARNING: did not recognize filter ',filter, f)
         sys.exit()
 
-    # get instrument
-    if instrument == 'INT':
-        iinstrument = 'i'
-    elif instrument == 'BOK':
-        iinstrument = 'b'
-    elif instrument == 'HDI':
-        iinstrument = 'h'
-    elif instrument == 'MOSAIC':
-        iinstrument = 'm'
-    elif instrument == 'MOS': # didn't have this case for mosaic images
-        iinstrument = 'm'
-    else:
-        print('WARNING: did not recognize instrument ',instrument, f)
-        sys.exit()
+
     
     # construct string
     getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter}"
