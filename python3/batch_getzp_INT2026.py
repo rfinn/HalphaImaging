@@ -124,8 +124,8 @@ if len(sys.argv) > 1:
             continue
         if f.find('CS-ZP.fits') > -1:
             continue
-        print("calling runone for ",filename)
-        runone(filename)
+        #print("calling runone for ",filename)
+        runone(f)
     os.chdir(topdir)
 
 
