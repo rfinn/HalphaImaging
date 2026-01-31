@@ -72,7 +72,10 @@ if len(sys.argv) > 1:
     os.chdir(subdirname)
 
     # get coadds
-    filelist = glob.glob('*coadd*.fits')
+    if '2019' in os.getcwd():
+        filelist = glob.glob('p*coadd*.fits')
+    else:
+        filelist = glob.glob('t*coadd*.fits')   
     # call runone for each coadd
     for f in filelist:
         if f.find('weight') > -1:
