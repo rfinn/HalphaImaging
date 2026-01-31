@@ -1162,7 +1162,8 @@ class getzp():
         s = ' std (MAD) = %.4f (%.4f)'%(np.std(self.zim[~clip_flag.mask]),MAD2(self.zim[~clip_flag.mask]))
         plt.title(self.plotprefix+': n poly = '+str(norder)+s)
         #plt.show()
-        
+        plt.xlabel(f"pixel/{n}")
+        plt.ylabel(f"pixel/{n}")        
         if suffix is None:
             plotname='imsurfit-'+str(norder)
         else:
