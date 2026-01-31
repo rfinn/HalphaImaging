@@ -1153,7 +1153,8 @@ class getzp():
             # Plot
         print("plotting results of background fitting...")
         plt.figure()
-        plt.imshow(self.zz,vmin=v1,vmax=v2,origin="lower")
+        n = 10 # downsampling to speed up 
+        plt.imshow(self.zz[::n,::n],vmin=v1,vmax=v2,origin="lower")
         plt.scatter(self.xim[~clip_flag.mask], self.yim[~clip_flag.mask], c=self.zim[~clip_flag.mask],vmin=v1,vmax=v2,s=15)
         cb=plt.colorbar()
         cb.set_label('f-meas/f-pan')
@@ -1162,11 +1163,11 @@ class getzp():
         #plt.show()
         
         if suffix is None:
-            plotname='-imsurfit-'+str(norder)
+            plotname='imsurfit-'+str(norder)
         else:
-            plotname='-imsurfit-'+str(norder)+'-'+suffix
+            plotname='imsurfit-'+str(norder)+'-'+suffix
         plt.savefig('plots/'+self.plotprefix.replace(".fits","")+plotname+'.png')
-        plt.savefig('plots/'+self.plotprefix.replace(".fits","")+plotname+'.pdf')
+        #plt.savefig('plots/'+self.plotprefix.replace(".fits","")+plotname+'.pdf')
         print("done plotting results.\n")
         
     def renorm_wfc(self):
