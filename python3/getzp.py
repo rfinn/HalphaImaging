@@ -1067,7 +1067,9 @@ class getzp():
 
         else:
             header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1])))
-        header.set('PHOTZPER',float('{:.3f}'.format(zperr)))            
+        print(f"PHOTZPER = {zperr}")
+        header.set('PHOTZPER',f'{zperr}')
+            
         header.set('PHOTSYS','AB')
         header.set('FLUXZPJY',float(3631))
         # add flatten number to header
