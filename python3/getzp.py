@@ -209,6 +209,7 @@ def get_filebasename(fname):
 class args():
     """ for replicating argparse input to getzp without using argparse"""
     def __init__(self,image,instrument,filter,nexptime=False):
+        self.catdir = 'getzp_secats'
         self.image = image
         self.instrument = instrument
         self.filter = filter
@@ -412,8 +413,7 @@ class getzp():
         if self.instrument == 'm':
             ADUlimit = 40000.
         #print('saturation limit in ADU/s {:.1f}'.format(ADUlimit))
-        catdir = 'getzp_secats'
-        self.catdir = catdir
+        catdir = self.catdir
         if not os.path.exists(catdir):
             os.mkdir(catdir)
             

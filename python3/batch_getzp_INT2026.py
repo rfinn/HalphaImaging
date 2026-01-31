@@ -52,7 +52,7 @@ def runone(f):
 
     
     # construct string
-    getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter}"
+    getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter} --flatten 1"
     #if instrument == 'BOK':
     #    getzpstring += ' --fixbok'
     print()
