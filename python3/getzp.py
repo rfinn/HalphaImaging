@@ -1068,7 +1068,10 @@ class getzp():
         else:
             header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1])))
         print(f"PHOTZPER = {zperr}")
-        header.set('PHOTZPER',f'{zperr}')
+        try:
+            header.set('PHOTZPER',f'{zperr:.3f}')
+        except ValueError:
+            header.set('PHOTZPER',f'{zperr}')            
             
         header.set('PHOTSYS','AB')
         header.set('FLUXZPJY',float(3631))
