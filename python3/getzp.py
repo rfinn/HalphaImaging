@@ -230,7 +230,7 @@ class args():
         
 class getzp():
     def __init__(self, args):
-        
+        self.catdir = 'getzp_secats'
         self.image = args.image
 
         header = fits.getheader(self.image)
