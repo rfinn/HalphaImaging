@@ -63,7 +63,8 @@ import os
 import numpy as np
 import sys
 import glob
-
+import time
+start_time = time.time()
 
 from matplotlib import pyplot as plt
 import matplotlib.patches as patches
@@ -1150,6 +1151,7 @@ class getzp():
             
 
             # Plot
+        print("plotting results of background fitting...")
         plt.figure()
         plt.imshow(self.zz,vmin=v1,vmax=v2,origin="lower")
         plt.scatter(self.xim[~clip_flag.mask], self.yim[~clip_flag.mask], c=self.zim[~clip_flag.mask],vmin=v1,vmax=v2,s=15)
@@ -1165,6 +1167,7 @@ class getzp():
             plotname='-imsurfit-'+str(norder)+'-'+suffix
         plt.savefig('plots/'+self.plotprefix.replace(".fits","")+plotname+'.png')
         plt.savefig('plots/'+self.plotprefix.replace(".fits","")+plotname+'.pdf')
+        print("done plotting results.\n")
         
     def renorm_wfc(self):
         # normalize surface fit
@@ -1327,3 +1330,4 @@ if __name__ == '__main__':
 
     # replicating main function for testing, so I can access zp in jupyter
     #main()
+    print(f"--- {(time.time() - start_time):.1f} seconds ---")
