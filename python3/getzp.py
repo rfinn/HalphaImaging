@@ -258,7 +258,11 @@ class getzp():
             self.pixelscale = pixelscale['MOS']            
         self.filter = args.filter
 
-
+        self.MINMAG = 14.
+        if self.instrument == 'i':
+            self.MINMAG = 15.
+        if self.instrument == 'b':
+            self.MINMAG = 15.
         # if image is in ADU rather than ADU/s, divide image by exptime before running sextractor
         if args.normbyexptime:
             im, header = fits.getdata(self.image,header=True)
@@ -568,7 +572,7 @@ class getzp():
         colorflag = (ps_gr > 0) & (ps_gr < 1)
         #colorflag = (ps_gr > -0.2) & (ps_gr < 1.2)
         #colorflag = np.ones(len(ps_gr),'bool')
-        self.fitflag = colorflag & self.matchflag  & (self.pan['rmag'] > 14.) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.pan['rmag'] < 19) #& (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.matchedarray1['MAG_AUTO'] > -11.)
+        self.fitflag = colorflag & self.matchflag  & (self.pan['rmag'] > self.MINMAG) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.pan['rmag'] < 19) #& (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.matchedarray1['MAG_AUTO'] > -11.)
         
         if self.verbose:
             print(f'\t number that pass fit {np.sum(self.fitflag)}')
