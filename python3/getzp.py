@@ -1154,9 +1154,9 @@ class getzp():
         print("plotting results of background fitting...")
         plt.figure(dpi=150)
         n = 10 # downsampling to speed up 
-        #plt.imshow(self.zz[::n,::n],vmin=v1,vmax=v2,origin="lower")
-        plt.imshow(self.zz,vmin=v1,vmax=v2,origin="lower")
-        plt.scatter(self.xim[~clip_flag.mask], self.yim[~clip_flag.mask], c=self.zim[~clip_flag.mask],vmin=v1,vmax=v2,s=15)
+        plt.imshow(self.zz[::n,::n],vmin=v1,vmax=v2,origin="lower")
+        #plt.imshow(self.zz,vmin=v1,vmax=v2,origin="lower")
+        plt.scatter(self.xim[~clip_flag.mask]/n, self.yim[~clip_flag.mask]/n, c=self.zim[~clip_flag.mask],vmin=v1,vmax=v2,s=15)
         cb=plt.colorbar()
         cb.set_label('f-meas/f-pan')
         s = ' std (MAD) = %.4f (%.4f)'%(np.std(self.zim[~clip_flag.mask]),MAD2(self.zim[~clip_flag.mask]))
