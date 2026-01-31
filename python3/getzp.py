@@ -384,7 +384,7 @@ class getzp():
         t = self.image.split('.fits')
         froot = t[0]
         # check for se catalog
-        secat = froot+'.cat'
+        secat = f"{self.catdir}/{froot}.cat"
 
         os.system('cp ' +self.astrodir + '/default.* .')        
         if self.instrument == 'h':
@@ -419,7 +419,7 @@ class getzp():
             
         if self.fwhm is None:
             
-            t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {catdir}/{froot}.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL {str(ADUlimit)}'
+            t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {self.catdir}/{froot}.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL {str(ADUlimit)}'
             #t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '
             if self.verbose:
                 print('running SE first time to get estimate of FWHM')
