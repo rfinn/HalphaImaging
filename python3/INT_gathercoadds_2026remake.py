@@ -38,7 +38,7 @@ if __name__ == '__main__':
     #parser.add_argument('--filestring', dest = 'filestring', default = 'UAT', help = 'filestring to match. default is UAT, which will grab all UAT*R.fits files. Note: weight images will be renamed with their corresponding science coadd.')
     #parser.add_argument('--se', dest = 'se', default = False, action='store_true', help = 'Run source extractor')    
     #parser.add_argument('--scamp', dest = 'scamp', default = False, action='store_true', help = 'Run scamp')
-    #parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true', help = 'Subtract a median sky value from each image.')
+    parser.add_argument('--overwrite', dest = 'overwrite', default = False, action='store_true', help = 'Overwrite the output images.  Default is false.')
     parser.add_argument('--outdir', dest = 'outdir', default = '/data-pool/Halpha/coadds-2025DEC', action='store_true', help = 'output directory to copy renamed coadds to.  default is /data-pool/Halpha/coadds-2025DEC ')    
     parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will print matches but will not edit headers.')
     
@@ -112,10 +112,23 @@ if __name__ == '__main__':
                         if weightflag:
                             print(f"testing: copying {weightfile} -> {outweightfile}")                            
                     else:
-                        shutil.copyfile(coadd,outfile)
+                        if os.path.exists(outfile):
+                            if args.overwrite:
+                                shutil.copyfile(coadd,outfile)
+                            else:
+                                print("not overwriting output file ",outfile)
+                        else:
+                            shutil.copyfile(coadd,outfile)
                         # copy weight file to output coadd directory
                         if weightflag:
-                            shutil.copyfile(weightfile,outweightfile)
+                            if os.path.exists(outweightfile):
+                                if args.overwrite:
+                                    shutil.copyfile(weightfile,outweightfile)
+                                else:
+                                    print("not overwriting output file ",outweightfile)
+                            else:
+                                shutil.copyfile(weightfile,outweightfile)
+                                
 
                     
 
