@@ -53,6 +53,7 @@ if __name__ == '__main__':
 
         # get list of directory, including lm/pointing/target_ subdirs
         flist1 = os.listdir()
+        print(flist1)
 
         # overwrite output files if they exist
         overwrite = True
@@ -60,11 +61,12 @@ if __name__ == '__main__':
 
         thisrundir = os.getcwd() # save for returning after each pointing
 
-        for f1 in flist1:
-
+        for targetdir in flist1:
+            os.chdir(thisrundir)
+            f1 = targetdir
             # check this is a directory and a pointing
             if (os.path.isdir(f1)) & (f1.startswith('pointing') | f1.startswith('lmpointing') | f1.startswith('target_')):
-                os.chdir(f1)
+                os.chdir(targetdir)
                 print('WORKING ON DIRECTORY: ',f1)
 
                 # get list of coadds
@@ -111,7 +113,8 @@ if __name__ == '__main__':
                         shutil.copyfile(coadd,outfile)
                         # copy weight file to output coadd directory
                         if weightflag:
-                            shutil.copyfile(weightfile,outweightfile)                    
+                            shutil.copyfile(weightfile,outweightfile)
+
                     
 
 
