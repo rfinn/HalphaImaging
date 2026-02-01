@@ -18,6 +18,7 @@ PROCEDURE:
 import os
 import shutil
 from astropy.io import fits
+import glob
 
 homedir = os.getenv("HOME")
 # define directory for all coadds
