@@ -48,7 +48,7 @@ if __name__ == '__main__':
     output_dir_coadds = args.outdir
     topdir = os.getcwd()
     for rd in rundirs:
-
+        os.chdir(topdir)
         os.chdir(rd)
 
         # get list of directory, including lm/pointing/target_ subdirs
@@ -89,7 +89,7 @@ if __name__ == '__main__':
                     if '2022' in rd:
                         pointing = cheader['OBJECT']#.replace('lm_pointing_','lmp').replace('pointing-','p')
                     else:
-                        pointing = f1
+                        pointing = f1.replace('ointing','')
 
                     tfilter = cheader['FILTER']
                     if float(dec) < 0:
