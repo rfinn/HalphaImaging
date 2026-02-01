@@ -110,7 +110,7 @@ if __name__ == '__main__':
                     if args.testing:
                         print(f"testing: copying {coadd} -> {outfile}")
                         if weightflag:
-                            print(f"testing: copying {coadd} -> {outfile}")                            
+                            print(f"testing: copying {weightfile} -> {outweightfile}")                            
                     else:
                         shutil.copyfile(coadd,outfile)
                         # copy weight file to output coadd directory
