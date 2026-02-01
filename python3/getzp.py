@@ -77,6 +77,8 @@ from astropy.io import fits
 from astropy.stats import sigma_clip
 from astropy.stats import mad_std
 from astropy.table import Table, hstack, Column
+from astropy.stats import sigma_clip
+from astropy.modeling import models, fitting
 
 from scipy.optimize import curve_fit
 from scipy import interpolate
@@ -132,6 +134,44 @@ def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=19,
     print("in panstarrs_query...")
     print(t)
     return t[0]
+
+def fitline_sigma_clipping(x, y, yerr=None, nsigma=3,niter=3):
+    """ 
+    fit a line with slope fixed at 1  
+
+    PARAMS:
+    * x
+    * y
+    * yerr OPTIONAL
+
+    RETURNS:
+    * fit function
+    * mask = with rejected values=True
+    * uncertainty = np array with uncertainty in slope
+
+    """
+    # 2. Initialize the polynomial model and fitter
+    poly_init = models.Linear1D(fixed={'slope': True},slope=1) # Initialize a 2nd degree polynomial model
+
+    fitter = fitting.LinearLSQFitter() # Standard least squares fitter
+    
+    # 3. Initialize the outlier removal fitter
+    # This wraps the standard fitter with sigma clipping logic
+    or_fit = fitting.FittingWithOutlierRemoval(
+        fitter,
+        sigma_clip,
+        niter=niter,        # Number of iterations for sigma clipping
+        sigma=nsigma       # Number of standard deviations to clip beyond
+    )
+    
+    # 4. Fit the data
+    # The fit returns the fitted model and a mask indicating clipped points
+    if yerr is not None:
+        fitted_poly, mask = or_fit(poly_init, x, y, weights=1/yerr)
+    else:
+        fitted_poly, mask = or_fit(poly_init, x, y)
+    
+    return fitted_poly, mask, or_fit.fitter.fit_info['singular_values']
 
 def fitspline2d(x,y,z,nx,ny,order=3,s=1000):
     """
@@ -305,7 +345,7 @@ class getzp():
         if self.verbose:
             print('')
             print('STATUS: running se')
-        secat = self.image.split('.fits')[0]+'.cat'
+        secat = os.path.join(self.catdir,self.image.split('.fits')[0]+'.cat')
         if os.path.exists(secat):
             print("found SE cat!!!")
             self.read_se_cat()
@@ -926,50 +966,85 @@ class getzp():
         x = self.R[flag] # expected mag from panstarrs
         color = self.pan_gr_color[flag]
         #print(f"len(x) = {len(x)}, len(color)= {len(color)}")
-        while delta > 1.e-3:
-            #c = np.polyfit(x,y,1)
-            t = curve_fit(zpfunc,x,y,sigma = yerr)
-            # convert to format expected from polyfit
-            c = np.array([1.,t[0][0]])
-            if self.verbose:
-                print('number of points retained = ',np.sum(flag))
-            yfit = np.polyval(c,x)
-            residual = (yfit - y)
 
-            if plotall:
-                self.plot_fitresults(x,y,yerr=yerr,polyfit_results = c,color=color)
+        useAstropyModel = True
 
-    
-            # check for convergence
-            if self.verbose:
-                print('new ZP = {:.3f}, previous ZP = {:.3f}'.format(self.bestc[1],c[1]))
-            delta = abs(self.bestc[1] - c[1])
-            self.bestc = c
-            MAD = mad_std(residual)#1.48*np.median(abs(residual - np.median(residual)))
-            #clip_flag = sigma_clip(self.zim,sigma=3,maxiters=10,masked=True)            
-            flag =  (abs(residual - np.median(residual)) < self.nsigma*MAD)
-            if sum(flag) < 2:
-                print(f'WARNING: ONLY ONE DATA POINT LEFT FOR {self.image}')
+        if useAstropyModel:
+
+            fit2, mask2,uncertainty = fitline_sigma_clipping(x,y, yerr=yerr)#,sigma = yerr)
+            slope = 1
+
+            yplot = self.matchedarray1['MAG_APER'][:,self.naper][self.fitflag]
+            magfit = fit2(self.R[self.fitflag])
+            residual_all = 10.**((magfit - yplot)/2.5)        
+            self.residual_all = residual_all
+
+            residual_match = residual_all[~mask2]
+            x = x[~mask2]
+            y = y[~mask2]
+            yerr = yerr[~mask2]
+
+            print("checking length of x,y, residual_all: ", len(x),len(y), len(self.residual_all)) 
+            self.zpcovar = [[0,0],[0,uncertainty[0]**2]]
+            self.zperr = uncertainty[0]
+            self.zp = fit2.intercept.value
+            #self.fitflag[self.fitflag] = self.fitflag[self.fitflag] & mask2
+            self.bestc = [1,self.zp]
+            self.plot_fitresults(x,y,yerr=yerr,polyfit_results = self.bestc,color=residual_match)
+            
+        else:
+            
+            while delta > 1.e-3:
+                #c = np.polyfit(x,y,1)
+                t = curve_fit(zpfunc,x,y,sigma = yerr)
+                # convert to format expected from polyfit
+                c = np.array([1.,t[0][0]])
+                if self.verbose:
+                    print('number of points retained = ',np.sum(flag))
+                yfit = np.polyval(c,x)
+                residual = (yfit - y)
+
+                if plotall:
+                    self.plot_fitresults(x,y,yerr=yerr,polyfit_results = c,color=color)
+
+
+                # check for convergence
+                if self.verbose:
+                    print('new ZP = {:.3f}, previous ZP = {:.3f}'.format(self.bestc[1],c[1]))
+                delta = abs(self.bestc[1] - c[1])
+                self.bestc = c
+                MAD = mad_std(residual)#1.48*np.median(abs(residual - np.median(residual)))
+                #clip_flag = sigma_clip(self.zim,sigma=3,maxiters=10,masked=True)            
+                flag =  (abs(residual - np.median(residual)) < self.nsigma*MAD)
+                if sum(flag) < 2:
+                    print(f'WARNING: ONLY ONE DATA POINT LEFT FOR {self.image}')
+                    self.x = x
+                    self.y = y
+                    self.residual = residual
+                    sys.exit()
+                #flag =  (abs(residual) < self.nsigma*np.std(residual))
                 self.x = x
                 self.y = y
-                self.residual = residual
-                sys.exit()
-            #flag =  (abs(residual) < self.nsigma*np.std(residual))
-            self.x = x
-            self.y = y
-            self.residual =residual
-            x = x[flag]
-            y = y[flag]
-            yerr = yerr[flag]
-            color = color[flag]
-        ###################################
-        ##  show histogram of residuals
-        ###################################
+                self.residual =residual
+                x = x[flag]
+                y = y[flag]
+                yerr = yerr[flag]
+                color = color[flag]
+            
 
-        yplot = self.matchedarray1['MAG_APER'][:,self.naper][self.fitflag]
-        magfit = np.polyval(self.bestc,self.R[self.fitflag])
-        residual_all = 10.**((magfit - yplot)/2.5)        
-        self.residual_all = residual_all
+            ###################################
+            ##  show histogram of residuals
+            ###################################
+
+            yplot = self.matchedarray1['MAG_APER'][:,self.naper][self.fitflag]
+            magfit = np.polyval(self.bestc,self.R[self.fitflag])
+            residual_all = 10.**((magfit - yplot)/2.5)        
+            self.residual_all = residual_all
+
+            self.zpcovar = t[1]
+            self.zperr = np.sqrt(self.zpcovar[0][0])
+            self.zp = self.bestc[1]
+            self.plot_fitresults(x,y,yerr=yerr,polyfit_results = self.bestc,color=color)            
         s = 'residual (mean,std) = %.3f +/- %.3f'%(np.mean(residual_all),np.std(residual_all))
         if self.verbose:
             print(s)
@@ -1015,10 +1090,8 @@ class getzp():
         self.x = x
         self.y = y
         self.yerr = yerr
-        self.zpcovar = t[1]
-        self.zperr = np.sqrt(self.zpcovar[0][0])
-        self.zp = self.bestc[1]
-        self.plot_fitresults(x,y,yerr=yerr,polyfit_results = self.bestc,color=color)
+
+        
 
     def check_90prime_ccds(self):
         image_med = np.ma.median(self.residual_all)
@@ -1054,19 +1127,19 @@ class getzp():
         #print('working on this')
         # add best-fit ZP to image header
         im, header = fits.getdata(self.image,header=True)
-        zperr = np.sqrt(self.zpcovar[0][0])            
+        zperr = self.zperr         
         # or convert vega zp to AB
         if self.filter == 'R':
             # conversion from Blanton+2007
             # http://www.astronomy.ohio-state.edu/~martini/usefuldata.html
             # header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1]+.21)))
             # changed this to write out phot zp in AB system for ALL filters
-            header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1])))
+            header.set('PHOTZP',float('{:.3f}'.format(-1.*self.zp)))
 
             header.set('LAMB_um',float(.6442))
 
         else:
-            header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1])))
+            header.set('PHOTZP',float('{:.3f}'.format(-1.*self.zp)))
         print(f"PHOTZPER = {zperr}")
         try:
             header.set('PHOTZPER',f'{zperr:.3f}')
@@ -1175,7 +1248,7 @@ class getzp():
             plotname='imsurfit-'+str(norder)+'-'+suffix
         plt.savefig('plots/'+self.plotprefix.replace(".fits","")+plotname+'.png')
         #plt.savefig('plots/'+self.plotprefix.replace(".fits","")+plotname+'.pdf')
-        print("done plotting results.\n")
+        print("... done plotting results.\n")
         
     def renorm_wfc(self):
         # normalize surface fit
