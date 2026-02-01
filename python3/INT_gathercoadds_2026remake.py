@@ -103,6 +103,8 @@ if __name__ == '__main__':
                     if os.path.exists(weightfile):
                         outweightfile = outfile.replace('.fits','.weight.fits')
                         weightflag = True
+                    else:
+                        print(f"WARNING: no weight file: {weightfile} in {os.getcwd()}")
                         
                     # copy file to output coadd directory
                     if args.testing:
