@@ -98,7 +98,7 @@ if __name__ == '__main__':
                         outfile = os.path.join(output_dir_coadds,'VF-{:07.3f}+{:06.3f}-{:s}-{:s}-{:s}-{:s}.fits'.format(ra,abs(dec),telescope,dateobs,pointing,tfilter))
 
                     # check for weight file
-                    weightfile = coadd.replace('coadd.fits','coadd.weight.fits')
+                    weightfile = coadd.replace('coadd.fits','coadd.weight.fits').replace('fp','p').replace('ft','t')
                     weightflag = False
                     if os.path.exists(weightfile):
                         outweightfile = outfile.replace('.fits','.weight.fits')
