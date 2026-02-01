@@ -73,7 +73,9 @@ if len(sys.argv) > 1:
 
     # get coadds
     if '2019' in os.getcwd():
-        filelist = glob.glob('p*coadd*.fits')
+        filelist1 = glob.glob('p*coadd*.fits')
+        filelist2 = glob.glob('lmp*coadd*.fits')
+        filelist = filelist1 + filelist2
     else:
         filelist = glob.glob('t*coadd*.fits')   
     # call runone for each coadd
