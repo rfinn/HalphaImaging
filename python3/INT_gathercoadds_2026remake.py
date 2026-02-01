@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
         # get list of directory, including lm/pointing/target_ subdirs
         flist1 = os.listdir()
-        print(flist1)
+        #print(flist1)
 
         # overwrite output files if they exist
         overwrite = True
