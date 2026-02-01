@@ -27,12 +27,12 @@ telescope = 'INT'
 rundirs = ['2019febINT-all', '2019nelvy-all','2022MayINT-allfiles-v2']
 
 
-topdir = os.getcwd()
+
 
 
 if __name__ == '__main__':
 
-    
+    import argparse
     parser = argparse.ArgumentParser(description ="This program copies coadd and weight files to output directory, renaming according to VFS convention.")
     #parser.add_argument('--filestring', dest = 'filestring', default = 'UAT', help = 'filestring to match. default is UAT, which will grab all UAT*R.fits files. Note: weight images will be renamed with their corresponding science coadd.')
     #parser.add_argument('--se', dest = 'se', default = False, action='store_true', help = 'Run source extractor')    
@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
 
     output_dir_coadds = args.outdir
-
+    topdir = os.getcwd()
     for rd in rundirs:
 
         os.chdir(rd)
@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
                     # construct output filename
                     ra = float(cheader['CRVAL1'])
-                    dec = float(cheader['CRVAL2'])e
+                    dec = float(cheader['CRVAL2'])
 
                     thisdate = cheader['DATE-OBS']
                     t = thisdate.split('T')
