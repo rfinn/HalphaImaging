@@ -25,12 +25,12 @@ def get_params_from_name_uat(image_name):
     each pointing will have an internal '-', like ABELL1367-h01
     '''
     t = os.path.basename(image_name).split('-')
-    #print(t)
-    if len(t) == 7: # meant to catch negative declinations
+    print(t)
+    if len(t) == 7: 
         telescope = t[2]
         dateobs = t[3]
         pointing = t[4]+'-'+t[5]
-    elif len(t) == 8:
+    elif len(t) == 8: # meant to catch negative declinations
         telescope = t[3]
         dateobs = t[4]
         pointing = t[5]+'-'+t[6]
