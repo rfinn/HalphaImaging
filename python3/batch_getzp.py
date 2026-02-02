@@ -44,11 +44,13 @@ def runone(i,f):
     # how do we skip the unshifted files?
     # this only seems to apply to INT data (why did I need to shift these, anyway???)
     # so if file has INT and -r
-    if ('INT' in f) and ('r.fits' in f):
-        return
+
+    # updating for 2026 - no more shifted images
+    #if ('INT' in f) and ('r.fits' in f):
+    #    return
     
-    if ('BOK' in f) and ('r.fits' in f):
-        return
+    #if ('BOK' in f) and ('r.fits' in f):
+    #    return
     
     # determine telescope and filter from filename
     t = f.split('-')
