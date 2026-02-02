@@ -25,7 +25,7 @@ def get_params_from_name_uat(image_name):
     each pointing will have an internal '-', like ABELL1367-h01
     '''
     t = os.path.basename(image_name).split('-')
-    print(t)
+    #print(t)
     if len(t) == 7: 
         telescope = t[2]
         dateobs = t[3]
@@ -52,12 +52,15 @@ def get_params_from_name_vfs(image_name):
     each pointing will have an internal '-', like ABELL1367-h01
     '''
     t = os.path.basename(image_name).split('-')
-    print(t)
-    if len(t) == 6: 
+    #print(t)
+    if len(t) == 6:
+        ra, dec = t[1].split('+')
         telescope = t[2]
         dateobs = t[3]
         pointing = t[4]
     elif len(t) == 7: # meant to catch negative declinations
+        ra = t[1]
+        dec = -1*t[2]
         telescope = t[3]
         dateobs = t[4]
         pointing = t[5]
@@ -67,7 +70,7 @@ def get_params_from_name_vfs(image_name):
         #print(image_name)
         print("t = ",t, len(t))
         return
-    return telescope,dateobs,pointing
+    return telescope,dateobs,pointing, ra, dec
 
 def add_field_2_header(ffile, field, value):
     """
@@ -113,14 +116,19 @@ if __name__ == '__main__':
 
         # get the target name
         if args.vfs:
-            telescope, dateobs, pointing = get_params_from_name_vfs(rfile)
+            telescope, dateobs, pointing, ra, dec = get_params_from_name_vfs(rfile)
         else:
             telescope, dateobs, pointing = get_params_from_name_uat(rfile)
         print(f"working on file {rfile}, target={pointing}")
         # look for target name with halpha image
         for h in halpha_options:
 
-            hfiles = glob.glob(f'{args.filestring}*{pointing}*-{h}.fits')
+            if args.vfs:
+                
+                searchstring = f"{args.filestring}-{ra}*{dec}-{telescope}-{pointing}*{h}.fits"
+            else:
+                searchstring = f'{args.filestring}*{pointing}*-{h}.fits'
+            hfiles = glob.glob(searchstring)
 
             if len(hfiles) == 1:
                 # add hfile to rband image header
