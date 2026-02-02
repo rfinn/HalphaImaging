@@ -124,7 +124,7 @@ if __name__ == '__main__':
         for h in halpha_options:
 
             if args.vfs:
-                
+                # don't include dateobs because it could be different for r vs halpha
                 searchstring = f"{args.filestring}*{ra}*{dec}*{telescope}*{pointing}*{h}.fits"
                 if args.verbose:
                     print(searchstring)
