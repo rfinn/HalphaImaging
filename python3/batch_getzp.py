@@ -68,7 +68,7 @@ def runone(i,f):
         ffilter = 'ha4'
     elif filter == 'Halpha': #int 197
         ffilter = 'ha197'
-    elif filter == 'Ha6657'
+    elif filter == 'Ha6657':
         ffilter = 'ha227'
     elif filter == 'r':
         ffilter = 'r'
