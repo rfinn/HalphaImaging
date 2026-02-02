@@ -41,6 +41,33 @@ def get_params_from_name_uat(image_name):
         print(t)
         return
     return telescope,dateobs,pointing
+def get_params_from_name_vfs(image_name):
+    '''
+    coadd names should be as follows.
+    if float(dec) < 0:
+        outfile = f'UAT-{ra:07.3f}-{dec:06.3f}-{telescope}-{dateobs}-{pointing}-{filterwithsuffix}'        
+    else:
+        outfile = f'UAT-{ra:07.3f}+{dec:06.3f}-{telescope}-{dateobs}-{pointing}-{filterwithsuffix}'    
+
+    each pointing will have an internal '-', like ABELL1367-h01
+    '''
+    t = os.path.basename(image_name).split('-')
+    print(t)
+    if len(t) == 6: 
+        telescope = t[2]
+        dateobs = t[3]
+        pointing = t[4]
+    elif len(t) == 7: # meant to catch negative declinations
+        telescope = t[3]
+        dateobs = t[4]
+        pointing = t[5]
+        
+    else:
+        print("ruh roh - trouble getting info from ",image_name, len(t))
+        #print(image_name)
+        print("t = ",t, len(t))
+        return
+    return telescope,dateobs,pointing
 
 def add_field_2_header(ffile, field, value):
     """
@@ -65,11 +92,12 @@ if __name__ == '__main__':
     #parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true', help = 'Subtract a median sky value from each image.')
     #parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true', help = 'Run swarp')    
     parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will print matches but will not edit headers.')
+    parser.add_argument('--vfs', dest = 'vfs', default = False, action='store_true', help = 'Set this if running of VFS coadds (different naming convention).')    
     
     args = parser.parse_args()
 
     halpha_options = [f"ha{i}" for i in [4,8,12,16]]
-    halpha_option = halpha_options + ['Ha4','Halpha','Ha6657'] # adding more options so we can use with Virgo VFS images
+    halpha_options = halpha_options + ['Ha4','Halpha','Ha6657'] # adding more options so we can use with Virgo VFS images
     print("halpha filters: ",halpha_options)
 
     rfilelist1 = glob.glob(f"{args.filestring}*R.fits")
@@ -84,7 +112,10 @@ if __name__ == '__main__':
         print()
 
         # get the target name
-        telescope, dateobs, pointing = get_params_from_name_uat(rfile)
+        if args.vfs:
+            telescope, dateobs, pointing = get_params_from_name_vfs(rfile)
+        else:
+            telescope, dateobs, pointing = get_params_from_name_uat(rfile)
         print(f"working on file {rfile}, target={pointing}")
         # look for target name with halpha image
         for h in halpha_options:
