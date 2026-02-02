@@ -250,7 +250,7 @@ def get_filebasename(fname):
 class args():
     """ for replicating argparse input to getzp without using argparse"""
     def __init__(self,image,instrument,filter,nexptime=False):
-        self.catdir = 'getzp_secats'
+        self.catdir = 'SEcats_getzp'
         self.image = image
         self.instrument = instrument
         self.filter = filter
@@ -271,7 +271,7 @@ class args():
         
 class getzp():
     def __init__(self, args):
-        self.catdir = 'getzp_secats'
+        self.catdir = 'SEcats_getzp'
         self.image = args.image
 
         header = fits.getheader(self.image)

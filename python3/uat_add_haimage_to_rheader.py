@@ -69,6 +69,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     halpha_options = [f"ha{i}" for i in [4,8,12,16]]
+    halpha_option = halpha_options + ['Ha4','Halpha','Ha6657'] # adding more options so we can use with Virgo VFS images
     print("halpha filters: ",halpha_options)
 
     rfilelist1 = glob.glob(f"{args.filestring}*R.fits")
@@ -88,7 +89,7 @@ if __name__ == '__main__':
         # look for target name with halpha image
         for h in halpha_options:
 
-            hfiles = glob.glob(f'UAT*{pointing}*-{h}.fits')
+            hfiles = glob.glob(f'{args.filestring}*{pointing}*-{h}.fits')
 
             if len(hfiles) == 1:
                 # add hfile to rband image header
