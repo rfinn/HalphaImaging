@@ -93,7 +93,7 @@ if __name__ == '__main__':
     #parser.add_argument('--se', dest = 'se', default = False, action='store_true', help = 'Run source extractor')    
     #parser.add_argument('--scamp', dest = 'scamp', default = False, action='store_true', help = 'Run scamp')
     #parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true', help = 'Subtract a median sky value from each image.')
-    #parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true', help = 'Run swarp')    
+    parser.add_argument('--verbose', dest = 'verbose', default = False, action='store_true', help = 'Print more information/diagnostic statements.')
     parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will print matches but will not edit headers.')
     parser.add_argument('--vfs', dest = 'vfs', default = False, action='store_true', help = 'Set this if running of VFS coadds (different naming convention).')    
     
@@ -125,7 +125,9 @@ if __name__ == '__main__':
 
             if args.vfs:
                 
-                searchstring = f"{args.filestring}-{ra}*{dec}-{telescope}-{pointing}*{h}.fits"
+                searchstring = f"{args.filestring}*{ra}*{dec}*{telescope}*{pointing}*{h}.fits"
+                if args.verbose:
+                    print(searchstring)
             else:
                 searchstring = f'{args.filestring}*{pointing}*-{h}.fits'
             hfiles = glob.glob(searchstring)
