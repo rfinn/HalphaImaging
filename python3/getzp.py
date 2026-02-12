@@ -849,7 +849,7 @@ class getzp():
         yfit = np.polyval(polyfit_results,x)
         residual = (yfit - y)
         plt.figure(figsize=(8,8))
-        s = ' (MAD =%.4f, std=%.4f)'%(MAD2(residual), np.std(residual))
+        s = ' (MAD =%.4f, std=%.4f, N=%d)'%(MAD2(residual), np.std(residual),len(residual))
         
         
         plt.subplot(2,1,1)
