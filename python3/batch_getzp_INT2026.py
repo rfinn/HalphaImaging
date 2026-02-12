@@ -36,11 +36,13 @@ def runone(f):
         
     iinstrument = 'i'
     
-
+    nflatten = 1
     if 'Halpha' in f: #int 197
         ffilter = 'ha197'
+        nflatten = 2
     elif 'Ha6657' in f:
         ffilter = 'ha227'
+        nflatten = 2        
     elif 'r.coadd' in f:
         ffilter = 'r'
     elif 'R.coadd' in f:
@@ -52,7 +54,7 @@ def runone(f):
 
     
     # construct string
-    getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter} --flatten 1 "
+    getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter} --flatten {nflatten} "
     #if instrument == 'BOK':
     #    getzpstring += ' --fixbok'
     print()

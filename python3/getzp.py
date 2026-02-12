@@ -464,7 +464,7 @@ class getzp():
             
         if self.fwhm is None:
             
-            t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {self.catdir}/{froot}.cat -BACK_SIZE 128 -BACKPHOTO_TYPE LOCAL -MAG_ZEROPOINT 0 -SATUR_LEVEL {str(ADUlimit)}'
+            t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {self.catdir}/{froot}.cat -BACK_SIZE 128 -BACKPHOTO_TYPE LOCAL -BACK_TYPE AUTO -MAG_ZEROPOINT 0 -SATUR_LEVEL {str(ADUlimit)}'
             #t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '
             if self.verbose:
                 print('running SE first time to get estimate of FWHM')
@@ -489,7 +489,7 @@ class getzp():
         fwhm = np.median(self.secat['FWHM_IMAGE'])*self.pixelscale
             
             
-        t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {catdir}/{froot}.cat -BACK_SIZE 128 -BACKPHOTO_TYPE LOCAL -MAG_ZEROPOINT 0 -SATUR_LEVEL {str(ADUlimit)} -SEEING_FWHM {fwhm:.2f}'
+        t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {catdir}/{froot}.cat -BACK_SIZE 128 -BACKPHOTO_TYPE LOCAL -BACK_TYPE AUTO -MAG_ZEROPOINT 0 -SATUR_LEVEL {str(ADUlimit)} -SEEING_FWHM {fwhm:.2f}'
         if float(fwhm) == 0:
             print('WARNING: measured FWHM is zero!')
             if self.verbose:
