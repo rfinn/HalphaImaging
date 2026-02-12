@@ -615,6 +615,7 @@ class getzp():
         #colorflag = (ps_gr > -0.2) & (ps_gr < 1.2)
 
         # testing what happens with removal of color cut
+        # doesn't affect anything
         colorflag = np.ones(len(ps_gr),'bool')
         self.fitflag = colorflag & self.matchflag  & (self.pan['rmag'] > self.MINMAG) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.pan['rmag'] < 19) #& (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.matchedarray1['MAG_AUTO'] > -11.)
         
@@ -993,7 +994,8 @@ class getzp():
             self.zp = fit2.intercept.value
             #self.fitflag[self.fitflag] = self.fitflag[self.fitflag] & mask2
             self.bestc = [1,self.zp]
-            self.plot_fitresults(x,y,yerr=yerr,polyfit_results = self.bestc,color=residual_match)
+            #self.plot_fitresults(x,y,yerr=yerr,polyfit_results = self.bestc,color=residual_match)
+            self.plot_fitresults(x,y,yerr=yerr,polyfit_results = self.bestc,color=color)
             
         else:
             
