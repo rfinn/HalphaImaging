@@ -971,7 +971,7 @@ class getzp():
         color = self.pan_gr_color[flag]
         #print(f"len(x) = {len(x)}, len(color)= {len(color)}")
 
-        useAstropyModel = False
+        useAstropyModel = True
 
         if useAstropyModel:
 
@@ -989,7 +989,7 @@ class getzp():
             yerr = yerr[~mask2]
             color = color[~mask2]
 
-            print("checking length of x,y, residual_all: ", len(x),len(y), len(self.residual_all)) 
+            #print("checking length of x,y, residual_all: ", len(x),len(y), len(self.residual_all)) 
             self.zpcovar = [[0,0],[0,uncertainty[0]**2]]
             self.zperr = uncertainty[0]
             self.zp = fit2.intercept.value
