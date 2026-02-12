@@ -987,6 +987,7 @@ class getzp():
             x = x[~mask2]
             y = y[~mask2]
             yerr = yerr[~mask2]
+            color = color[~mask2]
 
             print("checking length of x,y, residual_all: ", len(x),len(y), len(self.residual_all)) 
             self.zpcovar = [[0,0],[0,uncertainty[0]**2]]
