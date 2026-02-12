@@ -616,7 +616,7 @@ class getzp():
 
         # testing what happens with removal of color cut
         # doesn't affect anything
-        colorflag = np.ones(len(ps_gr),'bool')
+        #colorflag = np.ones(len(ps_gr),'bool')
         self.fitflag = colorflag & self.matchflag  & (self.pan['rmag'] > self.MINMAG) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.pan['rmag'] < 19) #& (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.matchedarray1['MAG_AUTO'] > -11.)
         
         if self.verbose:
