@@ -443,7 +443,7 @@ class getzp():
             print("hey Rose - ")
             print("using default.sex.BOK!!!")
             print()
-            defaultcat = 'default.sex.BOK.getzp'
+            defaultcat = 'default.sex.BOK'#.getzp'
         header = fits.getheader(self.image)
         try:
             expt = header['EXPTIME']
