@@ -976,11 +976,11 @@ class getzp():
         color = self.pan_gr_color[flag]
         #print(f"len(x) = {len(x)}, len(color)= {len(color)}")
 
-        useAstropyModel = False
+        useAstropyModel = True
 
         if useAstropyModel:
 
-            fit2, mask2,uncertainty = fitline_sigma_clipping(x,y, yerr=yerr)#,sigma = yerr)
+            fit2, mask2,uncertainty = fitline_sigma_clipping(x,y, yerr=yerr,niter=10)#,sigma = yerr)
             slope = 1
 
             yplot = self.matchedarray1['MAG_APER'][:,self.naper][self.fitflag]
@@ -1096,8 +1096,10 @@ class getzp():
 
         # debugging some wacky BOK results - want to see full range of residuals
         # so letting vmin/vmax get set automatically
-        #plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
-        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=.5,vmax=2.5,s=15)
+        # issue is with astropy sigma clipping - ugh!!!
+        # returning to normal...
+        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
+        #plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=.5,vmax=2.5,s=15)
         cb=plt.colorbar()
         cb.set_label('f-meas/f-pan')
         plt.savefig('plots/'+self.plotprefix.replace(".fits","")+'getzp-xyresidual-fitted.png')
