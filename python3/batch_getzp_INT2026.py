@@ -1,28 +1,27 @@
 #!/usr/bin/env python
 """
-* want to rerun getzp on all coadds b/c I've change how I am fitting ZP
-* I have incorporated color correction from Matteo Fossati
-
-* want to run all again to make sure all is done in a uniform way for all coadds
-
-* this assumes that the coadds have the most recent naming convention, which includes the telescope and filter
 
 OVERVIEW:
 
 This is for running the first round of getzp with flattening on the coadds, after reconstructing
 them in Dec 2025/Jan 2026.
 
-the files are organized by the 3 observing runs, and the coadds are in subdirectories according to the pointing.
+the files are organized by the 3 observing runs (2019 Feb, 2019 May, 2022 May), and the coadds are in subdirectories according to the pointing.
 
 goal is to:
 - flatten images in their current location, and 
 - (separate program) then use script to grab the flattened files and copy them to the main coadd directory, while renaming them with the proper VFS coadd name.
 
-USAGE:
-- create an input file that contains a list of all the pointing subdirectory names
-- then run in parallel
+X I am not running this in parallel because it corrupted a bunch of images - not sure why...  
 
-parallel 
+USAGE:
+
+python ~/github/HalphaImaging/python3/batch_getzp_INT2026.py pointing060
+
+parallel --eta python ~/github/HalphaImaging/python3/batch_getzp_INT2026.py :::: dirlist
+
+
+https://github.com/rfinn/HalphaImaging/wiki/06---INT-Data-and-Theli#run-getzp-to-flatten-images
 
 """
 import glob
@@ -37,12 +36,15 @@ def runone(f):
     iinstrument = 'i'
     
     nflatten = 1
+    usespline = False
     if 'Halpha' in f: #int 197
         ffilter = 'ha197'
         nflatten = 2
+        usespline = True
     elif 'Ha6657' in f:
         ffilter = 'ha227'
-        nflatten = 2        
+        nflatten = 2
+        usespline = True        
     elif 'r.coadd' in f:
         ffilter = 'r'
     elif 'R.coadd' in f:
@@ -55,6 +57,8 @@ def runone(f):
     
     # construct string
     getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter} --flatten {nflatten} "
+    if usespline:
+        getzpstring += " --spline --spline_order 4"
     #if instrument == 'BOK':
     #    getzpstring += ' --fixbok'
     print()
@@ -91,6 +95,10 @@ if len(sys.argv) > 1:
         if f.find('CS-ZP.fits') > -1:
             continue
         #print("calling runone for ",filename)
+
+        # when rerunning second time, I just need to rerun on halpha - skip r?
+        # going to run on both, just for completeness, symmetry, etc...
+        
         runone(f)
     os.chdir(topdir)
 

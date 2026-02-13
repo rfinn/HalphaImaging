@@ -70,7 +70,12 @@ if __name__ == '__main__':
                 print('WORKING ON DIRECTORY: ',f1)
 
                 # get list of coadds
-                coaddlist = glob.glob('f*coadd.fits')
+                rcoadd = f"f{f1}_r.coadd.fits"
+
+                # updating to account for 2 rounds of flattening for INT Halpha data
+                coaddlist = glob.glob(f'ff{f1}*H*coadd.fits')
+                coaddlist.append(rcoadd)
+
                 coaddlist.sort()
 
                 for coadd in coaddlist:
@@ -98,7 +103,7 @@ if __name__ == '__main__':
                         outfile = os.path.join(output_dir_coadds,'VF-{:07.3f}+{:06.3f}-{:s}-{:s}-{:s}-{:s}.fits'.format(ra,abs(dec),telescope,dateobs,pointing,tfilter))
 
                     # check for weight file
-                    weightfile = coadd.replace('coadd.fits','coadd.weight.fits').replace('fp','p').replace('flmp','lmp').replace('ft','t')
+                    weightfile = coadd.replace('coadd.fits','coadd.weight.fits').replace('ff','').replace('fp','p').replace('flmp','lmp').replace('ft','t')
                     weightflag = False
                     if os.path.exists(weightfile):
                         outweightfile = outfile.replace('.fits','.weight.fits')
