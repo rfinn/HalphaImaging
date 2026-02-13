@@ -1174,7 +1174,8 @@ class getzp():
                 pass
         # add a new header keyword if the image has already been flattened
         # this could happen with renaming coadds to VFS format and then rerunning getzp
-        header.set('ZPNFLAT'+suffixes[npreviousflat],int(self.flatten),'getzp --flatten number')        
+        #header.set('ZPNFLAT'+suffixes[npreviousflat],int(self.flatten),'getzp --flatten number')
+        header.set('ZPNFLAT',int(self.flatten),'getzp --flatten number')        
         fits.writeto(self.image, im, header, overwrite=True)
         
     def fit_residual_surface(self,norder=2,suffix=None):
