@@ -77,7 +77,7 @@ if __name__ == '__main__':
                 coaddlist.append(rcoadd)
 
                 coaddlist.sort()
-
+                # update
                 for coadd in coaddlist:
 
                     # get info from header
