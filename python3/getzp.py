@@ -1092,7 +1092,7 @@ class getzp():
         # debugging some wacky BOK results - want to see full range of residuals
         # so letting vmin/vmax get set automatically
         #plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
-        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),s=15)
+        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=.5,vmax=2.5,s=15)
         cb=plt.colorbar()
         cb.set_label('f-meas/f-pan')
         plt.savefig('plots/'+self.plotprefix.replace(".fits","")+'getzp-xyresidual-fitted.png')
