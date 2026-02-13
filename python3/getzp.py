@@ -455,6 +455,11 @@ class getzp():
                 ADUlimit = 40000./60#/float(expt)
             elif 'ha' in self.filter:
                 ADUlimit = 40000./180.
+        if self.instrument == 'b':
+            if (self.filter == 'r'):
+                ADUlimit = 40000./120#/float(expt)
+            elif 'ha' in self.filter:
+                ADUlimit = 40000./180.
         if self.instrument == 'm':
             ADUlimit = 40000.
         #print('saturation limit in ADU/s {:.1f}'.format(ADUlimit))
