@@ -1088,7 +1088,11 @@ class getzp():
         plt.title(self.plotprefix+s)
         self.residual_allx = self.matchedarray1['X_IMAGE'][self.fitflag]
         self.residual_ally = self.matchedarray1['Y_IMAGE'][self.fitflag]
-        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
+
+        # debugging some wacky BOK results - want to see full range of residuals
+        # so letting vmin/vmax get set automatically
+        #plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
+        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),s=15)
         cb=plt.colorbar()
         cb.set_label('f-meas/f-pan')
         plt.savefig('plots/'+self.plotprefix.replace(".fits","")+'getzp-xyresidual-fitted.png')
@@ -1155,7 +1159,17 @@ class getzp():
         header.set('PHOTSYS','AB')
         header.set('FLUXZPJY',float(3631))
         # add flatten number to header
-        header.set('ZPNFLAT',int(self.flatten),'getzp --flatten number')        
+        npreviousflat = 0
+        suffixes = ['','1','2']
+        for s in suffixes:
+            try:
+                temp = header['ZPNFLAT'+s]
+                npreviousflat += 1
+            except KeyError:
+                pass
+        # add a new header keyword if the image has already been flattened
+        # this could happen with renaming coadds to VFS format and then rerunning getzp
+        header.set('ZPNFLAT'+suffixes[npreviousflat],int(self.flatten),'getzp --flatten number')        
         fits.writeto(self.image, im, header, overwrite=True)
         
     def fit_residual_surface(self,norder=2,suffix=None):
