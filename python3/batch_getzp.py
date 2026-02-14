@@ -99,6 +99,8 @@ def runone(i,f):
     getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter}"
     #if instrument == 'BOK':
     #    getzpstring += ' --fixbok'
+    if '20190211-p045' in f:
+        getzpstring += ' --useastropy'
     print()
     print(f"Running getzp.py for file {f}")
     #print(getzpstring)
