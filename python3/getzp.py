@@ -455,11 +455,11 @@ class getzp():
             expt = 1.
         ADUlimit = 40000.
         ADUlimit = 400.
-        #if self.instrument == 'i':
-        #    if (self.filter == 'r'):
-        #        ADUlimit = 40000./60#/float(expt)
-        #    elif 'ha' in self.filter:
-        #        ADUlimit = 40000./180.
+        if self.instrument == 'i':
+            if (self.filter == 'r'):
+                ADUlimit = 40000./60#/float(expt)
+            elif 'ha' in self.filter:
+                ADUlimit = 40000./180.
         #if self.instrument == 'b':
         #    if (self.filter == 'r'):
         #        ADUlimit = 40000./120#/float(expt)
