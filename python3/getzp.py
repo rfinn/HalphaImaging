@@ -430,6 +430,10 @@ class getzp():
         froot = t[0]
         # check for se catalog
         secat = f"{self.catdir}/{froot}.cat"
+        if os.path.exists(secat):
+            print("Found SE catalog: ",secat)
+            print("Not rerunning source extractor...")
+            return
 
         os.system('cp ' +self.astrodir + '/default.* .')        
         if self.instrument == 'h':
