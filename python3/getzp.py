@@ -981,7 +981,7 @@ class getzp():
         color = self.pan_gr_color[flag]
         #print(f"len(x) = {len(x)}, len(color)= {len(color)}")
 
-        useAstropyModel = False
+        useAstropyModel = True
 
         if useAstropyModel:
 
