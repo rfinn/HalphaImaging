@@ -1423,7 +1423,7 @@ if __name__ == '__main__':
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
     parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
     parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT data from 2022 does not seem to show it either.',choices=['0','1','2'])
-    parser.add_argument('--useastropy',dest = 'useastropy', default = False, action='store_true',help = 'Use astropy to fit the ZP line with sigma clipping.  Default is False, which then uses my own iterative fitting.'])    
+    parser.add_argument('--useastropy',dest = 'useastropy', default = False, action='store_true',help = 'Use astropy to fit the ZP line with sigma clipping.  Default is False, which then uses my own iterative fitting.')    
     parser.add_argument('--spline',dest = 'spline', default = False, action = 'store_true',help = 'Fit surface with a spline rather than a 2d polynomial')
     parser.add_argument('--spline_order',dest = 'spline_order', default = 3,help = 'order of spline.  default is 3.')
     parser.add_argument('--spline_smooth',dest = 'spline_smooth', default = 1000,help = 'smoothing for spline.  default is 1000.')                
