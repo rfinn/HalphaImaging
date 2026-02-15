@@ -1159,17 +1159,17 @@ class getzp():
             # http://www.astronomy.ohio-state.edu/~martini/usefuldata.html
             # header.set('PHOTZP',float('{:.3f}'.format(-1.*self.bestc[1]+.21)))
             # changed this to write out phot zp in AB system for ALL filters
-            header.set('PHOTZP',float('{:.3f}'.format(-1.*self.zp)))
+            header.set('PHOTZP',float('{:.3f}'.format(-1.*self.zp)),'ZP fit from panstarrs AB mag')
 
             header.set('LAMB_um',float(.6442))
 
         else:
-            header.set('PHOTZP',float('{:.3f}'.format(-1.*self.zp)))
+            header.set('PHOTZP',float('{:.3f}'.format(-1.*self.zp)),'ZP fit from panstarrs AB mag')
         print(f"PHOTZPER = {zperr}")
         try:
-            header.set('PHOTZPER',float(f'{zperr:.3f}'))
+            header.set('PHOTZPER',float(f'{zperr:.3f}'),'ZP fit err from covariance')
         except ValueError:
-            header.set('PHOTZPER',f'{zperr}')            
+            header.set('PHOTZPER',f'{zperr}','ZP fit err from covariance')            
         try:
             header.set('PHOTZMAD',float(f'{self.fitmad:.3f}'),'ZP fit MAD of residuals in mag')
         except ValueError:
