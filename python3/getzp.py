@@ -301,9 +301,9 @@ class getzp():
 
         self.MINMAG = 14.
         if self.instrument == 'i':
-            self.MINMAG = 14.5
+            self.MINMAG = 15.
         if self.instrument == 'b':
-            self.MINMAG = 14.5
+            self.MINMAG = 15.
         # if image is in ADU rather than ADU/s, divide image by exptime before running sextractor
         if args.normbyexptime:
             im, header = fits.getdata(self.image,header=True)
