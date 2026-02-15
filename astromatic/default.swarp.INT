@@ -58,9 +58,10 @@ FSCALE_KEYWORD         PANSCALE        # FITS keyword for the multiplicative
 FSCALE_DEFAULT         1.0             # Default FSCALE value if not in header
  
 GAIN_KEYWORD           GAIN            # FITS keyword for effect. gain (e-/ADU)
-GAIN_DEFAULT           1             # Default gain if no FITS keyword found
+GAIN_DEFAULT           0.0             # Default gain if no FITS keyword found
 
-SATLEV_KEYWORD         SATURATE        # FITS keyword for saturation level (ADU)
+#SATLEV_KEYWORD         SATURATE        # FITS keyword for saturation level (ADU)
+SATLEV_KEYWORD         NONSENSE        # FITS keyword for saturation level (ADU)
 SATLEV_DEFAULT         100000.0         # Default saturation if no FITS keyword
 #--------------------------- Background subtraction ---------------------------
  
