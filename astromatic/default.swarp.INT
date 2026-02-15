@@ -52,7 +52,10 @@ INTERPOLATE            N               # Interpolate bad input pixels (Y/N)?
                                        # (all or for each image)
  
 FSCALASTRO_TYPE        FIXED           # NONE,FIXED, or VARIABLE
-FSCALE_KEYWORD         PSCALE        # FITS keyword for the multiplicative
+#FSCALE_KEYWORD         PSCALE        # FITS keyword for the multiplicative
+# this should be PANFZP, not PSCALE - see example calculation in the
+# Halpha Reduction Log https://docs.google.com/spreadsheets/d/175ya3b6pd3sc_uHtmR6vmNi1wPBC4bSV9DMTG8od4_E/edit?usp=sharing
+FSCALE_KEYWORD         PANFZP        # FITS keyword for the multiplicative
 #FSCALE_KEYWORD         EXPTIME        # FITS keyword for the multiplicative
                                        # factor applied to each input image
 FSCALE_DEFAULT         1.0             # Default FSCALE value if not in header
