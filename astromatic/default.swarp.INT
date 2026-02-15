@@ -24,6 +24,7 @@ COMBINE_TYPE           CLIPPED          # MEDIAN,AVERAGE,MIN,MAX,WEIGHTED,CLIPPE
                                        # WEIGHTED_WEIGHT,MEDIAN_WEIGHT,
                                        # AND,NAND,OR or NOR
 CLIP_SIGMA             3.0
+BLANK_BADPIXELS        N               # Set to 0 pixels having a weight of 0
 #-------------------------------- Astrometry ----------------------------------
  
 CELESTIAL_TYPE         NATIVE          # NATIVE, PIXEL, EQUATORIAL,
