@@ -859,6 +859,9 @@ class getzp():
         yfit = np.polyval(polyfit_results,x)
         residual = (yfit - y)
         plt.figure(figsize=(8,8))
+
+        self.fitmad = MAD2(residual)
+        self.fitstd = np.std(residual)
         s = ' (MAD =%.4f, std=%.4f, N=%d)'%(MAD2(residual), np.std(residual),len(residual))
         
         
@@ -1164,9 +1167,17 @@ class getzp():
             header.set('PHOTZP',float('{:.3f}'.format(-1.*self.zp)))
         print(f"PHOTZPER = {zperr}")
         try:
-            header.set('PHOTZPER',f'{zperr:.3f}')
+            header.set('PHOTZPER',float(f'{zperr:.3f}'))
         except ValueError:
             header.set('PHOTZPER',f'{zperr}')            
+        try:
+            header.set('PZMAD',float(f'{self.fitmad:.3f}'))
+        except ValueError:
+            print("problem adding to header: MAD of the fit")            
+        try:
+            header.set('PZSTD',float(f'{self.fitstd:.3f}'))
+        except ValueError:
+            print("problem adding to header: STD of the fit")            
             
         header.set('PHOTSYS','AB')
         header.set('FLUXZPJY',float(3631))
