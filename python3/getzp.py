@@ -1171,11 +1171,11 @@ class getzp():
         except ValueError:
             header.set('PHOTZPER',f'{zperr}')            
         try:
-            header.set('PZMAD',float(f'{self.fitmad:.3f}'))
+            header.set('PHOTZMAD',float(f'{self.fitmad:.3f}'),'ZP fit MAD of residuals in mag')
         except ValueError:
             print("problem adding to header: MAD of the fit")            
         try:
-            header.set('PZSTD',float(f'{self.fitstd:.3f}'))
+            header.set('PHOTZSTD',float(f'{self.fitstd:.3f}'),'ZP fit STD of residuals in mag')
         except ValueError:
             print("problem adding to header: STD of the fit")            
             
