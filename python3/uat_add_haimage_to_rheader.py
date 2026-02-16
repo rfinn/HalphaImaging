@@ -130,6 +130,8 @@ if __name__ == '__main__':
                     print(searchstring)
             else:
                 searchstring = f'{args.filestring}*{pointing}*-{h}.fits'
+                if args.testing:
+                    print(f"looking for halpha image in filter {h} using search string = {searchstring}")
             hfiles = glob.glob(searchstring)
 
             if len(hfiles) == 1:
