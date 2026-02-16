@@ -11,8 +11,13 @@ This assumes that the files are already sorted by pointing, but not by filter.
 
 USAGE:
 Run this from, e.g. /home/rfinn/data/reduced/scratch-int-feb2019
+
+or 
+
+/data-pool/Halpha/processed/2019febINT-all
+
 - this directory has a subdirectory for each pointing
-- the subdirectory contains both the r and Halpha image
+- the pointing subdirectory contains both the r and Halpha image
 
 '''
 
