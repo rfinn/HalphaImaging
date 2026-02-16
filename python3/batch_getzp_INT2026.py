@@ -36,7 +36,7 @@ def runone(f):
     iinstrument = 'i'
     
     nflatten = 1
-    usespline = False
+    usespline = True # using spline for r-band images too
     if 'Halpha' in f: #int 197
         ffilter = 'ha197'
         nflatten = 2
