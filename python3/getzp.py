@@ -150,8 +150,11 @@ def fitline_sigma_clipping(x, y, yerr=None, nsigma=3,niter=3):
     * uncertainty = np array with uncertainty in slope
 
     """
+    # get estimate of intercept from polyfit
+    c = np.polyfit(x,y,1)
+    intercept = c[1]
     # 2. Initialize the polynomial model and fitter
-    poly_init = models.Linear1D(fixed={'slope': True},slope=1) # Initialize a 2nd degree polynomial model
+    poly_init = models.Linear1D(intercept=intercept, fixed={'slope': True},slope=1) # Initialize a 2nd degree polynomial model
 
     fitter = fitting.LinearLSQFitter() # Standard least squares fitter
     
