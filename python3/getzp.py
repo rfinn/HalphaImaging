@@ -150,7 +150,8 @@ def fitline_sigma_clipping(x, y, yerr=None, nsigma=3,niter=3):
     * uncertainty = np array with uncertainty in slope
 
     """
-    # get estimate of intercept from polyfit
+    # updating to get initial estimate of intercept from polyfit
+    # then feed this into Linear1D
     # hoping this helps the more difficult cases converge
     c = np.polyfit(x,y,1)
     intercept = c[1]
