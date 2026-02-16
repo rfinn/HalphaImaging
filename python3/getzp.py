@@ -151,6 +151,7 @@ def fitline_sigma_clipping(x, y, yerr=None, nsigma=3,niter=3):
 
     """
     # get estimate of intercept from polyfit
+    # hoping this helps the more difficult cases converge
     c = np.polyfit(x,y,1)
     intercept = c[1]
     # 2. Initialize the polynomial model and fitter
@@ -1170,7 +1171,7 @@ class getzp():
             header.set('PHOTZP',float('{:.3f}'.format(-1.*self.zp)),'ZP fit from panstarrs AB mag')
         print(f"PHOTZPER = {zperr}")
         try:
-            header.set('PHOTZPER',float(f'{zperr:.3f}'),'ZP fit err from covariance')
+            header.set('PHOTZPER',float(f'{zperr:.4f}'),'ZP fit err from covariance')
         except ValueError:
             header.set('PHOTZPER',f'{zperr}','ZP fit err from covariance')            
         try:
