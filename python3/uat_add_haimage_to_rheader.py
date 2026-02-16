@@ -26,11 +26,14 @@ def get_params_from_name_uat(image_name):
     '''
     t = os.path.basename(image_name).split('-')
     #print(t)
-    if len(t) == 7: 
+    if len(t) == 7:
+        ra, dec = t[1].split('+')
         telescope = t[2]
         dateobs = t[3]
         pointing = t[4]+'-'+t[5]
     elif len(t) == 8: # meant to catch negative declinations
+        ra = t[1]
+        dec = -1*t[2]
         telescope = t[3]
         dateobs = t[4]
         pointing = t[5]+'-'+t[6]
@@ -40,7 +43,8 @@ def get_params_from_name_uat(image_name):
         print(image_name)
         print(t)
         return
-    return telescope,dateobs,pointing
+    return telescope,dateobs,pointing,ra,dec
+
 def get_params_from_name_vfs(image_name):
     '''
     coadd names should be as follows.
@@ -118,7 +122,8 @@ if __name__ == '__main__':
         if args.vfs:
             telescope, dateobs, pointing, ra, dec = get_params_from_name_vfs(rfile)
         else:
-            telescope, dateobs, pointing = get_params_from_name_uat(rfile)
+            telescope, dateobs, pointing, ra, dec = get_params_from_name_uat(rfile)
+            print(f"I think: telescope={telescope}, dateobs={dateobs}, pointing={pointing}")
         print(f"working on file {rfile}, target={pointing}")
         # look for target name with halpha image
         for h in halpha_options:
@@ -129,7 +134,7 @@ if __name__ == '__main__':
                 if args.verbose:
                     print(searchstring)
             else:
-                searchstring = f'{args.filestring}*{pointing}*-{h}.fits'
+                searchstring = f'UAT*{ra}*{dec}*{pointing}*-{h}.fits'
                 if args.testing:
                     print(f"looking for halpha image in filter {h} using search string = {searchstring}")
             hfiles = glob.glob(searchstring)
