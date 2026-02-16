@@ -216,7 +216,7 @@ def subtract_median_one(fname,MEF=True,overwrite=False,MOS=False):
     if overwrite:
         hdu.writeto(fname,overwrite=True)
     else:
-        hdu.writeto("m"+fname,overwrite=True)
+        hdu.writeto("m"+fname,overwrite=True, output_verify='ignore')
     if MOS | weightflag:
         print("copying weight image\m")
         print(f"\tcp {weight_imname} m{weight_imname}")
