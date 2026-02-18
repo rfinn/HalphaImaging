@@ -992,7 +992,7 @@ class getzp():
         useAstropyModel = args.useastropy
 
         if useAstropyModel:
-
+            print("using astropy model...")
             fit2, mask2,uncertainty = fitline_sigma_clipping(x,y, yerr=yerr,niter=10)#,sigma = yerr)
             slope = 1
 
