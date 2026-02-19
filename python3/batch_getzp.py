@@ -96,14 +96,14 @@ def runone(i,f):
         sys.exit()
     
     # construct string
-    getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter}"
+    getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter} --useastropy"
     #if instrument == 'BOK':
     #    getzpstring += ' --fixbok'
-    aimages = ['20190211-p045','20210315-VFID1538', '20190208-p091','20210416-VFID2997','20220426-VFID2622','20130415-NGC5846_05','MOS-20110404-NGC5846_02','MOS-20120418-NGC5846_04','BOK-20220426-VFID6599','BOK-20220423-VFID0720','BOK-20220424-VFID0607','BOK-20220428-VFID4257','BOK-20210417-VFID3780','BOK-20210414-VFID0422','BOK-20220425-VFID3714','BOK-20210418-VFID3459','BOK-20220428-VFID0783','BOK-20220423-VFID0783']
-    for aim in aimages:
-        if aim in f:
-            getzpstring += ' --useastropy'
-            break
+    #aimages = ['20190211-p045','20210315-VFID1538', '20190208-p091','20210416-VFID2997','20220426-VFID2622','20130415-NGC5846_05','MOS-20110404-NGC5846_02','MOS-20120418-NGC5846_04','BOK-20220426-VFID6599','BOK-20220423-VFID0720','BOK-20220424-VFID0607','BOK-20220428-VFID4257','BOK-20210417-VFID3780','BOK-20210414-VFID0422','BOK-20220425-VFID3714','BOK-20210418-VFID3459','BOK-20220428-VFID0783','BOK-20220423-VFID0783']
+    #for aim in aimages:
+    #    if aim in f:
+    #        getzpstring += ' --useastropy'
+    #        break
     print()
     print(f"Running getzp.py for file {f}")
     #print(getzpstring)

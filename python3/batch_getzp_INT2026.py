@@ -37,14 +37,17 @@ def runone(f):
     
     nflatten = 1
     usespline = True # using spline for r-band images too
+    norder = 3
     if 'Halpha' in f: #int 197
         ffilter = 'ha197'
         nflatten = 2
         usespline = True
+        norder = 4
     elif 'Ha6657' in f:
         ffilter = 'ha227'
         nflatten = 2
-        usespline = True        
+        usespline = True
+        norder = 4
     elif 'r.coadd' in f:
         ffilter = 'r'
     elif 'R.coadd' in f:
@@ -56,9 +59,9 @@ def runone(f):
 
     
     # construct string
-    getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter} --flatten {nflatten} "
+    getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter} --flatten {nflatten} --useastropy"
     if usespline:
-        getzpstring += " --spline --spline_order 4"
+        getzpstring += " --spline --spline_order {norder}"
     #if instrument == 'BOK':
     #    getzpstring += ' --fixbok'
     print()
