@@ -215,7 +215,7 @@ def combine_masks(imname):
         for i in range(1,5):
             #print('combining image number ',i)
             dq_mask_bad = dq_hdu[i].data > 0 # these should be set equal to zero in weight image
-            weight_hdu[i].data = weight_hdu[i].data * dq_mask_bad #+ 1000*dq_hdu[i].data
+            weight_hdu[i].data[dq_mask_bad] = 0 #+ 1000*dq_hdu[i].data
         weight_hdu.writeto(combined_mask,overwrite=True)
         
         # prepend the m to match the name of the median subtracted image
