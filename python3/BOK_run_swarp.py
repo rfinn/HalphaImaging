@@ -209,11 +209,13 @@ def combine_masks(imname):
         dq_image = imname.replace('ooi','ood')
         weight_hdu = fits.open(weight_image)
         dq_hdu = fits.open(dq_image)
+
     
         # loop over the 4 images, extensions 1-4
         for i in range(1,5):
             #print('combining image number ',i)
-            weight_hdu[i].data = weight_hdu[i].data + 1000*dq_hdu[i].data
+            dq_mask_bad = dq_hdu[i].data > 0 # these should be set equal to zero in weight image
+            weight_hdu[i].data = weight_hdu[i].data * dq_mask_bad #+ 1000*dq_hdu[i].data
         weight_hdu.writeto(combined_mask,overwrite=True)
         
         # prepend the m to match the name of the median subtracted image
@@ -276,7 +278,7 @@ def run_swarp(image_list,refimage=None, verbose=True, runswarp=True):
     output_weight_image = 'VF-{}-BOK-{}-{}.weight.fits'.format(dateobs,vfid,filter)    
     # start building swarp command
     # not sure why command string is not propagating...
-    commandstring = 'swarp @{} -WEIGHT_IMAGE @{} -c default.swarp.BOK -IMAGEOUT_NAME {} -WEIGHTOUT_NAME {} -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE {} '.format(image_list,weight_list,output_image,output_weight_image, pixel_scale)
+    commandstring = f'swarp @{image_list} -WEIGHT_IMAGE @{weight_list} -c default.swarp.BOK -IMAGEOUT_NAME {output_image} -WEIGHTOUT_NAME {output_weight_image} -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE {pixel_scale} '
 
     #if verbose:
     #    print("value of refimage = ",refimage)
