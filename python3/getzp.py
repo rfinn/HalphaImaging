@@ -245,10 +245,13 @@ def get_filebasename(fname):
     #print(t)
     # check to see if declination is negative
     # if it is, then index of instrument will be off by one
-    if fname[10] == '+':
-        basename = '-'.join(t[0:5])
-    else:
-        basename = '-'.join(t[0:6])
+    try:
+        if fname[10] == '+':
+            basename = '-'.join(t[0:5])
+        else:
+            basename = '-'.join(t[0:6])
+    except IndexError:
+        basename = fname
     return basename
         
 
