@@ -197,6 +197,8 @@ def combine_masks(imname):
     '''
 
     combined_mask = imname.replace('.fits','.weight.fits')
+    # add the zm prefix to match the image files
+    combined_mask = 'zm'+combined_mask
     #combined_mask = 'm'+combined_mask
     if os.path.exists(combined_mask):
         print('output image already exists: ',combined_mask)
@@ -443,7 +445,7 @@ def write_filelists(targets,header_table,medsub=True):
             #    outfile.write('m{} \n'.format(f))
             #else:
             outfile.write('{} \n'.format(f))
-            combined_mask = f.replace('.fits','.weight.fits').replace('zmksb','ksb')
+            combined_mask = f.replace('.fits','.weight.fits')#.replace('zmksb','ksb')
             weightfile.write('{} \n'.format(combined_mask))
         outfile.close()
         weightfile.close()
