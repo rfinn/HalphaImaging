@@ -481,7 +481,7 @@ if __name__ == '__main__':
     parser.add_argument('--combinemasks', dest = 'combinemasks', default = False, action='store_true',help = 'set this to combine weight image and bad pixel mask.')
     parser.add_argument('--sortfiles', dest = 'sortfiles', default = False, action='store_true',help = 'write image and weights to files')
     parser.add_argument('--swarp', dest = 'swarp', default = False, action='store_true',help = 'run swarp to create coadded images')
-    parser.add_argument('--onetarget', dest = 'onetarget', default = None,help = 'run swarp on one target.  give the VFID2162_r to recreate the coadds')    
+    parser.add_argument('--onetarget', dest = 'onetarget', default = None,help = 'run swarp on one target.  give the VFID2162_r to recreate the coadds.  give individual image name to run combinemasks on one file.')    
     parser.add_argument('--getzp', dest = 'getzp', default = False, action='store_true',help = 'run getzp to determine photometric zp of r and Halpha images')
 
     
@@ -543,7 +543,10 @@ if __name__ == '__main__':
     if args.combinemasks:
         # combine masks
         # this combines weight image and bad pixel masks
-        mcombine_results = combine_all_masks(filetable['FILENAME'])
+        if args.onetarget is not None:
+            mcombine_results = combine_masks(args.onetarget)
+        else:
+            mcombine_results = combine_all_masks(filetable['FILENAME'])
  
     if args.se:
         os.system('cp ~/github/HalphaImaging/astromatic/default.* .')        
