@@ -376,7 +376,7 @@ class getzp():
             if self.fixbok:  
                 print("checking 90prime ccds...",self.fixbok)
                 self.check_90prime_ccds()
-            self.runse()
+            self.runse(useprevious=False)
             self.match_coords()
             self.fitzp(plotall=True)
         self.update_header()
@@ -422,7 +422,7 @@ class getzp():
         plt.axvline(x=1,color='k')
         plt.xlabel('Flux/Flux_predicted of fitted sources')
         
-    def runse(self):
+    def runse(self,useprevious=True):
         """
         Run Source Extractor on image to measure magnitudes
         """
@@ -435,7 +435,7 @@ class getzp():
         froot = t[0]
         # check for se catalog
         secat = f"{self.catdir}/{froot}.cat"
-        if os.path.exists(secat):
+        if (os.path.exists(secat) & useprevious):
             print("Found SE catalog: ",secat)
             print("Not rerunning source extractor...")
             return
