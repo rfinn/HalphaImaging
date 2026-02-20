@@ -94,6 +94,7 @@ if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(description ="This program adds the Halpha imaging name to the r-band images, searching for all UAT*-R.fits for the r-band images.")
     parser.add_argument('--filestring', dest = 'filestring', default = 'UAT', help = 'filestring to match. default is UAT, which will grab all UAT*R.fits files. Note: weight images will be renamed with their corresponding science coadd.')
+    parser.add_argument('--filestring2', dest = 'filestring2', default = None, help = 'additional filestring to match. Example {UAT}*{filestrig2}*R.fits.')    
     #parser.add_argument('--se', dest = 'se', default = False, action='store_true', help = 'Run source extractor')    
     #parser.add_argument('--scamp', dest = 'scamp', default = False, action='store_true', help = 'Run scamp')
     #parser.add_argument('--submedian', dest = 'submedian', default = False, action='store_true', help = 'Subtract a median sky value from each image.')
@@ -107,8 +108,14 @@ if __name__ == '__main__':
     halpha_options = halpha_options + ['Ha4','Halpha','Ha6657'] # adding more options so we can use with Virgo VFS images
     print("halpha filters: ",halpha_options)
 
-    rfilelist1 = glob.glob(f"{args.filestring}*R.fits")
-    rfilelist2 = glob.glob(f"{args.filestring}*r.fits")
+    if args.filestring2 is not None:
+        rfilelist1 = glob.glob(f"{args.filestring}*{args.filestring2}*R.fits")
+        rfilelist2 = glob.glob(f"{args.filestring}*{args.filestring2}*r.fits")
+
+    else:
+        rfilelist1 = glob.glob(f"{args.filestring}*R.fits")
+        rfilelist2 = glob.glob(f"{args.filestring}*r.fits")
+
     rfilelist = rfilelist1 + rfilelist2
 
     rfilelist.sort()
