@@ -2,7 +2,7 @@
 
 """
 OVERVIEW:
-- this is a wrapper for INT_add_inst_header.py
+- this is a wrapper for INT_get_ccd_offsets.py
 - this is intended to be used with gnu parallel
 
 USAGE:
