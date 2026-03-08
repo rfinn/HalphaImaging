@@ -155,6 +155,7 @@ def fitline_sigma_clipping(x, y, yerr=None, nsigma=3,niter=3):
     # hoping this helps the more difficult cases converge
     c = np.polyfit(x,y,1)
     intercept = c[1]
+    print(f"initial fit from polyfit: intercept={intercept:.2f}")
     # 2. Initialize the polynomial model and fitter
     poly_init = models.Linear1D(intercept=intercept, fixed={'slope': True},slope=1) # Initialize a 2nd degree polynomial model
 
@@ -996,7 +997,9 @@ class getzp():
 
         if useAstropyModel:
             print("using astropy model...")
-            fit2, mask2,uncertainty = fitline_sigma_clipping(x,y, yerr=yerr,niter=10)#,sigma = yerr)
+
+            # get initial fit from numpy inside fitline_sigma_clipping function
+            fit2, mask2,uncertainty = fitline_sigma_clipping(x,y, yerr=yerr,niter=5)#,sigma = yerr)
             slope = 1
 
             yplot = self.matchedarray1['MAG_APER'][:,self.naper][self.fitflag]
