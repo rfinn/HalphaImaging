@@ -308,7 +308,7 @@ class getzp():
             self.pixelscale = pixelscale['MOS']            
         self.filter = args.filter
 
-        self.MINMAG = args.minmag
+        self.MINMAG = float(args.minmag)
         #if self.instrument == 'i':
         #    self.MINMAG = 15.
         #if self.instrument == 'b':
