@@ -363,7 +363,7 @@ class getzp():
             print("found SE cat!!!")
             self.read_se_cat()
         else:
-            self.runse()
+            self.runse(userprevious=False)
         if self.verbose:
             print('')        
             print('STATUS: getting panstarrs')
@@ -467,20 +467,8 @@ class getzp():
         except KeyError:
             expt = 1.
         ADUlimit = 40000.
-        #ADUlimit = 400.
-        #if self.instrument == 'i':
-        #    if (self.filter == 'r'):
-        #        ADUlimit = 40000./60#/float(expt)
-        #    elif 'ha' in self.filter:
-        #        ADUlimit = 40000./180.
-        #if self.instrument == 'b':
-        #    if (self.filter == 'r'):
-        #        ADUlimit = 40000./120#/float(expt)
-        #    elif 'ha' in self.filter:
-        #        ADUlimit = 40000./180.
         if self.instrument == 'm':
             ADUlimit = 40000.
-        #print('saturation limit in ADU/s {:.1f}'.format(ADUlimit))
         catdir = self.catdir
         if not os.path.exists(catdir):
             os.mkdir(catdir)
@@ -492,7 +480,6 @@ class getzp():
                 weight_image = self.image.replace('.fits','.weight.fits')
                 if os.path.exists(weight_image):
                     t += f" -WEIGHT_IMAGE {weight_image} -WEIGHT_TYPE MAP_WEIGHT -RESCALE_WEIGHTS  N"
-            #t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '
             if self.verbose:
                 print('running SE first time to get estimate of FWHM')
                 print(t)
@@ -1194,7 +1181,7 @@ class getzp():
         fits.writeto(self.image, im, header, overwrite=True)
 
 
-    def fit_residual_surface(self, norder=2, suffix=None):
+    def fit_residual_surface_old(self, norder=2, suffix=None):
         mag_meas = self.matchedarray1['MAG_APER'][:, self.naper][self.fitflag]
         mag_pan = np.polyval(self.bestc, self.R[self.fitflag])
         flux_ratio = 10.**((mag_pan - mag_meas) / 2.5)
@@ -1235,7 +1222,60 @@ class getzp():
                   np.nanmin(self.zz),
                   np.nanmedian(self.zz),
                   np.nanmax(self.zz))
-    def fit_residual_surface_old(self,norder=2,suffix=None):
+    def fit_residual_surface(self, norder=2, suffix=None):
+
+        self.xim = self.residual_allx
+        self.yim = self.residual_ally
+        self.zim = self.residual_all
+
+        self.imagedata = fits.getdata(self.image)
+        ny, nx = self.imagedata.shape
+
+        clip_flag = sigma_clip(self.zim, sigma=3, maxiters=10, masked=True)
+        good = ~clip_flag.mask
+
+        if self.spline:
+            self.zz = fitspline2d(
+                self.xim[good], self.yim[good], self.zim[good],
+                nx, ny, order=self.spline_order, s=self.spline_smooth
+            )
+        else:
+            m = polyfit2d(self.xim[good], self.yim[good], self.zim[good], order=norder)
+            yy, xx = np.indices((ny, nx))
+            self.zz = polyval2d(xx, yy, m)
+
+        print("N stars used:", np.sum(good))
+        print("zim median/std/MAD:",
+              np.nanmedian(self.zim[good]),
+              np.nanstd(self.zim[good]),
+              MAD2(self.zim[good]))
+        print("zz min/median/max:",
+              np.nanmin(self.zz),
+              np.nanmedian(self.zz),
+              np.nanmax(self.zz))
+    
+        print("plotting results of background fitting...")
+        plt.figure(dpi=150)
+        n = 10 # downsampling to speed up 
+        plt.imshow(self.zz[::n,::n],vmin=v1,vmax=v2,origin="lower")
+        #plt.imshow(self.zz,vmin=v1,vmax=v2,origin="lower")
+        plt.scatter(self.xim[~clip_flag.mask]/n, self.yim[~clip_flag.mask]/n, c=self.zim[~clip_flag.mask],vmin=v1,vmax=v2,s=15)
+        cb=plt.colorbar()
+        cb.set_label('f-meas/f-pan')
+        s = ' std (MAD) = %.4f (%.4f)'%(np.std(self.zim[~clip_flag.mask]),MAD2(self.zim[~clip_flag.mask]))
+        plt.title(self.plotprefix+': n poly = '+str(norder)+s)
+        #plt.show()
+        plt.xlabel(f"pixel/{n}")
+        plt.ylabel(f"pixel/{n}")        
+        if suffix is None:
+            plotname='imsurfit-'+str(norder)
+        else:
+            plotname='imsurfit-'+str(norder)+'-'+suffix
+        plt.savefig('plots/'+self.plotprefix.replace(".fits","")+plotname+'.png')
+        #plt.savefig('plots/'+self.plotprefix.replace(".fits","")+plotname+'.pdf')
+        print("... done plotting results.\n")
+
+    def fit_residual_surface_old_old(self,norder=2,suffix=None):
         """
         for INT data, first pass:
         - create an image of the fit the residuals WRT panstarrs,
@@ -1315,6 +1355,7 @@ class getzp():
             # Plot
         print("zz stats:", np.nanmin(self.zz), np.nanmedian(self.zz), np.nanmax(self.zz))
         print("zim stats:", np.nanmin(self.zim), np.nanmedian(self.zim), np.nanmax(self.zim))
+        
         print("plotting results of background fitting...")
         plt.figure(dpi=150)
         n = 10 # downsampling to speed up 
@@ -1347,30 +1388,27 @@ class getzp():
 
         self.imagedata, header = fits.getdata(self.image, header=True)
         self.imagedata_norm = self.imagedata / self.zz_norm
+        print("DEBUG renorm_wfc input image:", self.image)
+        print("DEBUG correction min/med/max:",
+                  np.nanmin(self.zz_norm), np.nanmedian(self.zz_norm), np.nanmax(self.zz_norm))
+
+        ratio = self.imagedata_norm / self.imagedata
+        print("DEBUG flattened/original min/med/max:",
+                  np.nanmin(ratio), np.nanmedian(ratio), np.nanmax(ratio))
 
         self.renorm_image = 'f' + self.image
+        print("DEBUG renorm_wfc output image:", self.renorm_image)
+    
+        #self.renorm_image = 'f' + self.image
         fits.writeto(self.renorm_image, self.imagedata_norm, header=header, overwrite=True)
 
     
-    def renorm_wfc_old(self):
-        # normalize surface fit
-        self.zz_norm = self.zz/np.nanmedian(self.zz)
-        # not sure we want to normalize this, actually
-        #self.zz_norm = self.zz
-        self.zz_norm = np.where(np.isfinite(self.zz_norm) & (self.zz_norm > 0),
-                        self.zz_norm, 1.0)
-        # divide image by surface fit
-        self.imagedata,header = fits.getdata(self.image,header=True)
-        self.imagedata_norm = self.imagedata/self.zz_norm
-        # save flattened image
-        self.renorm_image = 'f'+self.image
-        fits.writeto(self.renorm_image,self.imagedata_norm,header=header,overwrite=True)
     def rerun_zp_fit(self):
         # change image name to flattened image
         self.image = self.renorm_image
         self.plotprefix = 'f'+self.plotprefix
         # rerun getzp, but don't download panstarrs again
-        self.runse()
+        self.runse(useprevious=False)
         if self.verbose:
             print('STATUS: matching se cat to panstarrs')
             
