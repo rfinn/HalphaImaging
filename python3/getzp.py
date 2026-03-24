@@ -485,9 +485,10 @@ class getzp():
         if self.fwhm is None:
             
             t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {self.catdir}/{froot}.cat -BACK_SIZE 128 -BACKPHOTO_TYPE LOCAL -BACK_TYPE AUTO -MAG_ZEROPOINT 0 -SATUR_LEVEL {ADUlimit:.1f}'
-            weight_image = self.image.replace('.fits','.weight.fits')
-            if os.path.exists(weight_image):
-                t += f" -WEIGHT_IMAGE {weight_image} -WEIGHT_TYPE MAP_WEIGHT -RESCALE_WEIGHTS  N"
+            if self.instrument == 'b':
+                weight_image = self.image.replace('.fits','.weight.fits')
+                if os.path.exists(weight_image):
+                    t += f" -WEIGHT_IMAGE {weight_image} -WEIGHT_TYPE MAP_WEIGHT -RESCALE_WEIGHTS  N"
             #t = 'sex ' + self.image + ' -c '+defaultcat+' -CATALOG_NAME ' + froot + '.cat -MAG_ZEROPOINT 0 -SATUR_LEVEL '
             if self.verbose:
                 print('running SE first time to get estimate of FWHM')
