@@ -228,7 +228,10 @@ def polyfit2d(x, y, z, order=3):
 def polyval2d(x, y, m):
     order = int(np.sqrt(len(m))) - 1
     ij = itertools.product(range(order+1), range(order+1))
-    z = np.zeros_like(x)
+    #z = np.zeros_like(x)
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    z = np.zeros(x.shape, dtype=float)
     for a, (i,j) in zip(m, ij):
         z += a * x**i * y**j
     return z
@@ -1222,7 +1225,16 @@ class getzp():
 
         print("zim stats:", np.nanmin(self.zim[good]), np.nanmedian(self.zim[good]), np.nanmax(self.zim[good]))
         print("zz stats :", np.nanmin(self.zz), np.nanmedian(self.zz), np.nanmax(self.zz))
-    
+        good = ~clip_flag.mask
+        print("N stars used:", np.sum(good))
+        print("zim median/std/MAD:",
+                  np.nanmedian(self.zim[good]),
+                  np.nanstd(self.zim[good]),
+                  MAD2(self.zim[good]))
+        print("zz min/median/max:",
+                  np.nanmin(self.zz),
+                  np.nanmedian(self.zz),
+                  np.nanmax(self.zz))
     def fit_residual_surface_old(self,norder=2,suffix=None):
         """
         for INT data, first pass:
