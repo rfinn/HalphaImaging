@@ -343,8 +343,8 @@ class getzp():
         if 'ha' in self.filter:
             v1 = .9
             v2 = 1.1
-            v1 = .95
-            v2 = 1.05 #  keep halph range to match broad band filters
+            #v1 = .95
+            #v2 = 1.05 #  keep halph range to match broad band filters
         else:
             v1=.95
             v2=1.05
@@ -576,31 +576,7 @@ class getzp():
             self.pan = Table.read(ptab_name)
             
         else:
-            # check for catalog from previous run on mosaic
-            # not sure what this does anymore - don't think we want this
-            # commenting out and querying for new catalog
 
-            
-            #print(self.image)
-            #print()
-            #print("looking for panstarrs catalog...")
-            #print()
-            #header = fits.getheader(self.image)
-            #objname = header['OBJECT'].split('_')[0]
-            #filter = header['FILTER'].replace('+','').replace('nm','')
-            
-            #glob_ptab_name = '*'+objname+'-'+filter+'_pan_tab.csv'
-            #print('\t',glob_ptab_name)
-            #print()
-            #filelist = glob.glob(glob_ptab_name)
-            ##print(filelist)
-            #if len(filelist) > 0:
-            #    ptab_name = filelist[0]
-            #    self.pan = Table.read(ptab_name)
-            #    print()
-            #    print('Good news - found a prior panstarrs catalog!')
-            #    print()
-            #else:
             print()
             print("no previous panstarrs catalog found :(")
             self.pan = panstarrs_query(self.centerRA, self.centerDEC, self.width)
@@ -742,6 +718,8 @@ class getzp():
         
     def color_correct_panstarrs_matteo(self):
         """
+        NOT USED!!!
+
         correcting panstarrs magnitudes into the observed filter systems using conversions from M. Fossati  
 
         Best fit quadratic Intha - PS1_r = 0.0182*(PS1_g-PS1_r)^2 + -0.2662*(PS1_g-PS1_r) + 0.0774
@@ -1211,8 +1189,41 @@ class getzp():
         #header.set('ZPNFLAT'+suffixes[npreviousflat],int(self.flatten),'getzp --flatten number')
         header.set('ZPNFLAT',int(self.flatten),'getzp --flatten number')        
         fits.writeto(self.image, im, header, overwrite=True)
-        
-    def fit_residual_surface(self,norder=2,suffix=None):
+
+
+    def fit_residual_surface(self, norder=2, suffix=None):
+        mag_meas = self.matchedarray1['MAG_APER'][:, self.naper][self.fitflag]
+        mag_pan = np.polyval(self.bestc, self.R[self.fitflag])
+        flux_ratio = 10.**((mag_pan - mag_meas) / 2.5)
+
+        self.xim = self.matchedarray1['X_IMAGE'][self.fitflag]
+        self.yim = self.matchedarray1['Y_IMAGE'][self.fitflag]
+        self.zim = flux_ratio
+
+        self.imagedata = fits.getdata(self.image)
+        ny, nx = self.imagedata.shape
+
+        clip_flag = sigma_clip(self.zim, sigma=3, maxiters=10, masked=True)
+        good = ~clip_flag.mask
+
+        if self.spline:
+            # depends on fitspline2d convention, but ideally this should also
+            # evaluate on the true detector grid
+            self.zz = fitspline2d(
+                self.xim[good], self.yim[good], self.zim[good],
+                nx, ny, order=self.spline_order, s=self.spline_smooth
+            )
+        else:
+            m = polyfit2d(self.xim[good], self.yim[good], self.zim[good], order=norder)
+
+            # evaluate on true detector coordinates
+            yy, xx = np.indices((ny, nx))
+            self.zz = polyval2d(xx, yy, m)
+
+        print("zim stats:", np.nanmin(self.zim[good]), np.nanmedian(self.zim[good]), np.nanmax(self.zim[good]))
+        print("zz stats :", np.nanmin(self.zz), np.nanmedian(self.zz), np.nanmax(self.zz))
+    
+    def fit_residual_surface_old(self,norder=2,suffix=None):
         """
         for INT data, first pass:
         - create an image of the fit the residuals WRT panstarrs,
@@ -1235,7 +1246,7 @@ class getzp():
         self.imagedata = fits.getdata(self.image)
         # fill in where there is no coverage        
         weight_name = self.image.split('.fits')[0]+'.weight.fits'
-        self.weightdata = fits.getdata(self.image)
+        self.weightdata = fits.getdata(weight_name)
         # this is not used
         self.nodata =  self.weightdata == 0
 
@@ -1283,12 +1294,15 @@ class getzp():
 
             # Evaluate it on a grid...        
 
-            xx, yy = np.meshgrid(np.linspace(self.xim.min(), self.xim.max(), nx), 
-                         np.linspace(self.yim.min(), self.yim.max(), ny))
+            #xx, yy = np.meshgrid(np.linspace(self.xim.min(), self.xim.max(), nx), 
+            #             np.linspace(self.yim.min(), self.yim.max(), ny))
+            yy, xx = np.indices((ny, nx))
             self.zz = polyval2d(xx, yy, m)
             
 
             # Plot
+        print("zz stats:", np.nanmin(self.zz), np.nanmedian(self.zz), np.nanmax(self.zz))
+        print("zim stats:", np.nanmin(self.zim), np.nanmedian(self.zim), np.nanmax(self.zim))
         print("plotting results of background fitting...")
         plt.figure(dpi=150)
         n = 10 # downsampling to speed up 
@@ -1309,13 +1323,30 @@ class getzp():
         plt.savefig('plots/'+self.plotprefix.replace(".fits","")+plotname+'.png')
         #plt.savefig('plots/'+self.plotprefix.replace(".fits","")+plotname+'.pdf')
         print("... done plotting results.\n")
-        
+
+
     def renorm_wfc(self):
+        self.zz_norm = self.zz / np.nanmedian(self.zz)
+
+        bad = ~np.isfinite(self.zz_norm) | (self.zz_norm <= 0)
+        if np.any(bad):
+            print(f"WARNING: replacing {np.sum(bad)} bad correction pixels with 1.0")
+            self.zz_norm = np.where(bad, 1.0, self.zz_norm)
+
+        self.imagedata, header = fits.getdata(self.image, header=True)
+        self.imagedata_norm = self.imagedata / self.zz_norm
+
+        self.renorm_image = 'f' + self.image
+        fits.writeto(self.renorm_image, self.imagedata_norm, header=header, overwrite=True)
+
+    
+    def renorm_wfc_old(self):
         # normalize surface fit
-        self.zz_norm = self.zz/np.median(self.zz)
+        self.zz_norm = self.zz/np.nanmedian(self.zz)
         # not sure we want to normalize this, actually
-        self.zz_norm = self.zz
-        
+        #self.zz_norm = self.zz
+        self.zz_norm = np.where(np.isfinite(self.zz_norm) & (self.zz_norm > 0),
+                        self.zz_norm, 1.0)
         # divide image by surface fit
         self.imagedata,header = fits.getdata(self.image,header=True)
         self.imagedata_norm = self.imagedata/self.zz_norm
