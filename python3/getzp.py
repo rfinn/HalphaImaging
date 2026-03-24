@@ -308,7 +308,7 @@ class getzp():
             self.pixelscale = pixelscale['MOS']            
         self.filter = args.filter
 
-        self.MINMAG = 14.
+        self.MINMAG = args.minmag
         if self.instrument == 'i':
             self.MINMAG = 15.
         if self.instrument == 'b':
@@ -337,6 +337,7 @@ class getzp():
         self.norder = int(args.norder)
         self.fwhm = args.fwhm
         self.fixbok = args.fixbok
+        self.minmag = args.minmag
         self.args = args
         global v1, v2
         if 'ha' in self.filter:
@@ -1440,6 +1441,7 @@ if __name__ == '__main__':
     parser.add_argument('--useri',dest = 'useri', default = False, action = 'store_true', help = 'Use r->R transformation as a function of r-i rather than the g-r relation.  g-r is the default.')
     parser.add_argument('--normbyexptime', dest = 'normbyexptime', default = False, action = 'store_true', help = "set this flag if the image is in ADU rather than ADU/s, and the program will then normalize by the exposure time.  Note: swarp produces images in ADU/s, so this is usually not necessary if using coadds from swarp.")
     parser.add_argument('--mag', dest = 'mag', default = 0,help = "select SE magnitude to use when solving for ZP.  0=MAG_APER,1=MAG_BEST,2=MAG_PETRO.  Default is MAG_APER ",choices=['0','1','2'])
+    parser.add_argument('--minmag', dest = 'minmag', default = 15,help = "bright magnitude cutoff; default is 15.")    
     parser.add_argument('--naper', dest = 'naper', default = 5,help = "select fixed aperture magnitude.  0=10pix,1=12pix,2=15pix,3=20pix,4=25pix,5=30pix.  Default is 5 (30 pixel diameter)")
     parser.add_argument('--nsigma', dest = 'nsigma', default = 3.5, help = 'number of std to use in iterative rejection of ZP fitting.  default is 3.5')
     parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
