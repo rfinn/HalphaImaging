@@ -693,7 +693,7 @@ class getzp():
                 print(f"WARNING: did not find segmentation image {self.segmentation_image}")
                 print("\t getzp will NOT be happy...")
         else:
-            print(f"{self.segmentation_image}")
+            print(f"Found {self.segmentation_image}")
     def get_panstarrs(self):
 
         ###################################
