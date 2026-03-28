@@ -34,7 +34,17 @@ def runone(f):
 
         
     iinstrument = 'i'
-    
+
+    # updating in March 2026 - I don't understand what happened and why some of the resulting flatfields looked so bad.
+    # this is particularly troublesome for Halpha
+    #
+    # when I rerun it now, the residual surfaces do not always match what is on the website - puzzling!
+    # tested halpha, and one round of flattening with 3rd order spline works pretty well
+    # I also used a minmag=14.5 for halpha (checked m=14, and this also works well
+    # takes about ~60 sec to run one halpha field, but I can omit the diagnositic plot of putting residuals on image b/c
+    # this is slow.
+
+    # saving values from Feb 2026 run
     nflatten = 1
     usespline = True # using spline for r-band images too
     norder = 3
@@ -56,17 +66,38 @@ def runone(f):
         print('WARNING: did not recognize filter ',filter, f)
         sys.exit()
 
+    # Values for March 28
+    nflatten = 1
+    usespline = True # using spline for r-band images too
+    norder = 3
+    if 'Halpha' in f: #int 197
+        ffilter = 'ha197'
+        minmag = 14.5
+    elif 'Ha6657' in f:
+        ffilter = 'ha227'
+        minmag = 14.5
+    elif 'r.coadd' in f:
+        ffilter = 'r'
+        minmag = 15.
+    elif 'R.coadd' in f:
+        ffilter = 'R'
+        minmag = 15.        
+    else:
+        print('WARNING: did not recognize filter ',filter, f)
+        sys.exit()
+
+        
 
     
     # construct string
-    getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter} --flatten {nflatten} --useastropy"
+    getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter} --flatten {nflatten} --useastropy --minmag {minmag}"
     if usespline:
         getzpstring += " --spline --spline_order {norder}"
     #if instrument == 'BOK':
     #    getzpstring += ' --fixbok'
     print()
     print(f"Running getzp.py for file {f}")
-    #print(getzpstring)
+    print(getzpstring)
 
     # run getzp
     os.system(getzpstring)
