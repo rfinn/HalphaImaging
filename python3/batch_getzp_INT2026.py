@@ -16,7 +16,7 @@ X I am not running this in parallel because it corrupted a bunch of images - not
 
 USAGE:
 
-python ~/github/HalphaImaging/python3/batch_getzp_INT2026.py pointing060
+python ~/github/HalphaImaging/python3/batch_getzp_INT2026.py 2019febINT-all
 
 parallel --eta python ~/github/HalphaImaging/python3/batch_getzp_INT2026.py :::: dirlist
 
