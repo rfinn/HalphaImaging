@@ -690,7 +690,7 @@ class getzp():
         self.segmentation_image =  f"{self.catdir}/{froot}-segmentation.fits"
         if not os.path.exists(self.segmentation_image):
             print(f"WARNING: did not find segmentation image {self.segmentation_image}")
-            print("\t getzp will NOT be happy..."
+            print("\t getzp will NOT be happy...")
                       
     def get_panstarrs(self):
 
