@@ -135,6 +135,25 @@ def panstarrs_query(ra_deg, dec_deg, rad_deg, maxmag=19,
     print(t)
     return t[0]
 
+def clipped_median(x, nsig=3.0):
+    """Robust median with simple MAD clipping."""
+    x = np.asarray(x, dtype=float)
+    x = x[np.isfinite(x)]
+    if x.size == 0:
+        return np.nan
+
+    med = np.median(x)
+    mad = 1.4826 * np.median(np.abs(x - med))
+
+    if (not np.isfinite(mad)) or (mad == 0):
+        return med
+
+    keep = np.abs(x - med) < nsig * mad
+    if np.sum(keep) == 0:
+        return med
+
+    return np.median(x[keep])
+
 def fitline_sigma_clipping(x, y, yerr=None, nsigma=3,niter=3):
     """ 
     fit a line with slope fixed at 1  
