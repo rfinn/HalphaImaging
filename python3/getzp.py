@@ -1477,7 +1477,7 @@ class getzp():
         cb=plt.colorbar()
         cb.set_label('f-meas/f-pan')
         print("... saving")        
-        plt.savefig('plots/'+self.plotprefix.replace(".fits","")+'getzp-xyresidual-fitted-onimage.png')
+        plt.savefig('plots/'+self.plotprefix.replace(".fits","")+'getzp-xyresidual-fitted-onimage.png',dpi=150)
 
         print("... finished onimage plot.")
         
