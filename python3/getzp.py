@@ -1677,8 +1677,8 @@ def build_parser():
                         help='download reference PANSTARRS catalog only. use this before running with slurm')
     parser.add_argument('--fixint', dest='fixint', default=False, action='store_true',
                         help='fix offset b/w INT ccds. default is False.')
-    parser.add_argument('--fixbok', dest='nofixbok', default=False, action='store_true',
-                        help='do NOT fix offset b/w bok amps')
+    parser.add_argument('--fixbok', dest='fixbok', default=False, action='store_true',
+                        help='fix offset b/w bok amps.  default is False, set to not fix bok.')
 
     return parser
 
