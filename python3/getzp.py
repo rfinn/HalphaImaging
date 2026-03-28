@@ -1418,9 +1418,9 @@ class getzp():
         # so letting vmin/vmax get set automatically
         # issue is with astropy sigma clipping - ugh!!!
         # returning to normal...
+        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag_rejected_by_mask],self.matchedarray1['Y_IMAGE'][self.fitflag_rejected_by_mask],c = '0.5',marker='v',vmin=v1,vmax=v2,s=15,label='rejected')
         plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
         # plot points rejected due to segmentation image
-        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag_rejected_by_mask],self.matchedarray1['Y_IMAGE'][self.fitflag_rejected_by_mask],c = '0.5',marker='v',vmin=v1,vmax=v2,s=15,label='rejected')
         cb=plt.colorbar()
         cb.set_label('f-meas/f-pan')
         plt.savefig('plots/'+self.plotprefix.replace(".fits","")+'getzp-xyresidual-fitted.png')
