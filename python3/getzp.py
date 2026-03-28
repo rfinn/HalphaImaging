@@ -757,9 +757,9 @@ class getzp():
         
         self.apply_exclusion_mask_to_fitflag(
             annulus_rin=15,
-            annulus_rout=25,
-            area_thresh=1500,
-            grow=10,
+            annulus_rout=30,
+            area_thresh=1000,
+            grow=15,
             max_maskfrac=0.10,
         )
 
@@ -783,7 +783,7 @@ class getzp():
 
 
     def apply_exclusion_mask_to_fitflag(self, annulus_rin=15, annulus_rout=25,
-                                        area_thresh=1500, grow=10,
+                                        area_thresh=1000, grow=15,
                                         max_maskfrac=0.10):
         """
         Reject matched calibration stars whose centers or local background annuli
@@ -1457,7 +1457,7 @@ class getzp():
         print("... image norm")
         from astropy.visualization import SimpleNorm
         
-        snorm = SimpleNorm('asinh',percent=98)
+        snorm = SimpleNorm('asinh',percent=99.5)
         norm = snorm(im)
         plt.imshow(im, cmap='gray_r', norm=norm, origin="lower")#, interpolation='nearest')
         
