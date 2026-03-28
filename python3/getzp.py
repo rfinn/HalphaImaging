@@ -156,7 +156,12 @@ def clipped_median(x, nsig=3.0):
     return np.median(x[keep])
 
 
-
+def make_annulus_kernel(rin, rout):
+    r = int(np.ceil(rout))
+    yy, xx = np.mgrid[-r:r+1, -r:r+1]
+    rr2 = xx**2 + yy**2
+    ann = (rr2 >= rin**2) & (rr2 < rout**2)
+    return ann
 def mask_large_segmentation_sources(segim, labels_to_mask, grow=5):
     """
     Build boolean mask from selected segmentation labels.
@@ -767,12 +772,7 @@ class getzp():
         #        (self.matchedarray1['Y_IMAGE'] < self.keepsection[3])
         #    self.fitflag = self.fitflag & self.goodarea_flag
 
-    def make_annulus_kernel(rin, rout):
-        r = int(np.ceil(rout))
-        yy, xx = np.mgrid[-r:r+1, -r:r+1]
-        rr2 = xx**2 + yy**2
-        ann = (rr2 >= rin**2) & (rr2 < rout**2)
-        return ann
+
 
     def apply_exclusion_mask_to_fitflag(self, annulus_rin=15, annulus_rout=25,
                                         area_thresh=1500, grow=10,
