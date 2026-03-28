@@ -781,10 +781,13 @@ class getzp():
         labels_to_mask = np.asarray(self.secat['NUMBER'])[large]
 
         # 2. build exclusion mask from segmentation labels
+        
         mask = np.isin(seg, labels_to_mask)
+        print("applying binary_dilation")
         if grow > 0:
-            from scipy.ndimage import binary_dilation
-            mask = binary_dilation(mask, iterations=grow)
+            #from scipy.ndimage import binary_dilation
+            print("skipping...")
+            #mask = binary_dilation(mask, iterations=grow)
 
         self.zp_exclusion_mask = mask
 
@@ -799,6 +802,7 @@ class getzp():
         annulus_ok = np.ones(len(x), dtype=bool)
         maskfrac = np.ones(len(x), dtype=float)
 
+        print("starting loop through fitflag")
         for i in np.where(self.fitflag)[0]:
             xi = x[i]
             yi = y[i]
