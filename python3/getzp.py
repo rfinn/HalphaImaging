@@ -398,7 +398,7 @@ class getzp():
     def __init__(self, args):
         self.catdir = 'SEcats_getzp'
         self.image = args.image
-
+        self.segmentation_image = None
         header = fits.getheader(self.image)
         self.header = header
         #self.plotprefix = self.image.split('coadd')[0].replace('.','-').replace('-noback',"")
@@ -687,11 +687,13 @@ class getzp():
         # fixing to be compatible with box search geometry
         self.width = max((maxRA - minRA), (maxDEC - minDEC))
 
-        self.segmentation_image =  f"{self.catdir}/{froot}-segmentation.fits"
-        if not os.path.exists(self.segmentation_image):
-            print(f"WARNING: did not find segmentation image {self.segmentation_image}")
-            print("\t getzp will NOT be happy...")
-                      
+        if self.segmentation_image is None:
+            self.segmentation_image =  f"{self.catdir}/{froot}-segmentation.fits"
+            if not os.path.exists(self.segmentation_image):
+                print(f"WARNING: did not find segmentation image {self.segmentation_image}")
+                print("\t getzp will NOT be happy...")
+        else:
+            print(f"{self.segmentation_image}")
     def get_panstarrs(self):
 
         ###################################
