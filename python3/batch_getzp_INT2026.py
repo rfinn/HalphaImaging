@@ -92,7 +92,7 @@ def runone(f):
     # construct string
     getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter} --flatten {nflatten} --useastropy --minmag {minmag}"
     if usespline:
-        getzpstring += " --spline --spline_order {norder}"
+        getzpstring += f" --spline --spline_order {norder}"
     #if instrument == 'BOK':
     #    getzpstring += ' --fixbok'
     print()
@@ -165,6 +165,8 @@ else:  # assume we are starting in /data-pool/Halpha/processed
 
                 # move back to rundir
                 os.chdir('..')
+                break
+        break
 
     os.chdir(rootdir)
     

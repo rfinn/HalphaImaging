@@ -1435,7 +1435,7 @@ class getzp():
         # 
         '''
         plot_onimage = False
-            if plot_onimage:
+        if plot_onimage:
             plt.close("all")
             print("starting onimage plot...")
             plt.figure(figsize=(8,8))
