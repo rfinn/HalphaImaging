@@ -1457,7 +1457,7 @@ class getzp():
         print("... image norm")
         from astropy.visualization import SimpleNorm
         
-        snorm = SimpleNorm('asinh',percent=99.9)
+        snorm = SimpleNorm('asinh',percent=99.5)
         norm = snorm(im)
         plt.imshow(im, cmap='gray_r', norm=norm, origin="lower")#, interpolation='nearest')
         
@@ -1470,9 +1470,10 @@ class getzp():
         # so letting vmin/vmax get set automatically
         # issue is with astropy sigma clipping - ugh!!!
         # returning to normal...
+        print(f"...v1={v1}, v2={v2}")
+        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag_rejected_by_mask],self.matchedarray1['Y_IMAGE'][self.fitflag_rejected_by_mask],c = 'r',marker='v',s=20,label='rejected')
         plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
         # plot points rejected due to segmentation image
-        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag_rejected_by_mask],self.matchedarray1['Y_IMAGE'][self.fitflag_rejected_by_mask],c = 'r',marker='v',vmin=v1,vmax=v2,s=20,label='rejected')
         cb=plt.colorbar()
         cb.set_label('f-meas/f-pan')
         print("... saving")        
