@@ -786,8 +786,8 @@ class getzp():
         print("applying binary_dilation")
         if grow > 0:
             #from scipy.ndimage import binary_dilation
-            print("skipping...")
-            #mask = binary_dilation(mask, iterations=grow)
+
+            mask = binary_dilation(mask, iterations=grow)
 
         self.zp_exclusion_mask = mask
 
