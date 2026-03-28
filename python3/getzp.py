@@ -340,6 +340,7 @@ class getzp():
         self.norder = int(args.norder)
         self.fwhm = args.fwhm
         self.fixbok = args.fixbok
+        self.fixint = args.fixint
         self.minmag = args.minmag
         self.args = args
         global v1, v2
@@ -387,6 +388,14 @@ class getzp():
             self.runse(useprevious=False)
             self.match_coords()
             self.fitzp(plotall=True)
+        elif self.instrument == 'i':
+            if self.fixint:
+                print("checking INT ccds...", self.fixint)
+                self.check_INT_ccds(min_stars=10,max_scale_dev=0.1)
+            self.runse(useprevious=False)
+            self.match_coords()
+            self.fitzp(plotall=True)
+            
         self.update_header()
 
         if self.flatten > 0:
@@ -478,6 +487,8 @@ class getzp():
             t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {self.catdir}/{froot}.cat -BACK_SIZE 128 -BACKPHOTO_TYPE LOCAL -BACK_TYPE AUTO -MAG_ZEROPOINT 0 -SATUR_LEVEL {ADUlimit:.1f}'
             if self.instrument == 'b':
                 weight_image = self.image.replace('.fits','.weight.fits')
+                if weight_image.startswith('f'):
+                    weight_image = weight_image[1:]
                 if os.path.exists(weight_image):
                     t += f" -WEIGHT_IMAGE {weight_image} -WEIGHT_TYPE MAP_WEIGHT -RESCALE_WEIGHTS  N"
                 else:
@@ -1141,6 +1152,129 @@ class getzp():
                 # in the weight image, high numbers are good
                 quad += 1
         hdu.writeto(self.image, overwrite=True)
+
+    def check_int_ccds(self, trim=100, min_stars=5, max_scale_dev=None):
+        """
+        Renormalize INT/WFC CCD regions using per-star residuals.
+
+        INT chip layout in mosaic coordinates:
+          CCD3: x=   1:4300, y=4560:6420
+          CCD4: x=   1:4300, y=2430:4280
+          CCD1: x=   1:4300, y=   1:2300
+          CCD2: x=4420:6450, y=   1:4420   (sideways chip)
+
+        Parameters
+        ----------
+        trim : int, optional
+            Pixels to trim from each chip boundary when selecting stars to
+            estimate the chip normalization. The full chip region is still
+            scaled after the factor is derived.
+        min_stars : int, optional
+            Minimum number of stars required on a chip to derive a correction.
+        max_scale_dev : float or None, optional
+            Optional safety limit. If set, skip applying a correction when
+            abs(scale - 1) > max_scale_dev.
+            Example: max_scale_dev=0.15 skips scales outside [0.85, 1.15].
+        """
+
+        # Full chip footprints (used when applying the correction)
+        chip_boxes = [
+            ("CCD3", (1,    4300, 4560, 6420)),
+            ("CCD4", (1,    4300, 2430, 4280)),
+            ("CCD1", (1,    4300, 1,    2300)),
+            ("CCD2", (4420, 6450, 1,    4420)),
+        ]
+
+        # Trimmed chip footprints (used when measuring the correction)
+        trimmed_boxes = []
+        for name, (xmin, xmax, ymin, ymax) in chip_boxes:
+            x0 = xmin + trim
+            x1 = xmax - trim
+            y0 = ymin + trim
+            y1 = ymax - trim
+
+            if (x1 <= x0) or (y1 <= y0):
+                print(f"{name}: trim={trim} too large; skipping chip")
+                continue
+
+            trimmed_boxes.append((name, (x0, x1, y0, y1)))
+
+        if len(trimmed_boxes) == 0:
+            print("No valid INT chip regions after trimming; skipping correction")
+            return
+
+        # Build mask of stars that land on any trimmed chip region
+        on_chip = np.zeros(len(self.residual_all), dtype=bool)
+        for name, (x0, x1, y0, y1) in trimmed_boxes:
+            on_chip |= (
+                (self.residual_allx >= x0) & (self.residual_allx < x1) &
+                (self.residual_ally >= y0) & (self.residual_ally < y1)
+            )
+
+        n_on_chip = np.sum(on_chip)
+        if n_on_chip < min_stars:
+            print(f"Only {n_on_chip} stars on trimmed INT chip regions; skipping correction")
+            return
+
+        image_med = clipped_median(self.residual_all[on_chip])
+        if not np.isfinite(image_med) or image_med == 0:
+            print(f"Invalid global INT residual median ({image_med}); skipping correction")
+            return
+
+        print(f"Global median residual over INT chips = {image_med:.4f}")
+
+        hdu = fits.open(self.image)
+        applied_scales = {}
+
+        for name, (xmin, xmax, ymin, ymax) in chip_boxes:
+            # matching trimmed box for measurement
+            tmatch = [box for n, box in trimmed_boxes if n == name]
+            if len(tmatch) == 0:
+                print(f"\t{name}: no valid trimmed region; skipping")
+                continue
+            x0, x1, y0, y1 = tmatch[0]
+
+            flag = (
+                (self.residual_allx >= x0) & (self.residual_allx < x1) &
+                (self.residual_ally >= y0) & (self.residual_ally < y1)
+            )
+
+            nstars = np.sum(flag)
+            if nstars < min_stars:
+                print(f"\t{name}: only {nstars} stars; skipping")
+                continue
+
+            chip_med = clipped_median(self.residual_all[flag])
+            if not np.isfinite(chip_med) or chip_med == 0:
+                print(f"\t{name}: invalid median {chip_med}; skipping")
+                continue
+
+            chip_scale = image_med / chip_med
+
+            if (max_scale_dev is not None) and (abs(chip_scale - 1.0) > max_scale_dev):
+                print(f"\t{name}: scale={chip_scale:.4f} exceeds limit; skipping")
+                continue
+
+            print(f"\t{name}: nstars={nstars:3d} median={chip_med:.4f} scale={chip_scale:.4f}")
+
+            # Apply correction to the full nominal chip footprint
+            hdu[0].data[ymin:ymax, xmin:xmax] *= chip_scale
+            applied_scales[name] = chip_scale
+
+        # Optional bookkeeping in the header
+        hdr = hdu[0].header
+        hdr["INTFIX"] = (True, "INT CCD normalization applied")
+        for name in ["CCD1", "CCD2", "CCD3", "CCD4"]:
+            key = f"I{name[-1]}SCL"
+            if name in applied_scales:
+                hdr[key] = (float(applied_scales[name]), f"{name} scale factor")
+            else:
+                hdr[key] = (-999.0, f"{name} scale factor not applied")
+
+        hdu.writeto(self.image, overwrite=True)
+        hdu.close()
+
+
     def update_header(self):
         #print('working on this')
         # add best-fit ZP to image header
@@ -1484,83 +1618,91 @@ class getzp():
         
         outtab.write(outname, format='fits', overwrite=True)
 
-def main(raw_args=None):
-    parser = argparse.ArgumentParser(description ='Run sextractor, get Pan-STARRS catalog, and then computer photometric ZP\n \n from within ipython: \n %run ~/github/Virgo/programs/getzp.py --image pointing031-r.coadd.fits --instrument i \n \n The y intercept is -1*ZP. \n \n x and y data can be accessed at zp.x and zp.y in case you want to make additional plots.', formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument('--image', dest = 'image', default = 'test.coadd.fits', help = 'Image for ZP calibration')
-    parser.add_argument('--instrument', dest = 'instrument', default = None, help = 'HDI = h, KPNO mosaic = m, INT = i, BOK 90Prime = b')
-    parser.add_argument('--catalog', dest = 'catalog', default = None, help = 'photometric catalog to use for bootrapping photometry')    
-    parser.add_argument('--fwhm', dest = 'fwhm', default = None, help = 'image FWHM in arcseconds.  Default is none, then SE assumes 1.5 arcsec')    
-    parser.add_argument('--filter', dest = 'filter', default = 'R', help = 'filter (R or r; use ha, ha4, ha8, ha12, ha16 for Halpha)')
-    parser.add_argument('--useri',dest = 'useri', default = False, action = 'store_true', help = 'Use r->R transformation as a function of r-i rather than the g-r relation.  g-r is the default.')
-    parser.add_argument('--normbyexptime', dest = 'normbyexptime', default = False, action = 'store_true', help = "set this flag if the image is in ADU rather than ADU/s, and the program will then normalize by the exposure time.  Note: swarp produces images in ADU/s, so this is usually not necessary if using coadds from swarp.")
-    parser.add_argument('--mag', dest = 'mag', default = 0,help = "select SE magnitude to use when solving for ZP.  0=MAG_APER,1=MAG_BEST,2=MAG_PETRO.  Default is MAG_APER ",choices=['0','1','2'])
-    parser.add_argument('--naper', dest = 'naper', default = 5,help = "select fixed aperture magnitude.  0=10pix,1=12pix,2=15pix,3=20pix,4=25pix,5=30pix.  Default is 5 (30 pixel diameter)")
-    parser.add_argument('--nsigma', dest = 'nsigma', default = 3.5, help = 'number of std to use in iterative rejection of ZP fitting.  default is 3.5')
-    parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
-    parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
-    parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT most of data from 2022 does not seem to show it either.',choices=['0','1','2'])
-    parser.add_argument('--spline',dest = 'spline', default = False, action = 'store_true',help = 'Fit surface with a spline rather than a 2d polynomial')
-    parser.add_argument('--spline_order',dest = 'spline_order', default = 3,help = 'order of spline.  default is 3.')
-    parser.add_argument('--spline_smooth',dest = 'spline_smooth', default = 1000,help = 'smoothing for spline.  default is 1000.')                
-    parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2','3','4','5'])    
-    parser.add_argument('--verbose',dest = 'verbose', default = False, action = 'store_true',help = 'print extra debug/status statements')
-    parser.add_argument('--getrefcatonly',dest = 'getrefcatonly',default=False,action='store_true',help='download reference PANSTARRS catalog only.  use this before running with slurm')
-    parser.add_argument('--nofixbok',dest = 'nofixbok',default=False,action='store_true',help='fix offset b/w bok amps')
+def build_parser():
+    parser = argparse.ArgumentParser(
+        description=(
+            "Run sextractor, get Pan-STARRS catalog, and then compute photometric ZP\n"
+            "\n"
+            "from within ipython:\n"
+            "%run ~/github/Virgo/programs/getzp.py --image pointing031-r.coadd.fits --instrument i\n"
+            "\n"
+            "The y intercept is -1*ZP.\n"
+            "\n"
+            "x and y data can be accessed at zp.x and zp.y in case you want to make additional plots."
+        ),
+        formatter_class=argparse.RawTextHelpFormatter
+    )
 
-    args = parser.parse_args(raw_args)
-    #zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
+    parser.add_argument('--image', dest='image', default='test.coadd.fits',
+                        help='Image for ZP calibration')
+    parser.add_argument('--instrument', dest='instrument', default=None,
+                        help='HDI = h, KPNO mosaic = m, INT = i, BOK 90Prime = b')
+    parser.add_argument('--catalog', dest='catalog', default=None,
+                        help='photometric catalog to use for bootstrapping photometry')
+    parser.add_argument('--fwhm', dest='fwhm', default=None,
+                        help='image FWHM in arcseconds. Default is none, then SE assumes 1.5 arcsec')
+    parser.add_argument('--filter', dest='filter', default='R',
+                        help='filter, options are: ha4, ha8, ha12, ha16, ha197 (INT Halpha), ha227 (INT Ha6657), r, R')
+    parser.add_argument('--useri', dest='useri', default=False, action='store_true',
+                        help='Use r->R transformation as a function of r-i rather than the g-r relation. g-r is the default.')
+    parser.add_argument('--normbyexptime', dest='normbyexptime', default=False, action='store_true',
+                        help='set this flag if the image is in ADU rather than ADU/s, and the program will then normalize by the exposure time. Note: swarp produces images in ADU/s, so this is usually not necessary if using coadds from swarp.')
+    parser.add_argument('--mag', dest='mag', default='0', choices=['0', '1', '2'],
+                        help='select SE magnitude to use when solving for ZP. 0=MAG_APER, 1=MAG_BEST, 2=MAG_PETRO. Default is MAG_APER')
+    parser.add_argument('--minmag', dest='minmag', default=15,
+                        help='bright magnitude cutoff; default is 15.')
+    parser.add_argument('--naper', dest='naper', default=5,
+                        help='select fixed aperture magnitude. 0=10pix, 1=12pix, 2=15pix, 3=20pix, 4=25pix, 5=30pix. Default is 5 (30 pixel diameter)')
+    parser.add_argument('--nsigma', dest='nsigma', default=3.5,
+                        help='number of std to use in iterative rejection of ZP fitting. default is 3.5')
+    parser.add_argument('--d', dest='d', default='~/github/HalphaImaging/astromatic/',
+                        help='Locates path of default config files. Default is ~/github/HalphaImaging/astromatic')
+    parser.add_argument('--fit', dest='fitonly', default=False, action='store_true',
+                        help='Do not run SE or download catalog. just redo fitting.')
+    parser.add_argument('--flatten', dest='flatten', default='0', choices=['0', '1', '2'],
+                        help='Number of times to run flattening process to try to remove vignetting/illumination patterns. The default is zero. Options are [0,1,2]. This is needed for INT data from 2019. HDI does not show this effect, and INT data from 2022 does not seem to show it either.')
+    parser.add_argument('--useastropy', dest='useastropy', default=False, action='store_true',
+                        help='Use astropy to fit the ZP line with sigma clipping. Default is False, which then uses my own iterative fitting.')
+    parser.add_argument('--spline', dest='spline', default=False, action='store_true',
+                        help='Fit surface with a spline rather than a 2d polynomial')
+    parser.add_argument('--spline_order', dest='spline_order', default=3,
+                        help='order of spline. default is 3.')
+    parser.add_argument('--spline_smooth', dest='spline_smooth', default=1000,
+                        help='smoothing for spline. default is 1000.')
+    parser.add_argument('--norder', dest='norder', default='2', choices=['0', '1', '2', '3', '4'],
+                        help='degree of polynomial to fit to overall background. default is 2.')
+    parser.add_argument('--verbose', dest='verbose', default=False, action='store_true',
+                        help='print extra debug/status statements')
+    parser.add_argument('--getrefcatonly', dest='getrefcatonly', default=False, action='store_true',
+                        help='download reference PANSTARRS catalog only. use this before running with slurm')
+    parser.add_argument('--fixint', dest='fixint', default=False, action='store_true',
+                        help='fix offset b/w INT ccds. default is False.')
+    parser.add_argument('--nofixbok', dest='nofixbok', default=False, action='store_true',
+                        help='do NOT fix offset b/w bok amps')
+
+    return parser
+
+
+def main(raw_args=None, write_table=False):
+    args = build_parser().parse_args(raw_args)
+
+
     zp = getzp(args)
-
     zp.getzp()
-    print('ZP = {:.3f} +/- {:.3f}, {}'.format(-1*zp.zp,zp.zperr,zp.image))
-    return zp,-1*zp.zp,zp.zperr
+
+    print('ZP = {:.3f} +/- {:.3f}, {}'.format(-1 * zp.zp, zp.zperr, zp.image))
+
+    if write_table:
+        print("writing out the merged panstarrs + SE table")
+        zp.write_pan_se_table()
+
+    return zp, -1 * zp.zp, zp.zperr
 
 
 if __name__ == '__main__':
-
-    ##
-    # adding commands for main function for testing
-    # many of Halpha images from BOK2022 are failing
-    # need to see why
-    ##
-
-    parser = argparse.ArgumentParser(description ='Run sextractor, get Pan-STARRS catalog, and then computer photometric ZP\n \n from within ipython: \n %run ~/github/Virgo/programs/getzp.py --image pointing031-r.coadd.fits --instrument i \n \n The y intercept is -1*ZP. \n \n x and y data can be accessed at zp.x and zp.y in case you want to make additional plots.', formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument('--image', dest = 'image', default = 'test.coadd.fits', help = 'Image for ZP calibration')
-    parser.add_argument('--instrument', dest = 'instrument', default = None, help = 'HDI = h, KPNO mosaic = m, INT = i, BOK 90Prime = b')
-    parser.add_argument('--catalog', dest = 'catalog', default = None, help = 'photometric catalog to use for bootrapping photometry')    
-    parser.add_argument('--fwhm', dest = 'fwhm', default = None, help = 'image FWHM in arcseconds.  Default is none, then SE assumes 1.5 arcsec')
-    # TODO - change to make a list of filters
-    # r, R, ha4, ha8, ha12, ha16
-    parser.add_argument('--filter', dest = 'filter', default = 'R', help = 'filter, options are: ha4, ha8, ha12, ha16,ha197 (INT Halpha),ha227 (INT Ha6657),r,R')
-    parser.add_argument('--useri',dest = 'useri', default = False, action = 'store_true', help = 'Use r->R transformation as a function of r-i rather than the g-r relation.  g-r is the default.')
-    parser.add_argument('--normbyexptime', dest = 'normbyexptime', default = False, action = 'store_true', help = "set this flag if the image is in ADU rather than ADU/s, and the program will then normalize by the exposure time.  Note: swarp produces images in ADU/s, so this is usually not necessary if using coadds from swarp.")
-    parser.add_argument('--mag', dest = 'mag', default = 0,help = "select SE magnitude to use when solving for ZP.  0=MAG_APER,1=MAG_BEST,2=MAG_PETRO.  Default is MAG_APER ",choices=['0','1','2'])
-    parser.add_argument('--minmag', dest = 'minmag', default = 15,help = "bright magnitude cutoff; default is 15.")    
-    parser.add_argument('--naper', dest = 'naper', default = 5,help = "select fixed aperture magnitude.  0=10pix,1=12pix,2=15pix,3=20pix,4=25pix,5=30pix.  Default is 5 (30 pixel diameter)")
-    parser.add_argument('--nsigma', dest = 'nsigma', default = 3.5, help = 'number of std to use in iterative rejection of ZP fitting.  default is 3.5')
-    parser.add_argument('--d',dest = 'd', default ='~/github/HalphaImaging/astromatic/', help = 'Locates path of default config files.  Default is ~/github/HalphaImaging/astromatic')
-    parser.add_argument('--fit',dest = 'fitonly', default = False, action = 'store_true',help = 'Do not run SE or download catalog.  just redo fitting.')
-    parser.add_argument('--flatten',dest = 'flatten', default = 0, help = 'Number of time to run flattening process to try to remove vignetting/illumination patterns.  The default is zero.  Options are [0,1,2].  This is needed for INT data from 2019.  HDI does not show this effect, and INT data from 2022 does not seem to show it either.',choices=['0','1','2'])
-    parser.add_argument('--useastropy',dest = 'useastropy', default = False, action='store_true',help = 'Use astropy to fit the ZP line with sigma clipping.  Default is False, which then uses my own iterative fitting.')    
-    parser.add_argument('--spline',dest = 'spline', default = False, action = 'store_true',help = 'Fit surface with a spline rather than a 2d polynomial')
-    parser.add_argument('--spline_order',dest = 'spline_order', default = 3,help = 'order of spline.  default is 3.')
-    parser.add_argument('--spline_smooth',dest = 'spline_smooth', default = 1000,help = 'smoothing for spline.  default is 1000.')                
-    
-    parser.add_argument('--norder',dest = 'norder', default = 2, help = 'degree of polynomial to fit to overall background.  default is 2.',choices=['0','1','2','3','4'])    
-    parser.add_argument('--verbose',dest = 'verbose', default = False, action = 'store_true',help = 'print extra debug/status statements')
-    parser.add_argument('--getrefcatonly',dest = 'getrefcatonly',default=False,action='store_true',help='download reference PANSTARRS catalog only.  use this before running with slurm')
-    parser.add_argument('--fixbok',dest = 'fixbok',default=True,action='store_false',help='fix offset b/w bok amps. basically just using this flag when calculating amp offsets in MEF images. call this to NOT fix offset...  I know...')    
-    #args = parser.parse_args(raw_args)
-    args = parser.parse_args()
-    #zp = getzp(args.image, instrument=args.instrument, filter=args.filter, astromatic_dir = args.d,norm_exptime = args.nexptime, nsigma = float(args.nsigma), useri = args.useri,naper = args.naper, mag = int(args.mag))
-    zp = getzp(args)
-
-    zp.getzp()
-    print('ZP = {:.3f} +/- {:.3f}, {}'.format(-1*zp.zp,zp.zperr,zp.image))
-    #return zp,-1*zp.zp,zp.zperr
-    print("writing out the merged panstarrs + SE table")
-    zp.write_pan_se_table()
-
-    # replicating main function for testing, so I can access zp in jupyter
-    #main()
+    start_time = time.time()
+    zp, zpval, zperr = main(write_table=True)
     print(f"--- {(time.time() - start_time):.1f} seconds ---")
+        
+
+ 
