@@ -1405,6 +1405,7 @@ class getzp():
         # are used in the ZPfitting
         # 
         '''
+        print("starting my plots...")
         plt.figure(figsize=(6,4))
         
         s = ' (mean,std,MAD = {:.3f},{:.3f},{:.3f})'.format(np.mean(residual_all),np.std(residual_all),MAD2(residual_all))
@@ -1424,7 +1425,7 @@ class getzp():
         cb.set_label('f-meas/f-pan')
         plt.savefig('plots/'+self.plotprefix.replace(".fits","")+'getzp-xyresidual-fitted.png')
 
-
+        print("... done with my plot.")
        ###################################
         # Show location of residuals
         ###################################
@@ -1453,17 +1454,17 @@ class getzp():
             vmax_im = vmed + 8.0 * vmad
         else:
             vmin_im, vmax_im = 0, 1
-
+        print("... image norm")
         from matplotlib.colors import AsinhNorm
         norm = AsinhNorm(vmin=vmin_im, vmax=vmax_im)
 
-        plt.imshow(im, origin='lower', cmap='gray', norm=norm, interpolation='nearest')
+        plt.imshow(im, cmap='gray_r', norm=norm)#, interpolation='nearest')
         
   
         plt.title(self.plotprefix+s)
         self.residual_allx = self.matchedarray1['X_IMAGE'][self.fitflag]
         self.residual_ally = self.matchedarray1['Y_IMAGE'][self.fitflag]
-
+        print("... scatter")
         # debugging some wacky BOK results - want to see full range of residuals
         # so letting vmin/vmax get set automatically
         # issue is with astropy sigma clipping - ugh!!!
@@ -1473,6 +1474,7 @@ class getzp():
         plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag_rejected_by_mask],self.matchedarray1['Y_IMAGE'][self.fitflag_rejected_by_mask],c = 'r',marker='v',vmin=v1,vmax=v2,s=20,label='rejected')
         cb=plt.colorbar()
         cb.set_label('f-meas/f-pan')
+        print("... saving")        
         plt.savefig('plots/'+self.plotprefix.replace(".fits","")+'getzp-xyresidual-fitted-onimage.png')
 
         print("... finished onimage plot.")
