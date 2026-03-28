@@ -686,6 +686,12 @@ class getzp():
         self.radius = np.sqrt(2)*max((maxRA - minRA), (maxDEC - minDEC))/2
         # fixing to be compatible with box search geometry
         self.width = max((maxRA - minRA), (maxDEC - minDEC))
+
+        self.segmentation_image =  f"{self.catdir}/{froot}-segmentation.fits"
+        if not os.path.exists(self.segmentation_image):
+            print(f"WARNING: did not find segmentation image {self.segmentation_image}")
+            print("\t getzp will NOT be happy..."
+                      
     def get_panstarrs(self):
 
         ###################################
