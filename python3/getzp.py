@@ -767,6 +767,13 @@ class getzp():
         #        (self.matchedarray1['Y_IMAGE'] < self.keepsection[3])
         #    self.fitflag = self.fitflag & self.goodarea_flag
 
+    def make_annulus_kernel(rin, rout):
+        r = int(np.ceil(rout))
+        yy, xx = np.mgrid[-r:r+1, -r:r+1]
+        rr2 = xx**2 + yy**2
+        ann = (rr2 >= rin**2) & (rr2 < rout**2)
+        return ann
+
     def apply_exclusion_mask_to_fitflag(self, annulus_rin=15, annulus_rout=25,
                                         area_thresh=1500, grow=10,
                                         max_maskfrac=0.10):
@@ -774,77 +781,175 @@ class getzp():
         Reject matched calibration stars whose centers or local background annuli
         overlap large-source exclusion regions.
         """
+        from astropy.io import fits
+        from scipy.ndimage import binary_dilation
+
         seg = fits.getdata(self.segmentation_image)
 
-        # 1. choose large detected objects from SE catalog
         large = np.asarray(self.secat['ISOAREA_IMAGE']) > area_thresh
         labels_to_mask = np.asarray(self.secat['NUMBER'])[large]
 
-        # 2. build exclusion mask from segmentation labels
-        
         mask = np.isin(seg, labels_to_mask)
-        print("applying binary_dilation")
         if grow > 0:
-            #from scipy.ndimage import binary_dilation
-
             mask = binary_dilation(mask, iterations=grow)
 
         self.zp_exclusion_mask = mask
 
-        # 3. evaluate matched stars
         x = np.asarray(self.matchedarray1['X_IMAGE'], dtype=float)
         y = np.asarray(self.matchedarray1['Y_IMAGE'], dtype=float)
 
         ny, nx = mask.shape
-        yy, xx = np.indices(mask.shape)
+        nobj = len(x)
 
-        center_ok = np.ones(len(x), dtype=bool)
-        annulus_ok = np.ones(len(x), dtype=bool)
-        maskfrac = np.ones(len(x), dtype=float)
+        center_ok = np.ones(nobj, dtype=bool)
+        annulus_ok = np.ones(nobj, dtype=bool)
+        maskfrac = np.full(nobj, np.nan, dtype=float)
+
+        # only work on fit candidates
+        idx = np.where(self.fitflag)[0]
+        if len(idx) == 0:
+            self.fitflag_mask_center_ok = center_ok
+            self.fitflag_mask_annulus_ok = annulus_ok
+            self.fitflag_maskfrac = maskfrac
+            return
+
+        xi = np.rint(x[idx]).astype(int) - 1
+        yi = np.rint(y[idx]).astype(int) - 1
+
+        finite = np.isfinite(x[idx]) & np.isfinite(y[idx])
+        in_bounds = finite & (xi >= 0) & (xi < nx) & (yi >= 0) & (yi < ny)
+
+        bad_idx = idx[~in_bounds]
+        center_ok[bad_idx] = False
+        annulus_ok[bad_idx] = False
+
+        good_idx = idx[in_bounds]
+        xg = xi[in_bounds]
+        yg = yi[in_bounds]
+
+        # center-in-mask check: vectorized
+        center_ok[good_idx] = ~mask[yg, xg]
+
+        # precompute annulus stencil once
+        ann_kernel = make_annulus_kernel(annulus_rin, annulus_rout)
+        kr = ann_kernel.shape[0] // 2
 
         print("starting loop through fitflag")
-        for i in np.where(self.fitflag)[0]:
-            xi = x[i]
-            yi = y[i]
+        for j, ix, iy in zip(good_idx, xg, yg):
+            x0 = max(0, ix - kr)
+            x1 = min(nx, ix + kr + 1)
+            y0 = max(0, iy - kr)
+            y1 = min(ny, iy + kr + 1)
 
-            if not np.isfinite(xi) or not np.isfinite(yi):
-                center_ok[i] = False
-                annulus_ok[i] = False
-                continue
+            kx0 = x0 - (ix - kr)
+            kx1 = ann_kernel.shape[1] - ((ix + kr + 1) - x1)
+            ky0 = y0 - (iy - kr)
+            ky1 = ann_kernel.shape[0] - ((iy + kr + 1) - y1)
 
-            ix = int(np.round(xi)) - 1
-            iy = int(np.round(yi)) - 1
+            local_ann = ann_kernel[ky0:ky1, kx0:kx1]
+            local_mask = mask[y0:y1, x0:x1]
 
-            if (ix < 0) or (ix >= nx) or (iy < 0) or (iy >= ny):
-                center_ok[i] = False
-                annulus_ok[i] = False
-                continue
-
-            # reject if star center lands in masked region
-            center_ok[i] = ~mask[iy, ix]
-
-            # reject if local sky annulus overlaps mask too much
-            rr = np.sqrt((xx - ix)**2 + (yy - iy)**2)
-            ann = (rr >= annulus_rin) & (rr < annulus_rout)
-            nann = np.sum(ann)
-
+            nann = np.sum(local_ann)
             if nann == 0:
-                annulus_ok[i] = False
+                annulus_ok[j] = False
                 continue
 
-            maskfrac[i] = np.sum(mask[ann]) / nann
-            annulus_ok[i] = maskfrac[i] < max_maskfrac
+            mf = np.sum(local_mask & local_ann) / nann
+            maskfrac[j] = mf
+            annulus_ok[j] = mf < max_maskfrac
 
         self.fitflag_mask_center_ok = center_ok
         self.fitflag_mask_annulus_ok = annulus_ok
         self.fitflag_maskfrac = maskfrac
 
         old_n = np.sum(self.fitflag)
+        self.fitflag_before_mask = self.fitflag.copy()
         self.fitflag = self.fitflag & center_ok & annulus_ok
+        self.fitflag_rejected_by_mask = self.fitflag_before_mask & (~self.fitflag)
         new_n = np.sum(self.fitflag)
 
         if self.verbose:
             print(f'\t number passing exclusion mask = {new_n} (removed {old_n - new_n})')
+
+        
+    # def apply_exclusion_mask_to_fitflag(self, annulus_rin=15, annulus_rout=25,
+    #                                     area_thresh=1500, grow=10,
+    #                                     max_maskfrac=0.10):
+    #     """
+    #     Reject matched calibration stars whose centers or local background annuli
+    #     overlap large-source exclusion regions.
+    #     """
+    #     seg = fits.getdata(self.segmentation_image)
+
+    #     # 1. choose large detected objects from SE catalog
+    #     large = np.asarray(self.secat['ISOAREA_IMAGE']) > area_thresh
+    #     labels_to_mask = np.asarray(self.secat['NUMBER'])[large]
+
+    #     # 2. build exclusion mask from segmentation labels
+        
+    #     mask = np.isin(seg, labels_to_mask)
+    #     print("applying binary_dilation")
+    #     if grow > 0:
+    #         #from scipy.ndimage import binary_dilation
+
+    #         mask = binary_dilation(mask, iterations=grow)
+
+    #     self.zp_exclusion_mask = mask
+
+    #     # 3. evaluate matched stars
+    #     x = np.asarray(self.matchedarray1['X_IMAGE'], dtype=float)
+    #     y = np.asarray(self.matchedarray1['Y_IMAGE'], dtype=float)
+
+    #     ny, nx = mask.shape
+    #     yy, xx = np.indices(mask.shape)
+
+    #     center_ok = np.ones(len(x), dtype=bool)
+    #     annulus_ok = np.ones(len(x), dtype=bool)
+    #     maskfrac = np.ones(len(x), dtype=float)
+
+    #     print("starting loop through fitflag")
+    #     for i in np.where(self.fitflag)[0]:
+    #         xi = x[i]
+    #         yi = y[i]
+
+    #         if not np.isfinite(xi) or not np.isfinite(yi):
+    #             center_ok[i] = False
+    #             annulus_ok[i] = False
+    #             continue
+
+    #         ix = int(np.round(xi)) - 1
+    #         iy = int(np.round(yi)) - 1
+
+    #         if (ix < 0) or (ix >= nx) or (iy < 0) or (iy >= ny):
+    #             center_ok[i] = False
+    #             annulus_ok[i] = False
+    #             continue
+
+    #         # reject if star center lands in masked region
+    #         center_ok[i] = ~mask[iy, ix]
+
+    #         # reject if local sky annulus overlaps mask too much
+    #         rr = np.sqrt((xx - ix)**2 + (yy - iy)**2)
+    #         ann = (rr >= annulus_rin) & (rr < annulus_rout)
+    #         nann = np.sum(ann)
+
+    #         if nann == 0:
+    #             annulus_ok[i] = False
+    #             continue
+
+    #         maskfrac[i] = np.sum(mask[ann]) / nann
+    #         annulus_ok[i] = maskfrac[i] < max_maskfrac
+
+    #     self.fitflag_mask_center_ok = center_ok
+    #     self.fitflag_mask_annulus_ok = annulus_ok
+    #     self.fitflag_maskfrac = maskfrac
+
+    #     old_n = np.sum(self.fitflag)
+    #     self.fitflag = self.fitflag & center_ok & annulus_ok
+    #     new_n = np.sum(self.fitflag)
+
+    #     if self.verbose:
+    #         print(f'\t number passing exclusion mask = {new_n} (removed {old_n - new_n})')
 
         
     def color_correct_panstarrs(self):
