@@ -102,13 +102,9 @@ def runone(f):
     # run getzp
     os.system(getzpstring)
 
-# run one galaxy at a time, in parallel
-# don't do this - it corrupted a bunch of images - need to figure out what I'm doing wrong in getzp.py
-# might be that a store image as a temp file, and these get overwritten/accessed by multiple programs?
-if len(sys.argv) > 1:
+def runone_directory(subdirname):
     topdir = os.getcwd()
-    
-    subdirname = sys.argv[1]
+    print("working on subdir ",subdirname)
     os.chdir(subdirname)
 
     # get coadds
@@ -136,6 +132,42 @@ if len(sys.argv) > 1:
         runone(f)
     os.chdir(topdir)
 
+
+# run one galaxy at a time, in parallel
+# don't do this - it corrupted a bunch of images - need to figure out what I'm doing wrong in getzp.py
+# might be that a store image as a temp file, and these get overwritten/accessed by multiple programs?
+if len(sys.argv) > 1:
+    topdir = os.getcwd()
+    
+    subdirname = sys.argv[1]
+    runone_directory(subdirname)
+
+else:  # assume we are starting in /data-pool/Halpha/processed
+    rootdir = os.getcwd()
+    rundirs = ["2019febINT-all", "2019nelvy-all", "2022MayINT-allfiles-v2"]
+
+    for rundir in rundirs:
+        os.chdir(os.path.join(rootdir, rundir))
+
+        # get list of subdirectories
+        subdirs = [d for d in os.listdir('.') if os.path.isdir(d)]
+
+        for subdirname in subdirs:
+            if subdirname.startswith(("lmpointing", "pointing", "target_")):
+                print(f"Running {subdirname}")
+
+                os.chdir(subdirname)
+
+                try:
+                    runone_directory(subdirname)
+                except Exception as e:
+                    print(f"ERROR in {subdirname}: {e}")
+
+                # move back to rundir
+                os.chdir('..')
+
+    os.chdir(rootdir)
+    
 
 
 
