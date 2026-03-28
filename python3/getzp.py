@@ -482,6 +482,7 @@ class getzp():
             print('')        
             print('STATUS: matching se cat to panstarrs')       
         self.match_coords()
+
         if self.verbose:
             print('')        
             print('STATUS: fitting zeropoint')        
@@ -589,10 +590,10 @@ class getzp():
         catdir = self.catdir
         if not os.path.exists(catdir):
             os.mkdir(catdir)
-        segimage = self.image.replace(".fits","-seg.fits")
+        self.segmentation_image = f"{self.catdir}/{self.image.replace(".fits","-seg.fits")}"
         if self.fwhm is None:
             
-            t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {self.catdir}/{froot}.cat -BACK_SIZE 128 -BACKPHOTO_TYPE LOCAL -BACK_TYPE AUTO -MAG_ZEROPOINT 0 -SATUR_LEVEL {ADUlimit:.1f} -DETECT_THRESH 1.5 -ANALYSIS_THRESH 1.5 -DETECT_MINAREA 10 -CHECKIMAGE_TYPE SEGMENTATION -CHECKIMAGE_NAME {self.catdir}/{segimage}'
+            t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {self.catdir}/{froot}.cat -BACK_SIZE 128 -BACKPHOTO_TYPE LOCAL -BACK_TYPE AUTO -MAG_ZEROPOINT 0 -SATUR_LEVEL {ADUlimit:.1f} -DETECT_THRESH 1.5 -ANALYSIS_THRESH 1.5 -DETECT_MINAREA 10 -CHECKIMAGE_TYPE SEGMENTATION -CHECKIMAGE_NAME {self.segmentation_image}'
             if self.instrument == 'b':
                 weight_image = self.image.replace('.fits','.weight.fits')
                 if weight_image.startswith('f'):
@@ -624,7 +625,7 @@ class getzp():
         fwhm = np.median(self.secat['FWHM_IMAGE'])*self.pixelscale
             
             
-        t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {catdir}/{froot}.cat -BACK_SIZE 128 -BACKPHOTO_TYPE LOCAL -BACK_TYPE AUTO -MAG_ZEROPOINT 0 -SATUR_LEVEL {ADUlimit:.1f} -SEEING_FWHM {fwhm:.2f} -DETECT_THRESH 1.5 -ANALYSIS_THRESH 1.5 -DETECT_MINAREA 10 -CHECKIMAGE_TYPE SEGMENTATION -CHECKIMAGE_NAME {self.catdir}/{segimage}'
+        t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {catdir}/{froot}.cat -BACK_SIZE 128 -BACKPHOTO_TYPE LOCAL -BACK_TYPE AUTO -MAG_ZEROPOINT 0 -SATUR_LEVEL {ADUlimit:.1f} -SEEING_FWHM {fwhm:.2f} -DETECT_THRESH 1.5 -ANALYSIS_THRESH 1.5 -DETECT_MINAREA 10 -CHECKIMAGE_TYPE SEGMENTATION -CHECKIMAGE_NAME {self.segmentation_image}'
         if self.instrument == 'b':
             weight_image = self.image.replace('.fits','.weight.fits')
             if os.path.exists(weight_image):
@@ -736,7 +737,20 @@ class getzp():
         # doesn't affect anything
         #colorflag = np.ones(len(ps_gr),'bool')
         self.fitflag = colorflag & self.matchflag  & (self.pan['rmag'] > self.MINMAG) & (self.matchedarray1['FLAGS'] <  1) & (self.pan['Qual'] < 64)  & (self.pan['rmag'] < 19) #& (self.matchedarray1['CLASS_STAR'] > 0.95) #& (self.matchedarray1['MAG_AUTO'] > -11.)
+
+        # NEW: reject stars near large detected sources / masked regions
+        self.fitflag_before_mask = self.fitflag.copy()
         
+        self.apply_exclusion_mask_to_fitflag(
+            annulus_rin=15,
+            annulus_rout=25,
+            area_thresh=1500,
+            grow=10,
+            max_maskfrac=0.10,
+        )
+
+        self.fitflag_rejected_by_mask = self.fitflag_before_mask & (~self.fitflag)
+                
         if self.verbose:
             print(f'\t number that pass fit {np.sum(self.fitflag)}')
         # for WFC on INT, restrict area to central region
@@ -751,6 +765,83 @@ class getzp():
         #        (self.matchedarray1['Y_IMAGE'] > self.keepsection[2]) & \
         #        (self.matchedarray1['Y_IMAGE'] < self.keepsection[3])
         #    self.fitflag = self.fitflag & self.goodarea_flag
+
+    def apply_exclusion_mask_to_fitflag(self, annulus_rin=15, annulus_rout=25,
+                                        area_thresh=1500, grow=10,
+                                        max_maskfrac=0.10):
+        """
+        Reject matched calibration stars whose centers or local background annuli
+        overlap large-source exclusion regions.
+        """
+        seg = fits.getdata(self.segmentation_image)
+
+        # 1. choose large detected objects from SE catalog
+        large = np.asarray(self.secat['ISOAREA_IMAGE']) > area_thresh
+        labels_to_mask = np.asarray(self.secat['NUMBER'])[large]
+
+        # 2. build exclusion mask from segmentation labels
+        mask = np.isin(seg, labels_to_mask)
+        if grow > 0:
+            from scipy.ndimage import binary_dilation
+            mask = binary_dilation(mask, iterations=grow)
+
+        self.zp_exclusion_mask = mask
+
+        # 3. evaluate matched stars
+        x = np.asarray(self.matchedarray1['X_IMAGE'], dtype=float)
+        y = np.asarray(self.matchedarray1['Y_IMAGE'], dtype=float)
+
+        ny, nx = mask.shape
+        yy, xx = np.indices(mask.shape)
+
+        center_ok = np.ones(len(x), dtype=bool)
+        annulus_ok = np.ones(len(x), dtype=bool)
+        maskfrac = np.ones(len(x), dtype=float)
+
+        for i in np.where(self.fitflag)[0]:
+            xi = x[i]
+            yi = y[i]
+
+            if not np.isfinite(xi) or not np.isfinite(yi):
+                center_ok[i] = False
+                annulus_ok[i] = False
+                continue
+
+            ix = int(np.round(xi)) - 1
+            iy = int(np.round(yi)) - 1
+
+            if (ix < 0) or (ix >= nx) or (iy < 0) or (iy >= ny):
+                center_ok[i] = False
+                annulus_ok[i] = False
+                continue
+
+            # reject if star center lands in masked region
+            center_ok[i] = ~mask[iy, ix]
+
+            # reject if local sky annulus overlaps mask too much
+            rr = np.sqrt((xx - ix)**2 + (yy - iy)**2)
+            ann = (rr >= annulus_rin) & (rr < annulus_rout)
+            nann = np.sum(ann)
+
+            if nann == 0:
+                annulus_ok[i] = False
+                continue
+
+            maskfrac[i] = np.sum(mask[ann]) / nann
+            annulus_ok[i] = maskfrac[i] < max_maskfrac
+
+        self.fitflag_mask_center_ok = center_ok
+        self.fitflag_mask_annulus_ok = annulus_ok
+        self.fitflag_maskfrac = maskfrac
+
+        old_n = np.sum(self.fitflag)
+        self.fitflag = self.fitflag & center_ok & annulus_ok
+        new_n = np.sum(self.fitflag)
+
+        if self.verbose:
+            print(f'\t number passing exclusion mask = {new_n} (removed {old_n - new_n})')
+
+        
     def color_correct_panstarrs(self):
         """
         from values that I calculated from filter traces and Manga MaStar normal spectral
@@ -1195,16 +1286,6 @@ class getzp():
         # this plots locations of all sources, not just the ones that 
         # are used in the ZPfitting
         # 
-        plt.figure(figsize=(6,4))
-        plt.title(self.image)
-        yplot2 = self.matchedarray1['MAG_APER'][:,self.naper]
-        magfit2 = np.polyval(self.bestc,self.R)
-        residual_all2 = 10.**((magfit2 - yplot2)/2.5)
-
-        plt.scatter(self.matchedarray1['X_IMAGE'],self.matchedarray1['Y_IMAGE'],c = (residual_all2),vmin=v1,vmax=v2,s=15)
-        cb=plt.colorbar()
-        cb.set_label('f-WFC/f-pan')        
-        plt.savefig('getzp-position-residuals-all-fig1.png')
         '''
         plt.figure(figsize=(6,4))
         
@@ -1219,7 +1300,8 @@ class getzp():
         # issue is with astropy sigma clipping - ugh!!!
         # returning to normal...
         plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
-        #plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=.5,vmax=2.5,s=15)
+        # plot points rejected due to segmentation image
+        plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag_rejected_by_mask],self.matchedarray1['Y_IMAGE'][self.fitflag_rejected_by_mask],c = (residual_all),marker='v',vmin=v1,vmax=v2,s=15,label='rejected')
         cb=plt.colorbar()
         cb.set_label('f-meas/f-pan')
         plt.savefig('plots/'+self.plotprefix.replace(".fits","")+'getzp-xyresidual-fitted.png')
