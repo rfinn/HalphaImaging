@@ -500,16 +500,16 @@ class getzp():
             if self.fixbok:  
                 print("checking 90prime ccds...",self.fixbok)
                 self.check_90prime_ccds()
-            self.runse(useprevious=False)
-            self.match_coords()
-            self.fitzp(plotall=True)
+                self.runse(useprevious=False)
+                self.match_coords()
+                self.fitzp(plotall=True)
         elif self.instrument == 'i':
             if self.fixint:
                 print("checking INT ccds...", self.fixint)
                 self.check_int_ccds(min_stars=10,max_scale_dev=0.1)
-            self.runse(useprevious=False)
-            self.match_coords()
-            self.fitzp(plotall=True)
+                self.runse(useprevious=False)
+                self.match_coords()
+                self.fitzp(plotall=True)
             
         self.update_header()
 
@@ -1455,10 +1455,11 @@ class getzp():
         else:
             vmin_im, vmax_im = 0, 1
         print("... image norm")
-        from matplotlib.colors import AsinhNorm
-        norm = AsinhNorm(vmin=vmin_im, vmax=vmax_im)
-
-        plt.imshow(im, cmap='gray_r', norm=norm)#, interpolation='nearest')
+        from astropy.visualization import SimpleNorm
+        
+        snorm = SimpleNorm('asinh',percent=98)
+        norm = snorm(im)
+        plt.imshow(im, cmap='gray_r', norm=norm, origin="lower")#, interpolation='nearest')
         
   
         plt.title(self.plotprefix+s)
