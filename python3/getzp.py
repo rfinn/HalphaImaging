@@ -590,7 +590,7 @@ class getzp():
         catdir = self.catdir
         if not os.path.exists(catdir):
             os.mkdir(catdir)
-        self.segmentation_image = f"{self.catdir}/{self.image.replace(".fits","-seg.fits")}"
+        self.segmentation_image = f"{self.catdir}/{self.image.replace('.fits','-seg.fits')}"
         if self.fwhm is None:
             
             t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {self.catdir}/{froot}.cat -BACK_SIZE 128 -BACKPHOTO_TYPE LOCAL -BACK_TYPE AUTO -MAG_ZEROPOINT 0 -SATUR_LEVEL {ADUlimit:.1f} -DETECT_THRESH 1.5 -ANALYSIS_THRESH 1.5 -DETECT_MINAREA 10 -CHECKIMAGE_TYPE SEGMENTATION -CHECKIMAGE_NAME {self.segmentation_image}'
