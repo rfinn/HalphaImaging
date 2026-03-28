@@ -506,6 +506,13 @@ class getzp():
             
             
         t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {catdir}/{froot}.cat -BACK_SIZE 128 -BACKPHOTO_TYPE LOCAL -BACK_TYPE AUTO -MAG_ZEROPOINT 0 -SATUR_LEVEL {ADUlimit:.1f} -SEEING_FWHM {fwhm:.2f}'
+        if self.instrument == 'b':
+            weight_image = self.image.replace('.fits','.weight.fits')
+            if os.path.exists(weight_image):
+                t += f" -WEIGHT_IMAGE {weight_image} -WEIGHT_TYPE MAP_WEIGHT -RESCALE_WEIGHTS  N"
+            else:
+                print(f"WARNING: no weight image {weight_image}")
+        
         if float(fwhm) == 0:
             print('WARNING: measured FWHM is zero!')
             if self.verbose:
