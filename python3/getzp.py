@@ -92,6 +92,7 @@ try:
 except ImportError: # photutils v 2.2
     from photutils.background import Background2D, MedianBackground
 import itertools
+from scipy.ndimage import binary_dilation
 
 #################################################
 ## GLOBAL VARIABLES
@@ -154,6 +155,93 @@ def clipped_median(x, nsig=3.0):
 
     return np.median(x[keep])
 
+
+
+def mask_large_segmentation_sources(segim, labels_to_mask, grow=5):
+    """
+    Build boolean mask from selected segmentation labels.
+
+    Parameters
+    ----------
+    segim : 2D ndarray
+        Segmentation image; 0 = background, positive ints = labels.
+    labels_to_mask : array-like
+        Segmentation labels to mask.
+    grow : int
+        Number of binary dilation iterations.
+
+    Returns
+    -------
+    mask : 2D bool ndarray
+        True where masked.
+    """
+    labels_to_mask = np.asarray(labels_to_mask)
+    if labels_to_mask.size == 0:
+        return np.zeros_like(segim, dtype=bool)
+
+    mask = np.isin(segim, labels_to_mask)
+    if grow > 0:
+        mask = binary_dilation(mask, iterations=grow)
+    return mask
+
+def make_circular_mask(shape, xc, yc, radius):
+    yy, xx = np.indices(shape)
+    return (xx - xc)**2 + (yy - yc)**2 <= radius**2
+
+def bright_star_mask_from_catalog(shape, x, y, mag, mag_limits=None):
+    """
+    Build mask for bright stars using simple magnitude-dependent radii.
+    """
+    if mag_limits is None:
+        mag_limits = [
+            (12.0, 120),
+            (14.0, 80),
+            (16.0, 50),
+        ]
+
+    mask = np.zeros(shape, dtype=bool)
+    x = np.asarray(x)
+    y = np.asarray(y)
+    mag = np.asarray(mag)
+
+    for xi, yi, mi in zip(x, y, mag):
+        if not np.isfinite(mi):
+            continue
+
+        radius = None
+        for mlim, r in mag_limits:
+            if mi < mlim:
+                radius = r
+                break
+
+        if radius is None:
+            continue
+
+        mask |= make_circular_mask(shape, xi, yi, radius)
+
+    return mask
+
+def build_zp_exclusion_mask(segim, secat, area_thresh=3000, grow=5,
+                            bright_mag_col='MAG_AUTO',
+                            xcol='X_IMAGE', ycol='Y_IMAGE',
+                            label_col='NUMBER'):
+    """
+    Build exclusion mask for zeropoint fitting.
+    """
+    # large segmented objects
+    large = np.asarray(secat['ISOAREA_IMAGE']) > area_thresh
+    large_labels = np.asarray(secat[label_col])[large]
+    large_mask = mask_large_segmentation_sources(segim, large_labels, grow=grow)
+
+    # bright stars
+    # bright_mask = bright_star_mask_from_catalog(
+    #     segim.shape,
+    #     secat[xcol],
+    #     secat[ycol],
+    #     secat[bright_mag_col],
+    # )
+
+    return large_mask #| bright_mask
 def fitline_sigma_clipping(x, y, yerr=None, nsigma=3,niter=3):
     """ 
     fit a line with slope fixed at 1  
