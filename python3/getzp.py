@@ -363,7 +363,7 @@ class getzp():
             print("found SE cat!!!")
             self.read_se_cat()
         else:
-            self.runse(userprevious=False)
+            self.runse(useprevious=False)
         if self.verbose:
             print('')        
             print('STATUS: getting panstarrs')
