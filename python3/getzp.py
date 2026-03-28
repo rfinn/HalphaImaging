@@ -348,8 +348,8 @@ class getzp():
         if 'ha' in self.filter:
             v1 = .9
             v2 = 1.1
-            #v1 = .95
-            #v2 = 1.05 #  keep halph range to match broad band filters
+            v1 = .95
+            v2 = 1.05 #  keep halph range to match broad band filters
         else:
             v1=.95
             v2=1.05
@@ -392,7 +392,7 @@ class getzp():
         elif self.instrument == 'i':
             if self.fixint:
                 print("checking INT ccds...", self.fixint)
-                self.check_INT_ccds(min_stars=10,max_scale_dev=0.1)
+                self.check_int_ccds(min_stars=10,max_scale_dev=0.1)
             self.runse(useprevious=False)
             self.match_coords()
             self.fitzp(plotall=True)
