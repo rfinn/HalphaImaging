@@ -181,7 +181,8 @@ def mask_large_segmentation_sources(segim, labels_to_mask, grow=5):
 
     mask = np.isin(segim, labels_to_mask)
     if grow > 0:
-        mask = binary_dilation(mask, iterations=grow)
+        #mask = binary_dilation(mask, iterations=grow)
+        print("skipping binary_dilation b/c it's slow!")
     return mask
 
 def make_circular_mask(shape, xc, yc, radius):
