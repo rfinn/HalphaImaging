@@ -501,10 +501,10 @@ class getzp():
         catdir = self.catdir
         if not os.path.exists(catdir):
             os.mkdir(catdir)
-            
+        segimage = self.image.replace(".fits","-seg.fits")
         if self.fwhm is None:
             
-            t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {self.catdir}/{froot}.cat -BACK_SIZE 128 -BACKPHOTO_TYPE LOCAL -BACK_TYPE AUTO -MAG_ZEROPOINT 0 -SATUR_LEVEL {ADUlimit:.1f}'
+            t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {self.catdir}/{froot}.cat -BACK_SIZE 128 -BACKPHOTO_TYPE LOCAL -BACK_TYPE AUTO -MAG_ZEROPOINT 0 -SATUR_LEVEL {ADUlimit:.1f} -DETECT_THRESH 1.5 -ANALYSIS_THRESH 1.5 -DETECT_MINAREA 10 -CHECKIMAGE_TYPE SEGMENTATION -CHECKIMAGE_NAME {self.catdir}/{segimage}'
             if self.instrument == 'b':
                 weight_image = self.image.replace('.fits','.weight.fits')
                 if weight_image.startswith('f'):
@@ -536,7 +536,7 @@ class getzp():
         fwhm = np.median(self.secat['FWHM_IMAGE'])*self.pixelscale
             
             
-        t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {catdir}/{froot}.cat -BACK_SIZE 128 -BACKPHOTO_TYPE LOCAL -BACK_TYPE AUTO -MAG_ZEROPOINT 0 -SATUR_LEVEL {ADUlimit:.1f} -SEEING_FWHM {fwhm:.2f}'
+        t = f'sex {self.image} -c {defaultcat} -CATALOG_NAME {catdir}/{froot}.cat -BACK_SIZE 128 -BACKPHOTO_TYPE LOCAL -BACK_TYPE AUTO -MAG_ZEROPOINT 0 -SATUR_LEVEL {ADUlimit:.1f} -SEEING_FWHM {fwhm:.2f} -DETECT_THRESH 1.5 -ANALYSIS_THRESH 1.5 -DETECT_MINAREA 10 -CHECKIMAGE_TYPE SEGMENTATION -CHECKIMAGE_NAME {self.catdir}/{segimage}'
         if self.instrument == 'b':
             weight_image = self.image.replace('.fits','.weight.fits')
             if os.path.exists(weight_image):
