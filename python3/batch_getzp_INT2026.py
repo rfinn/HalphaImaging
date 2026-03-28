@@ -165,8 +165,8 @@ else:  # assume we are starting in /data-pool/Halpha/processed
 
                 # move back to rundir
                 os.chdir('..')
-                break
-        break
+                #break
+        #break
 
     os.chdir(rootdir)
     
