@@ -1434,6 +1434,7 @@ class getzp():
         # are used in the ZPfitting
         # 
         '''
+        plt.close("all")
         print("starting onimage plot...")
         plt.figure(figsize=(8,8))
         
@@ -1470,7 +1471,7 @@ class getzp():
         # so letting vmin/vmax get set automatically
         # issue is with astropy sigma clipping - ugh!!!
         # returning to normal...
-        print(f"...v1={v1}, v2={v2}")
+        #print(f"...v1={v1}, v2={v2}")
         plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag_rejected_by_mask],self.matchedarray1['Y_IMAGE'][self.fitflag_rejected_by_mask],c = 'r',marker='v',s=20,label='rejected')
         plt.scatter(self.matchedarray1['X_IMAGE'][self.fitflag],self.matchedarray1['Y_IMAGE'][self.fitflag],c = (residual_all),vmin=v1,vmax=v2,s=15)
         # plot points rejected due to segmentation image
@@ -1478,7 +1479,7 @@ class getzp():
         cb.set_label('f-meas/f-pan')
         print("... saving")        
         plt.savefig('plots/'+self.plotprefix.replace(".fits","")+'getzp-xyresidual-fitted-onimage.png',dpi=150)
-
+        plt.close('all')
         print("... finished onimage plot.")
         
         self.x = x
