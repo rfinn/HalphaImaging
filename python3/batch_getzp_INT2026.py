@@ -103,9 +103,9 @@ def runone(f):
     os.system(getzpstring)
 
 def runone_directory(subdirname):
-    topdir = os.getcwd()
+    #topdir = os.getcwd()
     print("working on subdir ",subdirname)
-    os.chdir(subdirname)
+    #os.chdir(subdirname)
 
     # get coadds
     if '2019' in os.getcwd():
@@ -130,7 +130,7 @@ def runone_directory(subdirname):
         # going to run on both, just for completeness, symmetry, etc...
         
         runone(f)
-    os.chdir(topdir)
+    #os.chdir(topdir)
 
 
 # run one galaxy at a time, in parallel
