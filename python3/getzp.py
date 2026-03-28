@@ -339,6 +339,7 @@ class getzp():
         self.spline_smooth = int(args.spline_smooth)
         self.norder = int(args.norder)
         self.fwhm = args.fwhm
+        self.useastropy = args.useastropy
         self.fixbok = args.fixbok
         self.fixint = args.fixint
         self.minmag = args.minmag
@@ -986,9 +987,9 @@ class getzp():
         color = self.pan_gr_color[flag]
         #print(f"len(x) = {len(x)}, len(color)= {len(color)}")
 
-        useAstropyModel = args.useastropy
+        
 
-        if useAstropyModel:
+        if self.useastropy:
             print("using astropy model...")
 
             # get initial fit from numpy inside fitline_sigma_clipping function
@@ -1679,10 +1680,6 @@ def build_parser():
                         help='fix offset b/w INT ccds. default is False.')
     parser.add_argument('--fixbok', dest='fixbok', default=False, action='store_true',
                         help='fix offset b/w bok amps.  default is False, set to not fix bok.')
-    parser.add_argument('--useastropy', dest='useastropy', default=False,
-                        action='store_true',
-                        help='Use astropy to fit the ZP line with sigma clipping. '
-                            'Default is False (uses custom iterative fitting).')
     return parser
 
 
