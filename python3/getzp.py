@@ -1408,7 +1408,7 @@ class getzp():
         print("starting my plots...")
         plt.figure(figsize=(6,4))
         
-        s = ' (mean,std,MAD = {:.3f},{:.3f},{:.3f})'.format(np.mean(residual_all),np.std(residual_all),MAD2(residual_all))
+        s = '\n (mean,std,MAD = {:.3f},{:.3f},{:.3f})'.format(np.mean(residual_all),np.std(residual_all),MAD2(residual_all))
         #s = str(MAD(residual_all))
         plt.title(self.plotprefix+s)
         self.residual_allx = self.matchedarray1['X_IMAGE'][self.fitflag]
@@ -1437,27 +1437,27 @@ class getzp():
         print("starting onimage plot...")
         plt.figure(figsize=(8,8))
         
-        s = ' (mean,std,MAD = {:.3f},{:.3f},{:.3f})'.format(np.mean(residual_all),np.std(residual_all),MAD2(residual_all))
+        s = '\n (mean,std,MAD = {:.3f},{:.3f},{:.3f})'.format(np.mean(residual_all),np.std(residual_all),MAD2(residual_all))
         #s = str(MAD(residual_all))
         im = fits.getdata(self.image)
 
-        # robust grayscale stretch + asinh
-        good = np.isfinite(im)
-        if np.sum(good) > 0:
-            vmed = np.median(im[good])
-            vmad = 1.4826 * np.median(np.abs(im[good] - vmed))
-            if (not np.isfinite(vmad)) or (vmad == 0):
-                vmad = np.std(im[good])
+        # # robust grayscale stretch + asinh
+        # good = np.isfinite(im)
+        # if np.sum(good) > 0:
+        #     vmed = np.median(im[good])
+        #     vmad = 1.4826 * np.median(np.abs(im[good] - vmed))
+        #     if (not np.isfinite(vmad)) or (vmad == 0):
+        #         vmad = np.std(im[good])
 
-            # conservative display limits
-            vmin_im = vmed - 2.0 * vmad
-            vmax_im = vmed + 8.0 * vmad
-        else:
-            vmin_im, vmax_im = 0, 1
+        #     # conservative display limits
+        #     vmin_im = vmed - 2.0 * vmad
+        #     vmax_im = vmed + 8.0 * vmad
+        # else:
+        #     vmin_im, vmax_im = 0, 1
         print("... image norm")
         from astropy.visualization import SimpleNorm
         
-        snorm = SimpleNorm('asinh',percent=99.5)
+        snorm = SimpleNorm('asinh',percent=99.9)
         norm = snorm(im)
         plt.imshow(im, cmap='gray_r', norm=norm, origin="lower")#, interpolation='nearest')
         
