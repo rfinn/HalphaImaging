@@ -480,6 +480,8 @@ class getzp():
                 weight_image = self.image.replace('.fits','.weight.fits')
                 if os.path.exists(weight_image):
                     t += f" -WEIGHT_IMAGE {weight_image} -WEIGHT_TYPE MAP_WEIGHT -RESCALE_WEIGHTS  N"
+                else:
+                    print(f"WARNING: no weight image {weight_image}")
             if self.verbose:
                 print('running SE first time to get estimate of FWHM')
                 print(t)
