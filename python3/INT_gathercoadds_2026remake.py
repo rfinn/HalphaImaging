@@ -39,7 +39,7 @@ if __name__ == '__main__':
     #parser.add_argument('--se', dest = 'se', default = False, action='store_true', help = 'Run source extractor')    
     #parser.add_argument('--scamp', dest = 'scamp', default = False, action='store_true', help = 'Run scamp')
     parser.add_argument('--overwrite', dest = 'overwrite', default = False, action='store_true', help = 'Overwrite the output images.  Default is false.')
-    parser.add_argument('--outdir', dest = 'outdir', default = '/data-pool/Halpha/coadds-2025DEC', action='store_true', help = 'output directory to copy renamed coadds to.  default is /data-pool/Halpha/coadds-2025DEC ')    
+    parser.add_argument('--outdir', dest = 'outdir', default = '/data-pool/Halpha/coadds-2025DEC', help = 'output directory to copy renamed coadds to.  default is /data-pool/Halpha/coadds-2025DEC ')    
     parser.add_argument('--testing', dest = 'testing', default = False, action='store_true', help = 'Will print matches but will not edit headers.')
     
     args = parser.parse_args()
