@@ -22,13 +22,14 @@ import glob
 import os
 import sys
 import numpy as np
-import multiprocessing as mp
 
-image_results = []
-def collect_results(result):
+# import multiprocessing as mp
 
-    global results
-    image_results.append(result)
+# image_results = []
+# def collect_results(result):
+
+#     global results
+#     image_results.append(result)
 
 
     
@@ -96,7 +97,7 @@ def runone(i,f):
         sys.exit()
     
     # construct string
-    getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter} --useastropy"
+    getzpstring = f'python ~/github/HalphaImaging/python3/getzp.py --image "{f}" --instrument {iinstrument} --filter {ffilter} --useastropy'
     #if instrument == 'BOK':
     #    getzpstring += ' --fixbok'
 
