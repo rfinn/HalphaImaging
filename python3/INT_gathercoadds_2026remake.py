@@ -68,11 +68,12 @@ if __name__ == '__main__':
             if (os.path.isdir(f1)) & (f1.startswith('pointing') | f1.startswith('lmpointing') | f1.startswith('target_')):
                 os.chdir(targetdir)
                 print('WORKING ON DIRECTORY: ',f1)
-                image_filter = ['r','Halpha','Ha6657']
+
                 # get list of coadds
                 coaddlist = []
-                for mfilt = image_filter:
-                    fname = f"f{f1}_{mfilt}.coadd.fits"
+                image_filters = ['r','Halpha','Ha6657']
+                for image_filter in image_filters:
+                    fname = f"f{f1}_{image_filter}.coadd.fits"
                     if os.path.exists(fname):
                         coaddlist.append(fname)
                 # updating to account for 2 rounds of flattening for INT Halpha data
