@@ -73,9 +73,11 @@ def runone(f):
     if 'Halpha' in f: #int 197
         ffilter = 'ha197'
         minmag = 14.5
+        nflatten = 2
     elif 'Ha6657' in f:
         ffilter = 'ha227'
         minmag = 14.5
+        nflatten = 2        
     elif 'r.coadd' in f:
         ffilter = 'r'
         minmag = 15.
@@ -141,7 +143,9 @@ def runone_directory(subdirname):
 if len(sys.argv) > 1:
     topdir = os.getcwd()
     subdirname = sys.argv[1]
+    os.chdir(subdirname)
     runone_directory(subdirname)
+    os.chdir(topdir)
 
 else:  # assume we are starting in /data-pool/Halpha/processed
     rootdir = os.getcwd()
