@@ -97,16 +97,16 @@ def runone(i,f):
     
     # construct string
     getzpstring = f"python ~/github/HalphaImaging/python3/getzp.py --image {f} --instrument {iinstrument} --filter {ffilter} --useastropy"
-    # set default for fixbok to be True, so only set this if you DON'T want to fix bok...
     #if instrument == 'BOK':
     #    getzpstring += ' --fixbok'
 
 
-    if instrument == 'BOK':
+    if instrument == 'BOK' and ffilter == 'r':
         getzpstring += " --minmag 15.5"
-    elif instrument == 'INT':
+    elif instrument == 'INT' and ffilter == 'r':
         getzpstring += " --minmag 15."
-        
+    if 'ha' in ffilter:
+        getzpstring += " --minmag 14."
     #aimages = ['20190211-p045','20210315-VFID1538', '20190208-p091','20210416-VFID2997','20220426-VFID2622','20130415-NGC5846_05','MOS-20110404-NGC5846_02','MOS-20120418-NGC5846_04','BOK-20220426-VFID6599','BOK-20220423-VFID0720','BOK-20220424-VFID0607','BOK-20220428-VFID4257','BOK-20210417-VFID3780','BOK-20210414-VFID0422','BOK-20220425-VFID3714','BOK-20210418-VFID3459','BOK-20220428-VFID0783','BOK-20220423-VFID0783']
     #for aim in aimages:
     #    if aim in f:
@@ -121,8 +121,6 @@ def runone(i,f):
     os.system(getzpstring)
 
 # run one galaxy at a time, in parallel
-# don't do this - it corrupted a bunch of images - need to figure out what I'm doing wrong in getzp.py
-# might be that a store image as a temp file, and these get overwritten/accessed by multiple programs?
 if len(sys.argv) > 1:
     filename = sys.argv[1]
     print("calling runone for ",filename)
@@ -130,25 +128,6 @@ if len(sys.argv) > 1:
 
 
 
-#else:
-#    # don't need this if I am going to run using gnu parallel instead
-#    if len(sys.argv) > 2:
-#        matchstring = sys.argv[1]
-#        rfiles = glob.glob('VF*'+matchstring+'*.fits') # grab subset of files in the directory
-#    else:
-#        rfiles = glob.glob('VF*.fits') # grab all files in the directory
-#        rfiles.sort()
-#        indices = np.arange(len(rfiles))#
-#
-#        #for rimage in rimages: # loop through list
-#        image_pool = mp.Pool(mp.cpu_count())
-#        myresults = [image_pool.apply_async(runone,args=(i,rfiles[i]),callback=collect_results) for i in indices]
-#    
-#        image_pool.close()
-#        image_pool.join()
-#        image_results = [r.get() for r in myresults]
 
-
-    
 
 
