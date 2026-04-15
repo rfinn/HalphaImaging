@@ -73,11 +73,13 @@ def runone(f):
     if 'Halpha' in f: #int 197
         ffilter = 'ha197'
         minmag = 14.5
-        nflatten = 2
+        #nflatten = 2
+        norder = 4
     elif 'Ha6657' in f:
         ffilter = 'ha227'
         minmag = 14.5
-        nflatten = 2        
+        #nflatten = 2
+        norder = 4        
     elif 'r.coadd' in f:
         ffilter = 'r'
         minmag = 15.
