@@ -153,6 +153,8 @@ old_ha = sorted([
     and (f.name not in EXCLUDE_HA_BASENAMES)
     ])
 
+print(f"number of files in old_ha = {len(old_ha)}")
+
 print(f"Excluding {len(EXCLUDE_HA_BASENAMES)} Halpha images by explicit exclude list")
 new_r = sorted([
     f for f in NEW_DIR.glob("*INT*-r.fits")
@@ -293,18 +295,3 @@ with open(OUT_JOBS, "w") as outfile:
 
 print(f"Wrote {OUT_JOBS}")
 
-
-
-for f in old_ha:
-    # old name
-
-    
-    # new name
-    out_ha = OUT_DIR / f.stem
-
-    print(f"copying {f} -> {out_ha}")
-    #shutil.copyfile(f,out_ha)
-
-    # copy weight and any csv files, etc
-
-    # copy gaia files
