@@ -80,7 +80,8 @@ def swarp_resample(infile, reffile, outname, weightfile=None, outweight=None, ov
     cmd = [
         "swarp", str(infile),
         "-RESAMPLE", "Y",
-        "-COMBINE", "N",
+        "-COMBINE", "Y",
+        "-COMBINE_TYPE", "WEIGHTED",
         "-CENTER_TYPE", "MANUAL",
         "-CENTER", f"{ra},{dec}",
         "-IMAGE_SIZE", f"{nx},{ny}",
