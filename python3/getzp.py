@@ -1688,7 +1688,18 @@ class getzp():
         # add a new header keyword if the image has already been flattened
         # this could happen with renaming coadds to VFS format and then rerunning getzp
         #header.set('ZPNFLAT'+suffixes[npreviousflat],int(self.flatten),'getzp --flatten number')
-        header.set('ZPNFLAT',int(self.flatten),'getzp --flatten number')        
+        header.set('ZPNFLAT',int(self.flatten),'getzp --flatten number')
+
+        hdr["ZPNFLAT"] = (int(self.flatten), "Number of photometric flattening cycles")
+        hdr["ZPFLAT"]  = (True, "Photometric illumination flattening applied")
+        hdr["ZPFSPL"]  = (bool(self.spline), "Spline fit used for illumination correction")
+        hdr["ZPFORD"]  = (int(self.norder), "Polynomial/order parameter for flattening fit")
+        #hdr["ZPFFILT"] = (ffilter, "Filter used for PS1-to-image transformation")
+        hdr["ZPFMMAG"] = (float(self.minmag), "Minimum PS1 mag used for flattening fit")
+        flat_method = "spline" if self.spline else "poly"
+        hdr["ZPFMETH"] = (flat_method, "Photometric flattening method")
+
+        
         fits.writeto(self.image, im, header, overwrite=True)
 
 
@@ -1907,7 +1918,16 @@ class getzp():
         print("DEBUG flattened/original min/med/max:",
                   np.nanmin(ratio), np.nanmedian(ratio), np.nanmax(ratio))
 
-        self.renorm_image = 'f' + self.image
+        #self.renorm_image = 'f' + self.image
+        # 2026-05-26 - added tracking for spline vs polynomial
+        if self.spline:
+            flat_tag = "fs"
+        else:
+            flat_tag = "fp"
+
+        self.renorm_image = flat_tag + self.image
+
+        
         print("DEBUG renorm_wfc output image:", self.renorm_image)
     
         #self.renorm_image = 'f' + self.image

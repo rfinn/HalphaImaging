@@ -90,6 +90,32 @@ def runone(f):
         print('WARNING: did not recognize filter ',filter, f)
         sys.exit()
 
+    # Values for May 18, 2026
+    nflatten = 1
+    usespline = True # using spline for r-band images too
+    norder = 3
+    if 'Halpha' in f: #int 197
+        ffilter = 'ha197'
+        minmag = 14.5
+        nflatten = 2
+        norder = 4
+        usespline=False
+    elif 'Ha6657' in f:
+        ffilter = 'ha227'
+        minmag = 14.5
+        nflatten = 2
+        norder = 4
+        usespline=False
+    elif 'r.coadd' in f:
+        ffilter = 'r'
+        minmag = 15.
+    elif 'R.coadd' in f:
+        ffilter = 'R'
+        minmag = 15.        
+    else:
+        print('WARNING: did not recognize filter ',filter, f)
+        sys.exit()
+        
         
 
     
