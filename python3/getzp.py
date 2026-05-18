@@ -1690,14 +1690,14 @@ class getzp():
         #header.set('ZPNFLAT'+suffixes[npreviousflat],int(self.flatten),'getzp --flatten number')
         header.set('ZPNFLAT',int(self.flatten),'getzp --flatten number')
 
-        hdr["ZPNFLAT"] = (int(self.flatten), "Number of photometric flattening cycles")
-        hdr["ZPFLAT"]  = (True, "Photometric illumination flattening applied")
-        hdr["ZPFSPL"]  = (bool(self.spline), "Spline fit used for illumination correction")
-        hdr["ZPFORD"]  = (int(self.norder), "Polynomial/order parameter for flattening fit")
+        header["ZPNFLAT"] = (int(self.flatten), "Number of photometric flattening cycles")
+        header["ZPFLAT"]  = (True, "Photometric illumination flattening applied")
+        header["ZPFSPL"]  = (bool(self.spline), "Spline fit used for illumination correction")
+        header["ZPFORD"]  = (int(self.norder), "Polynomial/order parameter for flattening fit")
         #hdr["ZPFFILT"] = (ffilter, "Filter used for PS1-to-image transformation")
-        hdr["ZPFMMAG"] = (float(self.minmag), "Minimum PS1 mag used for flattening fit")
+        header["ZPFMMAG"] = (float(self.minmag), "Minimum PS1 mag used for flattening fit")
         flat_method = "spline" if self.spline else "poly"
-        hdr["ZPFMETH"] = (flat_method, "Photometric flattening method")
+        header["ZPFMETH"] = (flat_method, "Photometric flattening method")
 
         
         fits.writeto(self.image, im, header, overwrite=True)
