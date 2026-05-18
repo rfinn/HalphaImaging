@@ -150,7 +150,7 @@ old_ha = sorted([
     if (not is_weight_file(f))
     and (f.name.endswith("-Halpha.fits") or f.name.endswith("-Ha6657.fits"))
     and (f.name not in EXCLUDE_HA_BASENAMES)
-])
+    ])
 
 print(f"Excluding {len(EXCLUDE_HA_BASENAMES)} Halpha images by explicit exclude list")
 new_r = sorted([
@@ -183,8 +183,6 @@ for f in new_r:
 # ------------------------------------------------------------
 # match old Ha -> new r
 # ------------------------------------------------------------
-
-for 
 ha_infos = [parse_filename(f) for f in old_ha]
 ha_infos = [x for x in ha_infos if x is not None]
 
