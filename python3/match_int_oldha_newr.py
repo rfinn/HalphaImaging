@@ -57,7 +57,7 @@ def parse_filename(path):
     m = re.match(
         r"VF-(?P<ra>[0-9.]+)(?P<dec>[+-][0-9.]+)-"
         r"(?P<tel>[A-Z]+)-(?P<date>\d{8})-"
-        r"(?P<pointing>p\d+)-(?P<filter>Halpha|Ha6657|r)\.fits$",
+        r"(?P<pointing>[^-]+)-(?P<filter>Halpha|Ha6657|r)\.fits$",
         name,
     )
 
@@ -186,14 +186,33 @@ for f in new_r:
 # ------------------------------------------------------------
 # match old Ha -> new r
 # ------------------------------------------------------------
-ha_infos = [parse_filename(f) for f in old_ha]
-ha_infos = [x for x in ha_infos if x is not None]
+
+ha_infos = []
+failed_ha_parse = []
+
+for f in old_ha:
+    p = parse_filename(f)
+    if p is None:
+        failed_ha_parse.append(f)
+    else:
+        ha_infos.append(p)
+
+print(f"number of old_ha files = {len(old_ha)}")
+print(f"number parsed into ha_infos = {len(ha_infos)}")
+print(f"number failed parse = {len(failed_ha_parse)}")
+
+for f in failed_ha_parse[:20]:
+    print("FAILED PARSE:", f.name)
+    
+#ha_infos = [parse_filename(f) for f in old_ha]
+#ha_infos = [x for x in ha_infos if x is not None]
 
 r_infos = [parse_filename(f) for f in new_r]
 r_infos = [x for x in r_infos if x is not None]
 
 rows = []
 
+#print(f"length of files in ha_infos = {len(ha_infos)}")
 for ha in ha_infos:
     # skip bad images
     
