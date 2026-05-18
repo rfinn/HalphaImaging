@@ -45,9 +45,10 @@ def parse_filename(path):
     name = path.name
 
     m = re.match(
-        r"VF-[^/]+-(?P<tel>[A-Z]+)-(?P<date>\d{8})-(?P<pointing>p\d+)-(?P<filter>.+)\.fits",
+        r"VF-[^/]+-(?P<tel>[A-Z]+)-(?P<date>\d{8})-(?P<pointing>p\d+)-(?P<filter>Halpha|Ha6657|r)\.fits$",
         name,
     )
+    
 
     if m is None:
         return None
@@ -61,12 +62,24 @@ def parse_filename(path):
 # ------------------------------------------------------------
 # gather files
 # ------------------------------------------------------------
+def is_weight_file(path):
+    return path.name.endswith(".weight.fits")
 
-old_ha = sorted(OLD_DIR.glob("*INT*-Ha*.fits"))
-new_r = sorted(NEW_DIR.glob("*INT*-r.fits"))
 
-print(f"Found {len(old_ha)} old INT Halpha images")
-print(f"Found {len(new_r)} new INT r-band images")
+old_ha = sorted([
+    f for f in OLD_DIR.glob("*INT*.fits")
+    if (not is_weight_file(f))
+    and (f.name.endswith("-Halpha.fits") or f.name.endswith("-Ha6657.fits"))
+])
+
+new_r = sorted([
+    f for f in NEW_DIR.glob("*INT*-r.fits")
+    if not is_weight_file(f)
+])
+
+new_r_weight = sorted([
+    f for f in NEW_DIR.glob("*INT*-r.weight.fits")
+])
 
 
 # ------------------------------------------------------------
@@ -107,8 +120,13 @@ for ha in old_ha:
 
     rfile = r_lookup[key]
 
-    # output reprojected r filename
+    rweight = rfile.with_name(rfile.name.replace("-r.fits", "-r.weight.fits"))
+
+    if not rweight.exists():
+        print(f"WARNING: missing r weight image: {rweight}")
+
     out_r = OUT_DIR / rfile.name
+    out_r_weight = OUT_DIR / rweight.name
 
     rows.append({
         "tel": p["tel"],
@@ -116,8 +134,11 @@ for ha in old_ha:
         "pointing": p["pointing"],
         "old_ha": str(ha),
         "new_r": str(rfile),
+        "new_r_weight": str(rweight),
         "out_r": str(out_r),
-    })
+        "out_r_weight": str(out_r_weight),
+        })
+
 
 
 df = pd.DataFrame(rows)
@@ -134,14 +155,16 @@ print(f"Wrote {OUT_CSV}")
 # ------------------------------------------------------------
 
 with open(OUT_JOBS, "w") as outfile:
-
     for _, row in df.iterrows():
-
         outfile.write(
             f"{row['new_r']} "
+            f"{row['new_r_weight']} "
             f"{row['old_ha']} "
-            f"{row['out_r']}\n"
+            f"{row['out_r']} "
+            f"{row['out_r_weight']}\n"
         )
+        
+
 
 print(f"Wrote {OUT_JOBS}")
 
