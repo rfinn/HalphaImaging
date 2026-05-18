@@ -27,9 +27,9 @@ import pandas as pd
 import re
 
 
-OLD_DIR = Path("/data-pool/coadds-pre2025-hapy/")
-NEW_DIR = Path("/data-pool/coadds-v20260330/")
-OUT_DIR = Path("/data-pool/coadds-v20260518/")
+OLD_DIR = Path("/data-pool/Halpha/coadds-pre2025-hapy/")
+NEW_DIR = Path("/data-pool/Halpha/coadds-v20260330/")
+OUT_DIR = Path("/data-pool/Halpha/coadds-v20260518/")
 
 OUT_CSV = "int_hybrid_matches.csv"
 OUT_JOBS = "reproject_jobs.txt"
@@ -62,7 +62,7 @@ def parse_filename(path):
 # gather files
 # ------------------------------------------------------------
 
-old_ha = sorted(OLD_DIR.glob("*INT*-ha*.fits"))
+old_ha = sorted(OLD_DIR.glob("*INT*-Ha*.fits"))
 new_r = sorted(NEW_DIR.glob("*INT*-r.fits"))
 
 print(f"Found {len(old_ha)} old INT Halpha images")

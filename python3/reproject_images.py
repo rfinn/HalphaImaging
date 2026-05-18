@@ -78,7 +78,7 @@ def reproject_images(ic):
 if __name__ == '__main__':
     import argparse
 
-    parser = argparse.ArgumentParser(description ='Run gui for analyzing Halpha images')
+    parser = argparse.ArgumentParser(description ='Reproject images')
 
     parser.add_argument('--filestring', dest = 'filestring', default = 'WFC', help = 'filestring to match. default is WFC')
     args = parser.parse_args()
