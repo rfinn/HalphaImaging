@@ -34,29 +34,103 @@ OUT_DIR = Path("/data-pool/Halpha/coadds-v20260518/")
 OUT_CSV = "int_hybrid_matches.csv"
 OUT_JOBS = "reproject_jobs.txt"
 
+import re
+import numpy as np
+from datetime import datetime
+
 
 def parse_filename(path):
     """
     Parse filenames like:
 
     VF-266.040+57.998-INT-20190531-p012-r.fits
+    VF-266.040+57.998-INT-20190531-p012-Halpha.fits
+    VF-266.040+57.998-INT-20190531-p012-Ha6657.fits
+
+    Returns dict with:
+        ra, dec, tel, date, date_dt, pointing, filter, path
     """
 
     name = path.name
 
     m = re.match(
-        r"VF-[^/]+-(?P<tel>[A-Z]+)-(?P<date>\d{8})-(?P<pointing>p\d+)-(?P<filter>Halpha|Ha6657|r)\.fits$",
+        r"VF-(?P<ra>[0-9.]+)(?P<dec>[+-][0-9.]+)-"
+        r"(?P<tel>[A-Z]+)-(?P<date>\d{8})-"
+        r"(?P<pointing>p\d+)-(?P<filter>Halpha|Ha6657|r)\.fits$",
         name,
     )
-    
 
     if m is None:
         return None
 
     d = m.groupdict()
+    d["ra"] = float(d["ra"])
+    d["dec"] = float(d["dec"])
+    d["date_dt"] = datetime.strptime(d["date"], "%Y%m%d")
     d["path"] = str(path)
 
     return d
+
+
+def angular_sep_deg(ra1, dec1, ra2, dec2):
+    """
+    Small-angle angular separation in degrees.
+    Good enough for matching coadd centers.
+    """
+    dra = (ra2 - ra1) * np.cos(np.deg2rad(0.5 * (dec1 + dec2)))
+    ddec = dec2 - dec1
+    return np.sqrt(dra**2 + ddec**2)
+
+
+def find_best_r_match(
+    ha_info,
+    r_infos,
+    max_date_diff_days=7,
+    max_sep_deg=0.25,
+):
+    """
+    Find best r-band match for one Halpha image.
+
+    Hard requirements:
+      - same telescope
+      - same pointing
+      - angular separation < max_sep_deg
+      - date difference <= max_date_diff_days
+
+    Ranking:
+      - smallest angular separation
+      - then smallest date difference
+    """
+
+    candidates = []
+
+    for r in r_infos:
+        if r["tel"] != ha_info["tel"]:
+            continue
+        if r["pointing"] != ha_info["pointing"]:
+            continue
+
+        dt_days = abs((r["date_dt"] - ha_info["date_dt"]).days)
+        if dt_days > max_date_diff_days:
+            continue
+
+        sep = angular_sep_deg(
+            ha_info["ra"], ha_info["dec"],
+            r["ra"], r["dec"],
+        )
+
+        if sep > max_sep_deg:
+            continue
+
+        candidates.append((sep, dt_days, r))
+
+    if len(candidates) == 0:
+        return None
+
+    candidates.sort(key=lambda x: (x[0], x[1]))
+    return candidates[0][2]
+
+
 
 
 # ------------------------------------------------------------
@@ -103,41 +177,68 @@ for f in new_r:
 # match old Ha -> new r
 # ------------------------------------------------------------
 
+ha_infos = [parse_filename(f) for f in old_ha]
+ha_infos = [x for x in ha_infos if x is not None]
+
+r_infos = [parse_filename(f) for f in new_r]
+r_infos = [x for x in r_infos if x is not None]
+
 rows = []
 
-for ha in old_ha:
+for ha in ha_infos:
+    r = find_best_r_match(
+        ha,
+        r_infos,
+        max_date_diff_days=7,
+        max_sep_deg=0.25,   # stricter than 0.5 deg
+    )
 
-    p = parse_filename(ha)
-
-    if p is None:
+    if r is None:
+        print(f"NO MATCH: {Path(ha['path']).name}")
         continue
 
-    key = (p["tel"], p["date"], p["pointing"])
+    sep = angular_sep_deg(ha["ra"], ha["dec"], r["ra"], r["dec"])
+    dt_days = abs((r["date_dt"] - ha["date_dt"]).days)
 
-    if key not in r_lookup:
-        print(f"NO MATCH: {ha.name}")
-        continue
-
-    rfile = r_lookup[key]
+    rfile = Path(r["path"])
+    ha_file = Path(ha["path"])
 
     rweight = rfile.with_name(rfile.name.replace("-r.fits", "-r.weight.fits"))
-
-    if not rweight.exists():
-        print(f"WARNING: missing r weight image: {rweight}")
 
     out_r = OUT_DIR / rfile.name
     out_r_weight = OUT_DIR / rweight.name
 
     rows.append({
-        "tel": p["tel"],
-        "dateobs": p["date"],
-        "pointing": p["pointing"],
-        "old_ha": str(ha),
+        "tel": ha["tel"],
+        "ha_dateobs": ha["date"],
+        "r_dateobs": r["date"],
+        "date_diff_days": dt_days,
+        "pointing": ha["pointing"],
+        "ha_ra": ha["ra"],
+        "ha_dec": ha["dec"],
+        "r_ra": r["ra"],
+        "r_dec": r["dec"],
+        "sep_deg": sep,
+        "ha_filter": ha["filter"],
+        "r_filter": r["filter"],
+        "old_ha": str(ha_file),
         "new_r": str(rfile),
         "new_r_weight": str(rweight),
         "out_r": str(out_r),
         "out_r_weight": str(out_r_weight),
-        })
+    })
+
+for row in rows:
+    if row["sep_deg"] > 0.05 or row["date_diff_days"] > 2:
+        print(
+            "CHECK:",
+            row["pointing"],
+            row["ha_dateobs"],
+            row["r_dateobs"],
+            f"sep={row['sep_deg']:.3f} deg",
+            Path(row["old_ha"]).name,
+            Path(row["new_r"]).name,
+        )
 
 
 
