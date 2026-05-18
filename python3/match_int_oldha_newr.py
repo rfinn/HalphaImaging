@@ -25,6 +25,7 @@ Example output reprojection command:
 from pathlib import Path
 import pandas as pd
 import re
+import shutil
 
 
 OLD_DIR = Path("/data-pool/Halpha/coadds-pre2025-hapy/")
@@ -293,14 +294,13 @@ with open(OUT_JOBS, "w") as outfile:
 print(f"Wrote {OUT_JOBS}")
 
 
-# ------------------------------------------------------------
-# example parallel command
-# ------------------------------------------------------------
 
-print()
-print("Example:")
-print("parallel --bar -j 8 --memfree 80G python reproject_int_r_to_old_ha.py {1} {2} {3} {4} {5} :::: reproject_jobs.txt"
-    f":::: {OUT_JOBS}"
-)
+for f in old_ha:
+    # old name
 
+    
+    # new name
+    out_ha = OUT_DIR / f.stemp
 
+    print(f"copying {f} -> {out_ha}")
+    #shutil.copyfile(f,out_ha)
