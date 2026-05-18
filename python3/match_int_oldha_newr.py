@@ -139,13 +139,20 @@ def find_best_r_match(
 def is_weight_file(path):
     return path.name.endswith(".weight.fits")
 
+EXCLUDE_HA_BASENAMES = {
+    "VF-234.434+59.357-INT-20190530-p040-Halpha.fits",
+    "VF-255.453+23.075-INT-20190601-p008-Ha6657.fits",
+    "VF-265.866+57.999-INT-20190601-p012-Ha6657.fits",
+}
 
 old_ha = sorted([
     f for f in OLD_DIR.glob("*INT*.fits")
     if (not is_weight_file(f))
     and (f.name.endswith("-Halpha.fits") or f.name.endswith("-Ha6657.fits"))
+    and (f.name not in EXCLUDE_HA_BASENAMES)
 ])
 
+print(f"Excluding {len(EXCLUDE_HA_BASENAMES)} Halpha images by explicit exclude list")
 new_r = sorted([
     f for f in NEW_DIR.glob("*INT*-r.fits")
     if not is_weight_file(f)
@@ -177,6 +184,7 @@ for f in new_r:
 # match old Ha -> new r
 # ------------------------------------------------------------
 
+for 
 ha_infos = [parse_filename(f) for f in old_ha]
 ha_infos = [x for x in ha_infos if x is not None]
 
@@ -186,6 +194,8 @@ r_infos = [x for x in r_infos if x is not None]
 rows = []
 
 for ha in ha_infos:
+    # skip bad images
+    
     r = find_best_r_match(
         ha,
         r_infos,
@@ -205,8 +215,23 @@ for ha in ha_infos:
 
     rweight = rfile.with_name(rfile.name.replace("-r.fits", "-r.weight.fits"))
 
-    out_r = OUT_DIR / rfile.name
-    out_r_weight = OUT_DIR / rweight.name
+    out_r_name = (
+        f"VF-{ha['ra']:.3f}"
+        f"{ha['dec']:+.3f}-"
+        f"{ha['tel']}-"
+        f"{ha['date']}-"
+        f"{ha['pointing']}-r.fits"
+    )
+
+    out_r_weight_name = out_r_name.replace(
+        "-r.fits",
+        "-r.weight.fits"
+    )
+
+    out_r = OUT_DIR / out_r_name
+    out_r_weight = OUT_DIR / out_r_weight_name
+    
+
 
     rows.append({
         "tel": ha["tel"],
