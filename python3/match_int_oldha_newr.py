@@ -300,7 +300,11 @@ for f in old_ha:
 
     
     # new name
-    out_ha = OUT_DIR / f.stemp
+    out_ha = OUT_DIR / f.stem
 
     print(f"copying {f} -> {out_ha}")
     #shutil.copyfile(f,out_ha)
+
+    # copy weight and any csv files, etc
+
+    # copy gaia files
