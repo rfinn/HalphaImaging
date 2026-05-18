@@ -80,6 +80,9 @@ Create:
 - reprojected weight image:
   - hybrid `*-r.weight.fits`
   
+```
+parallel --bar -j 4 --memfree 50G python ~/github/HalphaImaging/python3/reproject_int_r_to_old_ha.py {1} {2} {3} {4} {5} :::: reproject_jobs.txt
+```
   
 ### 3. Write reprojection jobs file
 

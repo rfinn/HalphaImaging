@@ -299,8 +299,8 @@ print(f"Wrote {OUT_JOBS}")
 
 print()
 print("Example:")
-print(
-    "parallel --colsep ' ' -j 6 "
-    "python reproject_int_r_to_old_ha.py {1} {2} {3} "
+print("parallel --bar -j 8 --memfree 80G python reproject_int_r_to_old_ha.py {1} {2} {3} {4} {5} :::: reproject_jobs.txt"
     f":::: {OUT_JOBS}"
 )
+
+
