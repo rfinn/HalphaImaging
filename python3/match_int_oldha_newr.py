@@ -261,8 +261,8 @@ for ha in ha_infos:
     #     "-r.weight.fits"
     # )
 
-    # out_r = OUT_DIR / out_r_name
-    # out_r_weight = OUT_DIR / out_r_weight_name
+    out_r = OUT_DIR / out_r_name
+    out_r_weight = OUT_DIR / out_r_weight_name
     
 
 
@@ -282,7 +282,7 @@ for ha in ha_infos:
         "old_ha": str(ha_file),
         "new_r": str(rfile),
         "new_r_weight": str(rweight),
-        "out_r": str(out_r_name),
+        "out_r": str(out_r),
         "out_r_weight": str(out_r_weight),
     })
 
