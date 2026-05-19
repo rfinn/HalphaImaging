@@ -120,10 +120,20 @@ conda deactivate
 ```
 
 
+On the first few passes, the output names for the low dec fields did not contain a leading 0, e.g the dec was `+2.123` instead of `+02.123`.
+
+
+```
+python ~/github/HalphaImaging/python3/rename_low_dec_reprojected_INT_rband.py
+```
+
 Make a pdf of the halpha and r-band coadds to check that nothing got corrupted:
 ```
 python ~/github/HalphaImaging/python3/make_int_hybrid_coadd_qc.py
 ```
+
+
+
 
 ## 3. Copy old INT Hα coadds, new BOK, HDI, and MOS coadds into new coadd directory
 so the hybrid dataset becomes self-contained.
@@ -140,7 +150,7 @@ python  ~/github/HalphaImaging/python3/build_hybrid_int_coadds.py
 ```
 NOTE: this also copies the gaia catalogs and panstarrs csv files.
 
-## 4. Make INT r had `HAIMAGE` in header and INT Halpha has `RIMAGE` in header
+## 4a. Make INT r had `HAIMAGE` in header and INT Halpha has `RIMAGE` in header
 
 Update:
 
@@ -154,9 +164,19 @@ python ~/github/HalphaImaging/python3/uat_add_haimage_to_rheader.py --filestring
 ```
 
 
+## 4b. Add psf header keywords to INT r-band coadd, if psf images already exist
+
+
+
 ## 5. Rebuild INT r-band PSF images
 
-### Approach
+### If the psf images already exist, you can copy the psf info from the psf images:
+
+```
+python ~/github/hapy/scripts/copy_psf_header_fields.py --newdir /data-pool/Halpha/coadds-v20260518/ --psfdir /data-pool/Halpha/psf-images-v20260518/ --pattern "*INT*r.fits"
+```
+
+### Strategy for assembling new set of psf images
 
 create `/data-pool/psf-images-v20260518/`
 
@@ -249,7 +269,16 @@ parallel --bar -j 16 --joblog buildpsf_non_int_hybrid.joblog --results buildpsf_
 | BOK  |0    | 66 | 66  |
 | HDI  | 19 | 12 | 31|
 | MOS | 7 |  0 | 7 |
-| INT | 0 | 112 | 113 + 10 | 
+| INT | 0 | 118 | 110 + 8 | 
 
-Total : r 66 + 31 + 12+7 +123 = 227
-Total : halpha : = 216
+Total : r 66 + 31 + 12+7 +123 = 222
+
+Total : halpha : = 222
+
+Phew!
+
+
+# Move on to running-pipeline.md
+
+hapy/docs/running-pipeline.md
+
