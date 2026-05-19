@@ -9,17 +9,22 @@ PSF_DIR = Path("/data-pool/Halpha/psf-images-v20260518")
 DRY_RUN = True   # set False after checking output
 
 
+# def fixed_name(name):
+#     return re.sub(
+#         r"(VF-\d{3}\.\d{3})([+-])(\d\.\d{3})(-INT-)",
+#         r"\1\20\3\4",
+#         name,
+#     )
+
 def fixed_name(name):
     return re.sub(
         r"(VF-\d{3}\.\d{3})([+-])(\d\.\d{3})(-INT-)",
-        r"\1\20\3\4",
+        r"\g<1>\g<2>0\g<3>\g<4>",
         name,
     )
-
-
 def rename_bad_dec_files(directory):
     for p in sorted(directory.glob("*INT*r.fits")):
-        print(p)
+        print("p = ",p)
         newname = fixed_name(p.name)
         print(p.name,newname)
         if newname == p.name:
