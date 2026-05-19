@@ -238,8 +238,8 @@ for ha in ha_infos:
     rweight = rfile.with_name(rfile.name.replace("-r.fits", "-r.weight.fits"))
 
     out_r_name = (
-        f"VF-{ha['ra']:.3f}"
-        f"{ha['dec']:+.3f}-"
+        f"VF-{ha['ra']:07.3f}"
+        f"{ha['dec']:+07.3f}-"
         f"{ha['tel']}-"
         f"{ha['date']}-"
         f"{ha['pointing']}-r.fits"
