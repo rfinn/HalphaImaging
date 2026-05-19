@@ -50,6 +50,9 @@ def rename_bad_dec_files(directory):
 print("COADDS")
 rename_bad_dec_files(COADD_DIR)
 
+print("GAIA CATALOGS")
+rename_bad_dec_files(COADD_DIR / "gaia_catalogs")
+
 print("\nPSFS")
 rename_bad_dec_files(PSF_DIR)
 
