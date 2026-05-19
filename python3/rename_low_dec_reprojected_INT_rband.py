@@ -6,7 +6,7 @@ import re
 COADD_DIR = Path("/data-pool/Halpha/coadds-v20260518")
 PSF_DIR = Path("/data-pool/Halpha/psf-images-v20260518")
 
-DRY_RUN = True   # set False after checking output
+DRY_RUN = False   # set False after checking output
 
 
 # def fixed_name(name):
