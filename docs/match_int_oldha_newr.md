@@ -68,6 +68,19 @@ Wrote reproject_jobs.txt
 
 ```
 
+### Check that all INT images have a pair
+
+Halpha without a matching r:
+```
+for h in *INT*-Halpha.fits *INT*-Ha6657.fits; do [[ -e "$h" ]] || continue; r="${h/-Halpha.fits/-r.fits}"; r="${r/-Ha6657.fits/-r.fits}"; [[ ! -e "$r" ]] && echo "$h -> missing $r"; done
+```
+
+r without a matching Halpha:
+```
+for r in *INT*-r.fits; do [[ -e "$r" ]] || continue; h1="${r/-r.fits/-Halpha.fits}"; h2="${r/-r.fits/-Ha6657.fits}"; [[ ! -e "$h1" && ! -e "$h2" ]] && echo "$r -> no Halpha/Ha6657"; done
+```
+
+
 ## 2. Reproject new INT r-band images and weights images onto prior INT Hα coadds
 For each hybrid INT field:
 
@@ -92,13 +105,26 @@ go into `virgo` conda environment to have access to swarp:
 conda activate virgo
 ```
 
+run one:
 ```
-parallel --bar -j 16 --joblog swarp_int_hybrid.joblog --results swarp_int_hybrid_logs --colsep ' ' python ~/github/HalphaImaging/python3/swarp_int_r_to_old_ha.py {1} {2} {3} {4} {5} --overwrite :::: reproject_jobs.txt
+python ~/github/HalphaImaging/python3/swarp_int_r_to_old_ha.py  --overwrite /data-pool/Halpha/coadds-v20260330/VF-139.119+41.961-INT-20190205-p026-r.fits /data-pool/Halpha/coadds-v20260330/VF-139.119+41.961-INT-20190205-p026-r.weight.fits /data-pool/Halpha/coadds-pre2025-hapy/VF-139.115+41.958-INT-20190205-p026-Halpha.fits /data-pool/Halpha/coadds-v20260518/VF-139.115+41.958-INT-20190205-p026-r.fits /data-pool/Halpha/coadds-v20260518/VF-139.115+41.958-INT-20190205-p026-r.weight.fits
+```
+
+```
+export OMP_NUM_THREADS=1
+parallel --bar -j 1 --joblog swarp_int_hybrid.joblog --results swarp_int_hybrid_logs --colsep ' ' python ~/github/HalphaImaging/python3/swarp_int_r_to_old_ha.py {1} {2} {3} {4} {5} --overwrite :::: reproject_jobs.txt
 ```
   
 ```
 conda deactivate
 ```
+
+
+Make a pdf of the halpha and r-band coadds to check that nothing got corrupted:
+```
+python ~/github/HalphaImaging/python3/make_int_hybrid_coadd_qc.py
+```
+
 ## 3. Copy old INT Hα coadds, new BOK, HDI, and MOS coadds into new coadd directory
 so the hybrid dataset becomes self-contained.
 

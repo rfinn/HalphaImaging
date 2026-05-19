@@ -39,6 +39,8 @@ import re
 import numpy as np
 from datetime import datetime
 
+def vf_coord_string(ra, dec):
+    return f"VF-{float(ra):07.3f}{float(dec):+07.3f}"
 
 def parse_filename(path):
     """
@@ -243,13 +245,24 @@ for ha in ha_infos:
         f"{ha['pointing']}-r.fits"
     )
 
-    out_r_weight_name = out_r_name.replace(
-        "-r.fits",
-        "-r.weight.fits"
+    vfroot = vf_coord_string(ha["ra"], ha["dec"])
+
+    out_r_name = (
+        f"{vfroot}-"
+        f"{ha['tel']}-"
+        f"{ha['date']}-"
+        f"{ha['pointing']}-r.fits"
     )
 
-    out_r = OUT_DIR / out_r_name
-    out_r_weight = OUT_DIR / out_r_weight_name
+    out_r_weight_name = out_r_name.replace("-r.fits", "-r.weight.fits")
+
+    # out_r_weight_name = out_r_name.replace(
+    #     "-r.fits",
+    #     "-r.weight.fits"
+    # )
+
+    # out_r = OUT_DIR / out_r_name
+    # out_r_weight = OUT_DIR / out_r_weight_name
     
 
 
