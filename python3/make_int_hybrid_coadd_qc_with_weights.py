@@ -58,7 +58,46 @@ def finite_minmax(data):
     if not np.any(good):
         return None
     return np.nanmin(d[good]), np.nanmax(d[good])
+def collect_weight_values(image_files):
+    values = []
+    for imfile in image_files:
+        wfile = get_weight_for_image(imfile)
+        if wfile is None:
+            continue
+        try:
+            wdata = read_downsample(wfile)
+            good = np.isfinite(wdata)
+            if np.any(good):
+                values.append(wdata[good].ravel())
+        except Exception:
+            pass
+    return values
 
+
+def make_weight_norm(values, label):
+    if not values:
+        print(f"WARNING: no {label} weight images found")
+        return None
+
+    allw = np.concatenate(values)
+
+    # ignore exact zeros for stretch if nonzero pixels exist
+    nonzero = allw[np.isfinite(allw) & (allw != 0)]
+    if len(nonzero) > 0:
+        use = nonzero
+    else:
+        use = allw[np.isfinite(allw)]
+
+    wmin = np.nanpercentile(use, 1)
+    wmax = np.nanpercentile(use, 99)
+
+    if not np.isfinite(wmin) or not np.isfinite(wmax) or wmin == wmax:
+        wmin = np.nanmin(use)
+        wmax = np.nanmax(use)
+
+    print(f"{label} weight stretch: vmin={wmin:.4g}, vmax={wmax:.4g}")
+
+    return ImageNormalize(vmin=wmin, vmax=wmax, stretch=LinearStretch())
 
 ha_files = sorted(
     list(COADD_DIR.glob("*INT*-Halpha.fits")) +
@@ -97,7 +136,18 @@ if weight_values:
         wmin = np.nanmin(allw)
         wmax = np.nanmax(allw)
 
-    weight_norm = ImageNormalize(vmin=wmin, vmax=wmax, stretch=LinearStretch())
+    #weight_norm = ImageNormalize(vmin=wmin, vmax=wmax, stretch=LinearStretch())
+
+    ha_weight_norm = make_weight_norm(
+        collect_weight_values([h for h, r in pairs]),
+        "Ha",
+        )
+
+    r_weight_norm = make_weight_norm(
+        collect_weight_values([r for h, r in pairs]),
+        "r",
+        )
+
     print(f"Global weight stretch: vmin={wmin:.4g}, vmax={wmax:.4g}")
 else:
     weight_norm = None
@@ -142,13 +192,13 @@ with PdfPages(OUTPDF) as pdf:
                 show_image(ax_ha, hdata, f"Ha\n{root}")
                 show_image(ax_r, rdata, "r")
 
-                if hweight is not None and weight_norm is not None:
+                if hweight is not None and ha_weight_norm is not None:
                     hwdata = read_downsample(hweight)
                     show_weight(ax_hw, hwdata, "Ha weight", weight_norm)
                 else:
                     ax_hw.text(0.5, 0.5, "No Ha weight", ha="center", va="center", fontsize=6)
 
-                if rweight is not None and weight_norm is not None:
+                if rweight is not None and r_weight_norm is not None:
                     rwdata = read_downsample(rweight)
                     show_weight(ax_rw, rwdata, "r weight", weight_norm)
                 else:

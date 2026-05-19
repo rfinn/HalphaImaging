@@ -132,6 +132,7 @@ Make a pdf of the halpha and r-band coadds to check that nothing got corrupted:
 python ~/github/HalphaImaging/python3/make_int_hybrid_coadd_qc.py
 ```
 
+### Fix up the swarp header
 
 
 
