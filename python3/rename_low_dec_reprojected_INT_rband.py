@@ -8,7 +8,7 @@ PSF_DIR = Path("/data-pool/Halpha/psf-images-v20260518")
 
 DRY_RUN = False   # set False after checking output
 
-
+overwrite = True
 # def fixed_name(name):
 #     return re.sub(
 #         r"(VF-\d{3}\.\d{3})([+-])(\d\.\d{3})(-INT-)",
@@ -37,7 +37,7 @@ def rename_bad_dec_files(directory):
         #print(p.name,newname)        
         newpath = p.with_name(newname)
 
-        if newpath.exists():
+        if newpath.exists() and not overwrite:
             print(f"SKIP exists: {newpath}")
             continue
 
