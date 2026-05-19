@@ -93,7 +93,7 @@ conda activate virgo
 ```
 
 ```
-parallel --bar -j 8 --joblog swarp_int_hybrid.joblog --results swarp_int_hybrid_logs --colsep ' ' python ~/github/HalphaImaging/python3/swarp_int_r_to_old_ha.py {1} {2} {3} {4} {5} :::: reproject_jobs.txt
+parallel --bar -j 16 --joblog swarp_int_hybrid.joblog --results swarp_int_hybrid_logs --colsep ' ' python ~/github/HalphaImaging/python3/swarp_int_r_to_old_ha.py {1} {2} {3} {4} {5} :::: reproject_jobs.txt
 ```
   
 ```
@@ -224,3 +224,6 @@ parallel --bar -j 16 --joblog buildpsf_non_int_hybrid.joblog --results buildpsf_
 | HDI  | 19 | 12 | 31|
 | MOS | 7 |  0 | 7 |
 | INT | 0 | 112 | 113 + 10 | 
+
+Total : r 66 + 31 + 12+7 +123 = 227
+Total : halpha : = 216
