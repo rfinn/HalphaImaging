@@ -18,7 +18,7 @@ def fixed_name(name):
 
 
 def rename_bad_dec_files(directory):
-    for p in sorted(directory.glob("*INT*")):
+    for p in sorted(directory.glob("*INT*r.fits")):
         newname = fixed_name(p.name)
 
         if newname == p.name:
