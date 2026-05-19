@@ -46,6 +46,28 @@ Script:
 python ~/github/HalphaImaging/python3/match_int_oldha_newr.py 
 ```
 
+Output:
+```
+(hapy) rfinn@draco:/data-pool/Halpha/coadds-v20260518$ python ~/github/HalphaImaging/python3/match_int_oldha_newr.py 
+number of files in old_ha = 119
+Excluding 3 Halpha images by explicit exclude list
+number of old_ha files = 119
+number parsed into ha_infos = 119
+number failed parse = 0
+CHECK: VFID1168 20220501 20220501 sep=0.054 deg VF-179.400+53.345-INT-20220501-VFID1168-Halpha.fits VF-179.321+53.372-INT-20220501-VFID1168-r.fits
+CHECK: VFID1304 20220501 20220501 sep=0.110 deg VF-181.400+50.500-INT-20220501-VFID1304-Halpha.fits VF-181.237+50.538-INT-20220501-VFID1304-r.fits
+CHECK: VFID3025 20220502 20220505 sep=0.141 deg VF-187.100+28.700-INT-20220502-VFID3025-Halpha.fits VF-186.957+28.764-INT-20220505-VFID3025-r.fits
+CHECK: VFID6397 20220502 20220502 sep=0.140 deg VF-215.900+1.700-INT-20220502-VFID6397-Halpha.fits VF-215.763+01.729-INT-20220502-VFID6397-r.fits
+CHECK: VFID6183 20220505 20220505 sep=0.079 deg VF-224.518+02.955-INT-20220505-VFID6183-Halpha.fits VF-224.593+02.979-INT-20220505-VFID6183-r.fits
+CHECK: VFID4086 20220504 20220504 sep=0.100 deg VF-233.701+16.331-INT-20220504-VFID4086-Halpha.fits VF-233.609+16.377-INT-20220504-VFID4086-r.fits
+CHECK: VFID4037 20220502 20220502 sep=0.106 deg VF-234.076+16.541-INT-20220502-VFID4037-Halpha.fits VF-233.977+16.588-INT-20220502-VFID4037-r.fits
+
+Matched 119 INT Ha/r pairs
+Wrote int_hybrid_matches.csv
+Wrote reproject_jobs.txt
+
+```
+
 ## 2. Reproject new INT r-band images and weights images onto prior INT Hα coadds
 For each hybrid INT field:
 
@@ -63,10 +85,20 @@ Create:
 - reprojected weight image:
   - hybrid `*-r.weight.fits`
   
+  
+go into `virgo` conda environment to have access to swarp:
+
+```
+conda activate virgo
+```
+
 ```
 parallel --bar -j 8 --joblog swarp_int_hybrid.joblog --results swarp_int_hybrid_logs --colsep ' ' python ~/github/HalphaImaging/python3/swarp_int_r_to_old_ha.py {1} {2} {3} {4} {5} :::: reproject_jobs.txt
 ```
   
+```
+conda deactivate
+```
 ## 3. Copy old INT Hα coadds, new BOK, HDI, and MOS coadds into new coadd directory
 so the hybrid dataset becomes self-contained.
 
@@ -95,7 +127,7 @@ HAIMAGE
 python ~/github/HalphaImaging/python3/uat_add_haimage_to_rheader.py --filestring VF --filestring2 INT --vfs
 ```
 
-ls 
+
 ## 5. Rebuild INT r-band PSF images
 
 ### Approach
@@ -182,3 +214,13 @@ and for all coadds while I'm at it...
 parallel --bar -j 16 --joblog buildpsf_non_int_hybrid.joblog --results buildpsf_non_int_hybrid_logs python -m hapy.imagetools.buildpsf --image {} --int --overwrite :::: non_int_hybrid_images.txt
 ```
 
+
+
+# Number of coadds
+
+|Instrument | N(R) |N(r) | N(Halpha) |
+|---|---|---|
+| BOK  |0    | 66 | 66  |
+| HDI  | 19 | 12 | 31|
+| MOS | 7 |  0 | 7 |
+| INT | 0 | 112 | 113 + 10 | 
