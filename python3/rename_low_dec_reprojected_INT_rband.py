@@ -6,7 +6,7 @@ import re
 COADD_DIR = Path("/data-pool/Halpha/coadds-v20260518")
 PSF_DIR = Path("/data-pool/Halpha/psf-images-v20260518")
 
-DRY_RUN = False   # set False after checking output
+DRY_RUN = True   # set False after checking output
 
 
 # def fixed_name(name):
@@ -23,7 +23,11 @@ def fixed_name(name):
         name,
     )
 def rename_bad_dec_files(directory):
-    for p in sorted(directory.glob("*INT*r.fits")):
+    #t1 = glob("*INT*r.fits")
+    #t2 = glob("*INT*r-psf.fits")
+    #t3 = glob("*INT*.png")
+    
+    for p in sorted(directory.glob("*INT*")):
 
         newname = fixed_name(p.name)
 
