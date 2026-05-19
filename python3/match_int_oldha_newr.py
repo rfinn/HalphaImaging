@@ -237,13 +237,13 @@ for ha in ha_infos:
 
     rweight = rfile.with_name(rfile.name.replace("-r.fits", "-r.weight.fits"))
 
-    out_r_name = (
-        f"VF-{ha['ra']:07.3f}"
-        f"{ha['dec']:+07.3f}-"
-        f"{ha['tel']}-"
-        f"{ha['date']}-"
-        f"{ha['pointing']}-r.fits"
-    )
+    # out_r_name = (
+    #     f"VF-{ha['ra']:07.3f}"
+    #     f"{ha['dec']:+07.3f}-"
+    #     f"{ha['tel']}-"
+    #     f"{ha['date']}-"
+    #     f"{ha['pointing']}-r.fits"
+    # )
 
     vfroot = vf_coord_string(ha["ra"], ha["dec"])
 
@@ -282,7 +282,7 @@ for ha in ha_infos:
         "old_ha": str(ha_file),
         "new_r": str(rfile),
         "new_r_weight": str(rweight),
-        "out_r": str(out_r),
+        "out_r": str(out_r_name),
         "out_r_weight": str(out_r_weight),
     })
 
