@@ -116,7 +116,7 @@ def repair_swarp_header(out_r, source_r, ref_ha, out_weight=None):
                 hdr["REPROJ"] = (True, "Weight map reprojected to Halpha grid")
                 hw.flush()
 
-def get_ref_params_old(reffile):
+def get_ref_params(reffile):
     data, hdr = fits.getdata(reffile, header=True)
     w = WCS(hdr)
 
@@ -134,7 +134,7 @@ def get_ref_params_old(reffile):
     pixscale = float(abs(pscale[0]) * 3600.0)
 
     return float(ra), float(dec), int(nx), int(ny), pixscale
-def get_ref_params(reffile):
+def get_ref_params_v2(reffile):
     data, hdr = fits.getdata(reffile, header=True)
     w = WCS(hdr)
 
