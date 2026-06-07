@@ -116,7 +116,7 @@ def repair_swarp_header(out_r, source_r, ref_ha, out_weight=None):
                 hdr["REPROJ"] = (True, "Weight map reprojected to Halpha grid")
                 hw.flush()
 
-def get_ref_params(reffile):
+def get_ref_params_old(reffile):
     data, hdr = fits.getdata(reffile, header=True)
     w = WCS(hdr)
 
@@ -134,7 +134,22 @@ def get_ref_params(reffile):
     pixscale = float(abs(pscale[0]) * 3600.0)
 
     return float(ra), float(dec), int(nx), int(ny), pixscale
+def get_ref_params(reffile):
+    data, hdr = fits.getdata(reffile, header=True)
+    w = WCS(hdr)
 
+    ny, nx = data.shape
+
+    # Use the reference image WCS reference coordinate, not the
+    # sky coordinate of the array midpoint.
+    ra = float(hdr.get("CRVAL1", w.wcs.crval[0]))
+    dec = float(hdr.get("CRVAL2", w.wcs.crval[1]))
+
+    # pixel scale in arcsec/pixel
+    pscale = proj_plane_pixel_scales(w)  # deg/pix
+    pixscale = float(abs(pscale[0]) * 3600.0)
+
+    return ra, dec, int(nx), int(ny), pixscale
 def swarp_resample(infile, reffile, outname, weightfile=None, outweight=None, overwrite=False):
     infile = Path(infile)
     reffile = Path(reffile)

@@ -106,6 +106,17 @@ conda activate virgo
 ```
 
 run one:
+
+```bash
+python ~/github/HalphaImaging/python3/swarp_int_r_to_old_ha.py \
+--overwrite \
+/data-pool/Halpha/coadds-v20260330/VF-177.143+56.083-INT-20220502-VFID0957-r.fits\
+/data-pool/Halpha/coadds-v20260330/VF-177.143+56.083-INT-20220502-VFID0957-r.weight.fits\
+/data-pool/Halpha/coadds-pre2025-hapy/VF-177.200+56.055-INT-20220502-VFID0957-Halpha.fits\
+/data-pool/Halpha/INT-test-hybrid-alignment/VF-177.200+56.055-INT-20220502-VFID0957-r.fits\
+/data-pool/Halpha/INT-test-hybrid-alignment/VF-177.200+56.055-INT-20220502-VFID0957-r.weight.fits
+```
+
 ```
 python ~/github/HalphaImaging/python3/swarp_int_r_to_old_ha.py  --overwrite /data-pool/Halpha/coadds-v20260330/VF-139.119+41.961-INT-20190205-p026-r.fits /data-pool/Halpha/coadds-v20260330/VF-139.119+41.961-INT-20190205-p026-r.weight.fits /data-pool/Halpha/coadds-pre2025-hapy/VF-139.115+41.958-INT-20190205-p026-Halpha.fits /data-pool/Halpha/coadds-v20260518/VF-139.115+41.958-INT-20190205-p026-r.fits /data-pool/Halpha/coadds-v20260518/VF-139.115+41.958-INT-20190205-p026-r.weight.fits
 ```
