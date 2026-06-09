@@ -50,7 +50,7 @@ python ~/github/HalphaImaging/python3/match_int_oldha_newr.py
 
 Output:
 ```
-(hapy) rfinn@draco:/data-pool/Halpha/coadds-v20260518$ python ~/github/HalphaImaging/python3/match_int_oldha_newr.py 
+(hapy) rfinn@draco:/data-pool/Halpha/coadds-v20260609$ python ~/github/HalphaImaging/python3/match_int_oldha_newr.py
 number of files in old_ha = 119
 Excluding 3 Halpha images by explicit exclude list
 number of old_ha files = 119
@@ -135,17 +135,30 @@ conda deactivate
 ```
 
 
-On the first few passes, the output names for the low dec fields did not contain a leading 0, e.g the dec was `+2.123` instead of `+02.123`.
-
-
-```
-python ~/github/HalphaImaging/python3/rename_low_dec_reprojected_INT_rband.py
-```
-
+### Check images
 Make a pdf of the halpha and r-band coadds to check that nothing got corrupted:
 ```
 python ~/github/HalphaImaging/python3/make_int_hybrid_coadd_qc.py
 ```
+
+Output:
+```
+(virgo) rfinn@draco:/data-pool/Halpha/coadds-v20260609$ python ~/github/HalphaImaging/python3/make_int_hybrid_coadd_qc.py
+Found 118 INT Halpha/r pairs
+```
+why only 118 instead of 119 pairs?
+
+This runs in serial, so this is a good time to refresh your
+beverage...
+
+
+### [OUTDATED - SKIP THIS] 
+
+On the first few passes, the output names for the low dec fields did not contain a leading 0, e.g the dec was `+2.123` instead of `+02.123`.
+```
+python ~/github/HalphaImaging/python3/rename_low_dec_reprojected_INT_rband.py
+```
+
 
 
 
