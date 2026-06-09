@@ -69,7 +69,7 @@ if missing_r:
 pairs_per_page = 20
 nrows = 10
 ncols = 4   # Ha, r, Ha, r
-
+page = 1 
 with PdfPages(OUTPDF) as pdf:
     for start in range(0, len(pairs), pairs_per_page):
         subset = pairs[start:start + pairs_per_page]
@@ -109,6 +109,9 @@ with PdfPages(OUTPDF) as pdf:
             f"INT hybrid coadd QC: pairs {start+1}-{start+len(subset)}",
             fontsize=14,
         )
+        if (start % nrows*ncols//2) == 0:
+            print(f"done with page {page}")
+            page += 1
         pdf.savefig(fig)
         plt.close(fig)
 
