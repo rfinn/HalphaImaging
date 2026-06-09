@@ -30,7 +30,10 @@ import shutil
 
 OLD_DIR = Path("/data-pool/Halpha/coadds-pre2025-hapy/")
 NEW_DIR = Path("/data-pool/Halpha/coadds-v20260330/")
-OUT_DIR = Path("/data-pool/Halpha/coadds-v20260518/")
+#OUT_DIR = Path("/data-pool/Halpha/coadds-v20260518/")
+
+# redoing after I realized that both halpha and r-band coadds need to be swarped
+OUT_DIR = Path("/data-pool/Halpha/coadds-v20260609/")
 
 OUT_CSV = "int_hybrid_matches.csv"
 OUT_JOBS = "reproject_jobs.txt"
@@ -232,20 +235,29 @@ for ha in ha_infos:
     sep = angular_sep_deg(ha["ra"], ha["dec"], r["ra"], r["dec"])
     dt_days = abs((r["date_dt"] - ha["date_dt"]).days)
 
+
     rfile = Path(r["path"])
     ha_file = Path(ha["path"])
 
     rweight = rfile.with_name(rfile.name.replace("-r.fits", "-r.weight.fits"))
-
-    # out_r_name = (
-    #     f"VF-{ha['ra']:07.3f}"
-    #     f"{ha['dec']:+07.3f}-"
-    #     f"{ha['tel']}-"
-    #     f"{ha['date']}-"
-    #     f"{ha['pointing']}-r.fits"
-    # )
+    ha_weight = ha_file.with_name(ha_file.name.replace(".fits", ".weight.fits"))
 
     vfroot = vf_coord_string(ha["ra"], ha["dec"])
+
+    # Preserve Halpha vs Ha6657 suffix
+    if ha_file.name.endswith("-Halpha.fits"):
+        ha_suffix = "Halpha"
+    elif ha_file.name.endswith("-Ha6657.fits"):
+        ha_suffix = "Ha6657"
+    else:
+        ha_suffix = "Ha"
+
+    out_ha_name = (
+        f"{vfroot}-"
+        f"{ha['tel']}-"
+        f"{ha['date']}-"
+        f"{ha['pointing']}-{ha_suffix}.fits"
+    )
 
     out_r_name = (
         f"{vfroot}-"
@@ -254,17 +266,14 @@ for ha in ha_infos:
         f"{ha['pointing']}-r.fits"
     )
 
+    out_ha_weight_name = out_ha_name.replace(".fits", ".weight.fits")
     out_r_weight_name = out_r_name.replace("-r.fits", "-r.weight.fits")
 
-    # out_r_weight_name = out_r_name.replace(
-    #     "-r.fits",
-    #     "-r.weight.fits"
-    # )
+    out_ha = OUT_DIR / out_ha_name
+    out_ha_weight = OUT_DIR / out_ha_weight_name
 
     out_r = OUT_DIR / out_r_name
     out_r_weight = OUT_DIR / out_r_weight_name
-    
-
 
     rows.append({
         "tel": ha["tel"],
@@ -280,11 +289,15 @@ for ha in ha_infos:
         "ha_filter": ha["filter"],
         "r_filter": r["filter"],
         "old_ha": str(ha_file),
+        "old_ha_weight": str(ha_weight),
         "new_r": str(rfile),
         "new_r_weight": str(rweight),
+        "out_ha": str(out_ha),
+        "out_ha_weight": str(out_ha_weight),
         "out_r": str(out_r),
         "out_r_weight": str(out_r_weight),
     })
+
 
 for row in rows:
     if row["sep_deg"] > 0.05 or row["date_diff_days"] > 2:
@@ -312,9 +325,19 @@ print(f"Wrote {OUT_CSV}")
 # ------------------------------------------------------------
 # write GNU parallel jobs file
 # ------------------------------------------------------------
-
 with open(OUT_JOBS, "w") as outfile:
     for _, row in df.iterrows():
+
+        # First: resample old Halpha through SWarp onto the chosen reference grid.
+        outfile.write(
+            f"{row['old_ha']} "
+            f"{row['old_ha_weight']} "
+            f"{row['old_ha']} "
+            f"{row['out_ha']} "
+            f"{row['out_ha_weight']}\n"
+        )
+
+        # Second: resample matched r-band onto the same old-Halpha reference grid.
         outfile.write(
             f"{row['new_r']} "
             f"{row['new_r_weight']} "
@@ -322,8 +345,6 @@ with open(OUT_JOBS, "w") as outfile:
             f"{row['out_r']} "
             f"{row['out_r_weight']}\n"
         )
-        
 
 
 print(f"Wrote {OUT_JOBS}")
-

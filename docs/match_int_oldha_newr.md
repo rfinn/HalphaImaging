@@ -108,8 +108,7 @@ conda activate virgo
 run one:
 
 ```bash
-python ~/github/HalphaImaging/python3/swarp_int_r_to_old_ha.py
---overwrite /data-pool/Halpha/coadds-pre2025-hapy/VF-177.200+56.055-INT-20220502-VFID0957-Halpha.fits /data-pool/Halpha/coadds-pre2025-hapy/VF-177.200+56.055-INT-20220502-VFID0957-Halpha.weight.fits /data-pool/Halpha/coadds-pre2025-hapy/VF-177.200+56.055-INT-20220502-VFID0957-Halpha.fits /data-pool/Halpha/INT-test-hybrid-alignment/VF-177.200+56.055-INT-20220502-VFID0957-Halpha.fits /data-pool/Halpha/INT-test-hybrid-alignment/VF-177.200+56.055-INT-20220502-VFID0957-Halpha.weight.fits
+python ~/github/HalphaImaging/python3/swarp_int_r_to_old_ha.py --overwrite /data-pool/Halpha/coadds-pre2025-hapy/VF-177.200+56.055-INT-20220502-VFID0957-Halpha.fits /data-pool/Halpha/coadds-pre2025-hapy/VF-177.200+56.055-INT-20220502-VFID0957-Halpha.weight.fits /data-pool/Halpha/coadds-pre2025-hapy/VF-177.200+56.055-INT-20220502-VFID0957-Halpha.fits /data-pool/Halpha/INT-test-hybrid-alignment/VF-177.200+56.055-INT-20220502-VFID0957-Halpha.fits /data-pool/Halpha/INT-test-hybrid-alignment/VF-177.200+56.055-INT-20220502-VFID0957-Halpha.weight.fits
 ```
 
 ```bash
