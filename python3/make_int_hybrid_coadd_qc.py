@@ -7,7 +7,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 from astropy.io import fits
 from astropy.visualization import simple_norm
 
-COADD_DIR = Path("/data-pool/Halpha/coadds-v20260518")
+COADD_DIR = Path("/data-pool/Halpha/coadds-v20260609")
 OUTPDF = "int_halpha_r_coadd_qc.pdf"
 
 
