@@ -211,11 +211,11 @@ def swarp_resample(infile, reffile, outname, weightfile=None, outweight=None, ov
         if tmp_weight.exists():
             tmp_weight.replace(outweight)
 
-    # repair headers after SWarp output exists
+    # adds header info after SWarp output exists
     repair_swarp_header(
-        out_r=outname,
-        source_r=infile,
-        ref_ha=reffile,
+        out_image=outname,
+        source_image=infile,
+        ref_image=reffile,
         out_weight=outweight,
         )
 
