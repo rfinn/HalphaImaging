@@ -312,7 +312,7 @@ if args.swarp:
         #    commandstring='swarp @' + args.l + ' -c '+defaultswarp+' -IMAGEOUT_NAME ' + args.l + outimage+' -WEIGHTOUT_NAME ' + args.l + weightimage +' -PIXELSCALE_TYPE MANUAL -PIXEL_SCALE '+str(pixel_scale)
         if args.noback:
             commandstring += ' -SUBTRACT_BACK N'
-        commandstring += '-COPY_KEYWORDS OBJECT,FILTER,INSTRMNT,TELESCOP,GAIN,EPOCH,DATE-OBS,MJD-OBS,AIRMASS,EXPTIME,PHOTZP,MAGZP,PAN_FZP,FLTRATIO,FILTER_RATIO,FSCALE,SKYMED,SKYSTD,BUNIT,GAIN,RDNOISE,RIMAGE,HAIMAGE,SEFWHM,FWHM'
+        commandstring += '-COPY_KEYWORDS OBJECT,FILTER,INSTRMNT,TELESCOP,GAIN,EPOCH,DATE-OBS,MJD-OBS,AIRMASS,EXPTIME,PHOTZP,MAGZP,PAN_FZP,FLTRATIO,FILTER_RATIO,FSCALE,SKYMED,SKYSTD,BUNIT,GAIN,RDNOISE,RIMAGE,HAIMAGE,SEFWHM,FWHM,HAIMAGE,RIMAGE'
         print('running the following command:')
         print(commandstring)
         os.system(commandstring)
