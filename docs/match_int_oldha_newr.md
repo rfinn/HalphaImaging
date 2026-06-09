@@ -182,7 +182,7 @@ python  ~/github/HalphaImaging/python3/build_hybrid_int_coadds.py
 ```
 NOTE: this also copies the gaia catalogs and panstarrs csv files.
 
-## 4a. Make INT r had `HAIMAGE` in header and INT Halpha has `RIMAGE` in header
+## 4. Make INT r had `HAIMAGE` in header and INT Halpha has `RIMAGE` in header
 
 Update:
 
@@ -195,12 +195,11 @@ HAIMAGE
 python ~/github/HalphaImaging/python3/uat_add_haimage_to_rheader.py --filestring VF --filestring2 INT --vfs
 ```
 
-
-## 4b. Add psf header keywords to INT r-band coadd, if psf images already exist
-
+## 5. Get filter ratio
 
 
-## 5. Rebuild INT r-band PSF images
+
+## 6. Rebuild INT r-band PSF images
 
 ### If the psf images already exist, you can copy the psf info from the psf images:
 
@@ -294,7 +293,7 @@ parallel --bar -j 16 --joblog buildpsf_non_int_hybrid.joblog --results buildpsf_
 
 
 
-# Number of coadds
+# 7. Check Number of coadds
 
 |Instrument | N(R) |N(r) | N(Halpha) |
 |---|---|---|
@@ -310,7 +309,7 @@ Total : halpha : = 222
 Phew!
 
 
-# Move on to running-pipeline.md
+# 8. Move on to running-pipeline.md
 
 hapy/docs/running-pipeline.md
 
