@@ -297,8 +297,8 @@ if args.swarp:
 
         #get pixel scale from the ref image rather than using something fixed for all images
         #it could be that the different halpha images will have different
-        pscale = wcs.utils.proj_plane_pixel_scales(refwcs) # in deg -> arcsec
-        pixel_scale = round(pscale[0]*3600,5) # in arcsec per pixel
+        #pscale = wcs.utils.proj_plane_pixel_scales(refwcs) # in deg -> arcsec
+        #pixel_scale = round(pscale[0]*3600,5) # in arcsec per pixel
         
         print(('output mosaic image size = ',mosaic_image_size))
         print(('center of mosaic = ',center))
