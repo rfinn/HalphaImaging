@@ -48,74 +48,68 @@ COORD_KEYS_FROM_REF = [
 ]
 
 
-def repair_swarp_header(out_r, source_r, ref_ha, out_weight=None):
+
+
+def repair_swarp_header(out_image, source_image, ref_image, out_weight=None):
     """
-    Repair SWarp output headers for hybrid INT r-band products.
+    Add hybrid-product provenance after SWarp.
 
-    out_r    : reprojected r image
-    source_r : original new r image before reprojection
-    ref_ha   : old Halpha image defining final WCS/grid
+    SWarp already copies science/calibration metadata through COPY_KEYWORDS.
+    This function only adds bookkeeping keywords.
     """
-    out_r = Path(out_r)
-    source_r = Path(source_r)
-    ref_ha = Path(ref_ha)
+    out_image = Path(out_image)
+    source_image = Path(source_image)
+    ref_image = Path(ref_image)
 
-    with fits.open(out_r, mode="update") as hout, \
-         fits.open(source_r) as hsrc, \
-         fits.open(ref_ha) as href:
+    with fits.open(out_image, mode="update") as hdul:
+        hdr = hdul[0].header
 
-        hdr = hout[0].header
-        src = hsrc[0].header
-        ref = href[0].header
+        hdr["SRCIMG"] = (source_image.name, "Source image before SWarp")
+        hdr["REFIMG"] = (ref_image.name, "Reference image/grid for SWarp")
+        hdr["HYBRID"] = (True, "Hybrid INT product")
+        hdr["REPROJ"] = (True, "Image resampled with SWarp")
 
-        # science/calibration metadata should follow source r image
-        for key in SCIENCE_KEYS_FROM_SOURCE:
-            if key in src:
-                hdr[key] = src[key]
+        if "-r.fits" in out_image.name:
+            hdr["RIMAGE"] = (out_image.name, "Hybrid reprojected r image")
+            hdr["HAIMAGE"] = (ref_image.name, "Reference Halpha image")
+            hdr["SRC_R"] = (source_image.name, "Source r image before reprojection")
+            hdr["REF_HA"] = (ref_image.name, "Reference Halpha image")
+            hdr["RREDUCT"] = ("v20260330", "r-band reduction version")
+            hdr["HARED"] = ("pre2025", "Halpha reduction version")
 
-        # center/object coordinate keywords should follow reference Halpha grid
-        for key in COORD_KEYS_FROM_REF:
-            if key in ref:
-                hdr[key] = ref[key]
+        elif "-Halpha.fits" in out_image.name or "-Ha6657.fits" in out_image.name:
+            hdr["HAIMAGE"] = (out_image.name, "Hybrid reprojected Halpha image")
+            hdr["SRC_HA"] = (source_image.name, "Source Halpha image before reprojection")
+            hdr["REF_HA"] = (ref_image.name, "Reference Halpha image")
+            hdr["HARED"] = ("pre2025", "Halpha reduction version")
 
-        # matched image bookkeeping
-        hdr["RIMAGE"] = (out_r.name, "Hybrid reprojected r image")
-        hdr["HAIMAGE"] = (ref_ha.name, "Matched old Halpha image")
-        hdr["SRC_R"] = (source_r.name, "Source r image before reprojection")
-        hdr["REF_HA"] = (ref_ha.name, "Reference Halpha image")
-        hdr["HYBRID"] = (True, "Hybrid INT old-Halpha/new-r product")
-        hdr["RREDUCT"] = ("v20260330", "r-band reduction version")
-        hdr["HARED"] = ("pre2025", "Halpha reduction version")
-        hdr["REPROJ"] = (True, "r image reprojected to Halpha grid")
-        hdr["REFTYPE"] = ("Halpha", "Reference grid for reprojection")
-
-        hout.flush()
+        hdul.flush()
 
     if out_weight is not None:
         out_weight = Path(out_weight)
+
         if out_weight.exists():
-            with fits.open(out_weight, mode="update") as hw, \
-                 fits.open(source_r) as hsrc, \
-                 fits.open(ref_ha) as href:
+            with fits.open(out_weight, mode="update") as hdul:
+                hdr = hdul[0].header
 
-                hdr = hw[0].header
-                src = hsrc[0].header
-                ref = href[0].header
-
-                for key in COORD_KEYS_FROM_REF:
-                    if key in ref:
-                        hdr[key] = ref[key]
-
-                hdr["FILTER"] = src.get("FILTER", "r")
                 hdr["BUNIT"] = ("weight", "Weight map")
-                hdr["RIMAGE"] = (out_r.name, "Associated reprojected r image")
-                hdr["HAIMAGE"] = (ref_ha.name, "Matched old Halpha image")
-                hdr["SRC_R"] = (source_r.name, "Source r image before reprojection")
-                hdr["REF_HA"] = (ref_ha.name, "Reference Halpha image")
-                hdr["HYBRID"] = (True, "Hybrid INT old-Halpha/new-r weight")
-                hdr["REPROJ"] = (True, "Weight map reprojected to Halpha grid")
-                hw.flush()
+                hdr["SRCIMG"] = (source_image.name, "Source image before SWarp")
+                hdr["REFIMG"] = (ref_image.name, "Reference image/grid for SWarp")
+                hdr["HYBRID"] = (True, "Hybrid INT weight product")
+                hdr["REPROJ"] = (True, "Weight map resampled with SWarp")
 
+                if "-r.weight.fits" in out_weight.name:
+                    hdr["RIMAGE"] = (out_image.name, "Associated reprojected r image")
+                    hdr["SRC_R"] = (source_image.name, "Source r image before reprojection")
+                    hdr["REF_HA"] = (ref_image.name, "Reference Halpha image")
+
+                elif "-Halpha.weight.fits" in out_weight.name or "-Ha6657.weight.fits" in out_weight.name:
+                    hdr["HAIMAGE"] = (out_image.name, "Associated reprojected Halpha image")
+                    hdr["SRC_HA"] = (source_image.name, "Source Halpha image before reprojection")
+                    hdr["REF_HA"] = (ref_image.name, "Reference Halpha image")
+
+                hdul.flush()
+                
 def get_ref_params(reffile):
     data, hdr = fits.getdata(reffile, header=True)
     w = WCS(hdr)
@@ -194,7 +188,7 @@ def swarp_resample(infile, reffile, outname, weightfile=None, outweight=None, ov
         "-WEIGHTOUT_NAME", str(outweight),
         "-SUBTRACT_BACK", "N",
         "-FSCALE_DEFAULT", "1.0",
-        "-COPY_KEYWORDS", "OBJECT,FILTER,INSTRMNT,TELESCOP,GAIN,EPOCH,DATE-OBS,MJD-OBS,AIRMASS,EXPTIME,PHOTZP,MAGZP,PAN_FZP,FLTRATIO,FILTER_RATIO,SKYMED,SKYSTD,BUNIT,RIMAGE,HAIMAGE",
+        "-COPY_KEYWORDS", "OBJECT,FILTER,INSTRMNT,TELESCOP,GAIN,EPOCH,DATE-OBS,MJD-OBS,AIRMASS,EXPTIME,PHOTZP,MAGZP,PAN_FZP,FLTRATIO,FILTER_RATIO,SKYMED,SKYSTD,BUNIT,RIMAGE,HAIMAGE,SEFWHM,FWHM",
         ]
 
     if weightfile is not None:
