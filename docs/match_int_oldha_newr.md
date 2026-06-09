@@ -144,9 +144,10 @@ python ~/github/HalphaImaging/python3/make_int_hybrid_coadd_qc.py
 Output:
 ```
 (virgo) rfinn@draco:/data-pool/Halpha/coadds-v20260609$ python ~/github/HalphaImaging/python3/make_int_hybrid_coadd_qc.py
-Found 118 INT Halpha/r pairs
+Found 119 halpha files
+Found 119 INT Halpha/r pairs
+
 ```
-why only 118 instead of 119 pairs?
 
 This runs in serial, so this is a good time to refresh your
 beverage...
@@ -165,9 +166,6 @@ On the first few passes, the output names for the low dec fields did not contain
 ```
 python ~/github/HalphaImaging/python3/rename_low_dec_reprojected_INT_rband.py
 ```
-
-
-
 
 ## 3. Copy new BOK, HDI, and MOS coadds into new coadd directory
 so the hybrid dataset becomes self-contained.
