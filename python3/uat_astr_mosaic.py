@@ -95,10 +95,10 @@ def get_ref_params(reffile):
     ra, dec = w.wcs_pix2world(xcen, ycen, 0)
 
     # pixel scale in arcsec/pixel
-    pscale = proj_plane_pixel_scales(w)  # deg/pix
-    pixscale = float(abs(pscale[0]) * 3600.0)
+    #pscale = proj_plane_pixel_scales(w)  # deg/pix
+    #pixscale = float(abs(pscale[0]) * 3600.0)
 
-    return float(ra), float(dec), int(nx), int(ny), pixscale
+    return float(ra), float(dec), int(nx), int(ny)
 
 def update_coadd_header(coadd, input_image_list):
     '''
@@ -278,7 +278,7 @@ if args.swarp:
         outimage = '.coadd.fits'
         weightimage = '.coadd.weight.fits'                
     if args.refimage:
-        ra, dec, nx,ny, _pixscale = get_ref_params(args.refimage)
+        ra, dec, nx,ny = get_ref_params(args.refimage)
 
         center = str(ra)+','+str(dec)        
         mosaic_image_size = str(nx)+','+str(ny)
