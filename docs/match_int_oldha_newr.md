@@ -233,6 +233,9 @@ awk 'NR>1 && $7 != 0' filterratio_INT.joblog
 ```
 
 ## 6. Rebuild INT r-band PSF images
+> [!NOTE]
+> skipping this the second time around - going to use the previous psf
+> images
 
 ### If the psf images already exist, you can copy the psf info from the psf images:
 
@@ -324,9 +327,44 @@ and for all coadds while I'm at it...
 parallel --bar -j 16 --joblog buildpsf_non_int_hybrid.joblog --results buildpsf_non_int_hybrid_logs python -m hapy.imagetools.buildpsf --image {} --int --overwrite :::: non_int_hybrid_images.txt
 ```
 
+# 8. Copy gaia catalogs
+
+For some reason, these didn't get copied when 
+
+```
+cp ../coadds-v20260518/gaia_catalogs/*INT*.fits gaia_catalogs/.
+```
+
+# 9. Create simple weights for INT images
+
+```
+mkdir ORIGINAL_INT_WEIGHTS
+```
+
+```
+mv *INT*weight.fits ORIGINAL_INT_WEIGHTS/.
+```
+with the exception of the 3 that already went into `BAD_WEIGHTS_ORIG`
 
 
-# 7. Check Number of coadds
+create a list of all INT coadds:
+```
+ls VF*INT*r.fits VF*INT*Halpha.fits VF*INT*Ha6657.fits > INT_all_coadds.txt
+```
+or
+
+```
+find . -maxdepth 1 -type f \( -name "VF*INT*r.fits" -o -name "VF*INT*Halpha.fits" -o -name "VF*INT*Ha6657.fits" \) | sort > INT_all_coadds.txt
+```
+
+```
+parallel --bar -j 16 python ~/github/hapy/scripts/make_simple_weight_from_coadd.py {} :::: INT_all_coadds.txt
+```
+
+```
+parallel --bar -j 16 --joblog make_simple_weight_INT.joblog --results make_simple_weight_logs python ~/github/hapy/scripts/make_simple_weight_from_coadd.py {} :::: INT_all_coadds.txt
+```
+# 10. Check Number of coadds
 
 |Instrument | N(R) |N(r) | N(Halpha) |
 |---|---|---|
@@ -342,7 +380,7 @@ Total : halpha : = 222
 Phew!
 
 
-# 8. Move on to running-pipeline.md
+# 11. Move on to running-pipeline.md
 
 [hapy/docs/running-pipeline.md](https://github.com/rfinn/hapy/blob/main/docs/running-pipeline.md)
 
