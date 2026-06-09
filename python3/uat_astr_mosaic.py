@@ -278,30 +278,30 @@ if args.swarp:
         outimage = '.coadd.fits'
         weightimage = '.coadd.weight.fits'                
     if args.refimage:
-        ra, dec, nx,ny = get_ref_params(args.refimage)
-
-        center = str(ra)+','+str(dec)        
-        mosaic_image_size = str(nx)+','+str(ny)
-
-        # data,header = fits.getdata(args.refimage,header=True)
-        # refwcs = WCS(header)
-        # image_size = data.shape
-
-        # #ra,dec = refwcs.wcs_pix2world(image_size[0]/2.,image_size[1]/2.,1)
-        # # why not use CRVAL1 and CRVAL2 from reference image???
-        # ra = header['CRVAL1']
-        # dec = header['CRVAL2']
+        # ra, dec, nx,ny = get_ref_params(args.refimage)
 
         # center = str(ra)+','+str(dec)        
-        # mosaic_image_size = str(image_size[1])+','+str(image_size[0])
+        # mosaic_image_size = str(nx)+','+str(ny)
 
-        # get pixel scale from the ref image rather than using something fixed for all images
-        # it could be that the different halpha images will have different
-        #pscale = wcs.utils.proj_plane_pixel_scales(refwcs) # in deg -> arcsec
-        #pixel_scale = round(pscale[0]*3600,5) # in arcsec per pixel
+        data,header = fits.getdata(args.refimage,header=True)
+        refwcs = WCS(header)
+        image_size = data.shape
+
+        #ra,dec = refwcs.wcs_pix2world(image_size[0]/2.,image_size[1]/2.,1)
+        # why not use CRVAL1 and CRVAL2 from reference image???
+        ra = header['CRVAL1']
+        dec = header['CRVAL2']
+
+        center = str(ra)+','+str(dec)        
+        mosaic_image_size = str(image_size[1])+','+str(image_size[0])
+
+        #get pixel scale from the ref image rather than using something fixed for all images
+        #it could be that the different halpha images will have different
+        pscale = wcs.utils.proj_plane_pixel_scales(refwcs) # in deg -> arcsec
+        pixel_scale = round(pscale[0]*3600,5) # in arcsec per pixel
         
-        #print(('output mosaic image size = ',mosaic_image_size))
-        #print(('center of mosaic = ',center))
+        print(('output mosaic image size = ',mosaic_image_size))
+        print(('center of mosaic = ',center))
     if not(args.l):
         print('No file list provided for swarp')
     else:
