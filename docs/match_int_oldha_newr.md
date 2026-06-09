@@ -197,7 +197,20 @@ python ~/github/HalphaImaging/python3/uat_add_haimage_to_rheader.py --filestring
 
 ## 5. Get filter ratio
 
+Create a list of the r-band INT images:
+```
+ls VF*INT*r.fits > INT_rband_files.txt
+```
 
+Then run `batch_filterratio.py` 
+```
+parallel --bar -j 20 \
+  --joblog filterratio_INT.joblog \
+  python ~/github/HalphaImaging/python3/batch_filterratio.py \
+  --plotdir plots-filterratio-INT \
+  --oneimage {} \
+  :::: INT_rband_files.txt
+```
 
 ## 6. Rebuild INT r-band PSF images
 
