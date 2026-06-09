@@ -80,6 +80,26 @@ nfiles = len(files)
 print(('number of files = ',nfiles))
 i = 1
 
+                
+def get_ref_params(reffile):
+    data, hdr = fits.getdata(reffile, header=True)
+    w = WCS(hdr)
+
+    ny, nx = data.shape
+
+    # center pixel in FITS/image coordinates
+    xcen = nx / 2.0
+    ycen = ny / 2.0
+
+    # origin=0 because these are numpy/python pixel coordinates
+    ra, dec = w.wcs_pix2world(xcen, ycen, 0)
+
+    # pixel scale in arcsec/pixel
+    pscale = proj_plane_pixel_scales(w)  # deg/pix
+    pixscale = float(abs(pscale[0]) * 3600.0)
+
+    return float(ra), float(dec), int(nx), int(ny), pixscale
+
 def update_coadd_header(coadd, input_image_list):
     '''
     GOAL:
@@ -258,20 +278,22 @@ if args.swarp:
         outimage = '.coadd.fits'
         weightimage = '.coadd.weight.fits'                
     if args.refimage:
-        data,header = fits.getdata(args.refimage,header=True)
-        refwcs = WCS(header)
-        image_size = data.shape
-
-        #ra,dec = refwcs.wcs_pix2world(image_size[0]/2.,image_size[1]/2.,1)
-        # why not use CRVAL1 and CRVAL2 from reference image???
-        ra = header['CRVAL1']
-        dec = header['CRVAL2']
+        ra, dec, nx,ny, _pixscale = get_ref_params(args.refimage)
 
         center = str(ra)+','+str(dec)        
+        mosaic_image_size = str(nx)+','+str(ny)
 
+        # data,header = fits.getdata(args.refimage,header=True)
+        # refwcs = WCS(header)
+        # image_size = data.shape
 
-        
-        mosaic_image_size = str(image_size[1])+','+str(image_size[0])
+        # #ra,dec = refwcs.wcs_pix2world(image_size[0]/2.,image_size[1]/2.,1)
+        # # why not use CRVAL1 and CRVAL2 from reference image???
+        # ra = header['CRVAL1']
+        # dec = header['CRVAL2']
+
+        # center = str(ra)+','+str(dec)        
+        # mosaic_image_size = str(image_size[1])+','+str(image_size[0])
 
         # get pixel scale from the ref image rather than using something fixed for all images
         # it could be that the different halpha images will have different
