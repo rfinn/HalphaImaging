@@ -5,6 +5,8 @@ import shutil
 
 OLD_DIR = Path("/data-pool/Halpha/coadds-pre2025-hapy/")
 NEW_DIR = Path("/data-pool/Halpha/coadds-v20260330/")
+#OUT_DIR = Path("/data-pool/Halpha/coadds-v20260518/")
+# after realizing that both the halpha and r-band INT coadds need to be reprojected
 OUT_DIR = Path("/data-pool/Halpha/coadds-v20260518/")
 
 GAIA_SUBDIR = "gaia_catalogs"   # change to "gaia_catalog" if needed
@@ -57,21 +59,21 @@ def is_weight_file(p):
 def main(overwrite=False):
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    # ------------------------------------------------------------
-    # 1. INT Halpha images from OLD_DIR
-    # ------------------------------------------------------------
-    int_ha = sorted([
-        f for f in OLD_DIR.glob("*INT*.fits")
-        if not is_weight_file(f)
-        and (
-            f.name.endswith("-Halpha.fits")
-            or f.name.endswith("-Ha6657.fits")
-        )
-    ])
+    # # ------------------------------------------------------------
+    # # 1. INT Halpha images from OLD_DIR
+    # # ------------------------------------------------------------
+    # int_ha = sorted([
+    #     f for f in OLD_DIR.glob("*INT*.fits")
+    #     if not is_weight_file(f)
+    #     and (
+    #         f.name.endswith("-Halpha.fits")
+    #         or f.name.endswith("-Ha6657.fits")
+    #     )
+    # ])
 
-    print(f"\nCopying {len(int_ha)} old INT Halpha coadds")
-    for f in int_ha:
-        copy_science_with_aux(f, OLD_DIR, OUT_DIR, overwrite=overwrite)
+    # print(f"\nCopying {len(int_ha)} old INT Halpha coadds")
+    # for f in int_ha:
+    #     copy_science_with_aux(f, OLD_DIR, OUT_DIR, overwrite=overwrite)
 
     # ------------------------------------------------------------
     # 2. All BOK coadds from NEW_DIR

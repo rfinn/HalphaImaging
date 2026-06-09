@@ -41,6 +41,8 @@ using:
 * pointing
 
 
+
+In new coadd directory (e.g. `/data-pool/Halpha/coadds-v20260609`):
 Script:
 ```
 python ~/github/HalphaImaging/python3/match_int_oldha_newr.py 
@@ -123,6 +125,10 @@ python ~/github/HalphaImaging/python3/swarp_int_r_to_old_ha.py  --overwrite /dat
 export OMP_NUM_THREADS=1
 parallel --bar -j 1 --joblog swarp_int_hybrid.joblog --results swarp_int_hybrid_logs --colsep ' ' python ~/github/HalphaImaging/python3/swarp_int_r_to_old_ha.py {1} {2} {3} {4} {5} --overwrite :::: reproject_jobs.txt
 ```
+This takes about 10 min.  swarp is already multithreaded, and I've
+    found some contamination/scrambling of images when running it in
+    parallel, so I just do one at a time.
+  
   
 ```
 conda deactivate
@@ -141,17 +147,15 @@ Make a pdf of the halpha and r-band coadds to check that nothing got corrupted:
 python ~/github/HalphaImaging/python3/make_int_hybrid_coadd_qc.py
 ```
 
-### Fix up the swarp header
 
 
-
-## 3. Copy old INT Hα coadds, new BOK, HDI, and MOS coadds into new coadd directory
+## 3. Copy new BOK, HDI, and MOS coadds into new coadd directory
 so the hybrid dataset becomes self-contained.
 
 
 The new coadd directory:
 ```text
-/data-pool/coadds-v20260518/
+/data-pool/coadds-v20260609/
 ```
 
 Script to copy the files:
