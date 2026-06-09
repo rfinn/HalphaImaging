@@ -7,7 +7,7 @@ OLD_DIR = Path("/data-pool/Halpha/coadds-pre2025-hapy/")
 NEW_DIR = Path("/data-pool/Halpha/coadds-v20260330/")
 #OUT_DIR = Path("/data-pool/Halpha/coadds-v20260518/")
 # after realizing that both the halpha and r-band INT coadds need to be reprojected
-OUT_DIR = Path("/data-pool/Halpha/coadds-v20260518/")
+OUT_DIR = Path("/data-pool/Halpha/coadds-v20260609/")
 
 GAIA_SUBDIR = "gaia_catalogs"   # change to "gaia_catalog" if needed
 
