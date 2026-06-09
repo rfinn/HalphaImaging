@@ -151,7 +151,14 @@ why only 118 instead of 119 pairs?
 This runs in serial, so this is a good time to refresh your
 beverage...
 
-
+To review the results:
+```
+(virgo) rfinn@s64247 tables % mkdir coadds-v20260609
+(virgo) rfinn@s64247 tables % cd coadds-v20260609 
+(virgo) rfinn@s64247 coadds-v20260609 % scp draco:/data-pool/Halpha/coadds-v20260609/int_halpha_r_coadd_qc.pdf .
+int_halpha_r_coadd_qc.pdf                                                                                  100% 2498KB   4.9MB/s   00:00    
+(virgo) rfinn@s64247 coadds-v20260609 % open int_halpha_r_coadd_qc.pdf 
+```
 ### [OUTDATED - SKIP THIS] 
 
 On the first few passes, the output names for the low dec fields did not contain a leading 0, e.g the dec was `+2.123` instead of `+02.123`.

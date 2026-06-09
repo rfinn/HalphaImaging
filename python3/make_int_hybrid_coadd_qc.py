@@ -22,8 +22,8 @@ def read_downsample(path, step=8):
     return data[::step, ::step]
 
 
-def show_image(ax, data, title):
-    norm = simple_norm(data, stretch="asinh", percent=99.5)
+def show_image(ax, data, title,percent=99.5):
+    norm = simple_norm(data, stretch="asinh", percent=percent)
     ax.imshow(data, origin="lower", cmap="gray", norm=norm)
     ax.set_title(title, fontsize=7)
     ax.set_xticks([])
@@ -35,9 +35,36 @@ ha_files = sorted(
     list(COADD_DIR.glob("*INT*-Ha6657.fits"))
 )
 
-pairs = [(h, get_r_for_ha(h)) for h in ha_files if get_r_for_ha(h).exists()]
+print(f"Found {len(ha_files)} halpha files")
+
+pairs = []
+missing_r = []
+
+for h in ha_files:
+    rfile = get_r_for_ha(h)
+
+    if rfile.exists():
+        pairs.append((h, rfile))
+    else:
+        missing_r.append(h)
 
 print(f"Found {len(pairs)} INT Halpha/r pairs")
+
+if missing_r:
+    print(f"\nMissing r-band match for {len(missing_r)} Halpha files:")
+    for h in missing_r:
+        print(f"  {h.name}")
+    
+# ha_files = sorted(
+#     list(COADD_DIR.glob("*INT*-Halpha.fits")) +
+#     list(COADD_DIR.glob("*INT*-Ha6657.fits"))
+# )
+
+# print(f"Found {len(ha_files)} halpha files")
+
+# pairs = [(h, get_r_for_ha(h)) for h in ha_files if get_r_for_ha(h).exists()]
+
+# print(f"Found {len(pairs)} INT Halpha/r pairs")
 
 pairs_per_page = 20
 nrows = 10
@@ -70,7 +97,7 @@ with PdfPages(OUTPDF) as pdf:
 
                 root = hfile.name.replace("-Halpha.fits", "").replace("-Ha6657.fits", "")
 
-                show_image(ax_ha, hdata, f"Ha\n{root}")
+                show_image(ax_ha, hdata, f"Ha\n{root}",percent=99.9)
                 show_image(ax_r, rdata, "r")
 
             except Exception as e:
