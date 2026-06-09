@@ -196,6 +196,21 @@ python ~/github/HalphaImaging/python3/uat_add_haimage_to_rheader.py --filestring
 ```
 
 ## 5. Get filter ratio
+Get SE config files:
+
+```
+cp ~/github/halphagui/astromatic/default.* .
+```
+
+
+Test one image:
+
+```
+python ~/github/halphagui/batch_filterratio.py \
+  --plotdir plots-filterratio-INT \
+  --oneimage VF-118.182+20.982-INT-20190205-p001-r.fits
+```
+
 
 Create a list of the r-band INT images:
 ```
@@ -210,6 +225,11 @@ parallel --bar -j 20 \
   --plotdir plots-filterratio-INT \
   --oneimage {} \
   :::: INT_rband_files.txt
+```
+
+And make sure all of the jobs completed ok:
+```
+awk 'NR>1 && $7 != 0' filterratio_INT.joblog
 ```
 
 ## 6. Rebuild INT r-band PSF images
@@ -324,5 +344,5 @@ Phew!
 
 # 8. Move on to running-pipeline.md
 
-hapy/docs/running-pipeline.md
+[hapy/docs/running-pipeline.md](https://github.com/rfinn/hapy/blob/main/docs/running-pipeline.md)
 
