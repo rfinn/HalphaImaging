@@ -206,7 +206,7 @@ Then run `batch_filterratio.py`
 ```
 parallel --bar -j 20 \
   --joblog filterratio_INT.joblog \
-  python ~/github/HalphaImaging/python3/batch_filterratio.py \
+  python ~/github/halphagui/batch_filterratio.py \
   --plotdir plots-filterratio-INT \
   --oneimage {} \
   :::: INT_rband_files.txt
