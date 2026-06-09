@@ -84,6 +84,139 @@ for r in *INT*-r.fits; do [[ -e "$r" ]] || continue; h1="${r/-r.fits/-Halpha.fit
 
 
 ## 2. Reproject new INT r-band images and weights images onto prior INT Hα coadds
+
+```
+python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --s --filestring VF
+
+python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --scamp --filestring VF --instrument i
+
+ls VF-177.200+56.055-INT-20220502-VFID0957-Halpha.fits > VF-Halpha
+ls VF-177.200+56.055-INT-20220502-VFID0957-r.fits >  VF-r
+python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --l VF-Halpha --instrument i
+python ~/github/HalphaImaging/python3/uat_astr_mosaic.py --swarp --l VF-r --refimage VF-Halpha.coadd.fits  --instrument i
+
+sethead HAIMAGE=VF-Halpha.coadd.fits VF-r.coadd.fits
+python ~/github/halphagui/batch_filterratio.py   --plotdir plots-filterratio-INT   --oneimage VF-r.coadd.fits
+
+```
+
+
+Create a list of the r-band INT images:
+```
+ls VF*INT*r.fits > INT_rband_files.txt
+```
+
+Then run `batch_filterratio.py` 
+```
+parallel --bar -j 20 \
+  --joblog filterratio_INT.joblog \
+  python ~/github/halphagui/batch_filterratio.py \
+  --plotdir plots-filterratio-INT \
+  --oneimage {} \
+  :::: INT_rband_files.txt
+```
+
+And make sure all of the jobs completed ok:
+```
+awk 'NR>1 && $7 != 0' filterratio_INT.joblog
+```
+
+## 6. Rebuild INT r-band PSF images
+> [!NOTE]
+> skipping this the second time around - going to use the previous psf
+> images
+
+### If the psf images already exist, you can copy the psf info from the psf images:
+
+```
+python ~/github/hapy/scripts/copy_psf_header_fields.py --newdir /data-pool/Halpha/coadds-v20260518/ --psfdir /data-pool/Halpha/psf-images-v20260518/ --pattern "*INT*r.fits"
+```
+
+### Strategy for assembling new set of psf images
+
+create `/data-pool/psf-images-v20260518/`
+
+Populate it with:
+- All non-INT / non-hybrid PSFs copied from:
+`/data-pool/psf-images/`
+- Old INT Hα PSFs copied from:
+`/data-pool/psf-images-pre2025/`
+- New INT r-band PSFs generated for the reprojected INT r coadds.
+
+Also copy matching diagnostic plots into:
+
+`/data-pool/psf-images-v20260518/plots/`
+
+This keeps provenance clean and avoids contaminating the existing PSF directory.
+
+Rationale:
+- /data-pool/psf-images/ remains the current/new-coadd PSF set.
+- /data-pool/psf-images-pre2025/ remains the old PSF set.
+- /data-pool/psf-images-v20260518/ becomes the hybrid production PSF set.
+- run_analysis --psf-dir /data-pool/psf-images-v20260518/ is unambiguous.
+
+
+
+### Building new psf images 
+
+
+```
+/data-pool/Halpha/psf-images-v20260518
+```
+
+Create an input file list:
+```
+find /data-pool/Halpha/coadds-v20260518 -maxdepth 1 -type f -name "*-INT-*-r.fits" | sort > int_hybrid_r_images.txt
+```
+```
+cp /data-pool/github/hapy/hapy/astromatic/default.param .
+cp /data-pool/github/hapy/hapy/astromatic/default.conv .
+cp /data-pool/github/hapy/hapy/astromatic/default.nnw .
+```
+
+Test one:
+```
+python -m hapy.imagetools.buildpsf --image /data-pool/Halpha/coadds-v20260518/VF-256.898+60.794-INT-20190603-p010-r.fits --int --overwrite
+```
+
+
+Then build psfs in parallel:
+```
+parallel --bar -j 16 --joblog buildpsf_int_hybrid_r.joblog --results buildpsf_int_hybrid_r_logs python -m hapy.imagetools.buildpsf --image {} --int --overwrite :::: int_hybrid_r_images.txt
+```
+
+Rerunning on old INT halpha, just to be on the safe side
+```
+find /data-pool/Halpha/coadds-v20260518 -maxdepth 1 -type f -name "*-INT-*-Halpha.fits" | sort > int_hybrid_Halpha_images.txt
+```
+
+```
+find /data-pool/Halpha/coadds-v20260518 -maxdepth 1 -type f -name "*-INT-*-Ha6657.fits" | sort >> int_hybrid_Halpha_images.txt
+```
+
+```
+parallel --bar -j 16 --joblog buildpsf_int_hybrid_Halpha.joblog --results buildpsf_int_hybrid_Halpha_logs python -m hapy.imagetools.buildpsf --image {} --int --overwrite :::: int_hybrid_Halpha_images.txt
+```
+
+
+and for all coadds while I'm at it...
+
+```
+ find /data-pool/Halpha/coadds-v20260518 -maxdepth 1 -type f -name "*-BOK-*-r.fits" | sort > non_int_hybrid_images.txt
+ find /data-pool/Halpha/coadds-v20260518 -maxdepth 1 -type f -name "*-BOK-*-Ha4.fits" | sort >> non_int_hybrid_images.txt
+ find /data-pool/Halpha/coadds-v20260518 -maxdepth 1 -type f -name "*-HDI-*-r.fits" | sort >> non_int_hybrid_images.txt
+ find /data-pool/Halpha/coadds-v20260518 -maxdepth 1 -type f -name "*-HDI-*-R.fits" | sort >> non_int_hybrid_images.txt
+ find /data-pool/Halpha/coadds-v20260518 -maxdepth 1 -type f -name "*-MOS-*-R.fits" | sort >> non_int_hybrid_images.txt
+ find /data-pool/Halpha/coadds-v20260518 -maxdepth 1 -type f -name "*-MOS-*-ha4.fits" | sort >> non_int_hybrid_images.txt
+ find /data-pool/Halpha/coadds-v20260518 -maxdepth 1 -type f -name "*-HDI-*-ha4.fits" | sort >> non_int_hybrid_images.txt
+```
+
+
+```
+parallel --bar -j 16 --joblog buildpsf_non_int_hybrid.joblog --results buildpsf_non_int_hybrid_logs python -m hapy.imagetools.buildpsf --image {} --int --overwrite :::: non_int_hybrid_images.txt
+```
+
+# 8. Copy
 For each hybrid INT field:
 
 - source science image:
