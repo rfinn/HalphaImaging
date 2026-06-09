@@ -22,17 +22,17 @@ def copy_file(src, dst, overwrite=False):
     print(f"copying: {src} -> {dst}")
     shutil.copy2(src, dst)
 
-
-def copy_associated_files(src, src_dir, out_dir, overwrite=False):
+def copy_associated_files(src, src_dir, out_dir, overwrite=False, copy_weight=True):
     """
     Copy weight, pan_tab CSVs, and Gaia catalogs associated with src.
     """
     stem = src.name.replace(".fits", "")
 
     # weight file
-    weight = src.with_name(stem + ".weight.fits")
-    if weight.exists():
-        copy_file(weight, out_dir / weight.name, overwrite=overwrite)
+    if copy_weight:
+        weight = src.with_name(stem + ".weight.fits")
+        if weight.exists():
+            copy_file(weight, out_dir / weight.name, overwrite=overwrite)
 
     # matching pan_tab files in coadd dir
     for p in src_dir.glob(f"{stem}*pan_tab.csv"):
@@ -45,6 +45,7 @@ def copy_associated_files(src, src_dir, out_dir, overwrite=False):
             out_gaia_dir = out_dir / gaia_name
             for g in gaia_dir.glob(f"{stem}*"):
                 copy_file(g, out_gaia_dir / g.name, overwrite=overwrite)
+
 
 
 def copy_science_with_aux(src, src_dir, out_dir, overwrite=False):
@@ -74,7 +75,7 @@ def main(overwrite=False):
     print(f"\nCopying {len(int_ha)} old INT Halpha coadds")
     for f in int_ha:
         #copy_science_with_aux(f, OLD_DIR, OUT_DIR, overwrite=overwrite)
-        copy_associated_files(f, OLD_DIR, OUT_DIR, overwrite=overwrite)
+        copy_associated_files(f, OLD_DIR, OUT_DIR, overwrite=overwrite, copy_weight=False)
 
     # ------------------------------------------------------------
     # 2. All BOK coadds from NEW_DIR
